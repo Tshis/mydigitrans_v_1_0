@@ -1,0 +1,212 @@
+@use'../abstract/variables' as *;
+
+form{
+
+    span.help.has-error{
+        display: block;
+        color: $danger;
+        margin: .5rem 0;
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+    
+        &::before{
+            content: 'Error';
+            margin: 3px;
+            background: $danger;
+            color: $white;
+            padding: .1rem .5rem ;
+            border-radius: .3rem;
+            text-transform: uppercase;
+            font-size: 1rem;
+            font-weight: 600;            
+        }
+    }//span.help &.has.error
+    
+    input:not([type=checkbox]),
+    select,
+    textarea{
+        //border: .11rem solid $dark;
+        border: 1px solid rgba($color: $dark, $alpha: .35);
+        border-radius: .5rem;
+        padding: 1rem;
+        color: $dark;
+        background: inherit ;
+        font-size: 1.4rem;
+        font-weight: 500;
+        transition: .3s;
+    
+        &.w-full{
+            width: 100%;
+        }
+    
+        &:focus{
+            border-width: .16rem;
+        }    
+    
+        &.has-error{
+            border-color: $danger;
+        }
+    
+    }/*input:not([type=checkbox]),select,textarea*/
+    
+    textarea{
+        padding: 1rem;
+        resize: none;
+        height: 100px;
+    }//text-area
+    
+     label{
+        display: block;
+        padding: 0 1rem;
+        color: $dark;
+    }//label
+    
+    &.disabled{
+        input,
+        textarea,
+        select{
+            opacity: .35;
+            cursor: not-allowed;
+        }
+    
+    }//disabled
+    
+    .field{
+        position: relative;
+        background-color: inherit;   
+    
+        input:not([type=checkbox]),
+        select{
+            height: 4rem;
+            width: 100%;
+        }
+    
+        textarea{
+            width: 100%;
+        }
+    
+    
+        &.disabled{
+            input,
+            textarea,
+            select{
+                opacity: .35;
+                cursor: not-allowed;
+            }
+    
+        }//disabled
+    
+        
+    }//field
+    
+    .field-group{
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(20rem,1fr));
+        gap: 2rem;
+        background-color: inherit;
+    }
+
+    .h-4{height: 4rem;}
+    
+    
+    .required-mark{
+        margin-left: 1rem;
+        color: $primary;
+        font-weight: 600;
+    }//required-mark
+    
+    .field-button-right{
+        display: flex;
+        justify-content: end;
+    }//field-button-right
+    
+    .field-button-left{
+        display: flex;
+        justify-content: start;
+    }//field-button-left
+    
+    .field-button-center{
+        display: flex;
+        justify-content: center;
+    }//field-button-center
+    
+    //les boutton
+    .btn{
+        display: inline-block;
+        transition: .3s;
+        opacity: .90;
+    
+        &:hover{
+            cursor: pointer;
+            transform: translateY(-3px); box-shadow: 0 10px 26px rgba($dark,0.22);
+        }
+    
+        &.btn-primary{
+            background: $primary;
+            border: 1px solid $primary;
+            border-radius: 8px;
+            transition: all .3s;
+    
+            &:hover{
+                background: transparent;
+                color: $primary;
+            }
+        }//btn-primary
+    
+        &.btn-danger{
+            background: $danger;
+            border: 1px solid $danger;
+            border-radius: 8px;
+            transition: all .3s;
+    
+            &:hover{
+                background: transparent;
+                color: $danger;
+            }
+        }//btn-danger
+    }//btn
+
+    fieldset{
+        border: 1px solid rgba($color: $dark, $alpha: .65);
+        border-radius: .5rem;
+        padding: 1rem;
+        color: $dark;
+        margin-bottom: 3.5rem;
+
+        legend{
+            font-weight: 700;
+            font-size: 2.4rem;
+            letter-spacing: .5px;
+            margin-bottom: 2rem;
+
+        }//legend
+
+    }//fieldset
+
+}//form
+
+/* CONTAINER */
+.form-container {
+
+    display: flex;
+    justify-content: center;
+    padding-block: 80px;
+
+    .form-card{
+        background: $white;
+        width: 100%;
+        max-width: 600px;
+        padding: 35px;
+        border-radius: 14px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+
+        h3 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: $success;
+        }//h3
+
+    }//form-card
+
+}//form-container

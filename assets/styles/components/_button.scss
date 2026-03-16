@@ -1,0 +1,58 @@
+@use '../abstract/variables' as *;
+
+
+/* BUTTONS */
+.btn-primary {
+    background: $primary;
+    color: $white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .3s;
+    text-align: center;
+
+    &:hover{
+        border: 1px solid $primary;
+        background: transparent !important;
+        color: $primary;
+    }//hover
+
+    &.btn-full{
+        width: 100%;
+    }//btn-full
+
+}//btn-primary
+            
+
+.btn-secondary {
+    background: $success;
+    color: $white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .3s;
+    text-align: center;
+
+    &:hover{
+        border: 1px solid $success;
+        background: transparent !important;
+        color: $success;
+    }//hover
+
+    &.btn-full{
+        width: 100%;
+    }//btn-full
+
+}//btn-secondary
+
+
+.btn-disabled {
+    background: rgba($color: $gray, $alpha: .225);
+    color: $gray;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: not-allowed;
+}//btn-disabled

@@ -1,0 +1,72 @@
+@use'../abstract/variables' as *;
+
+$colors : (
+  'primary' : $primary,
+  'danger' : $danger,
+  'success' : $success,
+  'dark' : $dark,
+  'white' : $white,
+  'mute' : $mute,
+  'black' : $black,
+  'gray' : $gray,
+);
+
+@each $key, $value in $colors {
+  
+    .alert-#{$key}
+    {
+      background-color: rgba($color: $value, $alpha: .25);
+      border-color: $value !important;
+      color: $value !important;
+    }
+
+    .card-#{$key}{
+      background-color: rgba($color: $value, $alpha: .25);
+      border-color: $value !important;
+    }
+
+    .bg-#{$key} {
+      background-color: $value !important;
+    }
+
+    .text-#{$key} {
+      color: $value !important;
+    }
+
+    .border-#{$key} {
+      border-color: $value !important;
+    }
+
+    .border-top-#{$key} {
+      border-top-color: $value !important;
+    }
+
+    .border-bottom-#{$key} {
+      border-bottom-color: $value !important;
+    }
+
+    .border-left-#{$key} {
+      border-left-color: $value !important;
+    }
+
+    .border-right-#{$key} {
+        border-right-color: $value !important;
+    }
+
+    .btn-#{$key} {
+      background-color: $value !important;
+      border-color: $value !important;
+    }
+
+    .btn-#{$key}-inverted {
+      background-color: transparent;
+      border-color: $value !important;
+    }
+
+    .badge-#{$key} {
+      background-color: $value !important;
+      border-color: $value !important;
+    }
+
+     
+}

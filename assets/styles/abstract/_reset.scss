@@ -1,0 +1,135 @@
+@use '../abstract/variables' as *;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+
+
+/*
+  1. Use a more-intuitive box-sizing model.
+*/
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  /*
+  2. Remove default margin
+  */
+  * {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    text-decoration: 0;
+    scroll-behavior: smooth;
+    font-family: "DM sans", "inter","poppins", "montserrat","roboto", sans-serif;
+    outline: none;
+    outline-color: transparent;
+  }
+
+  /*
+    3. Allow percentage-based heights in the application and base font size root 10px (62.5%)
+  */
+  html{
+    body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        font-size: 1.6rem;
+
+        display: flex;
+        flex-direction: column;        
+    }
+    font-size: 62.5%; //pour 10px lorsque la font-size de base est 16px
+  }
+
+/* width */
+html::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: .5rem;
+  cursor: pointer !important;
+} 
+
+/* Handle */
+html::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: $primary;
+  border-radius: 1rem;
+  cursor: pointer !important;
+}
+
+  /*
+    Typographic tweaks!
+    4. Add accessible line-height
+    5. Improve text rendering
+  */
+  body {
+    line-height: 1.2;
+    -webkit-font-smoothing: antialiased;
+  }
+
+
+  /*
+    6. Improve media defaults
+  */
+  img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+  }
+
+
+
+
+  /*
+    7. Remove built-in form typography styles
+  */
+  input, button, textarea, select {
+    font: inherit;
+    border: none;
+  }
+
+
+  /*
+    8. Avoid text overflows
+  */
+  p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+  }
+
+  /**
+   9. reset ul, li and a tags
+  */
+  ul li{
+    list-style: none;
+  }
+
+  a{
+    text-decoration: none !important;
+    color: $dark;
+    cursor: pointer !important;
+  }
+
+
+blockquote {
+    font-style: italic;
+    font-family: Georgia, Times, "Times New Roman", serif;
+    padding: 2px 0;
+    border-style: solid;
+    border-color: #ccc;
+    border-width: 0;
+    padding-left: 20px;
+    padding-right: 8px;
+    border-left-width: 5px;
+}
+
+blockquote {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 40px;
+    margin-inline-end: 40px;
+}
+
+.marker{
+  background-color: yellow;
+}

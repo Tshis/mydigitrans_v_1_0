@@ -1,0 +1,52 @@
+@use '../abstract/variables' as *;
+
+body{
+    min-height: 100vh;
+    min-height: 100vdh;
+    display: flex;
+    flex-direction: column;
+
+    /**pour laisser la place au navbar fixed*/
+    padding-top: 0;
+
+    background: rgba($color: $mute, $alpha: .15);
+    color: $dark;
+
+    .page-footer-content{
+        margin-top: auto;
+    }
+
+}//body
+
+.container{
+    padding-left: 8%;
+    padding-right: 8%;
+}//container
+
+.container-bold{
+    padding-left: 20%;
+    padding-right: 20%;
+}//container-bold
+
+.alert{
+    padding: 2rem;
+    border-radius: 8px;
+}//alert
+
+ /*Page HEADER - home layouts hero */
+.page-header {
+    padding-block: 4rem;
+    background: $success;
+    color: $white;
+
+    p {
+        margin-top: 5px;
+        opacity: 0.9;
+    }//p
+
+}//page-header
+
+
+
+
+

@@ -1,0 +1,46 @@
+$alignments : 
+(
+    "center" : center,
+    "right" : right,
+    "justify" : justify,
+    "left" : left,
+);
+
+$fontWeight:(
+    'nomral' : normal,
+    'lighter' : lighter,
+    'bolder' : bolder,
+    'semi-bold' : semi-bold,
+    'bold' : bold,
+);
+
+//text-alignment
+@each $key,$value in $alignments{
+    .text-#{$key}{
+        text-align: $value !important;
+    }
+}
+
+//text-size (font-size)
+@for $i from 1 through 40{
+    .text-size-#{$i}{
+        font-size: #{$i * .1rem} !important;
+    }
+}
+
+//font-weight
+@each $key,$value in $fontWeight{
+    .text-weight-#{$key}{
+        font-weight: $value !important;
+    }
+}
+
+//font weight from 100 to 900
+$i: 100;
+@while $i < 1000 {
+  // do stuff
+  $i: $i + 100;
+  .text-weight-#{$i}{
+    font-weight: $i !important;
+  }
+}
