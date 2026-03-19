@@ -1,0 +1,43 @@
+<header
+	class="navbar container">
+
+	<!-- TOPBAR MENU -->
+	<div
+		class="navbar-container">
+
+		<!-- LOGO -->
+		<a class="nav-logo">
+			<img src="/img-core/logo.png" alt="My DigiTrans">
+		</a>
+
+		<!-- MENU -->
+		<nav class="nav-menu">
+			{% include "public/partials/_menu.html.twig" %}
+		</nav>
+
+		<!-- ACTIONS -->
+		<div class="nav-actions">
+			{% include "public/partials/_nav-actions.html.twig" %}
+		</div>
+
+		<!-- TOGGLE MOBILE -->
+		<div class="nav-toggle">
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+		<!--nav-toggle-->
+
+		<!-- MENU MOBILE -->
+		<div class="mobile-menu" id="mobileMenu">
+			{% include "public/partials/_menu.html.twig" %}
+
+			<div class="mobile-menu-actions">
+				{% include "public/partials/_nav-actions.html.twig" %}
+			</div>
+		</div>
+		<!--mobile-menu-->
+	</div>
+	<!--navbar-container-->
+
+</header>

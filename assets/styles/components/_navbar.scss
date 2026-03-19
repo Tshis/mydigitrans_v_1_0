@@ -1,32 +1,68 @@
 @use '../abstract/variables' as *;
 
-.header {
+.navbar {
+    width: 100%;
     background: $white;
-    border-bottom: 1px solid $mute;
+    height: 64px;
+    overflow: hidden;
+    padding: 1rem 0;
     
-    .navbar {
-        margin: auto;
-        padding: 1rem 1.5rem;
+    .navbar-container {
         display: grid;
-        grid-template-columns: 1fr 1.5fr 1fr;
+        grid-template-columns: 1fr 2fr 1fr;
         align-items: center;
-        gap: 1rem;
+        height: 100% !important;
+      
 
-        .nav-left{
-            .brand {
-                display: block;
-                width: 180px;
-                img{transition: all .3s;}
-                &:hover{
-                    img{
-                        transform: scale(1.1);
-                    }
+        .nav-logo{
+            display: flex;
+            align-items: center;
+            
+            img{
+                max-width: 170px;
+                transition: all .3s;
+            }
+            &:hover{
+                img{
+                    transform: scale(1.05);
                 }
-            }//brand
-        }//nav-left
+            }
+        }//nav-logo
 
 
-        .mobile{
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            z-index: 9999;
+            
+            a {
+                    color: $dark;
+                    text-decoration: none;
+                    font-weight: 500;
+                    transition: .3s ease-in-out;
+                    &:hover {
+                        color: $primary;
+                    }
+
+                    &.active{
+                        color: rgba($color: $primary, $alpha: .75);
+                    }
+            }//a  
+        }//nav-menu
+
+        .nav-actions{
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1rem;
+            text-decoration: none;
+            color: $dark;
+            
+        }//nav-actions
+
+        
+        .nav-toggle{
             display: none;
             width: max-content;
             position: relative;
@@ -66,40 +102,14 @@
 
             }//&.active
 
-        }//mobile
-        
+        }//nav-toggle
 
-        .nav-center {
-          display: flex;
-          justify-content: center;
-          gap: 1.5rem;
-          z-index: 9999;
-          
-          a {
-                color: $dark;
-                text-decoration: none;
-                font-weight: 500;
-                transition: .3s ease-in-out;
-                &:hover {
-                    color: $primary;
-                }
 
-                &.active{
-                    color: $mute;
-                }
-          }//a  
-        
-        }//nav-center
+        .mobile-menu{
+            display: none !important;
+        }//mobile-menu        
 
-        .nav-right{
-            text-align: right;
-            margin-right: 15px;
-            text-decoration: none;
-            color: $dark;
-            
-        }//nav-right
-
-    }//navbar
+    }//navbar-container
 
     
     .overlay-transparent{
@@ -118,17 +128,41 @@
 
     }// .overlay-transparent
 
-}//app-header
+}//navbar
 
-/* Mobile */
+/* Responsive */
+@media (max-width: 1157px) {
+    .navbar {
+        .navbar-container {
+            grid-template-columns: 1fr 2fr 1.25fr !important;
+        }//navbar-container
+    }//navbar
+}//max-width:1157px
+
+@media (max-width: 995px) {
+    .navbar {
+        .navbar-container {
+            grid-template-columns: 1fr 2fr 1.5fr !important;
+        }//navbar-container
+    }//navbar
+}//max-width:900px
+
 @media (max-width: 900px) {
     .navbar {
-        grid-template-columns: auto auto !important;
 
-        .mobile{
+         .navbar-container {
+            grid-template-columns:  auto auto !important;
+            .nav-menu,
+            .nav-actions{
+                display: none !important;
+            }
+        }//navbar-container
+        
+
+        .nav-toggle{
             display: flex !important;
             margin-left: auto;
-        }//mobile
+        }//nav-toggle
 
         .nav-center {
             display: flex;

@@ -1,239 +1,224 @@
-{% extends "base.html.twig" %}
+{% extends "public/base.html.twig" %}
 
 
 {% block body %}
 
-	<!DOCTYPE html>
-	<html lang="fr">
-		<head>
-			<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>Mydigitrans - Plateforme de transport</title>
 
-			<link rel="stylesheet" href="style.css">
+	<section class="hero">
 
-		</head>
+		<div class="container hero-grid">
 
-		<body>
+			<div class="hero-text">
 
-			<header>
-				<nav class="container nav">
+				<h1>La plateforme digitale du transport</h1>
 
-					<div class="logo">MYDIGITRANS</div>
+				<p>
+					Réservez vos trajets, gérez votre agence et développez votre réseau avec MyDigitrans.
+				</p>
 
-					<ul class="menu">
-						<li>
-							<a href="#">Accueil</a>
-						</li>
-						<li>
-							<a href="#">Trajets</a>
-						</li>
-						<li>
-							<a href="#">Comment ça marche</a>
-						</li>
-						<li>
-							<a href="#">Business</a>
-						</li>
-						<li>
-							<a href="#">Contact</a>
-						</li>
-					</ul>
+				<div class="hero-actions">
 
-					<div class="nav-actions">
-						<a class="login">Connexion</a>
-						<a class="cta">Créer une agence</a>
-					</div>
+					<button class="btn-primary">Rechercher un trajet</button>
 
-				</nav>
-			</header>
-
-
-			<section class="hero">
-
-				<div class="container hero-content">
-
-					<h1>La plateforme digitale du transport</h1>
-
-					<p>
-						Réservez vos trajets, gérez votre agence de transport et développez votre réseau avec Mydigitrans.
-					</p>
-
-					<div class="hero-buttons">
-						<button class="btn-primary">Rechercher un trajet</button>
-						<button class="btn-secondary">Créer une agence</button>
-					</div>
+					<button class="btn-outline">Créer une agence</button>
 
 				</div>
 
-			</section>
+			</div>
 
 
-			<section class="search">
+			<div class="hero-image">
 
-				<div class="container">
+				<div class="hero-card">
 
-					<form class="search-box">
+					<h3>Recherche rapide</h3>
 
-						<input type="text" placeholder="Ville de départ">
+					<input placeholder="Ville de départ">
 
-						<input type="text" placeholder="Destination">
+					<input placeholder="Destination">
 
-						<input type="date">
+					<input type="date">
 
-						<button>Rechercher</button>
-
-					</form>
+					<button>Rechercher</button>
 
 				</div>
 
-			</section>
+			</div>
+
+		</div>
+
+	</section>
 
 
-			<section class="features">
+	<section class="features">
 
-				<div class="container">
+		<div class="container">
 
-					<h2>Pourquoi choisir Mydigitrans</h2>
+			<h2>Pourquoi choisir MyDigitrans</h2>
 
-					<div class="features-grid">
+			<div class="features-grid">
 
-						<div class="feature">
-							<h3>Réservation rapide</h3>
-							<p>Trouvez et réservez vos trajets facilement.</p>
-						</div>
+				<div class="card">
 
-						<div class="feature">
-							<h3>Gestion des colis</h3>
-							<p>Envoyez et suivez vos colis en toute simplicité.</p>
-						</div>
+					<h3>🚍 Réservation rapide</h3>
 
-						<div class="feature">
-							<h3>Gestion d'agence</h3>
-							<p>Solution complète pour les agences de transport.</p>
-						</div>
-
-						<div class="feature">
-							<h3>Business rentable</h3>
-							<p>Gagnez des commissions avec notre réseau.</p>
-						</div>
-
-					</div>
+					<p>Trouvez facilement les trajets disponibles.</p>
 
 				</div>
 
-			</section>
 
+				<div class="card">
 
-			<section class="how">
+					<h3>📦 Gestion colis</h3>
 
-				<div class="container">
-
-					<h2>Comment ça marche</h2>
-
-					<div class="steps">
-
-						<div class="step">
-							<h3>1. Recherchez</h3>
-							<p>Choisissez votre trajet et votre date.</p>
-						</div>
-
-						<div class="step">
-							<h3>2. Réservez</h3>
-							<p>Sélectionnez votre siège et confirmez.</p>
-						</div>
-
-						<div class="step">
-							<h3>3. Voyagez</h3>
-							<p>Présentez votre billet et profitez du voyage.</p>
-						</div>
-
-					</div>
+					<p>Envoyez et suivez vos colis facilement.</p>
 
 				</div>
 
-			</section>
 
+				<div class="card">
 
-			<section class="agency">
+					<h3>🏢 Gestion d'agence</h3>
 
-				<div class="container agency-content">
-
-					<h2>Une solution pour les agences</h2>
-
-					<p>
-						Digitalisez la gestion de votre agence de transport avec Mydigitrans.
-					</p>
-
-					<button class="btn-primary">Créer mon agence</button>
+					<p>Outil complet pour gérer vos bus et trajets.</p>
 
 				</div>
 
-			</section>
 
+				<div class="card">
 
-			<section class="business">
+					<h3>💰 Business</h3>
 
-				<div class="container">
-
-					<h2>Gagnez de l'argent avec Mydigitrans</h2>
-
-					<p>
-						Devenez apporteur d'affaires et recevez des commissions sur chaque vente.
-					</p>
-
-					<button class="btn-secondary">Devenir partenaire</button>
+					<p>Gagnez des commissions avec notre réseau.</p>
 
 				</div>
 
-			</section>
+			</div>
+
+		</div>
+
+	</section>
 
 
-			<footer>
+	<section class="how">
 
-				<div class="container footer">
+		<div class="container">
 
-					<div>
+			<h2>Comment ça marche</h2>
 
-						<h3>Mydigitrans</h3>
+			<div class="steps">
 
-						<ul>
-							<li>Accueil</li>
-							<li>Trajets</li>
-							<li>Business</li>
-							<li>Contact</li>
-						</ul>
+				<div class="step">
 
-					</div>
+					<h3>1</h3>
 
-					<div>
-
-						<h3>Agences</h3>
-
-						<ul>
-							<li>Créer une agence</li>
-							<li>Fonctionnalités</li>
-							<li>Tarifs</li>
-						</ul>
-
-					</div>
-
-					<div>
-
-						<h3>Support</h3>
-
-						<ul>
-							<li>Contact</li>
-							<li>Assistance</li>
-						</ul>
-
-					</div>
+					<p>Recherchez votre trajet</p>
 
 				</div>
 
-			</footer>
+				<div class="step">
+
+					<h3>2</h3>
+
+					<p>Choisissez votre siège</p>
+
+				</div>
+
+				<div class="step">
+
+					<h3>3</h3>
+
+					<p>Réservez et voyagez</p>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</section>
 
 
-		</body>
-	</html>
+	<section class="agency">
+
+		<div class="container agency-box">
+
+			<h2>Une solution pour les agences de transport</h2>
+
+			<p>
+
+				Gérez vos bus, trajets, ventes et statistiques sur une seule plateforme.
+
+			</p>
+
+			<button class="btn-primary">Créer mon agence</button>
+
+		</div>
+
+	</section>
+
+
+	<section class="business">
+
+		<div class="container business-content">
+
+			<h2>Gagnez de l'argent avec MyDigitrans</h2>
+
+			<p>
+
+				Devenez apporteur d'affaires et recevez des commissions.
+
+			</p>
+
+			<button class="btn-outline">Devenir partenaire</button>
+
+		</div>
+
+	</section>
+
+
+	<footer>
+
+		<div class="container footer">
+
+			<div>
+
+				<h3>Mydigitrans</h3>
+
+				<p>La plateforme digitale du transport.</p>
+
+			</div>
+
+			<div>
+
+				<h4>Navigation</h4>
+
+				<ul>
+
+					<li>Accueil</li>
+					<li>Trajets</li>
+					<li>Business</li>
+
+				</ul>
+
+			</div>
+
+			<div>
+
+				<h4>Contact</h4>
+
+				<ul>
+
+					<li>Email</li>
+					<li>WhatsApp</li>
+
+				</ul>
+
+			</div>
+
+		</div>
+
+	</footer>
+
 
 {% endblock %}

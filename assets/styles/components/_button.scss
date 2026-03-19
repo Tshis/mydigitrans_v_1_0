@@ -23,6 +23,28 @@
     }//btn-full
 
 }//btn-primary
+
+.btn-primary-outline {
+    background: transparent;
+    color: $primary;
+    border: 1px solid $primary;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .3s;
+    text-align: center;
+
+    &:hover{
+        border: 1px solid $primary;
+        background: $primary !important;
+        color: $white;
+    }//hover
+
+    &.btn-full{
+        width: 100%;
+    }//btn-full
+
+}//btn-primary-outline
             
 
 .btn-secondary {
