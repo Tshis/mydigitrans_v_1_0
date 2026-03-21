@@ -1,0 +1,1 @@
+let navToggle=document.querySelector(".nav-toggle"),overlayDark=document.querySelector(".overlay-dark");function toggleMenu(){navToggle.classList.toggle("active"),mobileMenu.classList.toggle("active"),overlayDark.classList.toggle("active")}navToggle.addEventListener("click",toggleMenu),overlayDark.addEventListener("click",toggleMenu);

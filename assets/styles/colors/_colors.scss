@@ -56,11 +56,25 @@ $colors : (
     .btn-#{$key} {
       background-color: $value !important;
       border-color: $value !important;
+      color: $white;
+
+      &:hover{
+        border: 1px solid $value;
+        background: transparent !important;
+        color: $value;
+      }//hover 
     }
 
-    .btn-#{$key}-inverted {
+    .btn-#{$key}-outline {
       background-color: transparent;
       border-color: $value !important;
+      border: 1px solid $value !important;
+
+      &:hover{
+        border: 1px solid $value;
+        background: transparent !important;
+        color: $value;
+      }//hover
     }
 
     .badge-#{$key} {

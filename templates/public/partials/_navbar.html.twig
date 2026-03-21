@@ -1,9 +1,7 @@
-<header
-	class="navbar container">
+<header class="navbar container">
 
 	<!-- TOPBAR MENU -->
-	<div
-		class="navbar-container">
+	<div class="navbar-container">
 
 		<!-- LOGO -->
 		<a class="nav-logo">
@@ -27,17 +25,19 @@
 			<span></span>
 		</div>
 		<!--nav-toggle-->
-
-		<!-- MENU MOBILE -->
-		<div class="mobile-menu" id="mobileMenu">
-			{% include "public/partials/_menu.html.twig" %}
-
-			<div class="mobile-menu-actions">
-				{% include "public/partials/_nav-actions.html.twig" %}
-			</div>
-		</div>
-		<!--mobile-menu-->
 	</div>
 	<!--navbar-container-->
 
+	<!-- MENU MOBILE -->
+	<div class="mobile-menu" id="mobileMenu">
+
+		{% include "public/partials/_menu.html.twig" %}
+
+		<div class="mobile-menu-actions">
+			{% include "public/partials/_nav-actions.html.twig" %}
+		</div>
+	</div>
+	<!--mobile-menu-->
+
+	<div class="overlay-dark"></div>
 </header>

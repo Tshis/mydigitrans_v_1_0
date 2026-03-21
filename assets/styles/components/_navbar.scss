@@ -4,8 +4,8 @@
     width: 100%;
     background: $white;
     height: 64px;
-    overflow: hidden;
     padding: 1rem 0;
+    z-index: 9999;
     
     .navbar-container {
         display: grid;
@@ -34,21 +34,7 @@
             display: flex;
             justify-content: center;
             gap: 1.5rem;
-            z-index: 9999;
-            
-            a {
-                    color: $dark;
-                    text-decoration: none;
-                    font-weight: 500;
-                    transition: .3s ease-in-out;
-                    &:hover {
-                        color: $primary;
-                    }
-
-                    &.active{
-                        color: rgba($color: $primary, $alpha: .75);
-                    }
-            }//a  
+            z-index: 9999; 
         }//nav-menu
 
         .nav-actions{
@@ -58,6 +44,7 @@
             gap: 1rem;
             text-decoration: none;
             color: $dark;
+            font-size: 1.3rem;
             
         }//nav-actions
 
@@ -67,7 +54,7 @@
             width: max-content;
             position: relative;
             flex-direction: column;
-            gap: .25rem;
+            gap: .45rem;
             transition: all .3s;            
 
             &:hover{
@@ -76,57 +63,67 @@
 
             span{
                 display: block;
-                height: 2.25px;
-                width: 25px;
+                height: 2.725px;
+                width: 35px;
                 background: $primary;
+                transition: all .3s;
             }//span
 
             &.active{
-                padding-right: 8%;
+                padding-top: 8%;
+                transform: rotate(450deg);
+                gap: .75rem;
                 span{
-                    position: absolute;
-
-                    &:nth-child(1){
-                        transform: rotate(45deg);
-                    }
-
-                    &:nth-child(2){
-                        display: none;
-                    }
-
-                    &:nth-child(3){
-                        transform: rotate(-45deg);
-                    }
-
-                }//span
-
+                    width: 25px;
+                }
             }//&.active
 
         }//nav-toggle
-
-
-        .mobile-menu{
-            display: none !important;
-        }//mobile-menu        
-
+        
     }//navbar-container
 
+    a.menu-link{
+        color: $dark;
+        text-decoration: none;
+        font-weight: 500;
+        transition: .3s ease-in-out;
+        &:hover {
+            color: $primary;
+        }
+
+        &.active{
+            color: rgba($color: $primary, $alpha: .65);
+        }
+    }//a  
     
-    .overlay-transparent{
+    .mobile-menu{
+        display: none !important;
+        transition: all .3s;
+        
+        a.menu-link{
+            padding-bottom: .25rem;
+            border-bottom: 1px solid rgba($color: $dark, $alpha: .250);
+        }
+           
+
+    }//mobile-menu        
+    
+    .overlay-dark{
         position: fixed;
-        background-color: transparent;
-        top: 77.5px;
+        background-color: rgba($color: $dark, $alpha: .65);
+        top: 65px;
         left: 0;
         right: 0;
         bottom: 0;
         display: none;
         z-index: 8888;
+        transition: all .3s;
         
         &.active{
             display: block;
         }
 
-    }// .overlay-transparent
+    }// .overlay-dark
 
 }//navbar
 
@@ -147,10 +144,10 @@
     }//navbar
 }//max-width:900px
 
-@media (max-width: 900px) {
+@media (max-width: 920px) {
     .navbar {
 
-         .navbar-container {
+        .navbar-container {
             grid-template-columns:  auto auto !important;
             .nav-menu,
             .nav-actions{
@@ -158,7 +155,6 @@
             }
         }//navbar-container
         
-
         .nav-toggle{
             display: flex !important;
             margin-left: auto;
@@ -186,6 +182,38 @@
         .nav-right{
             display: none;
         }//nav-right
+
+        .mobile-menu{
+
+            position: fixed;
+            top: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: $white;
+            display: flex !important;
+            flex-direction: column;
+            padding: 2rem;
+            gap: 2rem;
+            justify-content: center;
+            border: 1px solid rgba($color: $success, $alpha: .65);
+            border-bottom-right-radius: 8px;
+            border-bottom-left-radius: 8px;
+            font-weight: 500;
+            z-index: 9999;
+
+            &.active{
+                 top: 65px;
+            }
+
+            .mobile-menu-actions{
+                display: flex;
+                justify-content: center;
+                gap: 1rem;
+                //flex-wrap: wrap;
+                font-size: 1.515rem;
+            }//mobile-menu-actions
+
+        }//mobile-menu
 
     }//navbar
 
