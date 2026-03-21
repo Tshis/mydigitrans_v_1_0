@@ -7,6 +7,9 @@
     cursor: pointer;
     transition: all .3s;
     text-align: center;
+    display: flex;
+    align-items: center;     /* centre verticalement */
+    justify-content: center; /* centre horizontalement */
 
     &.btn-full{
         width: 100%;

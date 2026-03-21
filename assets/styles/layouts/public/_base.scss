@@ -33,10 +33,10 @@ body{
     border-radius: 8px;
 }//alert
 
- /*Page HEADER - home layouts hero */
+/*Page HEADER - public layouts hero */
 .page-header {
     padding-block: 4rem;
-    background: $success;
+    background:linear-gradient(135deg,$dark,$success);
     color: $white;
 
     p {
