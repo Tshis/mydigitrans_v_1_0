@@ -211,6 +211,11 @@
                 gap: 1rem;
                 //flex-wrap: wrap;
                 font-size: 1.515rem;
+                .btn{
+                    display: flex;
+                    align-items: center;     /* centre verticalement */
+                    justify-content: center; /* centre horizontalement */
+                }//btn
             }//mobile-menu-actions
 
         }//mobile-menu

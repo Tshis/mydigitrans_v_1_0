@@ -1,6 +1,10 @@
 @use '../../abstract/variables' as *;
 
 .home{
+     section{        
+        padding-block:90px;        
+    }//section
+
     .hero{
         padding-block:100px;
         .hero-grid{
@@ -45,6 +49,65 @@
 
     }//hero
 
+    
+    .features{
+        text-align:center !important;
+
+        .features-grid{
+            margin-top:40px;
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+            gap:25px;
+
+            .feature {
+                padding: 20px;
+
+                .icon {
+                    font-size: 32px;
+                    margin-bottom: 10px;
+                    color: $success;
+                    color: linear-gradient(135deg,$dark,$success);
+                }//icon
+
+                p{
+                    font-size: 1.45rem;
+                }
+
+            }//feature
+
+        }//feature-grid
+    }//features
+
+    .how{
+        background:$success;
+        text-align:center;
+    
+        .title{
+            color: $white;
+        }
+    
+        .steps{
+            display:flex;
+            justify-content:center;
+            flex-wrap: wrap;
+            gap:40px;
+            margin-top:40px;
+            
+            .step{
+                background:$white;
+                padding:25px;
+                border-radius:10px;
+                width:200px;
+                box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+            }//step
+    
+        }//steps
+    }//how
+
+    .business{
+        background: rgba($color: $mute, $alpha: .3);    
+        text-align:center;
+    }//business
 
 }//home
 
@@ -57,71 +120,10 @@
 
 
 
-
-
-.features{
-padding:90px 0;
-text-align:center;
-}
-
-.features-grid{
-margin-top:40px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-gap:25px;
-}
-
-.card{
-background:white;
-padding:30px;
-border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,0.05);
-}
-
-.how{
-background:#eef3fa;
-padding:90px 0;
-text-align:center;
-}
-
-.steps{
-display:flex;
-justify-content:center;
-gap:40px;
-margin-top:40px;
-}
-
-.step{
-background:white;
-padding:25px;
-border-radius:10px;
-width:200px;
-}
-
-.agency{
-padding:90px 0;
-text-align:center;
-}
-
-.agency-box{
-background:white;
-padding:50px;
-border-radius:10px;
-box-shadow:0 5px 20px rgba(0,0,0,0.05);
-}
-
-.business{
-background:#0A4DA3;
-color:white;
-padding:90px 0;
-text-align:center;
-}
-
 footer{
 background:#111;
 color:white;
 padding:50px 0;
-margin-top:60px;
 }
 
 .footer{
