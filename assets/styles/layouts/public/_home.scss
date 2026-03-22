@@ -4,26 +4,42 @@
     .hero{
         padding-block:100px;
         .hero-grid{
+
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 50px;
             align-items:center;
 
-            h1{
-                font-size:45px;
-                margin-bottom:20px;
-            }//h1
+            .hero-text{
+                h1{
+                    font-size:41px;
+                    margin-bottom:20px;
+                }//h1
+    
+                p{
+                    margin-bottom:30px;
+                }//p
+    
+                .hero-actions{
+                    display:flex;
+                    gap:15px;
+                    font-size: 1.55rem;
+                }//hero-actions
+            }//hero-text
 
-            p{
-                margin-bottom:30px;
-            }//p
+            .hero-image{                
+                .hero-card{
+                    color: $dark;
+                    background:white;
+                    box-shadow:0 8px 30px rgba(0,0,0,0.15);
+                    padding:25px;
+                    border-radius:10px;
+                    display:flex;
+                    flex-direction:column;
+                    gap:10px;
+                }//hero-card
 
-            .hero-actions{
-                display:flex;
-                gap:15px;
-                font-size: 1.55rem;
-            }//hero-actions
-
+            }//hero-image
 
         }//hero-grid
 
@@ -39,22 +55,7 @@
 
 
 
-.hero-card{
-    background:white;
-    padding:25px;
-    border-radius:10px;
-    box-shadow:0 8px 30px rgba(0,0,0,0.15);
-    color:#333;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
 
-.hero-card input{
-    padding:10px;
-    border:1px solid #ddd;
-    border-radius:6px;
-}
 
 
 
