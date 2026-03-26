@@ -16,18 +16,13 @@ final class LinesController extends AbstractController
         ]);
     } //index
 
-
-
-
-    #[Route('/contact', name: 'home_contact')]
-    public function contact(): Response
+    #[Route('/public/lines/results', name: 'public_lines_results')]
+    public function results(): Response
     {
-        return $this->render('public/home/contact.html.twig', [
-            'page' => 'Contacts',
+        return $this->render('public/lines/results.html.twig', [
+            'page' => 'lines',
         ]);
-    } //contact
-
-
+    } //results
 
 
 }

@@ -1,0 +1,166 @@
+{% extends "public/base.html.twig" %}
+
+
+{% block body %}
+
+<div class="results">
+
+    <div class="page-header text-center container">
+        <h1>Trajets disponibles</h1>
+
+        <p class="results-info">
+            Kinshasa → Matadi • 12 Juin 2026 • 3 résultats
+        </p>
+    </div>
+    <!--page-header-->
+
+
+
+    <!-- FILTRES -->
+    <div class="filters">
+
+        <form action="">
+
+            <div class="field-group">
+                <div class="field">
+                    <select>
+                        <option>Trier par prix</option>
+                        <option>Heure de départ</option>
+                    </select>
+                </div>
+                <!--tri heure-prix-->
+
+                <div class="field">
+                    <select>
+                        <option>Tous les bus</option>
+                        <option>VIP</option>
+                        <option>Standard</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+    <!--filters-->
+
+    <section class="results-container container">
+
+        <div class="result-card">
+
+            <div class="company">
+                <h3>Trans RDC</h3>
+                <span class="badge danger">3 places restante</span>
+                <p class="details">
+                    Bus VIP • Climatisé
+                </p>
+            </div>
+            <!--company-->
+
+            <div class="details">
+                <div>
+                    <strong>Départ</strong><br>
+                    06:30
+                </div>
+                <div>
+                    <strong>Arrivée</strong><br>
+                    13:00
+                </div>
+                <div>
+                    <strong>Places</strong><br>
+                    12
+                </div>
+                <div>
+                    <strong>Prix</strong><br>
+                    25 $
+                </div>
+            </div>
+            <!--details-->
+
+            <a href="" class="btn btn-primary">Réserver</a>
+        </div>
+        <!--result-card voyage disponible-->
+
+        <div class="result-card">
+            <div class="company">
+                <h3>Express Congo</h3>
+                <span class="badge full">Complet</span>
+            </div>
+
+            <div class="details">
+                <div>
+                    <strong>Départ</strong><br>
+                    08:00
+                </div>
+                <div>
+                    <strong>Arrivée</strong><br>
+                    14:30
+                </div>
+                <div>
+                    <strong>Places</strong><br>
+                    0
+                </div>
+                <div>
+                    <strong>Prix</strong><br>
+                    30 $
+                </div>
+            </div>
+
+            <button class="btn-disabled" disabled>Indisponible</button>
+        </div>
+        <!--result-card voyage complet (places full)-->
+
+        <div class="result-card">
+
+            <div class="alert alert-danger">
+
+                Aucun voyage disponible trouvé.
+
+            </div>
+            <!--message-->
+
+            <a href="{{path('home_index')}}" class="btn btn-primary">Retour à la page d'accueil</a>
+
+        </div>
+        <!--Aucun voyage disponible-->
+
+
+        <div class="result-card">
+            <div class="company">
+                <h3>MB Transport</h3>
+                <span class="badge available">12 places restantes</span>
+                <p class="details">
+                    Bus Standard
+                </p>
+            </div>
+
+            <div class="details">
+                <div>
+                    <strong>Départ</strong><br>
+                    10:00
+                </div>
+                <div>
+                    <strong>Arrivée</strong><br>
+                    17:00
+                </div>
+                <div>
+                    <strong>Places</strong><br>
+                    5
+                </div>
+                <div>
+                    <strong>Prix</strong><br>
+                    22 $
+                </div>
+            </div>
+
+            <a href="" class="btn btn-primary">Réserver</a>
+        </div>
+
+    </section>
+    <!--results-container-->
+</div>
+<!--results-->
+
+
+{% endblock %}

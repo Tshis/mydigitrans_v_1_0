@@ -47,38 +47,142 @@
     }//form-card
 
 
+    /* suggestions */
+    .suggestions{
+        margin:50px auto;
+        text-align: center;
+    
+        .suggestion-list{
+            margin-top:15px;
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            justify-content:center;
+    
+            span{
+                background: rgba($color: $mute, $alpha: .5);
+                padding:10px 15px;
+                border-radius:20px;
+                cursor:pointer;
+                transition:all 0.2s;
+    
+                &:hover{
+                    background:$dark;
+                    color:$white;
+                }
+    
+            }//span
+    
+        }//suggestion-list
+    
+    }//suggestions
 
 }//lines
 
 
+.results{
+
+    .results-info{
+        margin-top:10px;
+        color:$white;
+    }//results-info
+    
+    .filters{
+        max-width: 650px;
+        margin-top:20px;
+        margin-inline: auto;
+        padding: 2rem;
+        box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+    }//filters
+   
+    
+    .results-container {
+        padding-block: 4.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    
+        .result-card {
+            background: $white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+    
+            .company {
+                h3 {
+                    margin-bottom: 1rem;
+                }//h3
+                
+                .badge {
+                    font-size: 12px;
+                    padding: 4px 10px;
+                    border-radius: 20px;
+                    font-weight: 600;
+    
+                    &.available {
+                        background: rgba($color: $success, $alpha: .225);
+                        color: $success;
+                    }//&.availanle
+    
+                    &.full {
+                        background: rgba($color: $danger, $alpha: .225);
+                        color: $danger;
+                    }//full
+    
+                }//badge
+    
+    
+            }//company
+    
+    
+            .details {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 2.5rem;
+                text-align: center;
+            }//details
+    
+    
+    
+        }//result-card
+    
+    }//results-container
 
 
-/* suggestions */
-.suggestions{
-    margin:50px auto;
-    text-align: center;
 
-    .suggestion-list{
-        margin-top:15px;
-        display:flex;
-        gap:10px;
-        flex-wrap:wrap;
-        justify-content:center;
+/* RESPONSIVE */
+@media (max-width: 900px) {
 
-        span{
-            background: rgba($color: $mute, $alpha: .5);
-            padding:10px 15px;
-            border-radius:20px;
-            cursor:pointer;
-            transition:all 0.2s;
+    .results-container{
 
-            &:hover{
-                background:$dark;
-                color:$white;
-            }
+        .result-card {
+            flex-direction: column;
+            gap: 2.5rem;
+            text-align: center;
+        }//result-card
+    
+        .details {
+            grid-template-columns: repeat(2, 1fr);
+        }//details
 
-        }//span
+    }//results-container
 
-    }//suggestion-list
+}//max-width: 900px
 
-}//suggestions
+
+
+
+
+
+
+}//results
+
+
+
+
+
+
+
