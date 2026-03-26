@@ -1,0 +1,35 @@
+<footer class="app-footer container">
+	<div class="footer-top">
+		<div class="footer-brand">
+			<strong>mydigitrans</strong>
+			<p>Réservez simplement,
+				<br>
+				gérez efficacement.</p>
+		</div>
+
+		<div class="footer-links">
+			<a class="menu-link {{ page is same as('accueil') ? 'active' : '' }} " href="{{path('home_index')}}">Accueil</a>
+			{% include "public/partials/_menu.html.twig" %}
+			<a class="menu-link {{ page is same as('login') ? 'active' : '' }}" href="">Connexion</a>
+		</div>
+
+		<div class="footer-contact">
+			<a href="mailto:support@mydigitrans.com">
+				support@mydigitrans.com
+			</a>
+		</div>
+	</div>
+	<!--footer-top-->
+
+	<div class="footer-bottom">
+		©
+		{{ "now"|date("Y") }}
+		mydigitrans. Tous droits réservés.
+
+		<div class="powered-by">
+			Powered by
+			<strong>Tshis'.</strong>
+		</div>
+	</div>
+	<!--footer-bottom-->
+</footer>

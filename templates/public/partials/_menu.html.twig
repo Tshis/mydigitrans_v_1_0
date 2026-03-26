@@ -1,4 +1,4 @@
-<a class="menu-link active" href="#">Trajets</a>
-<a class="menu-link" href="#">Reserver</a>
-<a class="menu-link" href="#">Colis</a>
-<a class="menu-link" href="#">Contact</a>
+<a class="menu-link {{ page is same as('lines') ? 'active' : '' }}" href="#">Trajets</a>
+<a class="menu-link {{ page is same as('packages') ? 'active' : '' }}" href="#">Colis</a>
+<a class="menu-link {{ page is same as('business') ? 'active' : '' }}" href="#">Business</a>
+<a class="menu-link {{ page is same as('contact') ? 'active' : '' }}" href="#">Contact</a>

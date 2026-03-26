@@ -4,7 +4,7 @@
     background: $dark;
     color: $white;
     padding: 2rem 1.5rem;
-    font-size: 1.2rem;
+    font-size: 1.35rem;
 
     a{
         color: $white;
@@ -12,6 +12,10 @@
         transition: all .3s;
         &:hover{
             color: $primary;
+        }//hover
+
+        &.active{
+            color: rgba($color: $primary, $alpha: .7);
         }//hover
 
     }//a
@@ -25,13 +29,13 @@
 
         .footer-brand {
             strong {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
                 color: $primary;
             }//strong
 
             p {
                 margin: 0.3rem 0 0;
-                font-size: 0.99rem;
+                font-size: 1.1rem;
             }//p
 
         }//footer-brand
@@ -50,11 +54,11 @@
       border-top: 1px solid $mute;
       padding-top: 1rem;
       text-align: center;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
     
       .powered-by {
           margin-top: 0.8rem;
-          font-size: 0.9rem;
+          font-size: 1.1rem;
           color: $mute;
       
           strong {
