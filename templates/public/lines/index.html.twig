@@ -3,66 +3,79 @@
 
 {% block body %}
 
-	<section class="search-page">
+<div class="lines">
 
-		<div class="container">
+	<section class="page-header container text-center">
+		<h1>Rechercher un trajet</h1>
+		<p>Trouvez rapidement les trajets disponibles et réservez votre place.</p>
+	</section>
+	<!--page-header-->
 
-			<h1>Rechercher un trajet</h1>
+	<div class="form-card">
+		<form class="search-form">
 
-			<p class="subtitle">
-				Trouvez rapidement les trajets disponibles et réservez votre place.
-			</p>
+			<div class="field-group">
 
-			<form class="search-form">
-
-				<div class="input-group">
-
+				<div class="field">
 					<input id="departure" type="text" placeholder="Ville de départ">
+				</div>
 
+				<div class="field">
 					<button type="button" class="swap-btn" onclick="swapCities()">⇄</button>
+				</div>
 
+				<div class="field">
 					<input id="destination" type="text" placeholder="Destination">
-
-				</div>
-
-				<div class="input-row">
-
-					<input type="date">
-
-					<select>
-						<option>1 passager</option>
-						<option>2 passagers</option>
-						<option>3 passagers</option>
-					</select>
-
-					<button class="search-btn">Rechercher</button>
-
-				</div>
-
-			</form>
-
-
-			<!-- Suggestions -->
-			<div class="suggestions">
-
-				<h3>Trajets populaires</h3>
-
-				<div class="suggestion-list">
-
-					<span onclick="fillRoute('Kinshasa','Matadi')">Kinshasa → Matadi</span>
-
-					<span onclick="fillRoute('Kinshasa','Lubumbashi')">Kinshasa → Lubumbashi</span>
-
-					<span onclick="fillRoute('Goma','Bukavu')">Goma → Bukavu</span>
-
-					<span onclick="fillRoute('Kinshasa','Kikwit')">Kinshasa → Kikwit</span>
-
 				</div>
 
 			</div>
+			<!--departure - destination-->
+
+			<div class="field-group row">
+
+				<div class="field">
+					<input type="date" placeholder="date de départ">
+				</div>
+
+				<div class="field">
+					<input type="number" placeholder="nombre passagers">
+				</div>
+
+				<div class="field">
+					<button class="btn btn-primary">
+						<i class="fa-brands fa-sistrix"></i>
+						Rechercher
+					</button>
+				</div>
+
+			</div>
+			<!--field row-->
+		</form>
+	</div>
+	<!--form-card-->
+
+	<div class="suggestions container">
+
+		<h2 class="text-center">Trajets populaires</h2>
+
+		<div class="suggestion-list">
+
+			<span onclick="fillRoute('Kinshasa','Matadi')">Kinshasa → Matadi</span>
+
+			<span onclick="fillRoute('Kinshasa','Lubumbashi')">Kinshasa → Lubumbashi</span>
+
+			<span onclick="fillRoute('Goma','Bukavu')">Goma → Bukavu</span>
+
+			<span onclick="fillRoute('Kinshasa','Kikwit')">Kinshasa → Kikwit</span>
 
 		</div>
 
-	</section>
+	</div>
+	<!-- Suggestions -->
+
+</div>
+<!--lines-->
+
+
 
 {% endblock %}
