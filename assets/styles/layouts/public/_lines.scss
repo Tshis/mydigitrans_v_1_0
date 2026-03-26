@@ -1,0 +1,96 @@
+@use '../../abstract/variables' as *;
+
+.search-page{
+padding:80px 0;
+text-align:center;
+}
+
+.subtitle{
+margin-top:10px;
+color:#666;
+}
+
+.search-form{
+margin-top:30px;
+display:flex;
+flex-direction:column;
+gap:20px;
+align-items:center;
+}
+
+/* bloc départ + destination */
+.input-group{
+display:flex;
+align-items:center;
+gap:10px;
+background:white;
+padding:15px;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,0.05);
+}
+
+.input-group input{
+padding:12px;
+border:1px solid #ddd;
+border-radius:6px;
+width:180px;
+}
+
+.swap-btn{
+background:#0A4DA3;
+color:white;
+border:none;
+padding:10px 12px;
+border-radius:50%;
+cursor:pointer;
+}
+
+/* ligne date + passagers */
+.input-row{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.input-row input,
+.input-row select{
+padding:12px;
+border:1px solid #ddd;
+border-radius:6px;
+}
+
+.search-btn{
+background:#FF7A00;
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* suggestions */
+.suggestions{
+margin-top:50px;
+}
+
+.suggestion-list{
+margin-top:15px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.suggestion-list span{
+background:#eef3fa;
+padding:10px 15px;
+border-radius:20px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.suggestion-list span:hover{
+background:#0A4DA3;
+color:white;
+}

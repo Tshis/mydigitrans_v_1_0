@@ -1,0 +1,68 @@
+{% extends "public/base.html.twig" %}
+
+
+{% block body %}
+
+	<section class="search-page">
+
+		<div class="container">
+
+			<h1>Rechercher un trajet</h1>
+
+			<p class="subtitle">
+				Trouvez rapidement les trajets disponibles et réservez votre place.
+			</p>
+
+			<form class="search-form">
+
+				<div class="input-group">
+
+					<input id="departure" type="text" placeholder="Ville de départ">
+
+					<button type="button" class="swap-btn" onclick="swapCities()">⇄</button>
+
+					<input id="destination" type="text" placeholder="Destination">
+
+				</div>
+
+				<div class="input-row">
+
+					<input type="date">
+
+					<select>
+						<option>1 passager</option>
+						<option>2 passagers</option>
+						<option>3 passagers</option>
+					</select>
+
+					<button class="search-btn">Rechercher</button>
+
+				</div>
+
+			</form>
+
+
+			<!-- Suggestions -->
+			<div class="suggestions">
+
+				<h3>Trajets populaires</h3>
+
+				<div class="suggestion-list">
+
+					<span onclick="fillRoute('Kinshasa','Matadi')">Kinshasa → Matadi</span>
+
+					<span onclick="fillRoute('Kinshasa','Lubumbashi')">Kinshasa → Lubumbashi</span>
+
+					<span onclick="fillRoute('Goma','Bukavu')">Goma → Bukavu</span>
+
+					<span onclick="fillRoute('Kinshasa','Kikwit')">Kinshasa → Kikwit</span>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</section>
+
+{% endblock %}
