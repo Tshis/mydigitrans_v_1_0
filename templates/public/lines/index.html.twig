@@ -1,5 +1,10 @@
 {% extends "public/base.html.twig" %}
 
+{% block javascripts %}
+{{parent()}}
+<script src="/js/public/lines.js" defer></script>
+{% endblock %}
+
 
 {% block body %}
 
