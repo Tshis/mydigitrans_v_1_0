@@ -1,0 +1,1 @@
+function swapCities(){var e=document.getElementById("departure"),t=document.getElementById("destination"),n=e.value;e.value=t.value,t.value=n}function fillRoute(e,t){document.getElementById("departure").value=e,document.getElementById("destination").value=t}
