@@ -106,12 +106,16 @@
             background: $white;
             border-radius: 10px;
             padding: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
             display: flex;
             align-items: center;
             justify-content: space-between;
     
             .company {
+                display: flex;
+                flex-direction: column;
+                
+                
                 h3 {
                     margin-bottom: 1rem;
                 }//h3
@@ -121,18 +125,30 @@
                     padding: 4px 10px;
                     border-radius: 20px;
                     font-weight: 600;
+                    display: block;
+                    width: max-content;
     
                     &.available {
                         background: rgba($color: $success, $alpha: .225);
                         color: $success;
                     }//&.availanle
     
-                    &.full {
+                    &.danger {
                         background: rgba($color: $danger, $alpha: .225);
                         color: $danger;
+                    }//danger
+
+                    &.full {
+                        background: rgba($color: $gray, $alpha: .225);
+                        color: $gray;
                     }//full
     
                 }//badge
+
+                .info-bus{
+                    display: block;
+                    margin-top: 1rem;
+                }//info-bus
     
     
             }//company
@@ -157,6 +173,11 @@
 @media (max-width: 900px) {
 
     .results-container{
+
+        .company{
+            align-items: center;
+            justify-content: center;
+        }
 
         .result-card {
             flex-direction: column;
