@@ -24,5 +24,13 @@ final class LinesController extends AbstractController
         ]);
     } //results
 
+    #[Route('/public/lines/{slug}/booking', name: 'public_lines_booking')]
+    public function booking(): Response
+    {
+        return $this->render('public/lines/booking.html.twig', [
+            'page' => 'lines',
+        ]);
+    } //booking
+
 
 }

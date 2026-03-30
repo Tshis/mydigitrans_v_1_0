@@ -1,0 +1,139 @@
+{% extends "public/base.html.twig" %}
+
+
+{% block body %}
+
+	<div class="line-booking">
+
+		<section class="page-header container text-center">
+			<h1>Réservation</h1>
+			<p>Kinshasa → Matadi | Départ aujourd’hui à 14h00</p>
+		</section>
+		<!--page-header-->
+
+		<section
+			class="reservation-container container">
+
+			<!-- FORMULAIRE -->
+			<form
+				class="reservation-form">
+
+				<!-- PASSAGER -->
+				<div class="card">
+
+					<h2>Informations du passager</h2>
+
+					<div class="field-group mb-20">
+						<div class="field">
+							<label>Nom complet</label>
+							<input type="text" placeholder="Ex : Jean Mukendi" required>
+						</div>
+						<!--field-->
+
+						<div class="field">
+							<label>Téléphone</label>
+							<input type="tel" placeholder="+243..." required>
+						</div>
+						<!--field-->
+					</div>
+					<!--field-group-->
+
+					<div class="field-group mb-20">
+
+						<div class="field">
+							<label>Type de document</label>
+							<select>
+								<option>Carte d’électeur</option>
+								<option>Carte d’identité</option>
+								<option>Passeport</option>
+							</select>
+						</div>
+						<!--field-->
+
+						<div class="field">
+							<label>Numéro du document</label>
+							<input type="text" placeholder="N° document">
+						</div>
+						<!--field-->
+					</div>
+					<!--field-group-->
+
+				</div>
+				<!--card-->
+
+				<!-- SIEGE -->
+				<div class="card">
+					<h2>Choix du siège</h2>
+
+					<p class="legend">
+						<span class="available">
+							Disponible</span>
+
+						<span class="selected">Sélectionné</span>
+
+						<span class="booked">Occupé</span>
+					</p>
+					<!--legend-->
+
+					<div class="seats">
+						<span class="seat available">1</span>
+						<span class="seat available">2</span>
+						<span class="seat booked">3</span>
+						<span class="seat available">4</span>
+						<span class="seat selected">5</span>
+						<span class="seat available">6</span>
+						<span class="seat booked">7</span>
+						<span class="seat available">8</span>
+					</div>
+				</div>
+				<!--siege-->
+
+				<!-- BOUTON -->
+				<button class="btn btn-primary btn-full mt-20 py-12">Confirmer la réservation</button>
+
+			</form>
+			<!--reservation-form-->
+
+			<!-- RECAP -->
+			<aside class="summary">
+				<div class="card">
+					<h2>Récapitulatif</h2>
+
+					<ul>
+						<li>
+							<strong>Ligne :</strong>
+							Kinshasa → Matadi
+						</li>
+						<li>
+							<strong>Agence :</strong>
+							Trans RDC
+						</li>
+						<li>
+							<strong>Départ :</strong>
+							Aujourd’hui à 14h00
+						</li>
+						<li>
+							<strong>Siège :</strong>
+							N°5
+						</li>
+					</ul>
+
+					<div class="total">
+						Total :
+						<strong>25 $</strong>
+					</div>
+
+					<p class="note">
+						Paiement requis pour valider la réservation.
+					</p>
+				</div>
+			</aside>
+			<!--summary-->
+
+		</section>
+		<!--reservation-container-->
+
+	</div>
+	<!--line-booking-->
+
+{% endblock %}
