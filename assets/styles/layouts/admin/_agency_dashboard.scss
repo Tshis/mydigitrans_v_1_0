@@ -1,0 +1,136 @@
+@use'../../abstract/variables' as *;
+
+/* ===== Dashboard ===== */
+
+.dashboard {
+    padding: 20px;
+}
+
+/* KPI GRID */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+    
+}
+
+.kpi-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    transition: 0.3s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+}
+
+.kpi-title {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.kpi-value {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 8px 0;
+}
+
+.kpi-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.kpi-trend.positive {
+    color: #16a34a;
+}
+
+.kpi-trend.negative {
+    color: #dc2626;
+}
+
+.status-active {
+    color: #16a34a;
+}
+
+/* GRID MAIN */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.chart-placeholder {
+    height: 200px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+/* Table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.table thead {
+    background: rgba(0,0,0,0.05);
+}
+
+/* Branch list */
+.branch-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.branch-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+/* Commission */
+.commission-box {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Alert */
+.alert-card p {
+    font-size: 14px;
+    margin: 6px 0;
+    color: #d97706;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}

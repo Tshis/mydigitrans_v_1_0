@@ -1,0 +1,123 @@
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+
+	<div
+		class="dashboard">
+
+		<!-- ===== KPI CARDS ===== -->
+		<div class="kpi-grid">
+
+			<div class="kpi-card">
+				<div class="kpi-title">Chiffre d'affaires (mois)</div>
+				<div class="kpi-value">2 450 000 FCFA</div>
+				<div class="kpi-trend positive">+12% ce mois</div>
+			</div>
+
+			<div class="kpi-card">
+				<div class="kpi-title">Réservations</div>
+				<div class="kpi-value">324</div>
+				<div class="kpi-trend positive">+8%</div>
+			</div>
+
+			<div class="kpi-card">
+				<div class="kpi-title">Colis</div>
+				<div class="kpi-value">189</div>
+				<div class="kpi-trend negative">-3%</div>
+			</div>
+
+			<div class="kpi-card">
+				<div class="kpi-title">Abonnement</div>
+				<div class="kpi-value status-active">Actif</div>
+				<div class="kpi-sub">Expire le 30 Juin 2026</div>
+			</div>
+
+		</div>
+
+
+		<!-- ===== MAIN GRID ===== -->
+		<div
+			class="dashboard-grid">
+
+			<!-- LEFT COLUMN -->
+			<div class="dashboard-main">
+
+				<div class="card">
+					<h3>Évolution des revenus</h3>
+					<div class="chart-placeholder">
+						Graphique ici
+					</div>
+				</div>
+
+				<div class="card">
+					<h3>Activité récente</h3>
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Type</th>
+								<th>Référence</th>
+								<th>Montant</th>
+								<th>Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Réservation</td>
+								<td>#RES-1023</td>
+								<td>15 000 FCFA</td>
+								<td>Aujourd’hui</td>
+							</tr>
+							<tr>
+								<td>Colis</td>
+								<td>#COL-450</td>
+								<td>5 000 FCFA</td>
+								<td>Hier</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+			</div>
+
+			<!-- RIGHT COLUMN -->
+			<div class="dashboard-side">
+
+				<div class="card">
+					<h3>Succursales</h3>
+					<ul class="branch-list">
+						<li>Yaoundé Centre
+							<span>124 ventes</span>
+						</li>
+						<li>Douala Akwa
+							<span>98 ventes</span>
+						</li>
+					</ul>
+				</div>
+
+				<div class="card">
+					<h3>Commissions</h3>
+					<div class="commission-box">
+						<div>
+							<strong>En attente</strong>
+							<p>120 000 FCFA</p>
+						</div>
+						<div>
+							<strong>Payées</strong>
+							<p>340 000 FCFA</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="card alert-card">
+					<h3>Alertes</h3>
+					<p>⚠ 3 paiements en attente</p>
+					<p>⚠ 2 colis en retard</p>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+{% endblock %}

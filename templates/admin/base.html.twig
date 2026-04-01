@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Dashboard
+			{% endblock %}
+		</title>
+		<link rel="stylesheet" href="/styles/app.css">
+	</head>
+	<body class="admin">
+
+		<div class="admin-container " id="adminContainer">
+
+			{% include 'admin/partials/_sidebar.html.twig' %}
+
+			<div class="main-wrapper">
+
+				{% include 'admin/partials/_topbar.html.twig' %}
+
+				<main class="main-content"> {% block body %}{% endblock %}
+					</main>
+
+					{% include 'admin/partials/_footer.html.twig' %}
+
+				</div>
+
+			</div>
+
+			<script src="/js/admin/app.js"></script>
+		</body>
+	</html>
