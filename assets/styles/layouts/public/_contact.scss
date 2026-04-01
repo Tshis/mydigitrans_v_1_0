@@ -1,0 +1,74 @@
+
+@use '../../abstract/variables' as *;
+
+
+.contact{
+
+    /* CONTACT */
+    .contact-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 10px 20px;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 40px;
+    }//contact-container
+
+    .contact-form {
+        background: $white;
+        padding: 30px;
+        border-radius: 14px;
+        //box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    
+        h3 {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: $success;
+        }//h3
+
+        strong{
+            display: inline-block;
+            width: 95px;
+        }
+    }//contact-form
+
+    .contact-info{
+
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        justify-content: center;
+
+        .card{
+            padding: 2.5rem 1rem;
+            background: rgba($color: $mute, $alpha: .3); 
+            text-align: center;
+            color: $gray;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            border-radius: 8px;
+
+            .icon{
+                font-size: 2.6rem;
+                color: $success;
+            }
+
+        }//card
+
+    }//contact-info
+}
+//contact
+
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+
+    .contact{
+        .contact-container {
+            grid-template-columns: 1fr;
+        }
+    }
+}

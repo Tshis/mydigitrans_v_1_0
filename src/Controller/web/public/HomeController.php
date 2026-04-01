@@ -23,7 +23,7 @@ final class HomeController extends AbstractController
     public function contact(): Response
     {
         return $this->render('public/home/contact.html.twig', [
-            'page' => 'Contacts',
+            'page' => 'contacts',
         ]);
     } //contact
 
