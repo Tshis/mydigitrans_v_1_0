@@ -1,0 +1,137 @@
+{% extends "public/base.html.twig" %}
+
+
+{% block body %}
+
+	<section class="page-header container">
+		<h2>Créer un compte agence</h2>
+		<p class="subtitle">
+			Inscrivez votre agence et gérer vos ventes de billet, réservations et colis.
+		</p>
+	</section>
+	<!--page-header-->
+
+
+	<section class="form-container mb-25">
+
+		<div class="form-card">
+
+
+			<form>
+
+				<h3>
+					<i class="fa-solid fa-hotel"></i>
+					Informations agence</h3>
+
+				<div
+					class="field-group mb-25">
+					<!--nom agence-->
+					<div class="field">
+						<label>Nom de l’agence</label>
+						<input type="text" required>
+					</div>
+
+					<!--type agence-->
+					<div class="field">
+						<label>Type d'agence</label>
+						<select required>
+							<option value="">-- Sélectionner --</option>
+							<option>Transporteur (agence de transport)</option>
+							<option>Commissionnaire (courtier)</option>
+							<option>Hybride</option>
+						</select>
+					</div>
+				</div>
+				<!--field-group-->
+
+				<div class="field-group mb-25">
+
+					<div class="field">
+						<label>Téléphone agence</label>
+						<input type="tel" required>
+					</div>
+
+					<div class="field">
+						<label>Email</label>
+						<input type="text" required>
+					</div>
+				</div>
+				<!--field-group-->
+
+				<!--##########################-->
+				<!--Antenne principale (Siege)-->
+				<!--##########################-->
+
+				<div class="field-group mb-25">
+					<div class="field">
+						<label>Ville principale</label>
+						<input type="text" required>
+					</div>
+					<div class="field">
+						<label>Pays</label>
+						<input type="text" required>
+					</div>
+				</div>
+				<!--ville et pays-->
+
+				<div class="field mb-25">
+					<label>Adresse</label>
+					<input type="text" required>
+				</div>
+				<h3>
+					<i class="fa-solid fa-user"></i>
+					Responsable</h3>
+
+				<div class="field-group mb-25">
+					<div class="field">
+						<label>Nom</label>
+						<input type="text" required>
+					</div>
+
+					<div class="field">
+						<label>Prenom</label>
+						<input type="text" required>
+					</div>
+				</div>
+				<!--nom et prenom-->
+
+				<div class="field mb-25">
+					<label>Téléphone</label>
+					<input type="tel" required>
+				</div>
+
+				<div class="field mb-25">
+					<label>Email</label>
+					<input type="email" required>
+				</div>
+
+				<div class="field-group mb-25">
+					<div class="field">
+						<label>Mot de passe</label>
+						<input type="password" required>
+					</div>
+
+					<div class="field">
+						<label>Confirmer le mot de passe</label>
+						<input type="password" required>
+					</div>
+				</div>
+				<!--password & confirm-->
+
+
+				<button class="btn btn-primary btn-full">Créer mon compte</button>
+
+			</form>
+
+			<p class="mt-25 text-weight-500">
+				Déjà un compte ?
+				<a class="text-success" href="{{path('security_login_index')}}">Se connecter</a>
+			</p>
+
+		</div>
+
+	</section>
+	<!--register-container-->
+
+
+</html>{% endblock %}
