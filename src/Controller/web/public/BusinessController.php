@@ -17,4 +17,12 @@ final class BusinessController extends AbstractController
         ]);
     } //index
 
+    #[Route('/business/parter-onboarding', name: 'business_onboarding')]
+    public function onboarding(): Response
+    {
+        return $this->render('public/business/onboarding.html.twig', [
+            'page' => 'business',
+        ]);
+    } //onboarding
+
 }

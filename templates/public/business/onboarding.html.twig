@@ -1,0 +1,80 @@
+{% extends "public/base.html.twig" %}
+
+{% block body %}
+<div class="public-become-partner">
+
+    <section class="page-header container">
+        <h1>Commencez à gagner dès aujourd’hui</h1>
+
+        <p>
+            Inscrivez-vous gratuitement et commencez à gagner des commissions avec MyDigitrans.
+        </p>
+    </section>
+    <!--page-header-->
+
+    <div class="form-container container">
+        <div class="form-card">
+
+            <h2 class="pb-30 text-center">
+                <i class="fa-solid fa-square-check"></i>
+                Inscrivez-vous
+            </h2>
+
+            <form>
+
+                <div class="field-group mb-25">
+                    <div class="field">
+                        <label>Nom</label>
+                        <input type="text" required>
+                    </div>
+
+                    <div class="field">
+                        <label>Prenom</label>
+                        <input type="text" required>
+                    </div>
+                </div>
+                <!--nom et prenom-->
+
+                <div class="field mb-25">
+                    <label>Téléphone</label>
+                    <input type="tel" required>
+                </div>
+                <!--telephone-->
+
+                <div class="field mb-25">
+                    <label>Email</label>
+                    <input type="email" required>
+                </div>
+                <!--email-->
+
+                <div class="field-group mb-25">
+                    <div class="field">
+                        <label>Mot de passe</label>
+                        <input type="password" required>
+                    </div>
+
+                    <div class="field">
+                        <label>Confirmer le mot de passe</label>
+                        <input type="password" required>
+                    </div>
+                </div>
+                <!--password & confirm-->
+
+
+                <button class="btn btn-primary btn-full">Créer mon compte</button>
+
+            </form>
+
+            <p class="mt-25 text-weight-500">
+                Déjà un compte ?
+                <a class="text-success" href="">Se connecter</a>
+            </p>
+
+        </div>
+        <!--form-card-->
+    </div>
+    <!--form-container-->
+
+</div>
+<!--public-become-partner-->
+{% endblock %}
