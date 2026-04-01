@@ -1,0 +1,173 @@
+@use '../../abstract/variables' as *;
+
+.public-business{
+
+    .business-how,
+    .commission,
+    .how-earn,
+    .benefits{
+        padding-block: 8rem;
+        text-align:center;
+    }//all sections
+
+    .how{
+        text-align: justify;
+    }//how
+
+    .commission{
+        background: rgba($color: $mute, $alpha: .3); 
+
+        .commission-grid{
+            display:flex;
+            justify-content:center;
+            gap:30px;
+            margin-top:40px;
+
+            .card{
+                background:$white;
+                padding:30px;
+                border-radius:10px;
+                width:200px;
+
+                p{
+                    font-size: 1.2rem;
+                font-weight: 500;
+                }
+                
+                .percent{
+                    font-size:3rem;
+                    color:$primary;
+                    margin:10px 0;
+                }//percent
+
+                
+                
+            }//card
+
+        }//commission-grid
+
+        .example{
+            color: $gray;
+            text-align: center;
+            max-width: 600px;
+            padding: 2.5rem;
+            margin: auto;
+        }//example
+
+    }//commission
+    
+    .benefits-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+        gap:20px;
+        margin-top:40px;
+
+        .benefit{
+            background:rgba($color: $mute, $alpha: .3);
+            padding:20px;
+            border-radius:8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            font-size: 1.45rem;
+            font-weight: 600;
+
+            i{font-size: 1.6rem;}
+        }//benefit
+
+    }//benefits-grid
+
+    .cta-section{
+        //background:rgba($color: $mute, $alpha: .3);
+        background:linear-gradient(180deg,$dark,$success);
+        color:$white;
+        padding-block:5rem;
+        text-align:center;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        justify-content: center;
+        align-items: center;
+    }//cta-section
+ 
+    
+    .how-earn{
+        
+        .timeline{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin-top:50px;
+            flex-wrap:wrap;
+    
+        }//timeline
+    
+        /* STEP */
+        .step{
+            text-align:center;
+            width:180px;
+        
+            /* CIRCLE */
+            .circle{
+                width:60px;
+                height:60px;
+                background:linear-gradient(to left,$dark,$success);
+                color:$white;
+                border-radius:50%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-weight:bold;
+                margin:0 auto 15px;
+                position:relative;
+            }//circle
+        
+            /* TEXT */
+            h3{
+                margin-bottom:8px;
+            }//h3
+            
+            p{
+                font-size:1.4rem;
+                color:$gray;
+            }//p
+        
+        }//step
+        
+        /* LINE */
+        .line{
+            width:80px;
+            height:4px;
+            background:linear-gradient(to right,$dark,$success);
+            margin:0 10px;
+        }//line
+    
+    }//how-earn
+    
+    //Responsive
+    @media(max-width:768px){
+    
+        .how-earn{
+            .timeline{
+                flex-direction:column;
+            }
+        
+            .line{
+                width:4px;
+                height:40px;
+                margin:10px 0;
+            }
+        }//how-earn
+    }
+}//public-business
+
+
+
+
+
+
+
+
+
+
