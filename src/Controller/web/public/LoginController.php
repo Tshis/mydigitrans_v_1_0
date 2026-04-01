@@ -16,4 +16,16 @@ final class LoginController extends AbstractController
             'error' => []
         ]);
     } //index
+
+
+    #[Route('/logout', name: 'security_login_logout')]
+    public function logout(): Response
+    {
+        return $this->render('public/security/login/index.html.twig', [
+            'page' => 'login',
+            'error' => []
+        ]);
+    } //logout
+
+
 }
