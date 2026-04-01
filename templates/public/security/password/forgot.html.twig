@@ -1,0 +1,38 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+
+	<section class="page-header container">
+		<h2>Mot de passe oublié ?</h2>
+		<p class="subtitle">
+			Entrez votre email pour recevoir un lien de réinitialisation.
+		</p>
+	</section>
+	<!--page header-->
+
+	<section class="login-container">
+
+		<div class="login-card">
+
+
+			<form method="post">
+
+				<div class="field mb-25">
+					<label>Email</label>
+					<input type="email" placeholder="exemple@voyagest.com" required>
+				</div>
+
+				<button class="btn-primary btn-full mb-25">Envoyer le lien</button>
+
+			</form>
+
+			<p class="back-link">
+				<a href="{{path('security_login_login')}}">← Retour à la connexion</a>
+			</p>
+		</div>
+
+	</section>
+
+
+{% endblock %}

@@ -1,0 +1,75 @@
+@use '../../abstract/variables' as *;
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 3rem;
+
+    .login-card {
+        background: $white;
+        width: 100%;
+        max-width: 400px;
+        padding: 35px;
+        border-radius: 14px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    
+        h2 {
+            margin-bottom: 5px;
+        }//h2
+        
+        .subtitle {
+            font-size: 14px;
+            color: rgba($color: $gray, $alpha: .80);
+            margin-bottom: 25px;
+        }//subtile
+    
+        /* OPTIONS */
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 20px;
+        
+            a {
+                text-decoration: none;
+                color: $success;
+                transition: all .3s;
+                font-weight: 600;
+                &:hover{
+                    color: rgba($color: $success, $alpha: .80);
+                }
+            }//a 
+
+            .remember{
+                display: flex;
+                gap: 3px;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }//remember
+
+        }//options
+    
+    }//login-card
+
+
+    .back-link {
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    .back-link a {
+        text-decoration: none;
+        color: $success;
+    }
+
+}//login-container
+
+
+
+
+
+
+

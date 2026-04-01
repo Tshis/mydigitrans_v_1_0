@@ -1,0 +1,42 @@
+{% extends "base.html.twig" %}
+
+
+{% block body %}
+
+	<section class="page-header container">
+		<h2>Reinitialiser votre mot de passe</h2>
+		<p>Veuillez choisir un nouveau mot de passe sécurisé pour accéder à votre compte.</p>
+	</section>
+	<!--page header-->
+
+	<section class="login-container">
+
+		<div class="login-card">
+
+			<form method="post">
+
+
+				<div class="field mb-25">
+					<div class="form-group">
+						<label>Nouveau mot de passe</label>
+						<input type="password" placeholder="••••••••" required>
+					</div>
+				</div>
+
+				<div class="field mb-25">
+					<div class="form-group">
+						<label>Confirmer</label>
+						<input type="password" placeholder="••••••••" required>
+					</div>
+				</div>
+
+
+				<button class="btn-primary btn-full">Valider</button>
+
+			</form>
+
+		</div>
+
+	</section>
+
+{% endblock %}

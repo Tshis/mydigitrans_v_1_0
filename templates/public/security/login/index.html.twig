@@ -1,0 +1,55 @@
+{% extends 'public/base.html.twig' %}
+
+{% block body %}
+
+	<section class="page-header container">
+		<h1>Connectez-vous</h1>
+		<p>Accédez à votre espace administration en toute sécurité.</p>
+	</section>
+	<!--page header-->
+
+	<section class="login-container">
+
+		<div class="login-card">
+
+			<form method="post">
+
+				{% if error %}
+					<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+				{% endif %}
+
+				<input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+
+				<div class="field mb-25">
+					<div class="form-group">
+						<label>Email</label>
+						<input type="email" placeholder="exemple@mydigitrans.com" required>
+					</div>
+				</div>
+
+
+				<div class="field mb-25">
+					<div class="form-group">
+						<label>Mot de passe</label>
+						<input type="password" placeholder="••••••••" required>
+					</div>
+				</div>
+
+				<div class="options mb-25">
+					<label class="remember">
+						<input type="checkbox">
+						Se souvenir de moi
+					</label>
+					<a href="" class="forgot">Mot de passe oublié ?</a>
+				</div>
+
+				<button class="btn btn-primary btn-full">Se connecter</button>
+
+			</form>
+
+		</div>
+
+	</section>
+
+{% endblock %}
