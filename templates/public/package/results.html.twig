@@ -1,0 +1,79 @@
+{% extends "public/base.html.twig" %}
+
+
+{% block body %}
+
+
+<section class="page-header container">
+	<h1>Disponibilité pour le transfert de colis</h1>
+	<p>Kinshasa → Matadi | Date : 12 février 2026</p>
+</section>
+
+<section class="public-package-result-container container">
+
+	<!-- RESULT CARD -->
+	<div class="result-card">
+
+		<div class="result-info">
+			<h3>Ligne Kinshasa – Matadi</h3>
+			<p>
+				<strong>Prochain départ :</strong>
+				Mercredi 13 février à 06h30
+			</p>
+			<p>
+				<strong>Type de véhicule :</strong>
+				Bus + soute
+			</p>
+			<p>
+				<strong>Capacité colis :</strong>
+				Disponible
+			</p>
+			<p>
+				<strong>Tarification :</strong>
+				Selon poids et nature du colis
+			</p>
+		</div>
+
+		<div class="agency-contact">
+			<h4>
+				<i class="fas fa-phone"></i>
+				Contact agence
+			</h4>
+			<p>
+				<strong>Agence :</strong>
+				Voyagest Kinshasa
+			</p>
+			<p>
+				<strong>Téléphone :</strong>
+				+243 81 234 56 78
+			</p>
+			<p>
+				<strong>WhatsApp :</strong>
+				+243 99 876 54 32
+			</p>
+			<p>
+				<strong>Horaires :</strong>
+				08h00 – 17h00
+			</p>
+		</div>
+
+	</div>
+	<!--result-card-->
+
+
+	<!-- RESULT CARD -->
+	<div class="result-card">
+		<div class="result-info">
+			<h3 class="text-danger">Cette ligne n'est pas Disponible</h3>
+		</div>
+	</div>
+
+	<!--PACKAGE FOOTER-->
+	<div class="package-footer">
+		<span class="text-size-20">⚠️</span> Les prix sont définis au guichet selon le poids réel et le type de colis.
+	</div>
+</section>
+<!--public-package-result-container-->
+
+
+{% endblock %}

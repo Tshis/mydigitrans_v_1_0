@@ -1,0 +1,69 @@
+{% extends "public/base.html.twig" %}
+
+
+{% block body %}
+
+	<div class="public-package">
+
+		<section class="page-header container">
+			<h1>Transfert de colis</h1>
+			<p>Envoyez vos colis en toute sécurité sur nos lignes régulières</p>
+		</section>
+		<!--page-header-->
+
+		<section class="info-section">
+			<div class="info-card">
+				<h3>📦 Ce service est fait pour vous si :</h3>
+				<ul>
+					<li>Vous n’êtes pas passager</li>
+					<li>Vous souhaitez envoyer un colis entre deux villes</li>
+					<li>Vous utilisez nos lignes existantes</li>
+				</ul>
+			</div>
+		</section>
+		<!--info-section-->
+
+		<section class="form-section-colis">
+			<form action="{{path('public_package_results')}}" method="post">
+
+				<div class="field mb-25">
+					<label>Ville de départ</label>
+					<input type="text" placeholder="Ex : Kinshasa" required>
+				</div>
+
+				<div class="field mb-25">
+					<label>Ville d’arrivée</label>
+					<input type="text" placeholder="Ex : Matadi" required>
+				</div>
+
+				<div class="field mb-25">
+					<label>Date souhaitée d’envoi</label>
+					<input type="date" required>
+				</div>
+
+				<div class="field mb-25">
+					<label>Type de colis (optionnel)</label>
+					<input type="text" placeholder="Documents, marchandises, effets personnels">
+				</div>
+
+				<div class="field mb-25">
+					<label>Poids approximatif</label>
+					<select>
+						<option>Moins de 5 kg</option>
+						<option>5 – 10 kg</option>
+						<option>10 – 20 kg</option>
+						<option>Plus de 20 kg</option>
+					</select>
+				</div>
+
+				<button class="btn btn-primary btn-full">Vérifier la disponibilité</button>
+
+			</form>
+		</section>
+		<!--form-selection-colis-->
+
+	</div>
+	<!--public-package-->
+
+
+{% endblock %}
