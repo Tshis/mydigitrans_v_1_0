@@ -1,16 +1,22 @@
 <header class="topbar">
 
-	<button id="mobileToggle" class="mobile-toggle">☰</button>
+	<button id="mobileToggle" class="mobile-toggle">
+		<i class="fa-solid fa-bars-staggered"></i>
+	</button>
 
 	<div class="topbar-right">
 
 		{% include 'admin/partials/_notifications.html.twig' %}
 
-		<button id="darkToggle" class="dark-toggle">🌙</button>
+		<button id="darkToggle" class="dark-toggle">
+			<i class="fa-solid fa-moon"></i>
+			{# <i class="fa-solid fa-sun"></i> #}
+		</button>
 
 		<div class="user-info">
-			tshisdaniel@gmail.com
+			Daniel LUKONU
 		</div>
+		<!--user-info-->
 
 	</div>
 

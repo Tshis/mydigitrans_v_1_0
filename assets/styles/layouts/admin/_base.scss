@@ -1,111 +1,116 @@
 @use'../../abstract/variables' as *;
 
-.admin{
+body#admin{
 
-
-
-/* ===============================
-   RESET
-=================================*/
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}//*
-
-body {
-    font-family: Arial, sans-serif;
-    background: #f3f4f6;
-    color: #1f2937;
     transition: background 0.3s, color 0.3s;
-}
+    
+    .admin-layout{
+        
+        /**Pour placer le sidebar et le contenu cote à cote*/
+        display: flex;
+        min-height: 100vh;
+        position: relative;
 
-/* ===============================
-   LAYOUT
-=================================*/
-.admin-container {
-    display: flex;
-    min-height: 100vh;
-}
+        .main-wrapper{
+    
+            min-height: 100vh;
+            min-height: 100vdh;
+            display: flex;
+            flex-direction: column;
+    
+            /**pour laisser la place au navbar fixed*/
+            padding-top: 0;
+            margin-left: 240px;
+    
+            //background: rgba($color: $mute, $alpha: .15);
+            color: $dark;
+    
+            .admin-footer{
+                margin-top: auto;
+            }
+    
+    
+        }//main-content
+    
+    
+    }//admin-layout
 
-/* ===============================
-   SIDEBAR
-=================================*/
-.sidebar {
-    width: 240px;
-    background: #ffffff;
-    border-right: 1px solid #e5e7eb;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 20px;
-    transition: width 0.3s ease;
-}
+}//#admin
 
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: bold;
-    color: #2563eb;
-    margin-bottom: 30px;
-}
 
-.collapse-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-}
 
-/* MENU */
-.menu-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: #374151;
-    margin-bottom: 6px;
-    position: relative;
-    transition: background 0.2s;
-}
-
-.menu-link:hover {
-    background: #2563eb;
-    color: white;
-}
-
-.menu-link.active {
-    background: #2563eb;
-    color: white;
-}
 
 /* ===============================
    COLLAPSED MODE
 =================================*/
-.admin-container.collapsed .sidebar {
-    width: 70px;
-}
+.admin-layout.collapsed{
 
-.admin-container.collapsed .text,
-.admin-container.collapsed .logo-text {
-    display: none;
-}
+    .sidebar {
+        width: 70px;
+        
+        .sidebar-header {
+            justify-content: center;
 
-/* TOOLTIP */
-.admin-container.collapsed .menu-link:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 70px;
-    background: #111827;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    white-space: nowrap;
-}
+            .collapse-btn {
+                transform: rotate(180deg);
+            }//collapse-btn
+
+        }//sidebar-header
+
+        //TOOLTIP
+
+        .menu-link {
+            position: relative;
+            justify-content: center;
+            overflow: visible; 
+
+            &::after {
+                content: attr(data-tooltip); /* Utilise ton attribut HTML */
+                position: fixed; /* 'fixed' permet de sortir de l'overflow du menu */
+                left: 80px; /* Position juste à côté de la barre de 70px */
+                background-color: $dark;
+                color: $white;
+                padding: 8px 12px;
+                border-radius: 5px;
+                font-size: 13px;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease, transform 0.2s ease;
+                transform: translateX(-10px); /* Petit effet de glissement */
+                box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+                z-index: 9999; /* Au-dessus de tout */
+            }//:after
+
+            &:hover {
+                background: $dark; // Le fond du lien change
+                
+                &::after {
+                    opacity: 1; // On cible le ::after DU lien survolé
+                    visibility: visible;
+                    transform: translateX(0);
+                }
+            }//&:hover:
+
+        }//menu-link
+
+
+    }//sidebar
+
+    .text,
+    .logo-text {
+        display: none;
+    }//text,long-text
+
+    .main-wrapper{
+        margin-left: 70px !important;
+        transition: width 0.3s ease;
+    }//main-wrapper
+
+}//.admin-layout.collapsed
+
+
+
 
 /* ===============================
    MAIN WRAPPER
@@ -235,30 +240,30 @@ body {
 /* ===============================
    DARK MODE
 =================================*/
-&.dark {
+dark {
     background: #111827;
     color: #f9fafb;
 }
 
-&.dark .sidebar,
-&.dark .topbar,
-&.dark .card,
-&.dark .admin-footer,
-&.dark .notification-dropdown {
+dark .sidebar,
+dark .topbar,
+dark .card,
+dark .admin-footer,
+dark .notification-dropdown {
     background: #1f2937;
     color: #f9fafb;
     border-color: #374151;
 }
 
-&.dark .menu-link {
+dark .menu-link {
     color: #f9fafb;
 }
 
-&.dark .menu-link:hover {
+dark .menu-link:hover {
     background: #2563eb;
 }
 
-&.dark .notif-item:hover {
+dark .notif-item:hover {
     background: #374151;
 }
 
@@ -285,9 +290,7 @@ body {
         transform: translateX(0);
     }
 
-    .admin-container.collapsed .sidebar {
+    .admin-layout.collapsed .sidebar {
         width: 240px; /* on évite mini en mobile */
     }
 }
-
-}//admin

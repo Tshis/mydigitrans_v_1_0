@@ -1,44 +1,26 @@
 <aside class="sidebar" id="sidebar">
 
 	<div class="sidebar-header">
-		<span class="logo-text">VOYAGEST</span>
-		<button id="collapseBtn" class="collapse-btn">⇤</button>
+		<span class="logo-text">MYDIGITRANS</span>
+		<button id="collapseBtn" class="collapse-btn">
+			<i class="fa-solid fa-arrow-left"></i>
+		</button>
 	</div>
+	<!--header-->
 
 	<nav class="menu">
-
-		<a href="" class="menu-link" data-tooltip="Dashboard">
-			<span class="icon">🏠</span>
-			<span class="text">Dashboard</span>
-		</a>
-
-		<a href="#" class="menu-link" data-tooltip="Lignes">
-			<span class="icon">🚌</span>
-			<span class="text">Lignes</span>
-		</a>
-
-		<a href="#" class="menu-link" data-tooltip="Réservations">
-			<span class="icon">🎟</span>
-			<span class="text">Réservations</span>
-		</a>
-
-		<a href="#" class="menu-link" data-tooltip="Colis">
-			<span class="icon">📦</span>
-			<span class="text">Colis</span>
-		</a>
-
-		<a href="#" class="menu-link" data-tooltip="Utilisateurs">
-			<span class="icon">👥</span>
-			<span class="text">Utilisateurs</span>
-		</a>
-
+		{% include "admin/partials/menu/_agency.html.twig" %}
 	</nav>
+	<!--menu-->
 
 	<div class="sidebar-footer">
 		<a href="" class="menu-link" data-tooltip="Déconnexion">
-			<span class="icon">🚪</span>
+			<span class="icon">
+				<i class="fa-solid fa-right-from-bracket"></i>
+			</span>
 			<span class="text">Déconnexion</span>
 		</a>
 	</div>
+	<!--side-footer-->
 
 </aside>

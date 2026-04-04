@@ -1,32 +1,54 @@
 <!DOCTYPE html>
-<html lang="fr">
-	<head>
-		<meta charset="UTF-8">
-		<title>
-			{% block title %}Dashboard
-			{% endblock %}
-		</title>
-		<link rel="stylesheet" href="/styles/app.css">
-	</head>
-	<body class="admin">
+<html>
 
-		<div class="admin-container " id="adminContainer">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-			{% include 'admin/partials/_sidebar.html.twig' %}
+    <link rel="icon" href="/img-core/favicon.png">
+    <meta name="theme-color" content="#ef6e17" />
 
-			<div class="main-wrapper">
+    <title>
+        {% block title %}My DigiTrans |
+        {{ page|capitalize }}
+        {% endblock %}
+    </title>
 
-				{% include 'admin/partials/_topbar.html.twig' %}
+    {% block stylesheets %}
+    <link rel="stylesheet" href="/styles/app.css">
+    {% endblock %}
 
-				<main class="main-content"> {% block body %}{% endblock %}
-					</main>
+    {% block javascripts %}
+    <script src="/js/admin/app.js" defer></script>
+    {% endblock %}
+</head>
 
-					{% include 'admin/partials/_footer.html.twig' %}
+<body id="admin">
 
-				</div>
+    <div class="admin-layout" id="adminContainer">
 
-			</div>
 
-			<script src="/js/admin/app.js"></script>
-		</body>
-	</html>
+        {% include 'admin/partials/_sidebar.html.twig' %}
+
+
+
+        <div class="main-wrapper">
+
+            {% include 'admin/partials/_topbar.html.twig' %}
+
+            <main class="main-content">
+                {% block body %}{% endblock %}
+            </main>
+
+            {% include 'admin/partials/_footer.html.twig' %}
+
+        </div>
+        <!--main-wrapper-->
+
+    </div>
+    <!--admin-layout-->
+
+</body>
+
+</html>

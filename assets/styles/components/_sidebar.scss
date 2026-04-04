@@ -1,0 +1,103 @@
+@use '../abstract/variables' as *;
+/* ===============================
+   SIDEBAR
+=================================*/
+.sidebar {
+    background: $white;
+    border-right: 1px solid $mute;
+    width: 240px;
+    min-height: 100vh;
+    min-height: 100vdh;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px;
+    transition: width 0.3s ease;
+
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+
+    z-index: 9999;
+
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+        color: $dark;
+        margin-bottom: 30px;
+        padding: 20px;
+        height: 60px;
+    }//sidebar-header
+
+
+    .collapse-btn {
+        transition:all .5s;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }//collapse-btn
+
+    /* MENU */
+    .menu{
+    
+        flex-grow: 1; /* Prend tout l'espace disponible au milieu */
+        padding: 10px 0;
+
+        /* 1. COMPORTEMENT DU SCROLL */
+        overflow-y: hidden; // Caché par défaut
+        overflow-x: hidden;
+        transition: overflow 0.3s;
+
+        &:hover {
+            overflow-y: auto; // Apparaît seulement au survol s'il y a besoin
+        }
+
+        &:hover::-webkit-scrollbar-thumb {
+            //margin-left: 5rem;
+            background: rgba($primary, 0.5); // Apparaît doucement au survol
+            // Si ton fond est sombre, utilise : rgba(255, 255, 255, 0.5)
+        
+            background-clip: content-box; // RÉEL SECRET : la couleur ne remplit que le contenu
+            border: 1px solid transparent; // Crée un vide de 2px autour de la barre de scroll
+            border-radius: 10px;
+        }
+       
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            margin-right: 2.4rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: $dark;
+            margin-bottom: 6px;
+            position: relative;
+            transition: background 0.2s;
+    
+            &:hover,
+            &.active{
+                background: $success;
+                color: $white;
+            }
+        }//menu-link
+    
+    }//menu
+
+    .sidebar-footer{
+        border-top: 1px solid $dark;
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        color: $danger !important;
+    }//sidebar-footer
+
+}//sidebar
+
+
+

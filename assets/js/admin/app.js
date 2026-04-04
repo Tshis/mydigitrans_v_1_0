@@ -7,6 +7,8 @@ const notifToggle = document.getElementById('notifToggle');
 const notifDropdown = document.getElementById('notifDropdown');
 const topbar = document.querySelector('.topbar');
 
+console.log(adminContainer)
+
 
 /* COLLAPSE SIDEBAR */
 collapseBtn?.addEventListener('click', () => {
