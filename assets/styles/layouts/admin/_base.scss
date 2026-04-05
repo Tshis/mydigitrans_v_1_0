@@ -35,79 +35,94 @@ body#admin{
     
     }//admin-layout
 
-}//#admin
-
-
-
-
-/* ===============================
-   COLLAPSED MODE
-=================================*/
-.admin-layout.collapsed{
-
-    .sidebar {
-        width: 70px;
+    /* ===============================
+       COLLAPSED MODE
+    =================================*/
+    .admin-layout.collapsed{
+    
+        .sidebar {
+            width: 70px;
+            
+            .sidebar-header {
+                justify-content: center;
+    
+                .collapse-btn {
+                    transform: rotate(180deg);
+                }//collapse-btn
+    
+            }//sidebar-header
+            
+            .menu{
+                .menu-link {
+                    position: relative;
+                    justify-content: center;
+                    overflow: visible; 
+                    
         
-        .sidebar-header {
-            justify-content: center;
+                    &::after {
+                        content: attr(data-tooltip); /* Utilise ton attribut HTML */
+                        position: fixed; /* 'fixed' permet de sortir de l'overflow du menu */
+                        left: 80px; /* Position juste à côté de la barre de 70px */
+                        background-color: $dark;
+                        color: $white;
+                        padding: 8px 12px;
+                        border-radius: 5px;
+                        font-size: 13px;
+                        white-space: nowrap;
+                        opacity: 0;
+                        pointer-events: none;
+                        transition: opacity 0.2s ease, transform 0.2s ease;
+                        transform: translateX(-10px); /* Petit effet de glissement */
+                        box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+                        z-index: 9999; /* Au-dessus de tout */
+                    }//:after
+        
+                    &:hover {
+                        background: $dark; // Le fond du lien change
+                        padding: 1.3rem;
+                        margin-right: 1rem;
+                        
+                        &::after {
+                            opacity: 1; // On cible le ::after DU lien survolé
+                            visibility: visible;
+                            transform: translateX(0);
+                        }
+                    }//&:hover:
+        
+                }//menu-link
+            }//menu
+            
+            .sidebar-footer{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                .menu-link{
 
-            .collapse-btn {
-                transform: rotate(180deg);
-            }//collapse-btn
+                    padding: none;
 
-        }//sidebar-header
+                }//menu-link
 
-        //TOOLTIP
-
-        .menu-link {
-            position: relative;
-            justify-content: center;
-            overflow: visible; 
-
-            &::after {
-                content: attr(data-tooltip); /* Utilise ton attribut HTML */
-                position: fixed; /* 'fixed' permet de sortir de l'overflow du menu */
-                left: 80px; /* Position juste à côté de la barre de 70px */
-                background-color: $dark;
-                color: $white;
-                padding: 8px 12px;
-                border-radius: 5px;
-                font-size: 13px;
-                white-space: nowrap;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity 0.2s ease, transform 0.2s ease;
-                transform: translateX(-10px); /* Petit effet de glissement */
-                box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
-                z-index: 9999; /* Au-dessus de tout */
-            }//:after
-
-            &:hover {
-                background: $dark; // Le fond du lien change
-                
-                &::after {
-                    opacity: 1; // On cible le ::after DU lien survolé
-                    visibility: visible;
-                    transform: translateX(0);
-                }
-            }//&:hover:
-
-        }//menu-link
+            }//sidebar-footer
+            
+            
+        }//sidebar
+    
+        .text,
+        .logo-text {
+            display: none;
+        }//text,long-text
+    
+        .main-wrapper{
+            margin-left: 70px !important;
+            transition: width 0.3s ease;
+        }//main-wrapper
+    
+    }//.admin-layout.collapsed
 
 
-    }//sidebar
 
-    .text,
-    .logo-text {
-        display: none;
-    }//text,long-text
 
-    .main-wrapper{
-        margin-left: 70px !important;
-        transition: width 0.3s ease;
-    }//main-wrapper
 
-}//.admin-layout.collapsed
 
 
 
@@ -245,25 +260,25 @@ dark {
     color: #f9fafb;
 }
 
-dark .sidebar,
-dark .topbar,
-dark .card,
-dark .admin-footer,
-dark .notification-dropdown {
+.dark .sidebar,
+.dark .topbar,
+.dark .card,
+.dark .admin-footer,
+.dark .notification-dropdown {
     background: #1f2937;
     color: #f9fafb;
     border-color: #374151;
 }
 
-dark .menu-link {
+.dark .menu-link {
     color: #f9fafb;
 }
 
-dark .menu-link:hover {
+.dark .menu-link:hover {
     background: #2563eb;
 }
 
-dark .notif-item:hover {
+.dark .notif-item:hover {
     background: #374151;
 }
 
@@ -294,3 +309,7 @@ dark .notif-item:hover {
         width: 240px; /* on évite mini en mobile */
     }
 }
+
+
+
+}//#admin

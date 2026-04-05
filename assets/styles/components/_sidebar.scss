@@ -24,15 +24,42 @@
 
     .sidebar-header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        height: 70px; // Un peu plus haut pour le prestige
+        //background: darken($dark, 5%); // Un fond légèrement plus sombre
+        border-bottom: 1px solid rgba($dark, 0.25);
+        overflow: hidden;
         font-weight: bold;
-        color: $dark;
-        margin-bottom: 30px;
-        padding: 20px;
-        height: 60px;
-    }//sidebar-header
 
+        .logo-text {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-weight: 800; // Très gras pour l'impact
+            font-size: 1.6rem;
+            //letter-spacing: 1.5px; // Espacement moderne
+            text-transform: uppercase;
+            
+            // --- EFFET DE COULEUR ---
+            background: linear-gradient(135deg, $dark 40%, $primary 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            white-space: nowrap;
+
+            &::after {
+                content: '';
+                display: block;
+                width: 30px;
+                height: 3px;
+                background: $primary;
+                border-radius: 2px;
+                margin-top: 2px;
+            }
+        }//.logo-text
+
+    }//sidebar-header
 
     .collapse-btn {
         transition:all .5s;
@@ -58,7 +85,7 @@
         }
 
         &:hover::-webkit-scrollbar-thumb {
-            //margin-left: 5rem;
+            //margin-left: 5rem !important;
             background: rgba($primary, 0.5); // Apparaît doucement au survol
             // Si ton fond est sombre, utilise : rgba(255, 255, 255, 0.5)
         
@@ -95,6 +122,21 @@
         align-items: center;
         padding: 1rem;
         color: $danger !important;
+        box-shadow: 0 -10px 10px -10px rgba($dark, 0.75);
+        margin-top: .5rem;
+
+        
+
+        .menu-link{
+            color: $danger;
+            transition: background .3s ease ;
+            padding: 8px 14px;
+
+            &:hover{
+                background: rgba($color: $primary, $alpha: .4);
+                border-radius: 5px;
+            }
+        }
     }//sidebar-footer
 
 }//sidebar
