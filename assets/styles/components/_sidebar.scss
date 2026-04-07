@@ -43,6 +43,7 @@
             
             // --- EFFET DE COULEUR ---
             background: linear-gradient(135deg, $dark 40%, $primary 100%);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             
