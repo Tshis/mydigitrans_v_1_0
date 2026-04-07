@@ -8,8 +8,10 @@ body#admin{
         
         /**Pour placer le sidebar et le contenu cote à cote*/
         display: flex;
-        min-height: 100vh;
+        height: 100dvh; /* Utilise la hauteur dynamique de l'écran */
+        width: 100%;
         position: relative;
+        overflow: hidden; /* EMPECHE LE LAYOUT DE SCROLLER */
 
         .main-wrapper{
     
@@ -30,10 +32,12 @@ body#admin{
             }
     
     
-        }//main-content
+        }//main-wrapper
     
     
     }//admin-layout
+
+
 
     /* ===============================
        COLLAPSED MODE
@@ -53,6 +57,7 @@ body#admin{
             }//sidebar-header
             
             .menu{
+                
                 .menu-link {
                     position: relative;
                     justify-content: center;
@@ -90,6 +95,8 @@ body#admin{
                     }//&:hover:
         
                 }//menu-link
+
+
             }//menu
             
             .sidebar-footer{
@@ -119,12 +126,35 @@ body#admin{
     
     }//.admin-layout.collapsed
 
+    /*======COLLAPSED MODE===========*/
 
 
+    /* ===============================
+    DARK MODE
+    =================================*/
+    &.dark {
+        background-color: $dm-bg-main;
+        color: $dm-text;
 
+        &::-webkit-scrollbar-thumb {
+            background: rgba($success, 0.5); // Apparaît doucement au survol
+        }//::-webkit-scrollbar-thumb
 
+        .sidebar,
+        .topbar,
+        .card,
+        .admin-footer,
+        .notification-dropdown {
+            background: $dm-bg-surface;
+            color: $white;
+            border-color: $mute;
+        }//.dark
 
+        .notif-item:hover {
+            background: #374151;
+        }//notif-item
 
+    }//&.dark
 
 
 /* ===============================
@@ -252,64 +282,130 @@ body#admin{
     color: #6b7280;
 }
 
-/* ===============================
-   DARK MODE
-=================================*/
-dark {
-    background: #111827;
-    color: #f9fafb;
-}
+}//#admin
 
-.dark .sidebar,
-.dark .topbar,
-.dark .card,
-.dark .admin-footer,
-.dark .notification-dropdown {
-    background: #1f2937;
-    color: #f9fafb;
-    border-color: #374151;
-}
-
-.dark .menu-link {
-    color: #f9fafb;
-}
-
-.dark .menu-link:hover {
-    background: #2563eb;
-}
-
-.dark .notif-item:hover {
-    background: #374151;
-}
 
 /* ===============================
    RESPONSIVE
 =================================*/
 @media (max-width: 900px) {
 
-    .mobile-toggle {
-        display: block;
-    }
+    body#admin{
 
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        transform: translateX(-100%);
-        z-index: 1000;
-        transition: transform 0.3s ease;
-    }
+        transition: background 0.3s, color 0.3s;
+        
+        .admin-layout{
+            display: flex;
+            overflow: hidden;
+            height: 100vh;
 
-    .sidebar.mobile-active {
-        transform: translateX(0);
-    }
+            .main-wrapper{
+                margin-left: 0 !important;
+            }//main-wrapper
 
-    .admin-layout.collapsed .sidebar {
-        width: 240px; /* on évite mini en mobile */
-    }
-}
+            .mobile-toggle {
+                display: block;
+            }//mobile-toggle
+        
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                height: 100vh !important;
+                transform: translateX(-100%);
+                z-index: 1000;
+                transition: transform 0.3s ease;
+                overscroll-behavior: contain; /* Empêche le scroll du body quand on scrolle la sidebar */
+                 overflow: hidden; /* Empêche la sidebar entière de scroller */
+
+                &.mobile-active {
+                    transform: translateX(0);
+                }//mobile-active
+
+                .js-desktop{
+                    display: none !important;
+                }//js-desktop
+
+                .js-mobile{
+                    display: block;
+                }//js-mobile
+
+                .sidebar-header{
+                    padding-block: 1.8rem;            
+                }//.sidebar-header
+   
+            }//sidebar    
+        
+            &.collapsed{
+                
+                .sidebar {
+                    width: 240px; /* on évite mini en mobile */
+                   // transform: translateX(-100%);
+                        
+                    .sidebar-header {
+                        justify-content:space-between;
+            
+                        .collapse-btn {
+                            transform: rotate(360deg);
+                        }//collapse-btn
+            
+                    }//sidebar-header
+                        
+                    .menu{
+                        .menu-link {
+                            position: relative;
+                            justify-content: flex-start;
+                            overflow: visible; 
+                            
+                
+                            &::after {
+                                display: none !important;
+                            }//:after
+                
+                            &:hover {
+                                display: none !important;
+                            }//&:hover:
+                
+                        }//menu-link
+                    }//menu
+                        
+                    .sidebar-footer{
+                        display: flex;
+                        justify-content: flex-start;
+                        align-items: center;
+                        .menu-link{
+
+                            padding: none;
+
+                        }//menu-link
+
+                    }//sidebar-footer
+                        
+                        
+                }//sidebar
 
 
 
-}//#admin
+                .main-wrapper{
+                    margin-left: 0 !important;
+                }//main-wrapper
+
+                .text,
+                .logo-text {
+                    display: block;
+                }//text,long-text
+
+            }//&.collapsed
+
+        }//admin-layout
+
+
+    }//body#admin
+
+
+}//@media (max-width: 900px)
+
+
+
+

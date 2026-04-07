@@ -1,5 +1,6 @@
 const adminContainer = document.getElementById('adminContainer');
 const collapseBtn = document.getElementById('collapseBtn');
+const collapseMobile = document.getElementById('collapseMobile');
 const darkToggle = document.getElementById('darkToggle');
 const mobileToggle = document.getElementById('mobileToggle');
 const sidebar = document.getElementById('sidebar');
@@ -7,12 +8,14 @@ const notifToggle = document.getElementById('notifToggle');
 const notifDropdown = document.getElementById('notifDropdown');
 const topbar = document.querySelector('.topbar');
 
-console.log(adminContainer)
-
-
 /* COLLAPSE SIDEBAR */
 collapseBtn?.addEventListener('click', () => {
     adminContainer.classList.toggle('collapsed');
+});
+
+/* COLLAPSE SIDEBAR */
+collapseMobile?.addEventListener('click', () => {
+    sidebar.classList.toggle('mobile-active');;
 });
 
 /* MOBILE SIDEBAR */
