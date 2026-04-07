@@ -1,23 +1,36 @@
 <header class="topbar">
 
-	<button id="mobileToggle" class="mobile-toggle">
-		<i class="fa-solid fa-bars-staggered"></i>
-	</button>
+	<div class="topbar-left">
+		<button id="mobileToggle" class="btn-icon mobile-toggle" aria-label="Menu">
+			<i class="fa-solid fa-bars-staggered"></i>
+		</button>
+		<!-- Optionnel : Titre de la page ou fil d'ariane ici -->
+		<h1 class="page-title">Tableau de bord</h1>
+	</div>
+	<!--topbar-left-->
 
 	<div class="topbar-right">
+		<div class="actions-group">
+			{% include 'admin/partials/_notifications.html.twig' %}
 
-		{% include 'admin/partials/_notifications.html.twig' %}
-
-		<button id="darkToggle" class="dark-toggle">
-			<i class="fa-solid fa-moon"></i>
-			{# <i class="fa-solid fa-sun"></i> #}
-		</button>
-
-		<div class="user-info">
-			Daniel LUKONU
+			<button id="darkToggle" class="btn-icon dark-toggle" title="Changer de mode">
+				<span class="moon"> <i class="fa-solid fa-moon"></i> </span>
+				<span class="sun"> <i class="fa-solid fa-sun"></i> </span>
+			</button>
 		</div>
-		<!--user-info-->
+
+		<div class="user-profile">
+			<div class="user-text">
+				<span class="user-name">Daniel LUKONU</span>
+				<span class="user-role">Administrateur</span>
+			</div>
+			<!-- Remplacement par l'icône -->
+			<div class="user-icon-wrapper">
+				<i class="fa-solid fa-circle-user"></i>
+			</div>
+		</div>
 
 	</div>
+	<!--topbar-right-->
 
 </header>

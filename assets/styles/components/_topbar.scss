@@ -1,0 +1,134 @@
+@use '../abstract/variables' as *;
+
+
+.topbar {
+    height: 70px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: $white;
+    border-bottom: 1px solid rgba($gray, 0.1);
+    position: fixed;
+    top: 0;
+    z-index: 9999;
+    font-size: 1.6rem;
+
+    .topbar-left, .topbar-right {
+        display: flex;
+        align-items: center;
+        align-items: center;
+        gap: 1rem;
+
+    }//.topbar-left, .topbar-right
+
+    .mobileToggle{
+        i{
+            color: $dark;
+            font-size: 2.6rem;
+        }//i
+    }//mobileToggle
+
+    // Titre de page discret
+    .page-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: $dark;
+        margin: 0;
+        @media (max-width: 768px) { display: none; }
+    }//.page-title
+
+    // Boutons d'actions génériques
+    .btn-icon {
+        background: transparent;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        color: $gray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        i { font-size: 1.2rem; }
+
+        &:hover {
+            background: rgba($primary, 0.1);
+            color: $primary;
+        }
+    }//btn-icon
+
+    span.sun,
+    span.moon{
+        transition: all .3s;
+    }
+    
+    span.sun{
+        display: none;
+    }//span.sun
+
+    // Groupe d'actions (Notifs + DarkMode)
+    .actions-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        padding-right: 1.25rem;
+        border-right: 1px solid rgba($gray, 0.1);
+    }//actions-group
+
+    // Profil Utilisateur
+    .user-profile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 12px;
+        transition: background 0.2s;
+
+        &:hover { background: rgba($gray, 0.25); }
+
+        .user-text {
+            text-align: right;
+            .user-name {
+                display: block;
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: $dark;
+            }
+            .user-role {
+                display: block;
+                font-size: 0.95rem;
+                color: $gray;
+            }
+            @media (max-width: 576px) { display: none; }
+        }// .user-text
+
+        .user-icon-wrapper{
+            font-size: 2.6rem !important;
+        }//user-icon-wrapper
+
+    }//user-profil
+
+
+
+}//topbar
+
+// Version Dark Mode automatique
+.dark .topbar {
+
+    span.moon{display: none;}
+    span.sun{display: block;}
+
+    .page-title, .user-name { color: $white; }
+    .btn-icon { 
+        color: $mute; 
+        &:hover { background: rgba($primary, 0.2); color: $primary; }
+    }
+    .actions-group { border-color: lighten($dark, 10%); }
+
+}//topbar
+
