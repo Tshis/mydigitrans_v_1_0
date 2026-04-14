@@ -1,134 +1,285 @@
 @use '../abstract/variables' as *;
 
-
-.topbar {
-    height: 70px !important;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: $white;
-    border-bottom: 1px solid rgba($gray, 0.1);
-    position: fixed;
-    top: 0;
-    z-index: 9999;
-    font-size: 1.6rem;
-
-    .topbar-left, .topbar-right {
-        display: flex;
-        align-items: center;
-        align-items: center;
-        gap: 1rem;
-
-    }//.topbar-left, .topbar-right
-
-    .mobileToggle{
-        i{
-            color: $dark;
-            font-size: 2.6rem;
-        }//i
-    }//mobileToggle
-
-    // Titre de page discret
-    .page-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: $dark;
-        margin: 0;
-        @media (max-width: 768px) { display: none; }
-    }//.page-title
-
-    // Boutons d'actions génériques
-    .btn-icon {
-        background: transparent;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        color: $gray;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        i { font-size: 1.2rem; }
-
-        &:hover {
-            background: rgba($primary, 0.1);
-            color: $primary;
-        }
-    }//btn-icon
-
-    span.sun,
-    span.moon{
-        transition: all .3s;
-    }
+body#admin{
     
-    span.sun{
-        display: none;
-    }//span.sun
-
-    // Groupe d'actions (Notifs + DarkMode)
-    .actions-group {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 2rem;
-        padding-right: 1.25rem;
-        border-right: 1px solid rgba($gray, 0.1);
-    }//actions-group
-
-    // Profil Utilisateur
-    .user-profile {
+    .topbar {
+        height: 70px !important;
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 12px;
-        cursor: pointer;
-        padding: 4px 8px;
-        border-radius: 12px;
-        transition: background 0.2s;
+        justify-content: space-between;
+        background: $white;
+        border-bottom: 1px solid rgba($gray, 0.2);
+        position: sticky;
+        top: 0;
+        right: 0;
+        z-index: 9999;
+        width: 100%;
+        font-size: 1.6rem;
+        padding: 9px 30px;
+        transition: box-shadow 0.2s;
 
-        &:hover { background: rgba($gray, 0.25); }
+        
+        /* L'effet de flou */
+        backdrop-filter: blur(10px); 
+        -webkit-backdrop-filter: blur(10px); /* Pour Safari */
+        
+        /* Transition pour l'ombre */
+        transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    
+        &.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.85); /* Devient un peu plus opaque */
+        }//&.scrolled
+    
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            
+    
+            .mobile-toggle {
+                display: none !important;
+                background: none;
+                border: none;
+                font-size: 20px;
+                cursor: pointer;
+                 i{
+                    color: $dark;
+                    font-size: 2rem;
+                }//i
 
-        .user-text {
-            text-align: right;
-            .user-name {
-                display: block;
-                font-size: 1.3rem;
-                font-weight: 700;
-                color: $dark;
+                 @media (max-width: 900px) { display: block !important; }
+
+            }//.mobile-toggle
+    
+        }//topbar-right 
+    
+        .topbar-left, .topbar-right {
+            display: flex;
+            align-items: center;
+            align-items: center;
+            gap: 1rem;
+            padding-inline: 2rem;
+    
+        }//.topbar-left, .topbar-right
+    
+        
+    
+        // Titre de page discret
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: $dark;
+            margin: 0;
+            @media (max-width: 768px) { display: none; }
+        }//.page-title
+    
+        // Boutons d'actions génériques
+        .btn-icon {
+            background: transparent;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            color: $dark;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            
+    
+            i { font-size: 2rem; }
+    
+            &:hover {
+                background: rgba($success, 0.1);
+                color: $success;
             }
-            .user-role {
+        }//btn-icon
+    
+        span.sun,
+        span.moon{
+            transition: all .3s;
+        }//span.sun et moon
+        
+        span.sun{
+            display: none;
+        }//span.sun
+    
+        // Groupe d'actions (Notifs + DarkMode)
+        .actions-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            padding-right: 1.25rem;
+            border-right: 1px solid rgba($mute, 0.75);
+            
+        }//actions-group
+    
+        /* ===============================
+        NOTIFICATIONS
+        =================================*/
+        .notification-wrapper {
+    
+            position: relative;
+            z-index: 9999 !important;
+    
+            .notification-icon {
+                font-size: 20px;
+                cursor: pointer;
+                position: relative;
+                transition: color .3s ease-in-out;
+    
+                .badge {
+                    position: absolute;
+                    top: -6px;
+                    right: -10px;
+                    background: $danger;
+                    color: $white;
+                    font-size: 11px;
+                    padding: 2px 6px;
+                    border-radius: 50%;
+                }//badge
+    
+                &:hover{
+                    color: rgba($success, 0.95);
+                }
+    
+            }//notification-icon
+    
+            .notification-dropdown {
+                position: absolute;
+                right: 0;
+                top: 30px;
+                width: 250px;
+                background: $white;
+                border-radius: 12px;
+                box-shadow: 0 15px 40px rgba($dark,0.1);
+                padding: 10px;
+                opacity: 0;
+                transform: translateY(-10px);
+                pointer-events: none;
+                transition: 0.2s ease;
+                z-index: 9999;
+        
+               
+        
+                &.active {
+                    opacity: 1;
+                    transform: translateY(0);
+                    pointer-events: auto;
+        
+                    .overlay{
+                        display: block;
+                    }//overlay
+        
+                }//&.active
+        
+                .notif-item {
+                    padding: 8px;
+                    border-radius: 8px;
+                    cursor: pointer;
+            
+                    &:hover {
+                        background: $mute;
+                    }//&:hover
+                 
+                }//.notif-item
+        
+        
+            }//notification-dropdown
+    
+        }//notification-wrapper
+    
+        .overlay{
+            display: none;
+            height: 100vh;
+            width: 100%;
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba($dark,0.5);
+            transition: background .3s ease-in;
+            z-index: 2;
+            cursor: pointer;
+    
+            &.active{
                 display: block;
-                font-size: 0.95rem;
-                color: $gray;
             }
-            @media (max-width: 576px) { display: none; }
-        }// .user-text
+            
+        }//overlay
+    
+        // Profil Utilisateur
+        .user-profile {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 12px;
+            transition: background 0.2s;
+    
+            &:hover { background: rgba($mute, 0.5); }
+    
+            .user-text {
+                text-align: right;
+                .user-name {
+                    display: block;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    color: $dark;
+                }
+                .user-role {
+                    display: block;
+                    font-size: 0.95rem;
+                    color: $gray;
+                }
+                @media (max-width: 576px) { display: none; }
+            }// .user-text
+    
+            .user-icon-wrapper{
+                font-size: 2.6rem !important;
+            }//user-icon-wrapper
+    
+        }//user-profil
+    
+    }//topbar
+    
+    // Version Dark Mode automatique
+    &.dark .topbar {
+    
+        span.moon{display: none;}
+        span.sun{display: block;}
+    
+        .page-title, .user-name { color: $white; }
+        .btn-icon { 
+            color: $mute; 
+            &:hover { background: rgba($primary, 0.2); color: $primary; }
+        }
+        .actions-group { border-color: lighten($dark, 10%); }
 
-        .user-icon-wrapper{
-            font-size: 2.6rem !important;
-        }//user-icon-wrapper
+        .notification-dropdown{  
+            background: $dm-bg-surface !important;     
+            
+            .notif-item:hover {
+                background: darken($mute,45%);
+            }//notif-item
+        
+        }//notification-dropdown
 
-    }//user-profil
+        .mobile-toggle{
+            i{color: $white !important};
+        }//mobile-toggle
 
+        .user-name{
+            color: $white !important;
+        }
+    
+    }//topbar
 
-
-}//topbar
-
-// Version Dark Mode automatique
-.dark .topbar {
-
-    span.moon{display: none;}
-    span.sun{display: block;}
-
-    .page-title, .user-name { color: $white; }
-    .btn-icon { 
-        color: $mute; 
-        &:hover { background: rgba($primary, 0.2); color: $primary; }
-    }
-    .actions-group { border-color: lighten($dark, 10%); }
-
-}//topbar
+}//body#admin
 

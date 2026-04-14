@@ -21,7 +21,7 @@
     bottom: 0;
     overflow: hidden;
 
-    z-index: 9999;
+    z-index: 99999 !important;
 
     .sidebar-header {
         display: flex;
@@ -147,6 +147,39 @@
             }
         }
     }//sidebar-footer
+
+
+    @media(max-width:900px){
+
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100vh !important;
+        transform: translateX(-100%);
+        z-index: 1000;
+        transition: transform 0.3s ease;
+        overscroll-behavior: contain; /* Empêche le scroll du body quand on scrolle la sidebar */
+            overflow: hidden; /* Empêche la sidebar entière de scroller */
+
+        &.mobile-active {
+            transform: translateX(0);
+        }//mobile-active
+
+        .js-desktop{
+            display: none !important;
+        }//js-desktop
+
+
+        .js-mobile{
+            display: block !important;
+        }//js-mobile
+
+        .sidebar-header{
+            padding-block: 1.8rem;            
+        }//.sidebar-header
+
+    }//@media max width 900px
 
 }//sidebar
 

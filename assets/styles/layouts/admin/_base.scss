@@ -19,6 +19,10 @@ body#admin{
             min-height: 100vdh;
             display: flex;
             flex-direction: column;
+            
+            scroll-behavior: smooth; /* Pour des ancres fluides */
+            -webkit-overflow-scrolling: touch; /* Pour un défilement fluide sur iPhone/iPad */
+    
     
             /**pour laisser la place au navbar fixed*/
             padding-top: 0;
@@ -35,267 +39,157 @@ body#admin{
         }//main-wrapper
     
     
-    }//admin-layout
-
-
-
-    /* ===============================
-       COLLAPSED MODE
-    =================================*/
-    .admin-layout.collapsed{
-    
-        .sidebar {
-            width: 70px;
+        /* ===============================
+            COLLAPSED MODE
+        =================================*/
+            &.collapsed{
             
-            .sidebar-header {
-                justify-content: center;
-    
-                .collapse-btn {
-                    transform: rotate(180deg);
-                }//collapse-btn
-    
-            }//sidebar-header
-            
-            .menu{
-                
-                .menu-link {
-                    position: relative;
-                    justify-content: center;
-                    overflow: visible; 
+                .sidebar {
+                    width: 70px;
                     
-        
-                    &::after {
-                        content: attr(data-tooltip); /* Utilise ton attribut HTML */
-                        position: fixed; /* 'fixed' permet de sortir de l'overflow du menu */
-                        left: 80px; /* Position juste à côté de la barre de 70px */
-                        background-color: $dark;
-                        color: $white;
-                        padding: 8px 12px;
-                        border-radius: 5px;
-                        font-size: 13px;
-                        white-space: nowrap;
-                        opacity: 0;
-                        pointer-events: none;
-                        transition: opacity 0.2s ease, transform 0.2s ease;
-                        transform: translateX(-10px); /* Petit effet de glissement */
-                        box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
-                        z-index: 9999; /* Au-dessus de tout */
-                    }//:after
-        
-                    &:hover {
-                        background: $dark; // Le fond du lien change
-                        padding: 1.3rem;
-                        margin-right: 1rem;
+                    .sidebar-header {
+                        justify-content: center;
+            
+                        .collapse-btn {
+                            transform: rotate(180deg);
+                        }//collapse-btn
+            
+                    }//sidebar-header
+                    
+                    .menu{
                         
-                        &::after {
-                            opacity: 1; // On cible le ::after DU lien survolé
-                            visibility: visible;
-                            transform: translateX(0);
-                        }
-                    }//&:hover:
+                        .menu-link {
+                            position: relative;
+                            justify-content: center;
+                            overflow: visible; 
+                            
+                
+                            &::after {
+                                content: attr(data-tooltip); /* Utilise ton attribut HTML */
+                                position: fixed; /* 'fixed' permet de sortir de l'overflow du menu */
+                                left: 80px; /* Position juste à côté de la barre de 70px */
+                                background-color: $dark;
+                                color: $white;
+                                padding: 8px 12px;
+                                border-radius: 5px;
+                                font-size: 13px;
+                                white-space: nowrap;
+                                opacity: 0;
+                                pointer-events: none;
+                                transition: opacity 0.2s ease, transform 0.2s ease;
+                                transform: translateX(-10px); /* Petit effet de glissement */
+                                box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+                                z-index: 9999; /* Au-dessus de tout */
+                            }//:after
+                
+                            &:hover {
+                                background: $dark; // Le fond du lien change
+                                padding: 1.3rem;
+                                margin-right: 1rem;
+                                
+                                &::after {
+                                    opacity: 1; // On cible le ::after DU lien survolé
+                                    visibility: visible;
+                                    transform: translateX(0);
+                                }
+                            }//&:hover:
+                
+                        }//menu-link
         
-                }//menu-link
-
-
-            }//menu
-            
-            .sidebar-footer{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                .menu-link{
-
-                    padding: none;
-
-                }//menu-link
-
-            }//sidebar-footer
-            
-            
-        }//sidebar
-    
-        .text,
-        .logo-text {
-            display: none;
-        }//text,long-text
-    
-        .main-wrapper{
-            margin-left: 70px !important;
-            transition: width 0.3s ease;
-        }//main-wrapper
-    
-    }//.admin-layout.collapsed
-
-    /*======COLLAPSED MODE===========*/
-
-
-    /* ===============================
-    DARK MODE
-    =================================*/
-    &.dark {
-        background-color: $dm-bg-main;
-        color: $dm-text;
-
-        &::-webkit-scrollbar-thumb {
-            background: rgba($success, 0.5); // Apparaît doucement au survol
-        }//::-webkit-scrollbar-thumb
-
-        .sidebar,
-        .topbar,
-        .card,
-        .admin-footer,
-        .notification-dropdown {
-            background: $dm-bg-surface;
-            color: $white;
-            border-color: $mute;
-        }//.dark
-
-        .notif-item:hover {
-            background: #374151;
-        }//notif-item
-
-    }//&.dark
-
-
-/* ===============================
-   MAIN WRAPPER
-=================================*/
-.main-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-/* ===============================
-   TOPBAR
-=================================*/
-.topbar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: box-shadow 0.2s;
-}
-
-.topbar.scrolled {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.mobile-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-/* ===============================
-   NOTIFICATIONS
-=================================*/
-.notification-wrapper {
-    position: relative;
-}
-
-.notification-icon {
-    font-size: 20px;
-    cursor: pointer;
-    position: relative;
-}
-
-.badge {
-    position: absolute;
-    top: -6px;
-    right: -10px;
-    background: #ef4444;
-    color: white;
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 50%;
-}
-
-.notification-dropdown {
-    position: absolute;
-    right: 0;
-    top: 40px;
-    width: 250px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-    padding: 10px;
-    opacity: 0;
-    transform: translateY(-10px);
-    pointer-events: none;
-    transition: 0.2s ease;
-}
-
-.notification-dropdown.active {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
-.notif-item {
-    padding: 8px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.notif-item:hover {
-    background: #f3f4f6;
-}
-
-/* ===============================
-   CONTENT
-=================================*/
-.main-content {
-    flex: 1;
-    padding: 30px;
-}
-
-.card {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-}
-
-/* ===============================
-   FOOTER
-=================================*/
-.admin-footer {
-    background: #ffffff;
-    border-top: 1px solid #e5e7eb;
-    padding: 15px;
-    text-align: center;
-    font-size: 13px;
-    color: #6b7280;
-}
-
-}//#admin
-
-
-/* ===============================
-   RESPONSIVE
-=================================*/
-@media (max-width: 900px) {
-
-    body#admin{
-
-        transition: background 0.3s, color 0.3s;
         
-        .admin-layout{
-            display: flex;
+                    }//menu
+                    
+                    .sidebar-footer{
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .menu-link{
+        
+                            padding: none;
+        
+                        }//menu-link
+        
+                    }//sidebar-footer
+                    
+                    
+                }//sidebar
+            
+                .text,
+                .logo-text {
+                    display: none;
+                }//text,long-text
+            
+                .main-wrapper{
+                    margin-left: 70px !important;
+                    transition: width 0.3s ease;
+                }//main-wrapper
+
+                @media(max-width:900px){
+                    .sidebar {
+                        width: 240px; /* on évite mini en mobile */
+                    // transform: translateX(-100%);
+                            
+                        .sidebar-header {
+                            justify-content:space-between;
+                
+                            .collapse-btn {
+                                transform: rotate(360deg);
+                            }//collapse-btn
+                
+                        }//sidebar-header
+                            
+                        .menu{
+                            .menu-link {
+                                position: relative;
+                                justify-content: flex-start;
+                                overflow: visible; 
+                                
+                    
+                                &::after {
+                                    display: none !important;
+                                }//:after
+                    
+                                &:hover {
+                                    display: none !important;
+                                }//&:hover:
+                    
+                            }//menu-link
+                        }//menu
+                            
+                        .sidebar-footer{
+                            display: flex;
+                            justify-content: flex-start;
+                            align-items: center;
+                            .menu-link{
+
+                                padding: none;
+
+                            }//menu-link
+
+                        }//sidebar-footer
+                            
+                            
+                    }//sidebar
+
+                    .main-wrapper{
+                        margin-left: 0 !important;
+                    }//main-wrapper
+
+                    .text,
+                    .logo-text {
+                        display: block;
+                    }//text,long-text
+
+                }//max-width:900
+            
+            }//.admin-layout.collapsed
+    
+        /*======COLLAPSED MODE===========*/
+
+
+        @media (max-width: 900px) {
+
+        display: flex;
             overflow: hidden;
             height: 100vh;
 
@@ -303,108 +197,80 @@ body#admin{
                 margin-left: 0 !important;
             }//main-wrapper
 
-            .mobile-toggle {
-                display: block;
-            }//mobile-toggle
+
+        }//@media (max-width: 900px)
+    
         
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                height: 100vh !important;
-                transform: translateX(-100%);
-                z-index: 1000;
-                transition: transform 0.3s ease;
-                overscroll-behavior: contain; /* Empêche le scroll du body quand on scrolle la sidebar */
-                 overflow: hidden; /* Empêche la sidebar entière de scroller */
+    }//admin-layout
 
-                &.mobile-active {
-                    transform: translateX(0);
-                }//mobile-active
+    /* ===============================
+    DARK MODE
+    =================================*/
+        &.dark {
+            background-color: $dm-bg-main;
+            color: $dm-text;
 
-                .js-desktop{
-                    display: none !important;
-                }//js-desktop
+            &::-webkit-scrollbar-thumb {
+                background: rgba($success, 0.5); // Apparaît doucement au survol
+            }//::-webkit-scrollbar-thumb
 
-                .js-mobile{
-                    display: block;
-                }//js-mobile
-
-                .sidebar-header{
-                    padding-block: 1.8rem;            
-                }//.sidebar-header
-   
-            }//sidebar    
-        
-            &.collapsed{
-                
-                .sidebar {
-                    width: 240px; /* on évite mini en mobile */
-                   // transform: translateX(-100%);
-                        
-                    .sidebar-header {
-                        justify-content:space-between;
+            .sidebar,
+            .topbar,
+            .card,
+            .admin-footer,
+            .notification-dropdown {
+                background: $dm-bg-surface;
+                background: darken($success,33%);
+                color: $white;
+                border-color: $mute;
+            }//     
             
-                        .collapse-btn {
-                            transform: rotate(360deg);
-                        }//collapse-btn
-            
-                    }//sidebar-header
-                        
-                    .menu{
-                        .menu-link {
-                            position: relative;
-                            justify-content: flex-start;
-                            overflow: visible; 
-                            
-                
-                            &::after {
-                                display: none !important;
-                            }//:after
-                
-                            &:hover {
-                                display: none !important;
-                            }//&:hover:
-                
-                        }//menu-link
-                    }//menu
-                        
-                    .sidebar-footer{
-                        display: flex;
-                        justify-content: flex-start;
-                        align-items: center;
-                        .menu-link{
+            .main-wrapper{
+                background: darken($success,33%);
+                background: $dm-bg-surface;
+            }
 
-                            padding: none;
+        }//&.dark
 
-                        }//menu-link
+    //===== Dark mode=====/
 
-                    }//sidebar-footer
-                        
-                        
-                }//sidebar
+    /* ===============================
+    MAIN WRAPPER
+    =================================*/
+        .main-wrapper {
+            width: 100%;
+            position: relative !important;
+            overflow: auto;
+            background: rgba($color: $mute, $alpha: .4);
+        }//.main-wrapper
+
+    //===== main-wrapper=====/
 
 
+    /* ===============================
+    CONTENT
+    =================================*/
+        .card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }//card
 
-                .main-wrapper{
-                    margin-left: 0 !important;
-                }//main-wrapper
+    /* ===============================
+    FOOTER
+    =================================*/
+        .admin-footer {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 15px;
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+        }//admin-footer
 
-                .text,
-                .logo-text {
-                    display: block;
-                }//text,long-text
+}//#admin
 
-            }//&.collapsed
-
-        }//admin-layout
-
-
-    }//body#admin
-
-
-}//@media (max-width: 900px)
 
 
 

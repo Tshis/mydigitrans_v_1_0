@@ -1,4 +1,5 @@
 const adminContainer = document.getElementById('adminContainer');
+const notifOverlay = document.getElementById('notif-overlay');
 const collapseBtn = document.getElementById('collapseBtn');
 const collapseMobile = document.getElementById('collapseMobile');
 const darkToggle = document.getElementById('darkToggle');
@@ -7,6 +8,7 @@ const sidebar = document.getElementById('sidebar');
 const notifToggle = document.getElementById('notifToggle');
 const notifDropdown = document.getElementById('notifDropdown');
 const topbar = document.querySelector('.topbar');
+const main = document.querySelector('.main-wrapper');
 
 /* COLLAPSE SIDEBAR */
 collapseBtn?.addEventListener('click', () => {
@@ -38,13 +40,20 @@ darkToggle?.addEventListener('click', () => {
 });
 
 /* NOTIFICATIONS */
-notifToggle?.addEventListener('click', () => {
+notifToggle?.addEventListener('click', notifToggleActive);
+notifOverlay?.addEventListener('click', notifToggleActive);
+
+console.log(main)
+
+function notifToggleActive(params) {
     notifDropdown.classList.toggle('active');
-});
+    notifOverlay.classList.toggle('active'); 
+}
+
 
 /* STICKY SHADOW */
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 10) {
+main?.addEventListener('scroll', () => {
+    if (main.scrollTop > 10) {
         topbar.classList.add('scrolled');
     } else {
         topbar.classList.remove('scrolled');
