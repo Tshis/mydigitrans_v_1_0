@@ -1,122 +1,151 @@
 {% extends "admin/base.html.twig" %}
 
+{% block javascripts %}
+{{parent()}}
+<script src="/js/admin/agency_dashboard.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block body %}
 
-<div class="dashboard">
-
-	<!-- ===== KPI CARDS ===== -->
-	<div class="kpi-grid">
-
+<div class="dashboard-wrapper">
+	<!-- 📊 INDICATEURS GLOBAUX -->
+	<section class="kpi-container">
 		<div class="kpi-card">
-			<div class="kpi-title">Chiffre d'affaires (mois)</div>
-			<div class="kpi-value">2 450 000 FCFA</div>
-			<div class="kpi-trend positive">+12% ce mois</div>
-		</div>
-
-		<div class="kpi-card">
-			<div class="kpi-title">Réservations</div>
-			<div class="kpi-value">324</div>
-			<div class="kpi-trend positive">+8%</div>
-		</div>
-
-		<div class="kpi-card">
-			<div class="kpi-title">Colis</div>
-			<div class="kpi-value">189</div>
-			<div class="kpi-trend negative">-3%</div>
-		</div>
-
-		<div class="kpi-card">
-			<div class="kpi-title">Abonnement</div>
-			<div class="kpi-value status-active">Actif</div>
-			<div class="kpi-sub">Expire le 30 Juin 2026</div>
-		</div>
-
-	</div>
-
-
-	<!-- ===== MAIN GRID ===== -->
-	<div class="dashboard-grid">
-
-		<!-- LEFT COLUMN -->
-		<div class="dashboard-main">
-
-			<div class="card">
-				<h3>Évolution des revenus</h3>
-				<div class="chart-placeholder">
-					Graphique ici
-				</div>
+			<div class="icon-box blue"><i class="fas fa-money-bill-wave"></i></div>
+			<div class="kpi-info">
+				<span class="label">Ventes Totales</span>
+				<h2 id="total-revenue">5.420.000 FC</h2>
 			</div>
+		</div>
+		<div class="kpi-card">
+			<div class="icon-box green"><i class="fas fa-ticket"></i></div>
+			<div class="kpi-info">
+				<span class="label">Réservations</span>
+				<h2>1.240</h2>
+			</div>
+		</div>
+		<div class="kpi-card">
+			<div class="icon-box orange"><i class="fas fa-box-open"></i></div>
+			<div class="kpi-info">
+				<span class="label">Colis</span>
+				<h2>850</h2>
+			</div>
+		</div>
+		<div class="kpi-card alert">
+			<div class="icon-box red"><i class="fas fa-vault"></i></div>
+			<div class="kpi-info">
+				<span class="label">Alertes Caisses</span>
+				<h2 class="text-red">02</h2>
+			</div>
+		</div>
+	</section>
 
-			<div class="card">
-				<h3>Activité récente</h3>
-				<table class="table">
+	<!-- 📈 GRAPHIQUES -->
+	<section class="charts-grid">
+		<div class="chart-card">
+			<h3><i class="fas fa-chart-line"></i> Évolution des Revenus</h3>
+			<div class="canvas-holder">
+				<canvas id="revenueChart"></canvas>
+			</div>
+		</div>
+		<div class="chart-card">
+			<h3><i class="fas fa-chart-pie"></i> Part par Succursale</h3>
+			<div class="canvas-holder">
+				<canvas id="branchPieChart"></canvas>
+			</div>
+		</div>
+	</section>
+
+	<!-- 🏬 TABLES & ACTIVITÉ -->
+	<section class="details-grid">
+		<!-- Performance Succursales -->
+		<div class="table-card">
+			<div class="card-header">
+				<h3><i class="fas fa-store"></i> Succursales</h3>
+			</div>
+			<div class="table-responsive">
+				<table class="custom-table">
 					<thead>
 						<tr>
-							<th>Type</th>
-							<th>Référence</th>
-							<th>Montant</th>
-							<th>Date</th>
+							<th>Agence</th>
+							<th>Ventes</th>
+							<th>Caisse</th>
+							<th>Status</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
-							<td>Réservation</td>
-							<td>#RES-1023</td>
-							<td>15 000 FCFA</td>
-							<td>Aujourd’hui</td>
+						<tr class="branch-row" data-sales="2.800.000 FC">
+							<td><strong>Kinshasa</strong></td>
+							<td>45%</td>
+							<td>2.800.000 FC</td>
+							<td><span class="badge online">Ouvert</span></td>
 						</tr>
-						<tr>
-							<td>Colis</td>
-							<td>#COL-450</td>
-							<td>5 000 FCFA</td>
-							<td>Hier</td>
+						<tr class="branch-row" data-sales="1.450.000 FC">
+							<td><strong>Matadi</strong></td>
+							<td>30%</td>
+							<td>1.450.000 FC</td>
+							<td><span class="badge online">Ouvert</span></td>
+						</tr>
+						<tr class="branch-row" data-sales="720.000 FC">
+							<td><strong>Boma</strong></td>
+							<td>15%</td>
+							<td>720.000 FC</td>
+							<td><span class="badge offline">Fermé</span></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
-
 		</div>
 
-		<!-- RIGHT COLUMN -->
-		<div class="dashboard-side">
-
-			<div class="card">
-				<h3>Succursales</h3>
-				<ul class="branch-list">
-					<li>Yaoundé Centre
-						<span>124 ventes</span>
-					</li>
-					<li>Douala Akwa
-						<span>98 ventes</span>
-					</li>
-				</ul>
-			</div>
-
-			<div class="card">
-				<h3>Commissions</h3>
-				<div class="commission-box">
-					<div>
-						<strong>En attente</strong>
-						<p>120 000 FCFA</p>
+		<!-- Trajets du jour -->
+		<div class="activity-card">
+			<h3><i class="fas fa-bus"></i> Trajets KIN ⇄ MAT</h3>
+			<div class="bus-items">
+				<div class="bus-item" data-route="Kinshasa > Matadi" data-time="06:30">
+					<div class="bus-meta">
+						<span class="time">06:30</span>
+						<span class="route">KIN > MAT</span>
 					</div>
-					<div>
-						<strong>Payées</strong>
-						<p>340 000 FCFA</p>
+					<div class="load-bar">
+						<div class="fill" style="width: 100%"></div>
 					</div>
+					<span class="load-status">Complet</span>
+				</div>
+				<div class="bus-item" data-route="Matadi > Kinshasa" data-time="11:00">
+					<div class="bus-meta">
+						<span class="time">11:00</span>
+						<span class="route">MAT > KIN</span>
+					</div>
+					<div class="load-bar">
+						<div class="fill" style="width: 45%"></div>
+					</div>
+					<span class="load-status">45%</span>
 				</div>
 			</div>
-
-			<div class="card alert-card">
-				<h3>Alertes</h3>
-				<p>⚠ 3 paiements en attente</p>
-				<p>⚠ 2 colis en retard</p>
-			</div>
-
 		</div>
+	</section>
 
+	<!-- 🪟 MODALE DÉTAILS -->
+	<div id="busModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 id="modalTitle">Détails Trajet</h4>
+				<i class="fas fa-times close-modal"></i>
+			</div>
+			<div class="modal-body">
+				<div class="info-row">
+					<div class="info-bit"><small>Bus</small><strong>Coaster #09</strong></div>
+					<div class="info-bit"><small>Chauffeur</small><strong>Jean Bakongo</strong></div>
+				</div>
+				<hr>
+				<button class="btn-action"><i class="fas fa-print"></i> Manifeste passagers</button>
+			</div>
+		</div>
 	</div>
-
 </div>
-<!--dashboard-->
+
+
 
 {% endblock %}
