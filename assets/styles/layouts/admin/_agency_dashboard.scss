@@ -7,8 +7,8 @@ $white: #ffffff;
 
 .dashboard-wrapper {
     padding: 20px;
-    background: $bg;
-    font-family: 'Segoe UI', sans-serif;
+    //background: $bg;
+    //font-family: 'Segoe UI', sans-serif;
 
     // KPI Cards
     .kpi-container {
@@ -23,13 +23,13 @@ $white: #ffffff;
 
             .icon-box {
                 width: 45px; height: 45px; border-radius: 10px;
-                display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+                display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
                 &.blue { background: #eff6ff; color: $blue; }
                 &.green { background: #ecfdf5; color: $green; }
                 &.orange { background: #fffbeb; color: $orange; }
                 &.red { background: #fef2f2; color: $red; }
             }
-            .label { color: #64748b; font-size: 0.85rem; }
+            .label { color: #1e2630; font-size: .9rem; font-weight: 700; }
             h2 { margin: 0; font-size: 1.4rem; }
         }
     }
@@ -91,6 +91,12 @@ $white: #ffffff;
         }
         .modal-header { display: flex; justify-content: space-between; align-items: center; }
         .close-modal { cursor: pointer; }
+    }
+}//.dashboard-wrapper
+
+.dark{
+    .kpi-card{
+        background: black !important    ;
     }
 }
 
