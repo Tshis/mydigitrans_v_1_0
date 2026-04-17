@@ -255,7 +255,7 @@ body#admin{
         span.moon{display: none;}
         span.sun{display: block;}
     
-        .page-title, .user-name { color: $white; }
+        .page-title, .user-name { color: lighten($success,18%); }
         .btn-icon { 
             color: $mute; 
             &:hover { background: rgba($primary, 0.2); color: $primary; }
@@ -272,14 +272,19 @@ body#admin{
         }//notification-dropdown
 
         .mobile-toggle{
-            i{color: $white !important};
+            i{color:lighten($success,18%) !important};
         }//mobile-toggle
 
         .user-name{
-            color: $white !important;
+            color: lighten($success,18%) !important;
         }
+
+        .user-icon-wrapper{
+            color: $mute;
+        }
+
     
-    }//topbar
+    }//dark .topbar
 
 }//body#admin
 

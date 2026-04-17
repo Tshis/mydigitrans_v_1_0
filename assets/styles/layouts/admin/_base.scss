@@ -220,13 +220,12 @@ body#admin{
             .admin-footer,
             .notification-dropdown {
                 background: $dm-bg-surface;
-                background: darken($success,33%);
+                background: $dm-bg;
                 color: $white;
                 border-color: $mute;
             }//     
             
             .main-wrapper{
-                background: darken($success,33%);
                 background: $dm-bg-surface;
             }
 

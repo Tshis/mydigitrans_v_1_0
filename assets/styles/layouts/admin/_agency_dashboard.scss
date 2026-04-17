@@ -1,38 +1,38 @@
-$blue: #2563eb;
-$green: #10b981;
-$orange: #f59e0b;
-$red: #ef4444;
-$bg: #f1f5f9;
-$white: #ffffff;
+@use'../../abstract/variables' as *;
+
+
 
 .dashboard-wrapper {
-    padding: 20px;
-    //background: $bg;
-    //font-family: 'Segoe UI', sans-serif;
+    padding: 2rem;
 
     // KPI Cards
     .kpi-container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px; margin-bottom: 25px;
+        gap: 15px; 
+        margin-bottom: 25px;
 
         .kpi-card {
-            background: $white; padding: 20px; border-radius: 12px;
-            display: flex; align-items: center; gap: 15px;
+            background: $white; 
+            padding: 20px; 
+            border-radius: 12px;
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 
             .icon-box {
                 width: 45px; height: 45px; border-radius: 10px;
                 display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-                &.blue { background: #eff6ff; color: $blue; }
-                &.green { background: #ecfdf5; color: $green; }
-                &.orange { background: #fffbeb; color: $orange; }
-                &.red { background: #fef2f2; color: $red; }
+                &.blue { background: rgba($color: $success, $alpha: .15); color: $success; }
+                &.green { background: rgba($color: $dark, $alpha: .15); color: $dark; }
+                &.orange { background: rgba($color: $primary, $alpha: .15); color: $primary; }
+                &.red { background: rgba($color: $danger, $alpha: .15); color: $danger; }
             }
-            .label { color: #1e2630; font-size: .9rem; font-weight: 700; }
+            .label { color:darken( $gray, 15%); font-size: .9rem; font-weight: 700; }
             h2 { margin: 0; font-size: 1.4rem; }
         }
-    }
+    }//kpi-container
 
     // Graphiques
     .charts-grid {
@@ -61,24 +61,24 @@ $white: #ffffff;
 
     .custom-table {
         width: 100%; border-collapse: collapse; margin-top: 10px;
-        th { text-align: left; padding: 12px; color: #64748b; font-size: 0.9rem; border-bottom: 2px solid $bg; }
-        td { padding: 12px; border-bottom: 1px solid $bg; font-size: 0.9rem; }
+        th { text-align: left; padding: 12px; color: #64748b; font-size: 0.9rem; border-bottom: 2px solid rgba($mute, .15); }
+        td { padding: 12px; border-bottom: 1px solid rgba($mute, .15); font-size: 0.9rem; }
         .branch-row { cursor: pointer; &:hover { background: #f8fafc; } }
     }
 
     .badge {
         padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold;
-        &.online { background: #dcfce7; color: $green; }
+        &.online { background: #dcfce7; color: $dark; }
         &.offline { background: #f1f5f9; color: #64748b; }
     }
 
     // Bus Items
     .bus-item {
-        padding: 15px; border: 1px solid $bg; border-radius: 8px; margin-top: 10px; cursor: pointer;
-        &:hover { border-color: $blue; }
+        padding: 15px; border: 1px solid rgba($mute, .15); border-radius: 8px; margin-top: 10px; cursor: pointer;
+        &:hover { border-color: $success; }
         .bus-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; }
-        .load-bar { height: 6px; background: $bg; border-radius: 3px; overflow: hidden; }
-        .fill { height: 100%; background: $blue; }
+        .load-bar { height: 6px; background: rgba($mute, .15); border-radius: 3px; overflow: hidden; }
+        .fill { height: 100%; background: $success; }
         .load-status { font-size: 0.75rem; color: #64748b; }
     }
 
@@ -96,8 +96,17 @@ $white: #ffffff;
 
 .dark{
     .kpi-card{
-        background: black !important    ;
-    }
-}
+        background: $dm-bg !important  ;
+        box-shadow: 0 2px 4px rgba($mute,.05);
+        color: $mute;
+
+        .label{
+           color : lighten($success,25%) !important;
+        }//label
+
+    }//.kpi-card
+
+    
+}//dark
 
 @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
