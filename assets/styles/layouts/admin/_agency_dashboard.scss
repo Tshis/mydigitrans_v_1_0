@@ -42,10 +42,10 @@
 
         .chart-card {
             background: $white; padding: 20px; border-radius: 12px;
-            h3 { font-size: 1rem; margin-bottom: 15px; color: #1e293b; }
+            h3 { font-size: 1.2rem; margin-bottom: 15px; color: $dark; }
             .canvas-holder { position: relative; height: 250px; width: 100%; }
-        }
-    }
+        }//chart-card
+    }//charts-grid
 
     // Tables & Bus
     .details-grid {
@@ -106,7 +106,7 @@
 
     }//.kpi-card
 
-    
+
 }//dark
 
 @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

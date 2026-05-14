@@ -1,0 +1,146 @@
+{% extends "admin/base.html.twig" %}
+
+
+{% block javascripts %}
+{# Conserve vos scripts globaux existants #}
+{{ parent() }}
+
+{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
+{{ importmap('app') }}
+{% endblock %}
+
+
+
+
+{% block body %}
+
+<div class="dashboard-wrapper">
+	<!-- 📊 INDICATEURS GLOBAUX -->
+	<section class="kpi-container">
+		<div class="kpi-card">
+			<div class="icon-box blue"><i class="fas fa-money-bill-wave"></i></div>
+			<div class="kpi-info">
+				<span class="label">Ventes du jour</span>
+				<h2 id="total-revenue">5.420.000 FC</h2>
+			</div>
+		</div>
+		<div class="kpi-card">
+			<div class="icon-box green"><i class="fas fa-ticket"></i></div>
+			<div class="kpi-info">
+				<span class="label">Réservations (mois en cours)</span>
+				<h2>1.240</h2>
+			</div>
+		</div>
+		<div class="kpi-card">
+			<div class="icon-box orange"><i class="fas fa-box-open"></i></div>
+			<div class="kpi-info">
+				<span class="label">Colis (mois en cours)</span>
+				<h2>850</h2>
+			</div>
+		</div>
+		<div class="kpi-card alert">
+			<div class="icon-box red"><i class="fas fa-vault"></i></div>
+			<div class="kpi-info">
+				<span class="label">Alertes Caisses (du jour)</span>
+				<h2 class="text-red">02</h2>
+			</div>
+		</div>
+	</section>
+
+	<!-- 📈 GRAPHIQUES -->
+	<div style="max-width: 600px;">
+		{# La fonction Twig génère le canvas HTML et l'attribut Stimulus de Symfony UX #}
+		{{ render_chart(my_chart) }}
+	</div>
+
+	<!-- 🏬 TABLES & ACTIVITÉ -->
+	<section class="details-grid">
+		<!-- Performance Succursales -->
+		<div class="table-card">
+			<div class="card-header">
+				<h3><i class="fas fa-store"></i> Succursales</h3>
+			</div>
+			<div class="table-responsive">
+				<table class="custom-table">
+					<thead>
+						<tr>
+							<th>Agence</th>
+							<th>Ventes</th>
+							<th>Caisse</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="branch-row" data-sales="2.800.000 FC">
+							<td><strong>Kinshasa</strong></td>
+							<td>45%</td>
+							<td>2.800.000 FC</td>
+							<td><span class="badge online">Ouvert</span></td>
+						</tr>
+						<tr class="branch-row" data-sales="1.450.000 FC">
+							<td><strong>Matadi</strong></td>
+							<td>30%</td>
+							<td>1.450.000 FC</td>
+							<td><span class="badge online">Ouvert</span></td>
+						</tr>
+						<tr class="branch-row" data-sales="720.000 FC">
+							<td><strong>Boma</strong></td>
+							<td>15%</td>
+							<td>720.000 FC</td>
+							<td><span class="badge offline">Fermé</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- Trajets du jour -->
+		<div class="activity-card">
+			<h3><i class="fas fa-bus"></i> Trajets KIN ⇄ MAT</h3>
+			<div class="bus-items">
+				<div class="bus-item" data-route="Kinshasa > Matadi" data-time="06:30">
+					<div class="bus-meta">
+						<span class="time">06:30</span>
+						<span class="route">KIN > MAT</span>
+					</div>
+					<div class="load-bar">
+						<div class="fill" style="width: 100%"></div>
+					</div>
+					<span class="load-status">Complet</span>
+				</div>
+				<div class="bus-item" data-route="Matadi > Kinshasa" data-time="11:00">
+					<div class="bus-meta">
+						<span class="time">11:00</span>
+						<span class="route">MAT > KIN</span>
+					</div>
+					<div class="load-bar">
+						<div class="fill" style="width: 45%"></div>
+					</div>
+					<span class="load-status">45%</span>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- 🪟 MODALE DÉTAILS -->
+	<div id="busModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 id="modalTitle">Détails Trajet</h4>
+				<i class="fas fa-times close-modal"></i>
+			</div>
+			<div class="modal-body">
+				<div class="info-row">
+					<div class="info-bit"><small>Bus</small><strong>Coaster #09</strong></div>
+					<div class="info-bit"><small>Chauffeur</small><strong>Jean Bakongo</strong></div>
+				</div>
+				<hr>
+				<button class="btn-action"><i class="fas fa-print"></i> Manifeste passagers</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+{% endblock %}
