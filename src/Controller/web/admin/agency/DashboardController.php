@@ -15,23 +15,60 @@ final class DashboardController extends AbstractController
     #[Route('/admin/agency/dashboard2', name: 'app_dashboard')]
     public function index(ChartBuilderInterface $chartBuilder): Response
     {
-        $chart = $chartBuilder->createChart(Chart::TYPE_LINE);
 
-        $chart->setData([
-            'labels' => ['Janvier', 'Février', 'Mars', 'Avril'],
+
+        // --- 📊 GRAPH 1 : REVENUS (Barres - 7 derniers jours) ---
+        $revenueChart = $chartBuilder->createChart(Chart::TYPE_BAR);
+        $revenueChart->setData([
+            'labels' => ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
             'datasets' => [
                 [
-                    'label' => 'Ventes SF8',
-                    'backgroundColor' => 'rgb(255, 99, 132)',
-                    'borderColor' => 'rgb(255, 99, 132)',
-                    'data' => [10, 25, 18, 40],
+                    'label' => 'Ventes Globale (FC)',
+                    'backgroundColor' => '#2563eb',
+                    'borderRadius' => 5,
+                    'data' => [1200000, 1900000, 1500000, 2500000, 2200000, 3000000, 2800000],
                 ],
             ],
         ]);
+        $revenueChart->setOptions([
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+            'plugins' => ['legend' => ['display' => false]],
+        ]);
 
+        // --- 🥧 GRAPH 2 : RÉPARTITION SUCCURSALES (Doughnut) ---
+        $branchChart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
+        $branchChart->setData([
+            'labels' => ['Kinshasa', 'Matadi', 'Boma', 'Muanda'],
+            'datasets' => [
+                [
+                    'backgroundColor' => ['#2563eb', '#10b981', '#f59e0b', '#6366f1'],
+                    'data' => [45, 30, 15, 10],
+                ],
+            ],
+        ]);
+        $branchChart->setOptions([
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+            'cutout' => '70%',
+            'plugins' => ['legend' => ['position' => 'bottom']],
+        ]);
+
+        // --- 📋 RENDU VUE AVEC LES KPI STATIQUES ---
         return $this->render('admin/agency/dashboard2.html.twig', [
             'page' => 'dashboard',
-            'my_chart' => $chart,
+            'revenueChart' => $revenueChart,
+            'branchChart' => $branchChart,
+            // Données du bandeau KPI
+            'kpi' => [
+                'ca_global' => '15.100.000',
+                'ca_global_usd' => '6.000',
+                'croissance' => '+12.4',
+                'championne_nom' => 'Kinshasa',
+                'championne_ca' => '6.795.000',
+                'championne_ca_usd' => '2.800',
+                'transactions' => '1.420',
+            ],
         ]);
     } //index
 

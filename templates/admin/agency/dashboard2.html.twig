@@ -14,133 +14,124 @@
 
 {% block body %}
 
-<div class="dashboard-wrapper">
-	<!-- 📊 INDICATEURS GLOBAUX -->
-	<section class="kpi-container">
-		<div class="kpi-card">
-			<div class="icon-box blue"><i class="fas fa-money-bill-wave"></i></div>
-			<div class="kpi-info">
-				<span class="label">Ventes du jour</span>
-				<h2 id="total-revenue">5.420.000 FC</h2>
+<div class="a-dashboard-wrapper">
+
+	<!-- En-tête -->
+	<header class="a-dashboard-wrapper_header">
+		<h1 class="a-dashboard-wrapper_title">Tableau de Bord Central</h1>
+		<div class="a-dashboard-wrapper_actions">
+			<select class="c-dropdown">
+				<option>Aujourd'hui</option>
+				<option selected>Cette Semaine</option>
+				<option>Ce Mois</option>
+				<option>Cette Année</option>
+			</select>
+		</div>
+	</header>
+
+	<!-- 1. Le Bandeau KPI -->
+	<section class="a-dashboard-wrapper_kpi-grid">
+
+		<div class="c-kpi-card">
+			<h2 class="c-kpi-card_title">Chiffre d'Affaires Global</h2>
+			<p class="c-kpi-card_value">{{ kpi.ca_global }} <span class="c-kpi-card_unit">FC</span></p>
+			<span class="c-kpi-card_sub">Soit environ {{ kpi.ca_global_usd }} $ USD</span>
+			<span class="c-kpi-card_sub">Cumul toutes villes</span>
+		</div>
+
+		<div class="c-kpi-card">
+			<h2 class="c-kpi-card_title">Croissance Globale</h2>
+			<p class="c-kpi-card_value c-kpi-card_value--green">{{ kpi.croissance }}%</p>
+			<span class="c-kpi-card_sub">vs période précédente</span>
+		</div>
+
+		<div class="c-kpi-card">
+			<h2 class="c-kpi-card_title"><i class="fa-solid fa-crown"></i> Branch Championne</h2>
+			<p class="c-kpi-card_value c-kpi-card_value--blue">{{ kpi.championne_nom }}</p>
+			<span class="c-kpi-card_sub">Score : {{ kpi.championne_ca }} FC</span>
+		</div>
+
+		<div class="c-kpi-card">
+			<h2 class="c-kpi-card_title">Transactions</h2>
+			<p class="c-kpi-card_value">{{ kpi.transactions }}</p>
+			<span class="c-kpi-card_sub">Tickets & billets vendus</span>
+		</div>
+
+	</section>
+
+	<!-- 2. La Section Graphiques -->
+	<section class="a-dashboard-wrapper_charts-grid">
+
+		<div class="c-chart-box c-chart-box--main">
+			<h3 class="c-chart-box_title">Évolution des ventes (7 derniers jours)</h3>
+			<div class="c-chart-box_wrapper">
+				{{ render_chart(revenueChart) }}
 			</div>
 		</div>
-		<div class="kpi-card">
-			<div class="icon-box green"><i class="fas fa-ticket"></i></div>
-			<div class="kpi-info">
-				<span class="label">Réservations (mois en cours)</span>
-				<h2>1.240</h2>
+
+		<div class="c-chart-box c-chart-box--side">
+			<h3 class="c-chart-box_title">Part du CA par Ville</h3>
+			<div class="c-chart-box_wrapper">
+				{{ render_chart(branchChart) }}
 			</div>
 		</div>
-		<div class="kpi-card">
-			<div class="icon-box orange"><i class="fas fa-box-open"></i></div>
-			<div class="kpi-info">
-				<span class="label">Colis (mois en cours)</span>
-				<h2>850</h2>
-			</div>
+
+	</section>
+
+	<!--3. Performance Succursales -->
+	<section class="table-card">
+		<div class="card-header">
+			<h3><i class="fas fa-store"></i> Succursales</h3>
 		</div>
-		<div class="kpi-card alert">
-			<div class="icon-box red"><i class="fas fa-vault"></i></div>
-			<div class="kpi-info">
-				<span class="label">Alertes Caisses (du jour)</span>
-				<h2 class="text-red">02</h2>
-			</div>
+		<div class="table-responsive">
+			<table class="custom-table">
+				<thead>
+					<tr>
+						<th>Agence</th>
+						<th>Ventes</th>
+						<th>Caisse CDF</th>
+						<th>Caisse USD</th>
+						<th>Status</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="branch-row" data-sales="2.800.000 FC">
+						<td><strong>Kinshasa</strong></td>
+						<td>45%</td>
+						<td>2.800.000 FC</td>
+						<td>1.300 USD</td>
+						<td><span class="badge online">Ouvert</span></td>
+						<td><a href="" class="btn btn-success p-5 border-radius-5 my-10"><i
+									class="fa-solid fa-eye"></i></a>
+						</td>
+					</tr>
+					<tr class="branch-row" data-sales="1.450.000 FC">
+						<td><strong>Matadi</strong></td>
+						<td>30%</td>
+						<td>1.450.000 FC</td>
+						<td>650 UDS</td>
+						<td><span class="badge online">Ouvert</span></td>
+						<td><a href="" class="btn btn-success p-5 border-radius-5 my-10"><i
+									class="fa-solid fa-eye"></i></a>
+						</td>
+					</tr>
+					<tr class="branch-row" data-sales="720.000 FC">
+						<td><strong>Boma</strong></td>
+						<td>15%</td>
+						<td>720.000 FC</td>
+						<td>350 USD</td>
+						<td><span class="badge offline">Fermé</span></td>
+						<td><a href="" class="btn btn-success p-5 border-radius-5 my-10"><i
+									class="fa-solid fa-eye"></i></a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</section>
 
-	<!-- 📈 GRAPHIQUES -->
-	<div style="max-width: 600px;">
-		{# La fonction Twig génère le canvas HTML et l'attribut Stimulus de Symfony UX #}
-		{{ render_chart(my_chart) }}
-	</div>
-
-	<!-- 🏬 TABLES & ACTIVITÉ -->
-	<section class="details-grid">
-		<!-- Performance Succursales -->
-		<div class="table-card">
-			<div class="card-header">
-				<h3><i class="fas fa-store"></i> Succursales</h3>
-			</div>
-			<div class="table-responsive">
-				<table class="custom-table">
-					<thead>
-						<tr>
-							<th>Agence</th>
-							<th>Ventes</th>
-							<th>Caisse</th>
-							<th>Status</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="branch-row" data-sales="2.800.000 FC">
-							<td><strong>Kinshasa</strong></td>
-							<td>45%</td>
-							<td>2.800.000 FC</td>
-							<td><span class="badge online">Ouvert</span></td>
-						</tr>
-						<tr class="branch-row" data-sales="1.450.000 FC">
-							<td><strong>Matadi</strong></td>
-							<td>30%</td>
-							<td>1.450.000 FC</td>
-							<td><span class="badge online">Ouvert</span></td>
-						</tr>
-						<tr class="branch-row" data-sales="720.000 FC">
-							<td><strong>Boma</strong></td>
-							<td>15%</td>
-							<td>720.000 FC</td>
-							<td><span class="badge offline">Fermé</span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-
-		<!-- Trajets du jour -->
-		<div class="activity-card">
-			<h3><i class="fas fa-bus"></i> Trajets KIN ⇄ MAT</h3>
-			<div class="bus-items">
-				<div class="bus-item" data-route="Kinshasa > Matadi" data-time="06:30">
-					<div class="bus-meta">
-						<span class="time">06:30</span>
-						<span class="route">KIN > MAT</span>
-					</div>
-					<div class="load-bar">
-						<div class="fill" style="width: 100%"></div>
-					</div>
-					<span class="load-status">Complet</span>
-				</div>
-				<div class="bus-item" data-route="Matadi > Kinshasa" data-time="11:00">
-					<div class="bus-meta">
-						<span class="time">11:00</span>
-						<span class="route">MAT > KIN</span>
-					</div>
-					<div class="load-bar">
-						<div class="fill" style="width: 45%"></div>
-					</div>
-					<span class="load-status">45%</span>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- 🪟 MODALE DÉTAILS -->
-	<div id="busModal" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 id="modalTitle">Détails Trajet</h4>
-				<i class="fas fa-times close-modal"></i>
-			</div>
-			<div class="modal-body">
-				<div class="info-row">
-					<div class="info-bit"><small>Bus</small><strong>Coaster #09</strong></div>
-					<div class="info-bit"><small>Chauffeur</small><strong>Jean Bakongo</strong></div>
-				</div>
-				<hr>
-				<button class="btn-action"><i class="fas fa-print"></i> Manifeste passagers</button>
-			</div>
-		</div>
-	</div>
 </div>
-
-
+<!--dashboard-->
 
 {% endblock %}
