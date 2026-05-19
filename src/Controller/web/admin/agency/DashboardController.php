@@ -73,10 +73,25 @@ final class DashboardController extends AbstractController
     } //dashboard_main
 
     #[Route('/admin/agency/branch/dashboard', name: 'admin_agency_branch_dashboard')]
-    public function dashboard_branch(): Response
+    public function dashboard_branch(ChartBuilderInterface $chartBuilder): Response
     {
+        $chart = $chartBuilder->createChart(Chart::TYPE_BAR);
+        $chart->setData([
+            'labels' => ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+            'datasets' => [
+                [
+                    'label' => 'Recettes Hebdo (FC)',
+                    'borderColor' => '#1473bc', // Ta couleur $success
+                    'backgroundColor' => 'rgb(52, 119, 207)',
+                    'data' => [1800000, 2200000, 2800000, 1900000, 2400000, 3100000, 1500000],
+                    'tension' => 0.4
+                ]
+            ]
+        ]);
+
         return $this->render('admin/agency/dashboard-branch.html.twig', [
             'page' => 'dashboard',
+            'chart' => $chart
         ]);
     } //dashboard_branch
 
