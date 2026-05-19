@@ -2,23 +2,83 @@
 
 
 .dark{
-    .kpi-card{
+
+    .a-dashboard-wrapper{
+        
+        &_title {
+            color: lighten($success,25%) !important;
+        }//&_title
+    
+        &_header {
+    
+            // Element indépendant : Dropdown
+            .c-dropdown {
+                
+                background-color: $dm-bg;
+                color: $mute;
+            }//c-dropdown
+    
+        }//&_header
+
+    }//.a-dashboard-wrapper
+    
+    // Élément indépendant : Cartes KPI
+    .c-kpi-card {
         background: $dm-bg !important  ;
         box-shadow: 0 2px 4px rgba($mute,.05);
-        color: $mute;
+       
+    
+        &_title {
+            color: lighten($success,25%) !important;
+        }//&_title
+    
+        &_value {
+             color: $mute !important;
+        }//&_value
+    
+        &_unit {
+            color: $mute !important;
+        }//&_unit
+    
+        // NOUVEAU : Style pour la ligne de conversion USD
+        &_conversion {
+            color: lighten($success,25%) !important;
+        }//&_conversion
+    
+        &_sub {
+            color: lighten($success,18%) !important;;
+        }//&_sub
+    }//c-kpi-card
 
-        .label{
-           color : lighten($success,25%) !important;
-        }//label
+    // Élément indépendant : Boîtes de graphiques
+    .c-chart-box {
+        background: $dm-bg !important;
+    
+        &_title {
+            color: lighten($success, 20%)  !important ;
+        }
+    
+       
+    }//.c-chart-box
 
-    }//.kpi-card
+    .table-card {
+    background: $dm-bg !important;  border: 1px solid $mute !important;
+    .custom-table {
+        th { text-align: left; padding: 12px; color: lighten($success,25%) !important; font-size: 1.4rem; border-bottom: 2px solid rgba($mute, .15); }
+        td { padding: 12px; border-bottom: 1px solid rgba($mute, .15); font-size: 1.2rem; color: $mute !important; }
+        .branch-row { cursor: pointer; &:hover { background: darken($color: $mute, $amount: 50);  } }
+    }//custom-table
+    
+    .badge {
+        padding: 4px 8px; border-radius: 6px; font-size: 1rem; font-weight: bold;
+        &.online { background: lighten($success, 40); color: $success; }
+        &.offline { background: lighten($primary, 40); color: $primary ; }
+    }//badge
+    }//.table-card
 
 
 }//dark
 
-
-
-$breakpoint-md: 992px;
 
 // --- STYLES ---
 .a-dashboard-wrapper {
@@ -75,97 +135,185 @@ $breakpoint-md: 992px;
         }
     }// &_charts-grid
 
+    // Élément indépendant : Cartes KPI
+    .c-kpi-card {
+        background: $white;
+        padding: 24px;
+        border-radius: $radius-card;
+        border: 1px solid $mute;
+        display: flex;
+        flex-direction: column;
+    
+        &_title {
+            font-size: 11px;
+            font-weight: 700;
+            color: $dark;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }//&_title
+    
+        &_value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: $dark;
+            margin: 10px 0 2px 0; // Réduit la marge basse pour faire place à la conversion
+    
+            &--green { color: $success; }
+            &--blue { color: lighten($dark,15%); }
+        }//&_value
+    
+        &_unit {
+            font-size: 14px;
+            color: $dark;
+            font-weight: 700;
+        }//&_unit
+    
+        // NOUVEAU : Style pour la ligne de conversion USD
+        &_conversion {
+            font-size: 13px;
+            font-weight: 600;
+            color: $gray; // Couleur ardoise intermédiaire
+            margin-bottom: 8px;
+        }
+    
+        &_sub {
+            font-size: 12px;
+            color: $gray;
+            border-top: 1px dashed darken($mute,25%); // Petit séparateur discret
+            padding-top: 6px;
+            margin-top: 4px;
+        }
+    }//c-kpi-card
+
+    // Élément indépendant : Boîtes de graphiques
+    .c-chart-box {
+        background: $white;
+        padding: 24px;
+        border-radius: $radius-card;
+        border: 1px solid $mute;
+        margin: 2rem 0;
+    
+        &_title {
+            margin: 0 0 20px 0;
+            font-size: 16px;
+            color: $dark    ;
+            font-weight: 600;
+        }
+    
+        &_wrapper {
+            position: relative;
+            height: 320px; // Requis pour que Chart.js lise la hauteur fixe
+            width: 100%;
+        }
+    }//.c-chart-box
+
+    .table-card { 
+      background: $white; 
+      border: 1px solid $mute !important; 
+      border-radius: 8px; // Optionnel : pour adoucir les angles de la carte
+      overflow: hidden;
+      padding: 2rem;
+
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+      }
+    
+      .custom-table { 
+        width: 100%;
+        border-collapse: collapse;
+    
+        th { 
+          text-align: left; 
+          padding: 12px; 
+          color: $dark; 
+          font-size: 1.4rem; 
+          border-bottom: 2px solid rgba($mute, .15); 
+        } 
+    
+        td { 
+          padding: 12px; 
+          border-bottom: 1px solid rgba($mute, .15); 
+          font-size: 1.2rem; 
+          color: $dark; 
+        } 
+    
+        .branch-row { 
+          cursor: pointer; 
+          &:hover { 
+            background: $mute; 
+          } 
+        } 
+    
+        // --- Mode Responsive (Mobile) ---
+        @media (max-width: 768px) {
+          &, thead, tbody, th, td, tr { 
+            display: block; 
+          }
+    
+          thead {
+            display: none; // Masque les en-têtes classiques du tableau
+          }
+    
+          .branch-row {
+            margin-bottom: 15px;
+            border: 1px solid rgba($mute, .2);
+            border-radius: 6px;
+            background: rgba($mute, .02);
+            padding: 8px;
+    
+            &:hover {
+              background: rgba($mute, .05);
+            }
+          }
+    
+          td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right;
+            padding: 8px 12px;
+            border-bottom: 1px dashed rgba($mute, .1);
+    
+            &:last-child {
+              border-bottom: none;
+            }
+    
+            // Génère automatiquement les labels à gauche
+            &::before {
+              content: attr(data-label);
+              font-weight: bold;
+              color: lighten($success, 15%);
+              font-size: 1.1rem;
+              text-transform: uppercase;
+              margin-right: 15px;
+            }
+          }
+        }
+      } //custom-table 
+    
+      .badge { 
+        padding: 4px 8px; 
+        border-radius: 6px; 
+        font-size: 1rem; 
+        font-weight: bold; 
+        display: inline-block;
+    
+        &.online { 
+          background: lighten($success, 40); 
+          color: $success; 
+        } 
+        &.offline { 
+          background: lighten($primary, 40); 
+          color: $primary ; 
+        } 
+      } //badge 
+    } //.table-card
+
 }//a-dashboard-wrapper
 
 
 
-// Élément indépendant : Cartes KPI
-.c-kpi-card {
-    background: $white;
-    padding: 24px;
-    border-radius: $radius-card;
-    border: 1px solid $mute;
-    display: flex;
-    flex-direction: column;
-
-    &_title {
-        font-size: 11px;
-        font-weight: 700;
-        color: $dark;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
-
-    &_value {
-        font-size: 26px;
-        font-weight: 700;
-        color: $dark;
-        margin: 10px 0 2px 0; // Réduit la marge basse pour faire place à la conversion
-
-        &--green { color: $success; }
-        &--blue { color: lighten($dark,15%); }
-    }
-
-    &_unit {
-        font-size: 14px;
-        color: $mute;
-        font-weight: 500;
-    }
-
-    // NOUVEAU : Style pour la ligne de conversion USD
-    &_conversion {
-        font-size: 13px;
-        font-weight: 600;
-        color: #475569; // Couleur ardoise intermédiaire
-        margin-bottom: 8px;
-    }
-
-    &_sub {
-        font-size: 12px;
-        color: $gray;
-        border-top: 1px dashed $mute; // Petit séparateur discret
-        padding-top: 6px;
-        margin-top: 4px;
-    }
-}//c-kpi-card
-
-// Élément indépendant : Boîtes de graphiques
-.c-chart-box {
-    background: $white;
-    padding: 24px;
-    border-radius: $radius-card;
-    border: 1px solid $mute;
-
-    &_title {
-        margin: 0 0 20px 0;
-        font-size: 16px;
-        color: #1e293b;
-        font-weight: 600;
-    }
-
-    &_wrapper {
-        position: relative;
-        height: 320px; // Requis pour que Chart.js lise la hauteur fixe
-        width: 100%;
-    }
-}
-
-
-.table-card {
-    background: $white; padding: 20px; border-radius: 12px;
-    .custom-table {
-        width: 100%; border-collapse: collapse; margin-top: 10px;
-        th { text-align: left; padding: 12px; color: #64748b; font-size: 0.9rem; border-bottom: 2px solid rgba($mute, .15); }
-        td { padding: 12px; border-bottom: 1px solid rgba($mute, .15); font-size: 0.9rem; }
-        .branch-row { cursor: pointer; &:hover { background: #f8fafc; } }
-    }//custom-table
-    
-    .badge {
-        padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold;
-        &.online { background: #dcfce7; color: $dark; }
-        &.offline { background: #f1f5f9; color: #64748b; }
-    }//badge
-}//.table-card
 
 

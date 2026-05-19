@@ -2,136 +2,174 @@
 
 
 {% block javascripts %}
-{# Conserve vos scripts globaux existants #}
-{{ parent() }}
+	{# Conserve vos scripts globaux existants #}
+	{{ parent() }}
 
-{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
-{{ importmap('app') }}
+	{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
+	{{ importmap('app') }}
 {% endblock %}
-
-
 
 
 {% block body %}
 
-<div class="a-dashboard-wrapper">
+	<div
+		class="a-dashboard-wrapper">
 
-	<!-- En-tête -->
-	<header class="a-dashboard-wrapper_header">
-		<h1 class="a-dashboard-wrapper_title">Tableau de Bord Central</h1>
-		<div class="a-dashboard-wrapper_actions">
-			<select class="c-dropdown">
-				<option>Aujourd'hui</option>
-				<option selected>Cette Semaine</option>
-				<option>Ce Mois</option>
-				<option>Cette Année</option>
-			</select>
-		</div>
-	</header>
-
-	<!-- 1. Le Bandeau KPI -->
-	<section class="a-dashboard-wrapper_kpi-grid">
-
-		<div class="c-kpi-card">
-			<h2 class="c-kpi-card_title">Chiffre d'Affaires Global</h2>
-			<p class="c-kpi-card_value">{{ kpi.ca_global }} <span class="c-kpi-card_unit">FC</span></p>
-			<span class="c-kpi-card_sub">Soit environ {{ kpi.ca_global_usd }} $ USD</span>
-			<span class="c-kpi-card_sub">Cumul toutes villes</span>
-		</div>
-
-		<div class="c-kpi-card">
-			<h2 class="c-kpi-card_title">Croissance Globale</h2>
-			<p class="c-kpi-card_value c-kpi-card_value--green">{{ kpi.croissance }}%</p>
-			<span class="c-kpi-card_sub">vs période précédente</span>
-		</div>
-
-		<div class="c-kpi-card">
-			<h2 class="c-kpi-card_title"><i class="fa-solid fa-crown"></i> Branch Championne</h2>
-			<p class="c-kpi-card_value c-kpi-card_value--blue">{{ kpi.championne_nom }}</p>
-			<span class="c-kpi-card_sub">Score : {{ kpi.championne_ca }} FC</span>
-		</div>
-
-		<div class="c-kpi-card">
-			<h2 class="c-kpi-card_title">Transactions</h2>
-			<p class="c-kpi-card_value">{{ kpi.transactions }}</p>
-			<span class="c-kpi-card_sub">Tickets & billets vendus</span>
-		</div>
-
-	</section>
-
-	<!-- 2. La Section Graphiques -->
-	<section class="a-dashboard-wrapper_charts-grid">
-
-		<div class="c-chart-box c-chart-box--main">
-			<h3 class="c-chart-box_title">Évolution des ventes (7 derniers jours)</h3>
-			<div class="c-chart-box_wrapper">
-				{{ render_chart(revenueChart) }}
+		<!-- En-tête -->
+		<header class="a-dashboard-wrapper_header">
+			<h1 class="a-dashboard-wrapper_title">Tableau de Bord Central</h1>
+			<div class="a-dashboard-wrapper_actions">
+				<select class="c-dropdown">
+					<option>Aujourd'hui</option>
+					<option selected>Cette Semaine</option>
+					<option>Ce Mois</option>
+					<option>Cette Année</option>
+				</select>
 			</div>
-		</div>
+		</header>
 
-		<div class="c-chart-box c-chart-box--side">
-			<h3 class="c-chart-box_title">Part du CA par Ville</h3>
-			<div class="c-chart-box_wrapper">
-				{{ render_chart(branchChart) }}
+		<!-- 1. Le Bandeau KPI -->
+		<section class="a-dashboard-wrapper_kpi-grid">
+
+			<div class="c-kpi-card">
+				<h2 class="c-kpi-card_title">
+					<i class="fa-solid fa-sack-dollar"></i>
+					Chiffre d'Affaires Global</h2>
+				<p class="c-kpi-card_value">{{ kpi.ca_global }}
+					<span class="c-kpi-card_unit">CDF</span>
+				</p>
+				<span class="c-kpi-card_sub">Soit environ
+					{{ kpi.ca_global_usd }}
+					$ USD</span>
+				<span class="c-kpi-card_sub">Cumul toutes villes</span>
 			</div>
-		</div>
 
-	</section>
+			<div class="c-kpi-card">
+				<h2 class="c-kpi-card_title">
+					<i class="fa-solid fa-chart-line"></i>
+					Croissance Globale</h2>
+				<p class="c-kpi-card_value c-kpi-card_value--green">{{ kpi.croissance }}%</p>
+				<span class="c-kpi-card_sub">vs période précédente</span>
+			</div>
 
-	<!--3. Performance Succursales -->
-	<section class="table-card">
-		<div class="card-header">
-			<h3><i class="fas fa-store"></i> Succursales</h3>
-		</div>
-		<div class="table-responsive">
-			<table class="custom-table">
-				<thead>
-					<tr>
-						<th>Agence</th>
-						<th>Ventes</th>
-						<th>Caisse CDF</th>
-						<th>Caisse USD</th>
-						<th>Status</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="branch-row" data-sales="2.800.000 FC">
-						<td><strong>Kinshasa</strong></td>
-						<td>45%</td>
-						<td>2.800.000 FC</td>
-						<td>1.300 USD</td>
-						<td><span class="badge online">Ouvert</span></td>
-						<td><a href="" class="btn btn-success p-5 border-radius-5 my-10"><i
-									class="fa-solid fa-eye"></i></a>
-						</td>
-					</tr>
-					<tr class="branch-row" data-sales="1.450.000 FC">
-						<td><strong>Matadi</strong></td>
-						<td>30%</td>
-						<td>1.450.000 FC</td>
-						<td>650 UDS</td>
-						<td><span class="badge online">Ouvert</span></td>
-						<td><a href="" class="btn btn-success p-5 border-radius-5 my-10"><i
-									class="fa-solid fa-eye"></i></a>
-						</td>
-					</tr>
-					<tr class="branch-row" data-sales="720.000 FC">
-						<td><strong>Boma</strong></td>
-						<td>15%</td>
-						<td>720.000 FC</td>
-						<td>350 USD</td>
-						<td><span class="badge offline">Fermé</span></td>
-						<td><a href="" class="btn btn-success p-5 border-radius-5 my-10"><i
-									class="fa-solid fa-eye"></i></a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</section>
+			<div class="c-kpi-card">
+				<h2 class="c-kpi-card_title">
+					<i class="fa-solid fa-crown"></i>
+					Branch Championne</h2>
+				<p class="c-kpi-card_value c-kpi-card_value--blue">{{ kpi.championne_nom }}</p>
+				<span class="c-kpi-card_sub">Score :
+					{{ kpi.championne_ca }}
+					FC</span>
+				<span class="c-kpi-card_sub">Soit environ
+					{{ kpi.championne_ca_usd }}
+					$ USD</span>
+			</div>
 
-</div>
-<!--dashboard-->
+			<div class="c-kpi-card">
+				<h2 class="c-kpi-card_title">
+					<i class="fa-solid fa-file-invoice"></i>
+					Transactions</h2>
+				<p class="c-kpi-card_value">{{ kpi.transactions }}</p>
+				<span class="c-kpi-card_sub">Tickets & billets vendus</span>
+			</div>
+
+		</section>
+
+		<!-- 2. La Section Graphiques -->
+		<section class="a-dashboard-wrapper_charts-grid">
+
+			<div class="c-chart-box c-chart-box--main">
+				<h3 class="c-chart-box_title">Évolution des ventes (7 derniers jours)</h3>
+				<div class="c-chart-box_wrapper">
+					{{ render_chart(revenueChart) }}
+				</div>
+			</div>
+
+			<div class="c-chart-box c-chart-box--side">
+				<h3 class="c-chart-box_title">Part du CA par Ville</h3>
+				<div class="c-chart-box_wrapper">
+					{{ render_chart(branchChart) }}
+				</div>
+			</div>
+
+		</section>
+
+		<!--3. Performance Succursales -->
+		<section class="table-card">
+			<div class="card-header">
+				<h3 class="a-dashboard-wrapper_title">
+					<i class="fas fa-store"></i>
+					Succursales (vente du jour)
+				</h3>
+			</div>
+			<div class="table-responsive">
+				<table class="custom-table">
+					<thead>
+						<tr>
+							<th>Agence</th>
+							<th>Ville</th>
+							<th>Vente CDF</th>
+							<th>Vente USD</th>
+							<th>Status</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="branch-row">
+							<td data-label="Agence">
+								<strong>Limete</strong>
+							</td>
+							<td data-label="Ville">Kinshasa</td>
+							<td data-label="Vente CDF">2.800.000 FC</td>
+							<td data-label="Vente USD">1.300 USD</td>
+							<td data-label="Status">
+								<span class="badge online">Ouvert</span>
+							</td>
+							<td data-label="Action">
+								<a href="" class="btn btn-primary p-5 border-radius-5 my-10">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</td>
+						</tr>
+						<tr class="branch-row">
+							<td data-label="Agence">
+								<strong>Soyo 2</strong>
+							</td>
+							<td data-label="Ville">Matadi</td>
+							<td data-label="Vente CDF">1.450.000 FC</td>
+							<td data-label="Vente USD">650 USD</td>
+							<td data-label="Status">
+								<span class="badge online">Ouvert</span>
+							</td>
+							<td data-label="Action">
+								<a href="" class="btn btn-primary p-5 border-radius-5 my-10">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</td>
+						</tr>
+						<tr class="branch-row">
+							<td data-label="Agence">
+								<strong>Boma</strong>
+							</td>
+							<td data-label="Ville">Boma</td>
+							<td data-label="Vente CDF">720.000 FC</td>
+							<td data-label="Vente USD">350 USD</td>
+							<td data-label="Status">
+								<span class="badge offline">Fermé</span>
+							</td>
+							<td data-label="Action">
+								<a href="" class="btn btn-primary p-5 border-radius-5 my-10">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+
+	</div>
+	<!--dashboard-->
 
 {% endblock %}
