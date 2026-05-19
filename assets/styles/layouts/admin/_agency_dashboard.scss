@@ -129,6 +129,9 @@
         display: grid;
         grid-template-columns: 2fr 1fr;
         gap: 2rem;
+        align-items: stretch; /* Force la même hauteur pour tous les éléments */
+
+        
 
         @media (max-width: 992px) {
             grid-template-columns: 1fr;
@@ -337,6 +340,30 @@
     } //.table-card
 
 }//a-dashboard-wrapper
+
+
+//===========================Pour aligner la chart et agent performance de lu branch dashboard=======/
+/* 2. Force le graphique et le tableau à occuper 100% de la hauteur */
+.a-dashboard-wrapper_charts-grid .c-chart-box,
+.a-dashboard-wrapper_charts-grid .table-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; /* Évite les débordements dus au padding */
+    margin: 0; /* Supprime les marges externes parasites */
+}
+
+/* 3. Permet au conteneur du graphique de prendre tout l'espace restant */
+.c-chart-box_wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center; /* Centre verticalement le canvas du graphique */
+}
+
+/* 4. Permet au tableau de prendre tout l'espace restant */
+.table-responsive {
+    flex-grow: 1;
+}
 
 
 
