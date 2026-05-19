@@ -5,14 +5,14 @@
 	<span class="text">Dashboard</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Lignes">
+<a href="{{path('admin_agency_branch_index')}}" class="menu-link {{ page is same as('branch') ? 'active' : '' }}" data-tooltip="Branches">
 	<span class="icon">
 		<i class="fa-solid fa-folder-tree"></i>
 	</span>
 	<span class="text">Branch</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Utilisateurs">
+<a href="#" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Utilisateurs">
 	<span class="icon">
 		<i class="fa-solid fa-users"></i>
 	</span>

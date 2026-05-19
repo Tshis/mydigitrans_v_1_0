@@ -1,0 +1,219 @@
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="branch-wrapper">
+
+		{# 1. EN-TÊTE DE LA PAGE #}
+		<header class="branch-wrapper_header">
+			<h2 class="branch-wrapper_title">
+				<i class="fas fa-network-wired"></i>
+				Gestion des Succursales
+			</h2>
+			<a href="#" class="btn btn-success border-radius-5">
+				<i class="fas fa-plus"></i>
+				Ajouter une succursale
+			</a>
+		</header>
+
+		{# 2. BARRE DE FILTRES ET RECHERCHE (Statique) #}
+		<div class="c-filter-bar my-20">
+			<form action="#" method="GET" class="c-filter-bar_form">
+				<div class="c-filter-bar_group">
+					<i class="fas fa-search c-filter-bar_icon"></i>
+					<input type="text" placeholder="Rechercher une succursale..." class="c-filter-bar_input">
+				</div>
+				<div class="c-filter-bar_group">
+					<select class="c-filter-bar_select">
+						<option value="">Toutes les villes</option>
+						<option value="kinshasa">Kinshasa</option>
+						<option value="matadi">Matadi</option>
+						<option value="lubumbashi">Lubumbashi</option>
+					</select>
+				</div>
+				<div class="c-filter-bar_group">
+					<select class="c-filter-bar_select">
+						<option value="">Tous les statuts</option>
+						<option value="open">Session Ouverte</option>
+						<option value="closed">Session Fermée</option>
+					</select>
+				</div>
+				<button type="button" class="btn btn-primary">Filtrer</button>
+			</form>
+		</div>
+
+		{# 3. BANDEAU DES MÉTRIQUES GLOBALES (Réutilisation de vos classes KPI) #}
+		<div
+			class="branch-wrapper_kpi-grid">
+			{# KPI 1 : Total Sites #}
+			<div class="c-kpi-card">
+				<h4 class="c-kpi-card_title">Réseau Global</h4>
+				<div class="c-kpi-card_value">
+					4
+					<span class="c-kpi-card_unit">Sites</span>
+				</div>
+				<div class="c-kpi-card_sub">3 sessions ouvertes / 1 fermée</div>
+			</div>
+			{# KPI 2 : CA Cumulé #}
+			<div class="c-kpi-card">
+				<h4 class="c-kpi-card_title">Recettes Globales (Jour)</h4>
+				<div class="c-kpi-card_value c-kpi-card_value--green">
+					6.450.000
+					<span class="c-kpi-card_unit">FC</span>
+				</div>
+				<div class="c-kpi-card_conversion">~ 3.000
+					<span class="c-kpi-card_unit">USD</span>
+				</div>
+				<div class="c-kpi-card_sub">Cumul de toutes les succursales</div>
+			</div>
+			{# KPI 3 : Top Performance #}
+			<div class="c-kpi-card">
+				<h4 class="c-kpi-card_title">Top Performance</h4>
+				<div class="c-kpi-card_value c-kpi-card_value--blue">Limete</div>
+				<div class="c-kpi-card_sub">92% de l'objectif atteint</div>
+			</div>
+		</div>
+
+		{# 4. LA GRILLE DES CARTES SUCCURSALES #}
+		<div
+			class="c-branches-grid py-20">
+
+			{# Carte 1 : Limete #}
+			<div class="c-branch-card">
+				<div class="c-branch-card_header">
+					<h3>
+						<i class="fas fa-building"></i>
+						Limete</h3>
+					<span class="badge online">Session Ouverte</span>
+				</div>
+				<div class="c-branch-card_body">
+					<p class="c-branch-card_info">
+						<span>Ville :</span>
+						<strong>Kinshasa</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Gérant :</span>
+						<strong>Kambale Pierre</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Bus Actifs :</span>
+						<strong>8 en service</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Ventes :</span>
+						<strong>2.800.000 FC</strong>
+					</p>
+				</div>
+				<div class="c-branch-card_actions">
+					<a href="#" class="btn btn-primary btn-sm">Dashboard</a>
+					<a href="#" class="btn btn-secondary btn-sm">
+						<i class="fas fa-cog"></i>
+						Configurer</a>
+				</div>
+			</div>
+
+			{# Carte 2 : Gombe #}
+			<div class="c-branch-card">
+				<div class="c-branch-card_header">
+					<h3>
+						<i class="fas fa-building"></i>
+						Gombe</h3>
+					<span class="badge online">Session Ouverte</span>
+				</div>
+				<div class="c-branch-card_body">
+					<p class="c-branch-card_info">
+						<span>Ville :</span>
+						<strong>Kinshasa</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Gérant :</span>
+						<strong>Mbuyi Jean</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Bus Actifs :</span>
+						<strong>5 en service</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Ventes :</span>
+						<strong>1.950.000 FC</strong>
+					</p>
+				</div>
+				<div class="c-branch-card_actions">
+					<a href="#" class="btn btn-primary btn-sm">Dashboard</a>
+					<a href="#" class="btn btn-secondary btn-sm">
+						<i class="fas fa-cog"></i>
+						Configurer</a>
+				</div>
+			</div>
+
+			{# Carte 3 : Matadi Centre #}
+			<div class="c-branch-card">
+				<div class="c-branch-card_header">
+					<h3>
+						<i class="fas fa-building"></i>
+						Matadi Centre</h3>
+					<span class="badge online">Session Ouverte</span>
+				</div>
+				<div class="c-branch-card_body">
+					<p class="c-branch-card_info">
+						<span>Ville :</span>
+						<strong>Kongo Central</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Gérant :</span>
+						<strong>Nsimba Sarah</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Bus Actifs :</span>
+						<strong>4 en service</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Ventes :</span>
+						<strong>1.700.000 FC</strong>
+					</p>
+				</div>
+				<div class="c-branch-card_actions">
+					<a href="#" class="btn btn-primary btn-sm">Dashboard</a>
+					<a href="#" class="btn btn-secondary btn-sm">
+						<i class="fas fa-cog"></i>
+						Configurer</a>
+				</div>
+			</div>
+
+			{# Carte 4 : Lubumbashi (Fermée) #}
+			<div class="c-branch-card c-branch-card--closed">
+				<div class="c-branch-card_header">
+					<h3>
+						<i class="fas fa-building"></i>
+						Lubumbashi</h3>
+					<span class="badge offline">Session Fermée</span>
+				</div>
+				<div class="c-branch-card_body">
+					<p class="c-branch-card_info">
+						<span>Ville :</span>
+						<strong>Haut-Katanga</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Gérant :</span>
+						<strong>Ilunga Marc</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Bus Actifs :</span>
+						<strong>0 en service</strong>
+					</p>
+					<p class="c-branch-card_info">
+						<span>Ventes :</span>
+						<strong>0 FC</strong>
+					</p>
+				</div>
+				<div class="c-branch-card_actions">
+					<a href="#" class="btn btn-primary btn-sm disabled">Dashboard</a>
+					<a href="#" class="btn btn-secondary btn-sm">
+						<i class="fas fa-cog"></i>
+						Configurer</a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}

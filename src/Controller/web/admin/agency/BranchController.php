@@ -13,8 +13,8 @@ final class BranchController extends AbstractController
     #[Route('/admin/agency/branches', name: 'admin_agency_branch_index')]
     public function index(): Response
     {
-        return $this->render('admin/agency/dashboard-main.html.twig', [
-            'page' => 'Branch',
+        return $this->render('admin/agency/branch/index.html.twig', [
+            'page' => 'branch',
         ]);
     } //index
 

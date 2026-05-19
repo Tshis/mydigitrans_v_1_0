@@ -1,0 +1,340 @@
+@use'../../abstract/variables' as *;
+
+
+
+/* ==========================================================================
+   PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
+   ========================================================================== */
+
+.branch-wrapper {
+  // 1. EN-TÊTE DE LA PAGE
+  &_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  &_title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $dark;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  // 3. BANDEAU DES MÉTRIQUES GLOBALES (Ta grille KPI)
+  &_kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+// 2. COMPOSANT : BARRE DE FILTRES ET RECHERCHE
+.c-filter-bar {
+  background-color: $white;
+  border-radius: $radius-input;
+  padding: 1rem 1.25rem;
+  border: 1px solid lighten($gray, 45%);
+
+  &_form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  &_group {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+  }
+
+  &_icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $gray;
+    font-size: 0.85rem;
+  }
+
+  &_input {
+    width: 100%;
+    padding: 0.6rem 0.75rem 0.6rem 2.25rem;
+    border: 1px solid lighten($gray, 35%);
+    border-radius: $radius-input;
+    font-size: 0.9rem;
+    color: $black;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: $primary;
+    }
+  }
+
+  &_select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid lighten($gray, 35%);
+    border-radius: $radius-input;
+    font-size: 0.9rem;
+    color: $black;
+    background-color: $white;
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    &:focus {
+      border-color: $primary;
+    }
+  }
+}
+
+// 4. COMPOSANT : LA GRILLE DES CARTES SUCCURSALES
+.c-branches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+// COMPOSANT : CARTE INDIVIDUELLE
+.c-branch-card {
+  background-color: $white;
+  border-radius: $radius-card;
+  padding: 1.5rem;
+  border: 1px solid lighten($gray, 45%);
+  border-top: 4px solid $primary; // Utilise ton orange #ef6e17
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 12px rgba($black, 0.06);
+  }
+
+  &_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $dark;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  &_body {
+    margin-bottom: 1.25rem;
+  }
+
+  &_info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin: 0 0 0.6rem 0;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px dashed lighten($gray, 45%);
+
+    &:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    span {
+      color: $gray;
+    }
+
+    strong {
+      color: $black;
+      font-weight: 600;
+    }
+  }
+
+  &_actions {
+    display: flex;
+    gap: 0.75rem;
+    border-top: 1px solid lighten($gray, 45%);
+    padding-top: 1rem;
+
+    .btn {
+      flex: 1;
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  // ÉTAT : SESSION FERMÉE
+  &--closed {
+    border-top-color: $gray;
+    opacity: 0.75;
+
+    .c-branch-card_info strong {
+      color: $gray;
+    }
+
+    .btn.disabled {
+      background-color: lighten($gray, 45%);
+      color: $gray;
+      border-color: lighten($gray, 45%);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+}
+
+/* ==========================================================================
+   SUPPORT DARK MODE (.dark-mode)
+   ========================================================================== */
+.dark-mode {
+  .branch-wrapper_title {
+    color: $dm-text;
+  }
+
+  .c-filter-bar {
+    background-color: $dm-bg-surface;
+    border-color: $dm-border;
+
+    &_icon { color: $dm-text-mute; }
+
+    &_input, &_select {
+      background-color: $dm-bg-main;
+      border-color: $dm-border;
+      color: $dm-text;
+      &:focus { border-color: $primary; }
+    }
+    &_select option { background-color: $dm-bg-surface; }
+  }
+
+  .c-branch-card {
+    background-color: $dm-bg-surface;
+    border-color: $dm-border;
+    border-top-color: $primary;
+
+    &_header h3 { color: $dm-text; }
+    &_info {
+      border-bottom-color: $dm-border;
+      span { color: $dm-text-mute; }
+      strong { color: $dm-text; }
+    }
+    &_actions { border-top-color: $dm-border; }
+
+    &--closed {
+      border-top-color: $gray;
+      .c-branch-card_info strong { color: $dm-text-mute; }
+      .btn.disabled {
+        background-color: $dm-bg-main;
+        color: $dm-text-mute;
+        border-color: $dm-border;
+      }
+    }
+  }
+}
+
+
+
+
+////Correctif
+/// 
+/// 
+/// 
+
+
+// --- COMPOSANT : CARTES KPI (.c-kpi-card) ---
+.c-kpi-card {
+  background-color: $white;
+  border-radius: $radius-card;
+  padding: 1.25rem;
+  border: 1px solid lighten($gray, 45%);
+  box-shadow: 0 4px 6px rgba($black, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &_title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $gray;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 0.25rem 0;
+  }
+
+  &_value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $dark; // Votre bleu foncé par défaut
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    line-height: 1.2;
+
+    // Déclinaisons de couleurs basées sur vos classes
+    &--green {
+      color: $success; // Votre bleu #1684c5 utilisé pour le succès/positif
+    }
+    
+    &--blue {
+      color: $primary; // Votre orange ou bleu secondaire
+    }
+  }
+
+  &_unit {
+    font-size: 1rem;
+    font-weight: 500;
+    color: $gray;
+  }
+
+  &_conversion {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $gray;
+  }
+
+  &_sub {
+    font-size: 0.85rem;
+    color: lighten($gray, 15%);
+    margin-top: 0.25rem;
+  }
+}
+
+// --- AJOUT AU DARK MODE (.dark-mode) ---
+.dark-mode {
+  .c-kpi-card {
+    background-color: $dm-bg-surface;
+    border-color: $dm-border;
+
+    &_title {
+      color: $dm-text-mute;
+    }
+    &_value {
+      color: $dm-text;
+      
+      &--green { color: lighten($success, 15%); }
+      &--blue { color: lighten($primary, 15%); }
+    }
+    &_unit {
+      color: $dm-text-mute;
+    }
+    &_conversion {
+      color: $dm-text;
+    }
+    &_sub {
+      color: $dm-text-mute;
+    }
+  }
+}
