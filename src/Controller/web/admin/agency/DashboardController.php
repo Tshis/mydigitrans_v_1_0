@@ -12,8 +12,8 @@ use Symfony\UX\Chartjs\Model\Chart;
 final class DashboardController extends AbstractController
 {
 
-    #[Route('/admin/agency/dashboard2', name: 'app_dashboard')]
-    public function index(ChartBuilderInterface $chartBuilder): Response
+    #[Route('/admin/agency/dashboard', name: 'admin_agency_dashboard')]
+    public function dashboard_main(ChartBuilderInterface $chartBuilder): Response
     {
 
 
@@ -55,7 +55,7 @@ final class DashboardController extends AbstractController
         ]);
 
         // --- 📋 RENDU VUE AVEC LES KPI STATIQUES ---
-        return $this->render('admin/agency/dashboard2.html.twig', [
+        return $this->render('admin/agency/dashboard-main.html.twig', [
             'page' => 'dashboard',
             'revenueChart' => $revenueChart,
             'branchChart' => $branchChart,
@@ -70,14 +70,14 @@ final class DashboardController extends AbstractController
                 'transactions' => '1.420',
             ],
         ]);
-    } //index
+    } //dashboard_main
 
-    #[Route('/admin/agency/dashboard', name: 'admin_agency_dashboard')]
-    public function dashboard(): Response
+    #[Route('/admin/agency/branch/dashboard', name: 'admin_agency_branch_dashboard')]
+    public function dashboard_branch(): Response
     {
-        return $this->render('admin/agency/dashboard.html.twig', [
+        return $this->render('admin/agency/dashboard-branch.html.twig', [
             'page' => 'dashboard',
         ]);
-    } //dashboard
+    } //dashboard_branch
 
 }
