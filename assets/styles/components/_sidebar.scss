@@ -116,7 +116,11 @@
             position: relative;
             transition: background 0.2s;
     
-            &:hover,
+            &:hover{
+                background: lighten($success,40%);
+                color: $dark;
+            }
+
             &.active{
                 background: $success;
                 color: $white;

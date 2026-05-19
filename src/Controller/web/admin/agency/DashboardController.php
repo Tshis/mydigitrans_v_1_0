@@ -12,6 +12,19 @@ use Symfony\UX\Chartjs\Model\Chart;
 final class DashboardController extends AbstractController
 {
 
+    #[Route('/admin/agency/dashboard', name: 'admin_agency_dashboard')]
+    public function index()
+    {
+        $user = "super";
+        $route = "";
+
+        if ($user == "super") {
+            return $this->redirectToRoute('admin_agency_main_dashboard');
+        } else {
+            return $this->redirectToRoute('admin_agency_branch_dashboard');
+        }
+    } //index
+
     #[Route('/admin/agency/main/dashboard', name: 'admin_agency_main_dashboard')]
     public function main(ChartBuilderInterface $chartBuilder): Response
     {
