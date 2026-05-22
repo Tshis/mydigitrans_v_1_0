@@ -8,6 +8,19 @@
         &_title {
             color: lighten($success,25%) !important;
         }//&_title
+
+        .c-cash-control-card {
+            background-color: $dm-bg;
+            border-color: $dm-border;
+
+            &_title {
+            color: $dm-text;
+            }
+            &_text {
+            color: $dm-text-mute;
+            strong { color: $dm-text; }
+            }
+        }//c-cash-control-card
     
         &_header {
     
@@ -110,6 +123,78 @@
         }//c-dropdown
 
     }//&_header
+
+    /* ==========================================================================
+   COMPOSANT : CARTE DE CONTRÔLE DE CAISSE POUR LE GÉRANT (.c-cash-control-card)
+   ========================================================================== */
+
+    .c-cash-control-card {
+    background-color: $white;
+    border-radius: $radius-card;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid lighten($gray, 45%);
+    box-shadow: 0 4px 6px rgba($black, 0.02);
+    margin-bottom: 1.5rem; // Crée un espace avant la grille des KPI
+
+    &_main {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    &_status {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    &_title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: $dark;
+        margin: 0 0 0.2rem 0;
+    }
+
+    &_text {
+        margin: 0;
+        font-size: 0.88rem;
+        color: $gray;
+        
+        strong {
+        color: $black;
+        }
+    }
+
+    // L'indicateur lumineux d'état de la caisse
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+
+        &.is-open {
+        background-color: $success;
+        box-shadow: 0 0 0 4px rgba($success, 0.2);
+        }
+
+        &.is-closed {
+        background-color: $danger;
+        box-shadow: 0 0 0 4px rgba($danger, 0.2);
+        }
+    }
+
+    &_actions {
+        display: flex;
+        gap: 0.75rem;
+        
+        .btn {
+        font-weight: 600;
+        font-size: 0.9rem;
+        }
+    }
+    }//c-cash-control-card
 
     &_title {
         font-size: 2.4rem;
@@ -364,6 +449,8 @@
 .table-responsive {
     flex-grow: 1;
 }
+
+
 
 
 

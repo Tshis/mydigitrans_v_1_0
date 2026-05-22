@@ -18,5 +18,21 @@ final class BranchController extends AbstractController
         ]);
     } //index
 
+    #[Route('/admin/agency/branches/new', name: 'admin_agency_branch_add')]
+    public function add(): Response
+    {
+        return $this->render('admin/agency/branch/add.html.twig', [
+            'page' => 'branch',
+        ]);
+    } //add
+
+    #[Route('/admin/agency/branches/modification', name: 'admin_agency_branch_edit')]
+    public function edit(): Response
+    {
+        return $this->render('admin/agency/branch/edit.html.twig', [
+            'page' => 'branch',
+        ]);
+    } //edit
+
 
 }

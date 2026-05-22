@@ -23,6 +23,40 @@
 			<span class="badge online">Session Ouverte</span>
 		</header>
 
+		{# Bloc exclusif au Gérant pour piloter l'état de son outil de travail #}
+		<div class="c-cash-control-card">
+			<div class="c-cash-control-card_main">
+				<div
+					class="c-cash-control-card_status">
+					{# État Dynamique : changez la classe par 'is-closed' si la caisse est fermée #}
+					<span class="status-indicator is-open"></span>
+					<div>
+						<h4 class="c-cash-control-card_title">Session Financière</h4>
+						<p class="c-cash-control-card_text">Caisse ouverte par :
+							<strong>Mukendi Jean</strong>
+							à 07:15</p>
+					</div>
+				</div>
+
+				<div
+					class="c-cash-control-card_actions">
+					{# Ce bouton s'affiche si la caisse est OUVERTE #}
+					<button type="button" class="btn btn-danger border-radius-5">
+						<i class="fas fa-lock"></i>
+						Clôturer la caisse & Arrêter les ventes
+					</button>
+
+					{# Ce bouton (masqué par défaut ici) s'affichera si la caisse est FERMÉE #}
+					{# 
+					            <button type="button" class="btn btn-success border-radius-5">
+					                <i class="fas fa-key"></i> Ouvrir la session du jour
+					            </button> 
+					            #}
+				</div>
+			</div>
+		</div>
+
+
 		{# 2. Grille de Cartes KPI (Utilise ta classe .c-kpi-card) #}
 		<div
 			class="a-dashboard-wrapper_kpi-grid">

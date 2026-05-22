@@ -1,0 +1,93 @@
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="branch-wrapper">
+
+		{# 1. EN-TÊTE DE LA PAGE #}
+		<header class="branch-wrapper_header">
+			<h2 class="branch-wrapper_title">
+				<i class="fas fa-plus-circle"></i>
+				Ajouter une succursale
+			</h2>
+			<a href="#" class="btn btn-secondary border-radius-5">
+				<i class="fas fa-arrow-left"></i>
+				Retour à la liste
+			</a>
+		</header>
+
+		{# 2. LE FORMULAIRE DÉDIÉ #}
+		<div class="c-form-card my-20">
+			<form
+				action="#" method="POST" class="c-form-card_form">
+
+				{# Section : Informations Générales #}
+				<div class="c-form-card_section">
+					<h3 class="c-form-card_section-title">
+						<i class="fas fa-info-circle"></i>
+						Informations de la succursale</h3>
+
+					<div class="c-form-card_grid">
+						<div class="c-form-card_group">
+							<label for="branch_name" class="c-form-card_label">Nom de la succursale
+								<span class="required">*</span>
+							</label>
+							<input type="text" id="branch_name" placeholder="Ex: Succursale de Limete" class="c-form-card_input" required>
+						</div>
+
+						<div class="c-form-card_group">
+							<label for="branch_code" class="c-form-card_label">Code unique
+								<span class="required">*</span>
+							</label>
+							<input type="text" id="branch_code" placeholder="Ex: KIN-LIM" class="c-form-card_input" required>
+						</div>
+					</div>
+				</div>
+
+				{# Section : Localisation & Responsable #}
+				<div class="c-form-card_section">
+					<h3 class="c-form-card_section-title">
+						<i class="fas fa-map-marker-alt"></i>
+						Localisation & Gestion</h3>
+
+					<div class="c-form-card_grid">
+						<div class="c-form-card_group">
+							<label for="branch_city" class="c-form-card_label">Ville / Province
+								<span class="required">*</span>
+							</label>
+							<select id="branch_city" class="c-form-card_select" required>
+								<option value="">Sélectionner une ville</option>
+								<option value="kinshasa">Kinshasa</option>
+								<option value="matadi">Matadi</option>
+								<option value="lubumbashi">Lubumbashi</option>
+							</select>
+						</div>
+
+						<div class="c-form-card_group">
+							<label for="branch_manager" class="c-form-card_label">Nom du Gérant / Responsable
+								<span class="required">*</span>
+							</label>
+							<input type="text" id="branch_manager" placeholder="Ex: Kambale Pierre" class="c-form-card_input" required>
+						</div>
+					</div>
+
+					<div class="c-form-card_group">
+						<label for="branch_address" class="c-form-card_label">Adresse physique détaillée</label>
+						<input type="text" id="branch_address" placeholder="Ex: N° 12, Boulevard Lumumba, Quartier Industriel" class="c-form-card_input">
+					</div>
+				</div>
+
+				{# 3. ACTIONS DU FORMULAIRE #}
+				<div class="c-form-card_actions">
+					<a href="#" class="btn btn-danger border-radius-5">Annuler</a>
+					<button type="button" class="btn btn-success border-radius-5">
+						<i class="fas fa-check"></i>
+						Créer la succursale
+					</button>
+				</div>
+
+			</form>
+		</div>
+
+	</div>
+{% endblock %}

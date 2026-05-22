@@ -1,0 +1,106 @@
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="branch-wrapper">
+
+		{# 1. EN-TÊTE DE LA PAGE #}
+		<header class="branch-wrapper_header">
+			<h2 class="branch-wrapper_title">
+				<i class="fas fa-cog"></i>
+				Configurer : Succursale de Limete
+			</h2>
+			<a href="#" class="btn btn-secondary border-radius-5">
+				<i class="fas fa-arrow-left"></i>
+				Retour à la liste
+			</a>
+		</header>
+
+		{# 2. DISPOSITION EN GRILLE (Formulaire vs Actions de Session) #}
+		<div
+			class="branch-edit-grid my-20">
+
+			{# COLONNE GAUCHE (2fr) : Formulaire de modification #}
+			<div class="c-form-card">
+				<form action="#" method="POST" class="c-form-card_form">
+
+					<div class="c-form-card_section">
+						<h3 class="c-form-card_section-title">
+							<i class="fas fa-edit"></i>
+							Modifier les détails</h3>
+
+						<div class="c-form-card_grid">
+							<div class="c-form-card_group">
+								<label for="edit_name" class="c-form-card_label">Nom de la succursale</label>
+								<input type="text" id="edit_name" value="Limete" class="c-form-card_input" required>
+							</div>
+							<div class="c-form-card_group">
+								<label for="edit_code" class="c-form-card_label">Code unique</label>
+								<input type="text" id="edit_code" value="KIN-LIM" class="c-form-card_input" required readonly>
+							</div>
+						</div>
+
+						<div class="c-form-card_grid">
+							<div class="c-form-card_group">
+								<label for="edit_city" class="c-form-card_label">Ville / Province</label>
+								<select id="edit_city" class="c-form-card_select" required>
+									<option value="kinshasa" selected>Kinshasa</option>
+									<option value="matadi">Matadi</option>
+								</select>
+							</div>
+							<div class="c-form-card_group">
+								<label for="edit_manager" class="c-form-card_label">Gérant actuel</label>
+								<input type="text" id="edit_manager" value="Kambale Pierre" class="c-form-card_input" required>
+							</div>
+						</div>
+					</div>
+
+					<div class="c-form-card_actions">
+						<button type="button" class="btn btn-success border-radius-5">
+							<i class="fas fa-save"></i>
+							Enregistrer les modifications
+						</button>
+					</div>
+				</form>
+			</div>
+
+			{# COLONNE DROITE (1fr) : Zone de Danger / Actions de Session #}
+			<div class="c-session-panel">
+				<h3 class="c-session-panel_title">
+					<i class="fas fa-shield-alt"></i>
+					Contrôle de Session</h3>
+
+				{# État Actuel #}
+				<div class="c-session-panel_status-box online">
+					<span class="status-dot"></span>
+					<div>
+						<strong>Session Ouverte</strong>
+						<p>Activité commerciale en cours</p>
+					</div>
+				</div>
+
+				<div class="c-session-panel_info">
+					<p>Clôturer la session va geler les ventes de billets pour cette succursale jusqu'à la prochaine réouverture réglementaire.</p>
+				</div>
+
+				{# Boutons d'action dédiés #}
+				<div
+					class="c-session-panel_actions">
+					{# Action Clôture (Ici en mode actif car la session est ouverte) #}
+					<button type="button" class="btn btn-danger w-100 mb-10">
+						<i class="fas fa-lock"></i>
+						Clôturer la Session du Jour
+					</button>
+
+					{# Option avancée de suppression/désactivation globale #}
+					<button type="button" class="btn btn-outline-danger w-100">
+						<i class="fas fa-trash"></i>
+						Archiver la succursale
+					</button>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+{% endblock %}

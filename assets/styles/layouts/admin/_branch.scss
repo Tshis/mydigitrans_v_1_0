@@ -1,6 +1,5 @@
 @use'../../abstract/variables' as *;
 
-
 /* ==========================================================================
 PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
 ========================================================================== */
@@ -321,6 +320,277 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
     }//branch-wrapper
 
 }//dark 
+
+
+//=================================================================================
+
+
+/* ==========================================================================
+   COMPOSANT : FORMULAIRE DÉDIÉ (.c-form-card)
+   ========================================================================== */
+
+.c-form-card {
+  background-color: $white;
+  border-radius: $radius-card;
+  padding: 2rem;
+  border: 1px solid lighten($gray, 45%);
+  box-shadow: 0 4px 6px rgba($black, 0.02);
+  max-width: 850px; // Évite que les champs soient trop étirés sur grand écran
+  margin: 0 auto; // Centre le formulaire dans la page
+
+  &_section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid lighten($gray, 45%);
+
+    &:last-of-type {
+      border-bottom: none;
+      margin-bottom: 1rem;
+      padding-bottom: 0;
+    }
+  }
+
+  &_section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $dark;
+    margin: 0 0 1.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      color: $primary;
+    }
+  }
+
+  // Grille interne : 2 colonnes par ligne sur PC, empilé sur mobile
+  &_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &_group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &_label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $gray;
+
+    .required {
+      color: $danger;
+      margin-left: 2px;
+    }
+  }
+
+  &_input, &_select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid lighten($gray, 35%);
+    border-radius: $radius-input;
+    font-size: 0.92rem;
+    color: $black;
+    background-color: $white;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+  }
+
+  &_select {
+    cursor: pointer;
+  }
+
+  // Pied du formulaire avec les actions
+  &_actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid lighten($gray, 45%);
+
+    .btn {
+      min-width: 140px;
+      justify-content: center;
+    }
+  }
+}
+
+/* ==========================================================================
+   SUPPORT DARK MODE (.dark-mode) FOR FORM
+   ========================================================================== */
+.dark-mode {
+  .c-form-card {
+    background-color: $dm-bg-surface;
+    border-color: $dm-border;
+
+    &_section {
+      border-bottom-color: $dm-border;
+    }
+
+    &_section-title {
+      color: $dm-text;
+    }
+
+    &_label {
+      color: $dm-text-mute;
+    }
+
+    &_input, &_select {
+      background-color: $dm-bg-main;
+      border-color: $dm-border;
+      color: $dm-text;
+
+      &:focus {
+        border-color: $primary;
+      }
+    }
+
+    &_select option {
+      background-color: $dm-bg-surface;
+      color: $dm-text;
+    }
+
+    &_actions {
+      border-top-color: $dm-border;
+    }
+  }
+}
+
+
+//================================================================================
+/* ==========================================================================
+   PAGE DÉDIÉE : MODIFICATION & CONFIGURATION (.branch-edit-grid)
+   ========================================================================== */
+
+// Grille principale de la page d'édition
+.branch-edit-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: start; // Aligne le haut du formulaire et du panneau latéral
+
+  // Évite les bugs d'affichage sur tablette/mobile en repassant sur une colonne
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Le panneau latéral de contrôle des sessions
+.c-session-panel {
+  background-color: $white;
+  border-radius: $radius-card;
+  padding: 1.5rem;
+  border: 1px solid lighten($gray, 45%);
+  box-shadow: 0 4px 6px rgba($black, 0.02);
+
+  &_title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $dark;
+    margin: 0 0 1.25rem 0;
+  }
+
+  // Boîte d'état visuelle (Vert si ouvert, Gris/Rouge si fermé)
+  &_status-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: $radius-input;
+    margin-bottom: 1.25rem;
+    background-color: lighten($success, 50%); // Fond bleu/vert très clair
+    border: 1px solid lighten($success, 30%);
+
+    strong {
+      display: block;
+      color: $dark;
+      font-size: 0.95rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: $gray;
+    }
+
+    // Le point lumineux d'état actif
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background-color: $success;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba($success, 0.2);
+    }
+  }
+
+  &_info {
+    font-size: 0.85rem;
+    color: $gray;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    padding: 0 0.25rem;
+  }
+
+  &_actions {
+    .w-100 { width: 100%; }
+    .mb-10 { margin-bottom: 0.75rem; }
+    
+    // Customisation pour le bouton outline danger
+    .btn-outline-danger {
+      background: transparent;
+      border: 1px solid $danger;
+      color: $danger;
+      
+      &:hover {
+        background-color: $danger;
+        color: $white;
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   SUPPORT DARK MODE (.dark-mode) FOR EDIT PANEL
+   ========================================================================== */
+.dark-mode {
+  .c-session-panel {
+    background-color: $dm-bg-surface;
+    border-color: $dm-border;
+
+    &_title {
+      color: $dm-text;
+    }
+
+    &_status-box {
+      background-color: rgba($success, 0.1);
+      border-color: rgba($success, 0.3);
+
+      strong { color: $dm-text; }
+      p { color: $dm-text-mute; }
+    }
+
+    &_info {
+      color: $dm-text-mute;
+    }
+  }
+}
+
 
 
 
