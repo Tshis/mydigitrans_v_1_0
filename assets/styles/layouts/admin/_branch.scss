@@ -32,8 +32,6 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
         gap: 1.5rem;
         margin-bottom: 1.5rem;
     }//&_kpi-grid
-
-
     
     // --- COMPOSANT : CARTES KPI (.c-kpi-card) ---
     .c-kpi-card {
@@ -265,6 +263,60 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
         }
     }//c-branch-card
 
+
+    /* ==========================================================================
+   COMPOSANT : FORMULAIRE DÉDIÉ (.c-form-card)
+   ========================================================================== */
+   .c-form-card {
+        background-color: $white;
+        border-radius: $radius-card;
+        padding: 2rem;
+        border: 1px solid lighten($gray, 45%);
+        box-shadow: 0 4px 6px rgba($black, 0.02);
+        max-width: 850px; // Évite que les champs soient trop étirés sur grand écran
+        margin: 0 auto; // Centre le formulaire dans la page
+
+        &_section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            //border-bottom: 1px solid lighten($gray, 45%);
+
+            &:last-of-type {
+                border-bottom: none;
+                margin-bottom: 1rem;
+                padding-bottom: 0;
+            }
+        }//&_section
+
+        &_section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: $dark;
+            margin: 0 0 1.25rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+                color: $primary;
+            }
+        }//&_section-title       
+    
+        // Pied du formulaire avec les actions
+        &_actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid lighten($gray, 45%);
+
+            .btn {
+            min-width: 140px;
+            justify-content: center;
+            }
+        }
+    }//.c-form-card
+
 }//branch-wrapper
 
 /* ==========================================================================
@@ -317,160 +369,17 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
           }
         }
 
+        .c-form-card{
+            background: $dm-bg;
+            
+            &_section-title{
+                color: lighten($dark, 45%) !important;
+            }// &_section-title 
+        }
+
     }//branch-wrapper
 
 }//dark 
-
-
-//=================================================================================
-
-
-/* ==========================================================================
-   COMPOSANT : FORMULAIRE DÉDIÉ (.c-form-card)
-   ========================================================================== */
-
-.c-form-card {
-  background-color: $white;
-  border-radius: $radius-card;
-  padding: 2rem;
-  border: 1px solid lighten($gray, 45%);
-  box-shadow: 0 4px 6px rgba($black, 0.02);
-  max-width: 850px; // Évite que les champs soient trop étirés sur grand écran
-  margin: 0 auto; // Centre le formulaire dans la page
-
-  &_section {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid lighten($gray, 45%);
-
-    &:last-of-type {
-      border-bottom: none;
-      margin-bottom: 1rem;
-      padding-bottom: 0;
-    }
-  }
-
-  &_section-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: $dark;
-    margin: 0 0 1.25rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    i {
-      color: $primary;
-    }
-  }
-
-  // Grille interne : 2 colonnes par ligne sur PC, empilé sur mobile
-  &_grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 1.25rem;
-  }
-
-  &_group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  &_label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: $gray;
-
-    .required {
-      color: $danger;
-      margin-left: 2px;
-    }
-  }
-
-  &_input, &_select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid lighten($gray, 35%);
-    border-radius: $radius-input;
-    font-size: 0.92rem;
-    color: $black;
-    background-color: $white;
-    outline: none;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease;
-
-    &:focus {
-      border-color: $primary;
-      box-shadow: 0 0 0 3px rgba($primary, 0.1);
-    }
-  }
-
-  &_select {
-    cursor: pointer;
-  }
-
-  // Pied du formulaire avec les actions
-  &_actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid lighten($gray, 45%);
-
-    .btn {
-      min-width: 140px;
-      justify-content: center;
-    }
-  }
-}
-
-/* ==========================================================================
-   SUPPORT DARK MODE (.dark-mode) FOR FORM
-   ========================================================================== */
-.dark-mode {
-  .c-form-card {
-    background-color: $dm-bg-surface;
-    border-color: $dm-border;
-
-    &_section {
-      border-bottom-color: $dm-border;
-    }
-
-    &_section-title {
-      color: $dm-text;
-    }
-
-    &_label {
-      color: $dm-text-mute;
-    }
-
-    &_input, &_select {
-      background-color: $dm-bg-main;
-      border-color: $dm-border;
-      color: $dm-text;
-
-      &:focus {
-        border-color: $primary;
-      }
-    }
-
-    &_select option {
-      background-color: $dm-bg-surface;
-      color: $dm-text;
-    }
-
-    &_actions {
-      border-top-color: $dm-border;
-    }
-  }
-}
 
 
 //================================================================================
