@@ -1,5 +1,13 @@
 {% extends "admin/base.html.twig" %}
 
+{% block javascripts %}
+	{# Conserve vos scripts globaux existants #}
+	{{ parent() }}
+
+	{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
+	{{ importmap('app') }}
+{% endblock %}
+
 {% block body %}
 	<div
 		class="branch-wrapper">
@@ -10,7 +18,7 @@
 				<i class="fas fa-cog"></i>
 				Configurer : Succursale de Limete
 			</h2>
-			<a href="#" class="btn btn-secondary border-radius-5">
+			<a href="{{path('admin_agency_branch_index')}}" class="btn btn-dark border-radius-5">
 				<i class="fas fa-arrow-left"></i>
 				Retour à la liste
 			</a>
@@ -22,46 +30,64 @@
 
 			{# COLONNE GAUCHE (2fr) : Formulaire de modification #}
 			<div class="c-form-card">
-				<form action="#" method="POST" class="c-form-card_form">
+				{{ form_start(form, {'method': 'POST','attr': {'class': 'c-form-card_form'} }) }}
 
-					<div class="c-form-card_section">
-						<h3 class="c-form-card_section-title">
-							<i class="fas fa-edit"></i>
-							Modifier les détails</h3>
+				{# Section : Informations Générales #}
+				<div class="c-form-card_section">
+					<h3 class="c-form-card_section-title">
+						<i class="fas fa-info-circle"></i>
+						Informations de la succursale
+					</h3>
 
-						<div class="c-form-card_grid">
-							<div class="c-form-card_group">
-								<label for="edit_name" class="c-form-card_label">Nom de la succursale</label>
-								<input type="text" id="edit_name" value="Limete" class="c-form-card_input" required>
-							</div>
-							<div class="c-form-card_group">
-								<label for="edit_code" class="c-form-card_label">Code unique</label>
-								<input type="text" id="edit_code" value="KIN-LIM" class="c-form-card_input" required readonly>
-							</div>
-						</div>
-
-						<div class="c-form-card_grid">
-							<div class="c-form-card_group">
-								<label for="edit_city" class="c-form-card_label">Ville / Province</label>
-								<select id="edit_city" class="c-form-card_select" required>
-									<option value="kinshasa" selected>Kinshasa</option>
-									<option value="matadi">Matadi</option>
-								</select>
-							</div>
-							<div class="c-form-card_group">
-								<label for="edit_manager" class="c-form-card_label">Gérant actuel</label>
-								<input type="text" id="edit_manager" value="Kambale Pierre" class="c-form-card_input" required>
-							</div>
-						</div>
+					<div class="field mb-20">
+						<label for="">Nom de la succursale</label>
+						<input type="text" placeholder="Ex: Agence de limete">
 					</div>
 
-					<div class="c-form-card_actions">
-						<button type="button" class="btn btn-success border-radius-5">
-							<i class="fas fa-save"></i>
-							Enregistrer les modifications
-						</button>
+
+					<div class="field-group">
+						<div class="field">
+							<label for="">Ville de la succursale</label>
+							<input type="text" placeholder="Ex: Kinshasa">
+						</div>
+						<div class="field">
+							<label for="">Pays de la succursale</label>
+							{# <input type="text" placeholder="Ex: RDCongo"> #}
+							{{ form_widget(form.pays) }}
+						</div>
 					</div>
-				</form>
+				</div>
+
+				{# Section :Responsable #}
+				<div class="c-form-card_section">
+					<h3 class="c-form-card_section-title">
+						<i class="fas fa-user-circle"></i>
+						Gestionnaire
+					</h3>
+
+					<div class="field mb-20">
+						<div class="c-form-card_group">
+							<label for="branch_city">
+								Gerant (Directeur d'agence)
+							</label>
+							<select id="branch_city" required>
+								<option value="">Billy Branham</option>
+								<option value="kinshasa">Dieudonné Okito</option>
+							</select>
+						</div>
+
+					</div>
+
+
+				</div>
+
+				<div class="c-form-card_actions">
+					<button type="button" class="btn btn-success border-radius-5">
+						<i class="fas fa-save"></i>
+						Enregistrer les modifications
+					</button>
+				</div>
+				{{ form_end(form) }}
 			</div>
 
 			{# COLONNE DROITE (1fr) : Zone de Danger / Actions de Session #}

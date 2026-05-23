@@ -85,7 +85,7 @@ final class DashboardController extends AbstractController
         ]);
     } //main
 
-    #[Route('/admin/agency/branch/dashboard', name: 'admin_agency_branch_dashboard')]
+    #[Route('/admin/agency/branch/{slug}/dashboard', name: 'admin_agency_branch_dashboard')]
     public function branch(ChartBuilderInterface $chartBuilder): Response
     {
         $chart = $chartBuilder->createChart(Chart::TYPE_BAR);

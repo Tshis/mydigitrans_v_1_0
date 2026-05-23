@@ -317,82 +317,22 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
         }
     }//.c-form-card
 
-}//branch-wrapper
 
-/* ==========================================================================
-   SUPPORT DARK MODE (.dark-mode)
-   ========================================================================== */
-.dark {
-
-    .branch-wrapper{
-        .branch-wrapper_title {
-          color: $success;
-        }//branch-wrapper_title
-      
-        .c-filter-bar {
-          background-color: $dm-bg;
-          border-color: $dm-border;
-      
-          &_icon { color: $dm-text-mute; }
-      
-          &_input, &_select {
-            background-color: $dm-bg-main;
-            border-color: $dm-border;
-            color: $dm-text;
-            &:focus { border-color: $primary; }
-          }
-          &_select option { background-color: $dm-bg-surface; }
-        }//.c-filter-bar 
-      
-        .c-branch-card {
-          background-color: $dm-bg;
-          border-color: $dm-border;
-          border-top-color: $success;
-      
-          &_header h3 { color: lighten($color: $success, $amount: 25%); }
-          &_info {
-            border-bottom-color: $dm-border;
-            span { color: $dm-text-mute; }
-            strong { color: $mute; }
-          }
-          &_actions { border-top-color: $dm-border; }
-      
-          &--closed {
-            border-top-color: $gray;
-            background: darken($mute,65%);
-            .c-branch-card_info strong { color: $dm-text-mute; }
-            .btn.disabled {
-              background-color: $gray !important;
-              color: $dark !important;
-              border-color: $dm-border;
-            }
-          }
-        }
-
-        .c-form-card{
-            background: $dm-bg;
-            
-            &_section-title{
-                color: lighten($dark, 45%) !important;
-            }// &_section-title 
-        }
-
-    }//branch-wrapper
-
-}//dark 
-
-
-//================================================================================
+    //================================================================================
 /* ==========================================================================
    PAGE DÉDIÉE : MODIFICATION & CONFIGURATION (.branch-edit-grid)
    ========================================================================== */
 
 // Grille principale de la page d'édition
 .branch-edit-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-  align-items: start; // Aligne le haut du formulaire et du panneau latéral
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start; // Aligne le haut du formulaire et du panneau latéral
+
+    .c-form-card{
+        width: 100%;
+    }
 
   // Évite les bugs d'affichage sur tablette/mobile en repassant sur une colonne
   @media (max-width: 900px) {
@@ -474,31 +414,96 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
   }
 }
 
+}//branch-wrapper
+
 /* ==========================================================================
-   SUPPORT DARK MODE (.dark-mode) FOR EDIT PANEL
+   SUPPORT DARK MODE (.dark-mode)
    ========================================================================== */
-.dark-mode {
-  .c-session-panel {
-    background-color: $dm-bg-surface;
-    border-color: $dm-border;
+.dark {
 
-    &_title {
-      color: $dm-text;
-    }
+    .branch-wrapper{
+        .branch-wrapper_title {
+          color: $success;
+        }//branch-wrapper_title
+      
+        .c-filter-bar {
+          background-color: $dm-bg;
+          border-color: $dm-border;
+      
+          &_icon { color: $dm-text-mute; }
+      
+          &_input, &_select {
+            background-color: $dm-bg-main;
+            border-color: $dm-border;
+            color: $dm-text;
+            &:focus { border-color: $primary; }
+          }
+          &_select option { background-color: $dm-bg-surface; }
+        }//.c-filter-bar 
+      
+        .c-branch-card {
+          background-color: $dm-bg;
+          border-color: $dm-border;
+          border-top-color: $success;
+      
+          &_header h3 { color: lighten($color: $success, $amount: 25%); }
+          &_info {
+            border-bottom-color: $dm-border;
+            span { color: $dm-text-mute; }
+            strong { color: $mute; }
+          }
+          &_actions { border-top-color: $dm-border; }
+      
+          &--closed {
+            border-top-color: $gray;
+            background: darken($mute,65%);
+            .c-branch-card_info strong { color: $dm-text-mute; }
+            .btn.disabled {
+              background-color: $gray !important;
+              color: $dark !important;
+              border-color: $dm-border;
+            }
+          }
+        }
 
-    &_status-box {
-      background-color: rgba($success, 0.1);
-      border-color: rgba($success, 0.3);
+        .c-form-card{
+            background: $dm-bg;
+            
+            &_section-title{
+                color: lighten($dark, 45%) !important;
+            }// &_section-title 
+        }
 
-      strong { color: $dm-text; }
-      p { color: $dm-text-mute; }
-    }
+        //=====Edit page========
+        .c-session-panel {
+            background-color: $dm-bg;
+            border-color: $dm-border;
 
-    &_info {
-      color: $dm-text-mute;
-    }
-  }
-}
+            &_title {
+            color: $dm-text;
+            }
+
+            &_status-box {
+            background-color: rgba($success, 0.1);
+            border-color: rgba($success, 0.3);
+
+            strong { color: $dm-text; }
+            p { color: $dm-text-mute; }
+            }
+
+            &_info {
+            color: $dm-text-mute;
+            }
+        }//c-session-panel
+
+    }//branch-wrapper
+
+}//dark 
+
+
+
+
+
 
 
 
