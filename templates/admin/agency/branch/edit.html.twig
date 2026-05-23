@@ -97,13 +97,22 @@
 					Contrôle de Session</h3>
 
 				{# État Actuel #}
-				<div class="c-session-panel_status-box online">
+				<div class="c-session-panel_status-box opened">
 					<span class="status-dot"></span>
 					<div>
 						<strong>Session Ouverte</strong>
 						<p>Activité commerciale en cours</p>
 					</div>
 				</div>
+
+
+				{# <div class="c-session-panel_status-box closed">
+									<span class="status-dot"></span>
+									<div>
+										<strong>Session Fermée</strong>
+										<p>Activité commerciale suspendues</p>
+									</div>
+								</div> #}
 
 				<div class="c-session-panel_info">
 					<p>Clôturer la session va geler les ventes de billets pour cette succursale jusqu'à la prochaine réouverture réglementaire.</p>
@@ -113,16 +122,20 @@
 				<div
 					class="c-session-panel_actions">
 					{# Action Clôture (Ici en mode actif car la session est ouverte) #}
-					<button type="button" class="btn btn-danger w-100 mb-10">
+					<a href="" class="btn btn-danger w-100 mb-10">
 						<i class="fas fa-lock"></i>
 						Clôturer la Session du Jour
-					</button>
+					</a>
+					{# <a href="" class="btn btn-success w-100 mb-10">
+											<i class="fa-solid fa-lock-open"></i>
+											Ouvrir la Session du Jour
+										</a> #}
 
 					{# Option avancée de suppression/désactivation globale #}
-					<button type="button" class="btn btn-outline-danger w-100">
+					<a href="" class="btn btn-outline-danger w-100">
 						<i class="fas fa-trash"></i>
 						Archiver la succursale
-					</button>
+					</a>
 				</div>
 			</div>
 

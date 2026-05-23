@@ -1,6 +1,7 @@
 @use '../abstract/variables' as *;
 
 .btn{
+    display: block;
     border: none;
     padding: 8px 14px;
     border-radius: 6px;

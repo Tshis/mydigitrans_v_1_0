@@ -363,12 +363,9 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
     padding: 1rem;
     border-radius: $radius-input;
     margin-bottom: 1.25rem;
-    background-color: lighten($success, 50%); // Fond bleu/vert très clair
-    border: 1px solid lighten($success, 30%);
 
     strong {
       display: block;
-      color: $dark;
       font-size: 0.95rem;
     }
 
@@ -378,15 +375,39 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
       color: $gray;
     }
 
+    &.opened{
+        strong{color: $dark;}
+        background-color: lighten($success, 50%); // Fond bleu/vert très clair
+        border: 1px solid lighten($success, 30%);
+
+        // Le point lumineux d'état actif
+        .status-dot {
+            background-color: $success;
+            box-shadow: 0 0 0 3px rgba($success, 0.2);
+        }
+    }
+
+    &.closed{
+        strong{color: $danger;}
+        background-color: lighten($danger, 50%); // Fond bleu/vert très clair
+        border: 1px solid lighten($danger, 30%);
+
+         // Le point lumineux d'état actif
+        .status-dot {
+            background-color: $danger;
+            box-shadow: 0 0 0 3px rgba($danger, 0.2);
+        }
+
+    }
+
     // Le point lumineux d'état actif
     .status-dot {
-      width: 10px;
-      height: 10px;
-      background-color: $success;
-      border-radius: 50%;
-      box-shadow: 0 0 0 3px rgba($success, 0.2);
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
     }
-  }
+       
+  }//_status-box
 
   &_info {
     font-size: 0.85rem;
@@ -402,6 +423,7 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
     
     // Customisation pour le bouton outline danger
     .btn-outline-danger {
+      display: block;
       background: transparent;
       border: 1px solid $danger;
       color: $danger;
@@ -483,14 +505,7 @@ PAGE : GESTION DES SUCCURSALES (.branch-wrapper)
             color: $dm-text;
             }
 
-            &_status-box {
-            background-color: rgba($success, 0.1);
-            border-color: rgba($success, 0.3);
-
-            strong { color: $dm-text; }
-            p { color: $dm-text-mute; }
-            }
-
+           
             &_info {
             color: $dm-text-mute;
             }
