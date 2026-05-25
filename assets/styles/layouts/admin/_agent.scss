@@ -15,7 +15,7 @@
     padding-bottom: 0.5rem;
     gap: 1rem;
     flex-wrap: wrap;
-  }
+  }//&_header 
 
   .c-datatable {
     background-color: $white;
@@ -56,7 +56,7 @@
       padding: 0.65rem 1rem 0.65rem 2.5rem;
       border: 1px solid lighten($gray, 30%);
       border-radius: $radius-input;
-      font-size: 0.88rem;
+      font-size: 0.98rem;
       color: $black;
       outline: none;
       background-color: $white;
@@ -79,7 +79,7 @@
       padding: 0.65rem 1rem;
       border: 1px solid lighten($gray, 30%);
       border-radius: $radius-input;
-      font-size: 0.88rem;
+      font-size: 0.98rem;
       color: $gray;
       background-color: $white;
       outline: none;
@@ -103,7 +103,7 @@
     }
 
     &_info {
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       color: $gray;
     }
 
@@ -144,13 +144,13 @@
         }
       }
     }
-  }
+  }//.c-datatable
 
   // --- NETTOYAGE ET FINITION DES DONNÉES DU TABLEAU ---
   .table-responsive {
     width: 100%;
     overflow-x: auto;
-  }
+  }// .table-responsive
 
   .custom-table {
     width: 100%;
@@ -161,19 +161,19 @@
       background-color: $white;
       color: $dark;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       padding: 1rem 1.5rem;
       border-bottom: 2px solid lighten($gray, 42%);
-    }
+    }//th
 
     td {
       padding: 1.1rem 1.5rem; 
       vertical-align: middle;
       border-bottom: 1px solid lighten($gray, 46%);
-      font-size: 0.9rem;
-    }
+      font-size: 1rem;
+    }//td
 
     // Alterne subtilement les lignes pour une lecture fluide
     tbody tr:nth-child(even) {
@@ -184,14 +184,14 @@
     tbody tr:hover {
       background-color: rgba($primary, 0.01);
     }
-  }
+  }//custom table
 
   // Composant Identité de l'agent
   .c-user-info {
     display: flex;
     align-items: center;
     gap: 1rem;
-  }
+  }//c-user-info
 
   .c-user-avatar {
     width: 40px;
@@ -202,9 +202,9 @@
     align-items: center;
     justify-content: center;
     color: $dark;
-    font-size: 1rem;
+    font-size: 1.1rem;
     flex-shrink: 0;
-  }
+  }//c-user-avatar
 
   .c-user-meta {
     display: flex;
@@ -214,15 +214,15 @@
     strong {
       color: $dark;
       font-weight: 600;
-      font-size: 0.95rem;
-    }
-  }
+      font-size: 1rem;
+    }//strong
+  }//c-user-meta
 
   .c-user-matricule {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: $gray;
     font-weight: 500;
-  }
+  }//c-user-matricule
 
   // Structuration des colonnes secondaires
   .c-user-phone {
@@ -230,13 +230,13 @@
     font-weight: 600;
     color: $black;
     margin-bottom: 0.15rem;
-  }
+  }//c-user-phone
 
   .c-user-email {
     display: block;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: $gray;
-  }
+  }//c-user-email 
 
   .c-user-branch {
     font-weight: 600;
@@ -247,16 +247,16 @@
 
     i {
       color: lighten($gray, 15%);
-      font-size: 0.85rem;
+      font-size: 0.95rem;
     }
-  }
+  }//.c-user-branch
 
   // Styles des Badges basés uniquement sur vos couleurs réelles
   .badge-role {
     display: inline-block;
     padding: 0.35rem 0.75rem;
     border-radius: 4px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 600;
     background-color: lighten($gray, 48%);
     color: $dark;
@@ -270,14 +270,14 @@
       background-color: lighten($gray, 40%);
       color: $black;
     }
-  }
+  }//badge-role
 
   .badge {
     display: inline-flex;
     align-items: center;
     padding: 0.25rem 0.65rem;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 700;
 
     &.online {
@@ -288,7 +288,7 @@
       background-color: rgba($danger, 0.12);
       color: $danger;
     }
-  }
+  }//badge 
 
   // Ligne spécifique d'un agent bloqué (Utilise $danger et $gray existants)
   .user-row.row-suspended {
@@ -302,7 +302,7 @@
     strong, .c-user-phone {
       color: lighten($gray, 10%);
     }
-  }
+  }//user-row.row-suspended
 
   // Alignement propre des boutons d'actions
   .c-table-actions {
@@ -321,7 +321,7 @@
       box-sizing: border-box;
       text-decoration: none;
     }
-  }
+  }//c-table-actions 
 
   /* ==========================================================================
      📱 RESPONSIVE DESIGN EMPILEMENT (Cartes fluides sous 768px)
@@ -409,7 +409,7 @@
         td:nth-child(4) { grid-column: span 1; display: flex; justify-content: flex-end; } 
         td:nth-child(5) { grid-column: span 2; } 
       }
-    }
+    }//.custom-table
 
     .c-table-actions {
       justify-content: space-between; 
@@ -418,6 +418,6 @@
         flex: 1;
         justify-content: center;
       }
-    }
-  }
-} 
+    }//.c-table-actions
+  }//@media max 768px
+} //user-wrapper
