@@ -18,4 +18,12 @@ final class UserController extends AbstractController
         ]);
     } //index
 
+    #[Route('/admin/agency/agent/new', name: 'admin_agency_agent_add')]
+    public function add(): Response
+    {
+        return $this->render('admin/agency/agent/add.html.twig', [
+            'page' => 'agent',
+        ]);
+    } //add
+
 }

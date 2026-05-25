@@ -1,0 +1,145 @@
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="user-wrapper">
+		{# En-tête de la page #}
+		<header class="user-wrapper_header">
+			<h2 class="user-wrapper_title">
+				<i class="fas fa-user-plus"></i>
+				Ajouter un nouvel agent
+			</h2>
+			<a href="{{path('admin_agency_agent_index')}}" class="btn btn-secondary border-radius-5">
+				<i class="fas fa-arrow-left"></i>
+				Retour à la liste
+			</a>
+		</header>
+
+		{# Formulaire de création #}
+		<div class="c-card my-20">
+			<form action="#" method="POST" class="c-form">
+
+				<div
+					class="c-form_grid">
+					{# Section 1 : Informations Générales #}
+					<div class="c-form_section">
+						<h3 class="c-form_subtitle">
+							<i class="fas fa-id-card"></i>
+							Identité de l'agent</h3>
+
+						<div class="c-form_group">
+							<label for="agent_matricule">Matricule
+								<span class="required">*</span>
+							</label>
+							<div class="c-form_input-wrapper">
+								<i class="fas fa-hashtag"></i>
+								<input type="text" id="agent_matricule" name="matricule" placeholder="Ex: AG-2603" required class="c-form_input">
+							</div>
+						</div>
+
+						<div class="c-form_group">
+							<label for="agent_nom">Nom complet
+								<span class="required">*</span>
+							</label>
+							<div class="c-form_input-wrapper">
+								<i class="fas fa-user"></i>
+								<input type="text" id="agent_nom" name="nom" placeholder="Ex: Ilunga Marc" required class="c-form_input">
+							</div>
+						</div>
+
+						<div class="c-form_group">
+							<label for="agent_phone">Téléphone
+								<span class="required">*</span>
+							</label>
+							<div class="c-form_input-wrapper">
+								<i class="fas fa-phone-alt"></i>
+								<input type="tel" id="agent_phone" name="phone" placeholder="Ex: +243 812 000 000" required class="c-form_input">
+							</div>
+						</div>
+
+						<div class="c-form_group">
+							<label for="agent_email">Adresse Email</label>
+							<div class="c-form_input-wrapper">
+								<i class="fas fa-envelope"></i>
+								<input type="email" id="agent_email" name="email" placeholder="Ex: m.ilunga@transport.cd" class="c-form_input">
+							</div>
+						</div>
+					</div>
+
+					{# Section 2 : Affectation & Sécurité #}
+					<div class="c-form_section">
+						<h3 class="c-form_subtitle">
+							<i class="fas fa-shield-alt"></i>
+							Affectation & Accès</h3>
+
+						<div class="c-form_group">
+							<label for="agent_branch">Succursale d'affectation
+								<span class="required">*</span>
+							</label>
+							<div class="c-form_input-wrapper">
+								<i class="fas fa-building"></i>
+								<select id="agent_branch" name="branch" required class="c-form_select">
+									<option value="" disabled selected>Choisir une succursale</option>
+									<option value="Limete">Limete (Kinshasa)</option>
+									<option value="Gombe">Gombe (Kinshasa)</option>
+									<option value="Matadi Centre">Matadi Centre</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="c-form_group">
+							<label for="agent_role">Rôle / Niveau d'accès
+								<span class="required">*</span>
+							</label>
+							<div class="c-form_input-wrapper">
+								<i class="fas fa-user-shield"></i>
+								<select id="agent_role" name="role" required class="c-form_select">
+									<option value="" disabled selected>Choisir un rôle</option>
+									<option value="ROLE_MANAGER">Gérant</option>
+									<option value="ROLE_GUICHETIER">Guichetier</option>
+									<option value="ROLE_OPERATEUR">Opérateur Fret</option>
+									<option value="ROLE_CONVOYEUR">Convoyeur</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="c-form_group">
+							<label for="agent_password">Mot de passe temporaire
+								<span class="required">*</span>
+							</label>
+							<div class="c-form_input-wrapper">
+								<i class="fas fa-key"></i>
+								<input type="password" id="agent_password" name="password" placeholder="••••••••" required class="c-form_input">
+							</div>
+							<small class="c-form_help">L'agent devra modifier ce mot de passe à sa première connexion.</small>
+						</div>
+
+						<div class="c-form_group">
+							<label for="agent_status">Statut initial</label>
+							<div class="c-form_input-wrapper">
+								<i class="fas fa-toggle-on"></i>
+								<select id="agent_status" name="status" class="c-form_select">
+									<option value="active">Actif (Accès autorisé immédiatement)</option>
+									<option value="suspended">Bloqué (Accès suspendu)</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{# Actions du formulaire #}
+				<div class="c-form_actions">
+					<button type="reset" class="btn btn-secondary">
+						<i class="fas fa-undo"></i>
+						Réinitialiser
+					</button>
+					<button type="submit" class="btn btn-primary">
+						<i class="fas fa-save"></i>
+						Enregistrer l'agent
+					</button>
+				</div>
+
+			</form>
+		</div>
+	</div>
+{% endblock %}
