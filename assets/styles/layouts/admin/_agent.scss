@@ -1,137 +1,202 @@
-@use'../../abstract/variables' as *;
+@use '../../abstract/variables' as *;
 
-
-/* ==========================================================================
-   DESIGN WOW : EN-TÊTE & DATATABLE DES AGENTS
+/* ========================================================================== 
+   DESIGN WOW : EN-TÊTE & DATATABLE DES AGENTS (SANS COULEURS INVENTÉES)
    ========================================================================== */
 
-// Alignement strict de la ligne du titre
-.user-wrapper_header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 0.5rem;
-}
+.user-wrapper {
+  padding: 2rem;
 
-.c-datatable {
-  background-color: $white;
-  border-radius: $radius-card;
-  border: 1px solid lighten($gray, 45%);
-  box-shadow: 0 4px 12px rgba($black, 0.03); // Ombre plus douce
-  overflow: hidden;
-
-  // Header de table unifié et aligné
+  // Alignement strict de la ligne du titre
   &_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid lighten($gray, 45%);
-    background-color: lighten($gray, 54%);
-    gap: 1.5rem;
+    padding-bottom: 0.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
 
-  &_search {
-    position: relative;
-    flex: 1;
-    max-width: 380px;
+  .c-datatable {
+    background-color: $white;
+    border-radius: $radius-card;
+    border: 1px solid lighten($gray, 45%);
+    box-shadow: 0 4px 12px rgba($black, 0.03); // Ombre plus douce
+    overflow: hidden;
+    margin-top: 1.25rem;
 
-    i {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: lighten($gray, 10%);
+    // Header de table unifié et aligné
+    &_header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid lighten($gray, 45%);
+      background-color: lighten($gray, 54%);
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    &_search {
+      position: relative;
+      flex: 1;
+      max-width: 380px;
+
+      i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: lighten($gray, 10%);
+      }
+    }
+
+    &_input {
+      width: 100%;
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      border: 1px solid lighten($gray, 30%);
+      border-radius: $radius-input;
+      font-size: 0.88rem;
+      color: $black;
+      outline: none;
+      background-color: $white;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: $primary;
+      }
+    }
+
+    &_filters {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    &_select {
+      padding: 0.65rem 1rem;
+      border: 1px solid lighten($gray, 30%);
+      border-radius: $radius-input;
+      font-size: 0.88rem;
+      color: $gray;
+      background-color: $white;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: $primary;
+      }
+    }
+
+    &_footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid lighten($gray, 45%);
+      background-color: lighten($gray, 54%);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    &_info {
+      font-size: 0.85rem;
+      color: $gray;
+    }
+
+    &_pagination {
+      display: flex;
+      gap: 0.35rem;
+
+      .btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        text-decoration: none;
+
+        &.btn-secondary {
+          background-color: lighten($gray, 48%);
+          border: 1px solid lighten($gray, 35%);
+          color: $gray;
+
+          &:hover:not([disabled]) {
+            background-color: lighten($gray, 40%);
+          }
+        }
+
+        &.btn-primary {
+          background-color: $primary;
+          border: 1px solid $primary;
+          color: $white;
+        }
+
+        &[disabled] {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
     }
   }
 
-  &_input {
+  // --- NETTOYAGE ET FINITION DES DONNÉES DU TABLEAU ---
+  .table-responsive {
     width: 100%;
-    padding: 0.65rem 1rem 0.65rem 2.5rem;
-    border: 1px solid lighten($gray, 30%);
-    border-radius: $radius-input;
-    font-size: 0.88rem;
-    color: $black;
-    outline: none;
-    background-color: $white;
-    box-sizing: border-box;
+    overflow-x: auto;
+  }
 
-    &:focus {
-      border-color: $primary;
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+
+    th {
+      background-color: $white;
+      color: $dark;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 1rem 1.5rem;
+      border-bottom: 2px solid lighten($gray, 42%);
+    }
+
+    td {
+      padding: 1.1rem 1.5rem; 
+      vertical-align: middle;
+      border-bottom: 1px solid lighten($gray, 46%);
+      font-size: 0.9rem;
+    }
+
+    // Alterne subtilement les lignes pour une lecture fluide
+    tbody tr:nth-child(even) {
+      background-color: lighten($gray, 55%);
+    }
+
+    // Effet hover sur les lignes de données
+    tbody tr:hover {
+      background-color: rgba($primary, 0.01);
     }
   }
 
-  &_filters {
+  // Composant Identité de l'agent
+  .c-user-info {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
   }
 
-  &_select {
-    padding: 0.65rem 1rem;
-    border: 1px solid lighten($gray, 30%);
-    border-radius: $radius-input;
-    font-size: 0.88rem;
-    color: $gray;
-    background-color: $white;
-    outline: none;
-    cursor: pointer;
-
-    &:focus {
-      border-color: $primary;
-    }
-  }
-
-  &_footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    border-top: 1px solid lighten($gray, 45%);
-    background-color: lighten($gray, 54%);
-  }
-}
-
-// --- NETTOYAGE ET FINITION DES DONNÉES DU TABLEAU (Évite le crash) ---
-.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-
-  th {
-    background-color: $white;
-    color: $dark;
-    font-weight: 700;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 1rem 1.5rem;
-    border-bottom: 2px solid lighten($gray, 42%);
-  }
-
-  td {
-    padding: 1.1rem 1.5rem; // Grand espace vertical pour aérer les données
-    vertical-align: middle;
-    border-bottom: 1px solid lighten($gray, 46%);
-    font-size: 0.9rem;
-  }
-
-  // Alterne subtilement les lignes pour une lecture fluide
-  tbody tr:nth-child(even) {
-    background-color: lighten($gray, 55%);
-  }
-}
-
-// Composant Identité de l'agent
-.c-user-identity {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-
-  &_avatar {
+  .c-user-avatar {
     width: 40px;
     height: 40px;
-    background-color: lighten($mute, 10%);
+    background-color: lighten($gray, 48%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -141,7 +206,7 @@
     flex-shrink: 0;
   }
 
-  &_meta {
+  .c-user-meta {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
@@ -153,96 +218,206 @@
     }
   }
 
-  &_matricule {
+  .c-user-matricule {
     font-size: 0.75rem;
     color: $gray;
     font-weight: 500;
   }
-}
 
-// Structuration des colonnes secondaires
-.c-user-phone {
-  display: block;
-  font-weight: 600;
-  color: $black;
-}
-
-.c-user-email {
-  display: block;
-  font-size: 0.8rem;
-  color: $gray;
-}
-
-.c-user-user {
-  font-weight: 600;
-  color: $dark;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  
-  i {
-    color: lighten($gray, 15%);
-    font-size: 0.85rem;
-  }
-}
-
-// Ligne spécifique d'un agent bloqué (Plus discret, pas d'effet flash agressif)
-.user-row.row-suspended {
-  background-color: rgba($danger, 0.03) !important;
-  
-  .c-user-identity_avatar {
-    background-color: lighten($danger, 42%);
-    color: $danger;
-  }
-  strong, .c-user-phone {
-    color: lighten($gray, 10%);
-  }
-}
-
-// Alignement propre des boutons d'actions
-.c-table-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-
-  .btn-xs {
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    padding: 0;
-    box-sizing: border-box;
-  }
-}
-
-.c-datatable_pagination {
-  display: flex;
-  gap: 0.35rem;
-
-  .btn {
-    padding: 6px 12px;
-    font-size: 0.85rem;
+  // Structuration des colonnes secondaires
+  .c-user-phone {
+    display: block;
     font-weight: 600;
-    cursor: pointer;
+    color: $black;
+    margin-bottom: 0.15rem;
+  }
+
+  .c-user-email {
+    display: block;
+    font-size: 0.8rem;
+    color: $gray;
+  }
+
+  .c-user-branch {
+    font-weight: 600;
+    color: $dark;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.4rem;
+
+    i {
+      color: lighten($gray, 15%);
+      font-size: 0.85rem;
+    }
+  }
+
+  // Styles des Badges basés uniquement sur vos couleurs réelles
+  .badge-role {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background-color: lighten($gray, 48%);
+    color: $dark;
+
+    &--guichetier {
+      background-color: rgba($primary, 0.1);
+      color: $primary;
+    }
     
-    &.btn-secondary {
-      background-color: lighten($gray, 48%);
-      border: 1px solid lighten($gray, 35%);
-      color: $gray;
+    &--convoyeur {
+      background-color: lighten($gray, 40%);
+      color: $black;
+    }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    &.online {
+      background-color: rgba($primary, 0.12);
+      color: $primary;
+    }
+    &.offline {
+      background-color: rgba($danger, 0.12);
+      color: $danger;
+    }
+  }
+
+  // Ligne spécifique d'un agent bloqué (Utilise $danger et $gray existants)
+  .user-row.row-suspended {
+    background-color: rgba($danger, 0.02) !important;
+
+    .c-user-avatar {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+    }
+
+    strong, .c-user-phone {
+      color: lighten($gray, 10%);
+    }
+  }
+
+  // Alignement propre des boutons d'actions
+  .c-table-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+
+    .btn-xs {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      padding: 0;
+      box-sizing: border-box;
+      text-decoration: none;
+    }
+  }
+
+  /* ==========================================================================
+     📱 RESPONSIVE DESIGN EMPILEMENT (Cartes fluides sous 768px)
+     ========================================================================== */
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    &_header {
+      flex-direction: column;
+      align-items: stretch;
       
-      &:hover {
-        background-color: lighten($gray, 40%);
+      .btn {
+        width: 100%;
+        justify-content: center;
       }
     }
-    
-    &[disabled] {
-      opacity: 0.5;
-      cursor: not-allowed;
+
+    .c-datatable {
+      &_header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
+        gap: 1rem;
+      }
+
+      &_search {
+        max-width: 100%;
+      }
+
+      &_filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+
+        .c-datatable_select, .btn {
+          width: 100%;
+        }
+      }
+
+      &_footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+
+    // Transformation du tableau HTML en Cartes responsives
+    .custom-table {
+      display: block;
+
+      thead {
+        display: none; 
+      }
+
+      tbody {
+        display: block;
+      }
+
+      tr.user-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr; 
+        gap: 0.75rem;
+        padding: 1.25rem 1rem;
+        border-bottom: 5px solid lighten($gray, 45%); 
+        background-color: $white;
+
+        td {
+          display: block;
+          padding: 0 !important;
+          border: none !important;
+          width: 100% !important;
+          text-align: left !important;
+
+          &.text-right {
+            grid-column: span 2;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem !important;
+            border-top: 1px dashed lighten($gray, 40%) !important;
+          }
+        }
+
+        td:nth-child(1) { grid-column: span 2; } 
+        td:nth-child(2) { grid-column: span 2; margin: 0.25rem 0; } 
+        td:nth-child(3) { grid-column: span 1; } 
+        td:nth-child(4) { grid-column: span 1; display: flex; justify-content: flex-end; } 
+        td:nth-child(5) { grid-column: span 2; } 
+      }
+    }
+
+    .c-table-actions {
+      justify-content: space-between; 
+      
+      .btn {
+        flex: 1;
+        justify-content: center;
+      }
     }
   }
-}
+} 

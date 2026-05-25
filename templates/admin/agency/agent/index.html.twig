@@ -1,5 +1,10 @@
 {% extends "admin/base.html.twig" %}
 
+
+{% block javascripts %}
+<script src="/js/admin/agentDataTable.js" defer></script>
+{% endblock %}
+
 {% block body %}
 
 <div class="user-wrapper">
@@ -18,7 +23,6 @@
     <div class="c-datatable my-20">
         <div class="c-datatable_header">
             <div class="c-datatable_search">
-                <i class="fas fa-search"></i>
                 <input type="text" placeholder="Rechercher un agent (nom, matricule, tel...)" class="c-datatable_input">
             </div>
 
@@ -37,7 +41,6 @@
                     <option value="ROLE_OPERATEUR">Opérateur Fret</option>
                     <option value="ROLE_CONVOYEUR">Convoyeur</option>
                 </select>
-                <button type="button" class="btn btn-primary">Filtrer</button>
             </div>
         </div>
 
@@ -55,89 +58,96 @@
                     </tr>
                 </thead>
                 <tbody>
+
                     {# Agent 1 #}
                     <tr class="user-row">
                         <td>
+                            <div class="c-user-info">
+                                <div class="c-user-avatar"><i class="fas fa-user"></i></div>
+                                <div class="c-user-meta">
+                                    <strong>Mukendi Jean</strong>
+                                    <span class="c-user-matricule">AG-2601</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="c-user-phone"><i class="fas fa-phone-alt"></i> +243 812 345 678</span>
+                            <span class="c-user-email"><i class="fas fa-envelope"></i> j.mukendi@transport.cd</span>
+                        </td>
+                        <td>
+                            <span class="c-user-branch"><i class="fas fa-building"></i> Limete</span>
+                        </td>
+                        <td>
+                            <span class="badge-role badge-role--guichetier">Guichetier</span>
+                        </td>
+                        <td>
+                            <span class="badge online">Actif</span>
+                        </td>
+                        <td class="text-right">
+                            <div class="c-table-actions">
+                                <a href="#" class="btn btn-secondary btn-xs" title="Modifier"><i
+                                        class="fas fa-edit"></i></a>
+                                <button type="button" class="btn btn-warning btn-xs" title="Password"><i
+                                        class="fas fa-key"></i></button>
+                                <button type="button" class="btn btn-outline-danger btn-xs" title="Bloquer"><i
+                                        class="fas fa-user-slash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
 
-                            <i class="fas fa-user"></i>
+                    {# Agent 2 #}
+                    <tr class="user-row row-suspended">
+                        <td>
+                            <div class="c-user-info">
+                                <div class="c-user-avatar"><i class="fas fa-user-slash"></i></div>
+                                <div class="c-user-meta">
+                                    <strong>Kabila Sarah</strong>
+                                    <span class="c-user-matricule">AG-2602</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="c-user-phone"><i class="fas fa-phone-alt"></i> +243 899 876 543</span>
+                            <span class="c-user-email"><i class="fas fa-envelope"></i> s.kabila@transport.cd</span>
+                        </td>
+                        <td>
+                            <span class="c-user-branch"><i class="fas fa-building"></i> Matadi Centre</span>
+                        </td>
+                        <td>
+                            <span class="badge-role badge-role--convoyeur">Convoyeur</span>
+                        </td>
+                        <td>
+                            <span class="badge offline">Bloqué</span>
+                        </td>
+                        <td class="text-right">
+                            <div class="c-table-actions">
+                                <a href="#" class="btn btn-secondary btn-xs" title="Modifier"><i
+                                        class="fas fa-edit"></i></a>
+                                <button type="button" class="btn btn-warning btn-xs" title="Password"><i
+                                        class="fas fa-key"></i></button>
+                                <button type="button" class="btn btn-success btn-xs" title="Débloquer"><i
+                                        class="fas fa-user-check"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+
+
+                </tbody>
+            </table>
         </div>
 
-        <strong>Mukendi Jean</strong>
-        AG-2601</span>
+        {# 4. PIED DE LA DATATABLE #}
+        <div class="c-datatable_footer">
+            <span class="c-datatable_info">Affichage de 1 à 2 sur 45 agents</span>
+            <div class="c-datatable_pagination">
+                <button type="button" class="btn btn-secondary btn-xs" disabled><i
+                        class="fas fa-chevron-left"></i></button>
+                <button type="button" class="btn btn-primary btn-xs">1</button>
+                <button type="button" class="btn btn-secondary btn-xs">2</button>
+                <button type="button" class="btn btn-secondary btn-xs"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
     </div>
-</div>
-</td>
-<td>
-    <span class="c-user-phone">+243 812 345 678</span>
-    <span class="c-user-email">j.mukendi@transport.cd</span>
-</td>
-<td>
-    <span class="c-user-user"><i class="fas fa-building"></i> Limete</span>
-</td>
-<td>
-    <span class="badge-role badge-role--guichetier">Guichetier</span>
-</td>
-<td>
-    <span class="badge online">Actif</span>
-</td>
-<td class="text-right">
-    <div class="c-table-actions">
-        <a href="#" class="btn btn-secondary btn-xs" title="Modifier"><i class="fas fa-edit"></i></a>
-        <button type="button" class="btn btn-warning btn-xs" title="Password"><i class="fas fa-key"></i></button>
-        <button type="button" class="btn btn-outline-danger btn-xs" title="Bloquer"><i
-                class="fas fa-user-slash"></i></button>
-    </div>
-</td>
-</tr>
-
-{# Agent 2 #}
-<tr class="user-row row-suspended">
-    <td>
-
-        <i class="fas fa-user-slash"></i></div>
-
-        <strong>Kabila Sarah</strong>
-        AG-2602</span>
-        </div>
-        </div>
-    </td>
-    <td>
-        <span class="c-user-phone">+243 899 876 543</span>
-        <span class="c-user-email">s.kabila@transport.cd</span>
-    </td>
-    <td>
-        <span class="c-user-user"><i class="fas fa-building"></i> Matadi Centre</span>
-    </td>
-    <td>
-        <span class="badge-role badge-role--convoyeur">Convoyeur</span>
-    </td>
-    <td>
-        <span class="badge offline">Bloqué</span>
-    </td>
-    <td class="text-right">
-        <div class="c-table-actions">
-            <a href="#" class="btn btn-secondary btn-xs" title="Modifier"><i class="fas fa-edit"></i></a>
-            <button type="button" class="btn btn-warning btn-xs" title="Password"><i class="fas fa-key"></i></button>
-            <button type="button" class="btn btn-success btn-xs" title="Débloquer"><i
-                    class="fas fa-user-check"></i></button>
-        </div>
-    </td>
-</tr>
-</tbody>
-</table>
-</div>
-
-{# 4. PIED DE LA DATATABLE #}
-<div class="c-datatable_footer">
-    <span class="c-datatable_info">Affichage de 1 à 2 sur 45 agents</span>
-    <div class="c-datatable_pagination">
-        <button type="button" class="btn btn-secondary btn-xs" disabled><i class="fas fa-chevron-left"></i></button>
-        <button type="button" class="btn btn-primary btn-xs">1</button>
-        <button type="button" class="btn btn-secondary btn-xs">2</button>
-        <button type="button" class="btn btn-secondary btn-xs"><i class="fas fa-chevron-right"></i></button>
-    </div>
-</div>
-</div>
 </div>
 
 
