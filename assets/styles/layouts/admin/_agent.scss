@@ -218,12 +218,6 @@
     }//strong
   }//c-user-meta
 
-  .c-user-matricule {
-    font-size: 0.85rem;
-    color: $gray;
-    font-weight: 500;
-  }//c-user-matricule
-
   // Structuration des colonnes secondaires
   .c-user-phone {
     display: block;
@@ -422,7 +416,77 @@
   }//@media max 768px
 } //user-wrapper
 
+.dark{
+     .c-datatable {
+        background-color: $dm-bg;
+        border: 1px solid lighten($gray, 45%);
 
+        // Header de table unifié et aligné
+        &_header {
+            border-bottom: 1px solid lighten($gray, 25%);
+            background-color: darken($gray, 15%);
+        }//header
+
+        &_footer {
+            border-top: 1px solid lighten($gray, 25%);
+            background-color: darken($gray, 15%);
+        }//footer
+
+        
+    .custom-table {
+
+        th {
+        background-color: darken($gray, 15%);
+        color: $white;
+        border-bottom: 2px solid lighten($gray, 42%);
+        }//th
+
+        td{
+            color: $white;
+        }
+    
+    }//custom table
+
+
+  .c-user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: lighten($gray, 48%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $dark;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }//c-user-avatar
+
+  .c-user-meta {
+    strong {
+      color: $mute;
+    }//strong
+  }//c-user-meta
+
+  // Structuration des colonnes secondaires
+  .c-user-phone {
+    color: $mute;
+  }//c-user-phone
+
+  .c-user-email {
+    color: $mute;
+  }//c-user-email 
+
+  .c-user-branch {
+    color: $mute;
+
+    i {
+      color: lighten($gray, 25%);
+      font-size: 0.95rem;
+    }
+  }//.c-user-branch
+      
+  }//.c-datatable
+}//dark
 
 
 //========Page ajout agent =============
