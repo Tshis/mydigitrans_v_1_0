@@ -1,0 +1,151 @@
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+
+	{# templates/branch/agent_detail.html.twig #}
+	<div
+		class="a-dashboard-wrapper">
+
+		{# 1. En-tête : Retour et Identité de l'agent #}
+		<header class="a-dashboard-wrapper_header">
+			<div style="display: flex; align-items: center; gap: 15px;">
+				<a href="#" class="c-btn-icon" style="font-size: 1.8rem;">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div>
+					<h2 class="a-dashboard-wrapper_title" style="font-size: 2.2rem; line-height: 1;">Mukendi Jean</h2>
+					<span class="badge role-tag" style="margin-top: 5px; display: inline-block;">Identifiant : AG-2026-089</span>
+				</div>
+			</div>
+
+			<div style="display: flex; gap: 10px;">
+				<span class="badge online" style="align-self: center;">Guichet Connecté</span>
+				<button class="c-btn-action btn-danger">
+					<i class="fa-solid fa-ban"></i>
+					Suspendre le compte</button>
+			</div>
+		</header>
+
+		{# 2. Résumé des performances de cet agent spécifique #}
+		<div class="a-dashboard-wrapper_kpi-grid">
+			<div class="c-kpi-card">
+				<h4 class="c-kpi-card_title">Volume Ventes (Mois)</h4>
+				<div class="c-kpi-card_value">3.450.000
+					<span class="c-kpi-card_unit">FC</span>
+				</div>
+				<div class="c-kpi-card_sub">284 billets imprimés</div>
+			</div>
+			<div class="c-kpi-card">
+				<h4 class="c-kpi-card_title">Fonds en Caisse Actuel</h4>
+				<div class="c-kpi-card_value c-kpi-card_value--green">450.000
+					<span class="c-kpi-card_unit">FC</span>
+				</div>
+				<div class="c-kpi-card_conversion">~ 180 USD</div>
+			</div>
+			<div class="c-kpi-card">
+				<h4 class="c-kpi-card_title">Taux d'erreur annulation</h4>
+				<div class="c-kpi-card_value c-kpi-card_value--blue">0.8
+					<span class="c-kpi-card_unit">%</span>
+				</div>
+				<div class="c-kpi-card_sub">Excellent seuil de tolérance</div>
+			</div>
+		</div>
+
+		{# 3. Grille : Permissions Granulaires #}
+		<div class="table-card" style="margin-top: 3rem;">
+			<div class="card-header" style="padding: 24px 24px 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+				<h3 class="a-dashboard-wrapper_title" style="font-size: 1.6rem;">
+					<i class="fas fa-sliders-h"></i>
+					Configuration des Droits d'Accès Granulaires
+				</h3>
+				<button class="c-btn-action btn-success">
+					<i class="fa-solid fa-floppy-disk"></i>
+					Enregistrer les permissions</button>
+			</div>
+
+			<div style="padding: 24px;">
+				<div class="table-responsive">
+					<table class="custom-table c-fine-permissions-table" style="width: 100%; border-collapse: collapse;">
+						<thead>
+							<tr>
+								<th>Module / Fonctionnalité</th>
+								<th style="text-align: center; width: 150px;">Aucun Accès</th>
+								<th style="text-align: center; width: 150px;">Lecture Seule</th>
+								<th style="text-align: center; width: 150px;">Action / Écriture</th>
+							</tr>
+						</thead>
+						<tbody>
+
+							{# Module Réservations (Cas demandé : Voir mais pas encaisser) #}
+							<tr class="branch-row">
+								<td>
+									<div class="module-info">
+										<i class="fa-solid fa-book-bookmark"></i>
+										<div>
+											<strong>Gestion des Réservations</strong>
+											<p>Consultation des listes d'attente et édition des fiches passagers.</p>
+										</div>
+									</div>
+								</td>
+								<td style="text-align: center;"><input type="radio" name="perm_reservation" value="none" class="c-permission-radio"></td>
+								<td style="text-align: center;"><input type="radio" name="perm_reservation" value="read" class="c-permission-radio" checked></td>
+								<td style="text-align: center;"><input type="radio" name="perm_reservation" value="write" class="c-permission-radio"></td>
+							</tr>
+
+							{# Module Encaissements #}
+							<tr class="branch-row">
+								<td>
+									<div class="module-info">
+										<i class="fa-solid fa-money-bill-wave"></i>
+										<div>
+											<strong>Encaissements & Ventes directes</strong>
+											<p>Encaisser le montant du billet (FC/USD) et valider définitivement la place.</p>
+										</div>
+									</div>
+								</td>
+								<td style="text-align: center;"><input type="radio" name="perm_cash" value="none" class="c-permission-radio" checked></td>
+								<td style="text-align: center;"><input type="radio" name="perm_cash" value="read" class="c-permission-radio"></td>
+								<td style="text-align: center;"><input type="radio" name="perm_cash" value="write" class="c-permission-radio"></td>
+							</tr>
+
+							{# Module Planification des Bus #}
+							<tr class="branch-row">
+								<td>
+									<div class="module-info">
+										<i class="fa-solid fa-bus"></i>
+										<div>
+											<strong>Assignation & Horaires des Bus</strong>
+											<p>Modifier l'heure de départ, changer de chauffeur ou remplacer un véhicule en panne.</p>
+										</div>
+									</div>
+								</td>
+								<td style="text-align: center;"><input type="radio" name="perm_bus" value="none" class="c-permission-radio" checked></td>
+								<td style="text-align: center;"><input type="radio" name="perm_bus" value="read" class="c-permission-radio"></td>
+								<td style="text-align: center;"><input type="radio" name="perm_bus" value="write" class="c-permission-radio"></td>
+							</tr>
+
+							{# Module Clôture de Caisse #}
+							<tr class="branch-row">
+								<td>
+									<div class="module-info">
+										<i class="fa-solid fa-vault"></i>
+										<div>
+											<strong>Clôture de Session Financière</strong>
+											<p>Générer le rapport financier de fin de journée et valider le coffre local.</p>
+										</div>
+									</div>
+								</td>
+								<td style="text-align: center;"><input type="radio" name="perm_cloture" value="none" class="c-permission-radio"></td>
+								<td style="text-align: center;"><input type="radio" name="perm_cloture" value="read" class="c-permission-radio"></td>
+								<td style="text-align: center;"><input type="radio" name="perm_cloture" value="write" class="c-permission-radio" checked></td>
+							</tr>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+{% endblock %}

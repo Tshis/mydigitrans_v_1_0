@@ -36,6 +36,15 @@ final class UserController extends AbstractController
         ]);
     } //edit
 
+    #[Route('/admin/agency/agent/{code}/access/control', name: 'admin_agency_agent_permission')]
+    public function permission(): Response
+    {
+        return $this->render('admin/agency/agent/permission.html.twig', [
+            'page' => 'agent',
+            'action' => 'edition'
+        ]);
+    } //permission
+
 
 
 }
