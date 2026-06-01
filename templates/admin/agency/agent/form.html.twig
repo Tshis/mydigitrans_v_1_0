@@ -5,8 +5,13 @@
     {# En-tête de la page #}
     <header class="user-wrapper_header">
         <h2 class="user-wrapper_title">
+            {% if action is same as('edition') %}
+            <i class="fas fa-user-edit"></i>
+            Modification de l'agent
+            {% else %}
             <i class="fas fa-user-plus"></i>
             Ajouter un nouvel agent
+            {% endif %}
         </h2>
         <a href="{{path('admin_agency_agent_index')}}" class="btn btn-dark border-radius-5">
             <i class="fas fa-arrow-left"></i>

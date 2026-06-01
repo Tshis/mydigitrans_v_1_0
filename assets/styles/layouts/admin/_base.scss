@@ -227,7 +227,19 @@ body#admin{
             
             .main-wrapper{
                 background: $dm-bg-surface;
-            }
+            }//main-wrapper
+
+            .form-card{
+                .login-card{
+                    background: $dm-bg;
+
+                    .header{
+                        .name{
+                            color: $success;
+                        }
+                    }
+                }
+            }//.form-card
 
         }//&.dark
 

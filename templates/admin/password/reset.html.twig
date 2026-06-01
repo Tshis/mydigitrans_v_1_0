@@ -1,0 +1,49 @@
+{% extends "admin/base.html.twig" %}
+
+
+{% block body %}
+
+<div class="form-card mt-20">
+
+
+    <section class="login-container">
+
+
+        <div class="login-card">
+
+            <div class="header text-center text-weight-700 text-size-20 my-20">
+                <i class="fas fa-user-circle"></i>
+                <span class="name">Matondo Ilunga Patrick</span>
+                <p class="text-weight-200 text-size-14 text-gray ">Reinitialisation du mot de passe</p>
+            </div>
+
+
+            <form method="post">
+
+                <div class="field mb-25">
+                    <div class="form-group">
+                        <label>Nouveau mot de passe</label>
+                        <input type="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="field mb-25">
+                    <div class="form-group">
+                        <label>Confirmer</label>
+                        <input type="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+
+                <button class="btn btn-primary btn-full">Valider</button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+</div>
+<!--form-card-->
+
+{% endblock %}
