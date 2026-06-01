@@ -574,6 +574,23 @@
         }//.c-user-branch
       
     }//.c-datatable
-    
+
+    .add-agent{
+
+        .c-card {
+             background-color: $dm-bg;
+        }//c-card
+
+        .c-form{
+            &_subtitle {
+                color: $success;
+                border-bottom: 1px solid lighten($gray, 45%);
+                   
+            }//&_subtitle
+        }//c-form
+        
+
+    }//add-agent
+
 }//dark
 
