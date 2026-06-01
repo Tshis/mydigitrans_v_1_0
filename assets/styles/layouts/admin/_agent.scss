@@ -416,8 +416,96 @@
   }//@media max 768px
 } //user-wrapper
 
+//========Page ajout agent =============
+// Ajoutez ce bloc à l'intérieur de votre sélecteur .user-wrapper existant
+.add-agent{
+
+
+    .c-card {
+      background-color: $white;
+      border-radius: $radius-card;
+      border: 1px solid lighten($gray, 45%);
+      box-shadow: 0 4px 12px rgba($black, 0.03);
+      padding: 2rem;
+      
+    }//c-card
+    
+    .c-form {
+        
+      &_grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; // Deux colonnes équitables sur grand écran
+        gap: 2.5rem;
+        
+      }//&_grid
+    
+      &_section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        
+        label{
+            font-size: 1.4rem;
+            .required{
+                color: $primary !important;
+            }//required
+        }//label
+
+      }//&_section
+    
+      &_subtitle {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: $dark;
+        margin: 0 0 0.5rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid lighten($gray, 45%);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    
+        i {
+          color: $primary;
+          font-size: 1rem;
+        }
+      }//&_subtitle
+    
+    
+      &_actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid lighten($gray, 45%);
+      }//&_actions
+    
+      // 📱 GESTION DU RESPONSIVE MOBILE
+      @media (max-width: 768px) {
+        &_grid {
+          grid-template-columns: 1fr; // Bascule sur une seule colonne sur mobile
+          gap: 2rem;
+        }
+    
+        &_actions {
+          flex-direction: column-reverse; // Met le bouton valider en haut au clic tactile
+          gap: 0.75rem;
+    
+          .btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      }
+    }//c-form
+
+}//add-agent
+
+
+
 .dark{
-     .c-datatable {
+
+    .c-datatable {
         background-color: $dm-bg;
         border: 1px solid lighten($gray, 45%);
 
@@ -433,217 +521,59 @@
         }//footer
 
         
-    .custom-table {
+        .custom-table {
 
-        th {
-        background-color: darken($gray, 15%);
-        color: $white;
-        border-bottom: 2px solid lighten($gray, 42%);
-        }//th
-
-        td{
+            th {
+            background-color: darken($gray, 15%);
             color: $white;
-        }
-    
-    }//custom table
+            border-bottom: 2px solid lighten($gray, 42%);
+            }//th
+
+            td{
+                color: $white;
+            }
+        
+        }//custom table
 
 
-  .c-user-avatar {
-    width: 40px;
-    height: 40px;
-    background-color: lighten($gray, 48%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $dark;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }//c-user-avatar
+        .c-user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: lighten($gray, 48%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $dark;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }//c-user-avatar
 
-  .c-user-meta {
-    strong {
-      color: $mute;
-    }//strong
-  }//c-user-meta
+        .c-user-meta {
+            strong {
+            color: $mute;
+            }//strong
+        }//c-user-meta
 
-  // Structuration des colonnes secondaires
-  .c-user-phone {
-    color: $mute;
-  }//c-user-phone
+        // Structuration des colonnes secondaires
+        .c-user-phone {
+            color: $mute;
+        }//c-user-phone
 
-  .c-user-email {
-    color: $mute;
-  }//c-user-email 
+        .c-user-email {
+            color: $mute;
+        }//c-user-email 
 
-  .c-user-branch {
-    color: $mute;
+        .c-user-branch {
+            color: $mute;
 
-    i {
-      color: lighten($gray, 25%);
-      font-size: 0.95rem;
-    }
-  }//.c-user-branch
+            i {
+            color: lighten($gray, 25%);
+            font-size: 0.95rem;
+            }
+        }//.c-user-branch
       
-  }//.c-datatable
+    }//.c-datatable
+    
 }//dark
-
-
-//========Page ajout agent =============
-// Ajoutez ce bloc à l'intérieur de votre sélecteur .user-wrapper existant
-
-.c-card {
-  background-color: $white;
-  border-radius: $radius-card;
-  border: 1px solid lighten($gray, 45%);
-  box-shadow: 0 4px 12px rgba($black, 0.03);
-  padding: 2rem;
-}
-
-.c-form {
-  &_grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; // Deux colonnes équitables sur grand écran
-    gap: 2.5rem;
-  }
-
-  &_section {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  &_subtitle {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: $dark;
-    margin: 0 0 0.5rem 0;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid lighten($gray, 45%);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    i {
-      color: $primary;
-      font-size: 1rem;
-    }
-  }
-
-  &_group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-
-    label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: $dark;
-
-      .required {
-        color: $danger;
-        margin-left: 2px;
-      }
-    }
-  }
-
-  &_input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    i {
-      position: absolute;
-      left: 14px;
-      color: lighten($gray, 10%);
-      font-size: 0.9rem;
-      pointer-events: none;
-    }
-  }
-
-  &_input, &_select {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem; // Recul pour laisser la place à l'icône
-    border: 1px solid lighten($gray, 30%);
-    border-radius: $radius-input;
-    font-size: 0.9rem;
-    color: $black;
-    outline: none;
-    background-color: $white;
-    box-sizing: border-box;
-    transition: all 0.2s ease-in-out;
-
-    &:focus {
-      border-color: $primary;
-      box-shadow: 0 0 0 3px rgba($primary, 0.1);
-    }
-  }
-
-  &_select {
-    cursor: pointer;
-    appearance: none; // Nettoie le design par défaut des navigateurs
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://w3.org' viewBox='0 0 24 24' fill='none' stroke='%23495057' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-size: 14px;
-    padding-right: 2.5rem;
-  }
-
-  &_help {
-    font-size: 0.75rem;
-    color: lighten($gray, 10%);
-    margin-top: 0.1rem;
-  }
-
-  &_actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid lighten($gray, 45%);
-
-    .btn {
-      padding: 0.75rem 1.5rem;
-      font-weight: 600;
-      border-radius: $radius-input;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      border: 1px solid transparent;
-
-      &.btn-primary {
-        background-color: $primary;
-        color: $white;
-        &:hover { background-color: darken($primary, 5%); }
-      }
-
-      &.btn-secondary {
-        background-color: lighten($gray, 48%);
-        border: 1px solid lighten($gray, 35%);
-        color: $gray;
-        &:hover { background-color: lighten($gray, 40%); }
-      }
-    }
-  }
-
-  // 📱 GESTION DU RESPONSIVE MOBILE
-  @media (max-width: 768px) {
-    &_grid {
-      grid-template-columns: 1fr; // Bascule sur une seule colonne sur mobile
-      gap: 2rem;
-    }
-
-    &_actions {
-      flex-direction: column-reverse; // Met le bouton valider en haut au clic tactile
-      gap: 0.75rem;
-
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  }
-}
 
