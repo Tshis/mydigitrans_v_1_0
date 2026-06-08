@@ -1,148 +1,207 @@
 {% extends "admin/base.html.twig" %}
 
+
 {% block body %}
 
-	{# templates/branch/agent_detail.html.twig #}
+	{# templates/agency/permissions/agent_fine_tuning.html.twig #}
 	<div
-		class="a-dashboard-wrapper">
+		class="agency-agent-permission-wrapper">
 
-		{# 1. En-tête : Retour et Identité de l'agent #}
-		<header class="a-dashboard-wrapper_header">
-			<div style="display: flex; align-items: center; gap: 15px;">
-				<a href="#" class="c-btn-icon" style="font-size: 1.8rem;">
+		{# --- EN-TÊTE DU PROFIL AGENT --- #}
+		<header class="agency-permission-header">
+			<div class="agency-profile-block">
+				<a href="{{path('admin_agency_agent_index')}}" class="agency-back-action">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
-				<div>
-					<h2 class="a-dashboard-wrapper_title" style="font-size: 2.2rem; line-height: 1;">Mukendi Jean</h2>
-					<span class="badge role-tag" style="margin-top: 5px; display: inline-block;">Identifiant : AG-2026-089</span>
+				<div class="agency-profile-meta">
+					<h2 class="agency-profile-name">Mukendi Jean</h2>
+					<div class="agency-profile-badge-row">
+						<span class="agency-badge-role">Guichetier Principal</span>
+					</div>
 				</div>
 			</div>
 
-			<div style="display: flex; gap: 10px;">
-				<span class="badge online" style="align-self: center;">Guichet Connecté</span>
-				<button class="c-btn-action btn-danger">
-					<i class="fa-solid fa-ban"></i>
-					Suspendre le compte</button>
+			<div class="agency-action-bar">
+				<button class="agency-btn-control btn btn-success">
+					<i class="fa-solid fa-floppy-disk"></i>
+					Enregistrer les droits</button>
 			</div>
 		</header>
 
-		{# 2. Résumé des performances de cet agent spécifique #}
-		<div class="a-dashboard-wrapper_kpi-grid">
-			<div class="c-kpi-card">
-				<h4 class="c-kpi-card_title">Volume Ventes (Mois)</h4>
-				<div class="c-kpi-card_value">3.450.000
-					<span class="c-kpi-card_unit">FC</span>
-				</div>
-				<div class="c-kpi-card_sub">284 billets imprimés</div>
-			</div>
-			<div class="c-kpi-card">
-				<h4 class="c-kpi-card_title">Fonds en Caisse Actuel</h4>
-				<div class="c-kpi-card_value c-kpi-card_value--green">450.000
-					<span class="c-kpi-card_unit">FC</span>
-				</div>
-				<div class="c-kpi-card_conversion">~ 180 USD</div>
-			</div>
-			<div class="c-kpi-card">
-				<h4 class="c-kpi-card_title">Taux d'erreur annulation</h4>
-				<div class="c-kpi-card_value c-kpi-card_value--blue">0.8
-					<span class="c-kpi-card_unit">%</span>
-				</div>
-				<div class="c-kpi-card_sub">Excellent seuil de tolérance</div>
-			</div>
+		{# --- AVERTISSEMENT SÉCURITÉ --- #}
+		<div class="agency-security-notice">
+			<i class="fa-solid fa-shield-halved"></i>
+			<p>
+				<strong>Rappel de sécurité :</strong>
+				Le mode
+				<em>"Écriture seule"</em>
+				permet à l'agent de soumettre ou modifier des données à l'aveugle sans pouvoir consulter l'historique ou les listes existantes.</p>
 		</div>
 
-		{# 3. Grille : Permissions Granulaires #}
-		<div class="table-card" style="margin-top: 3rem;">
-			<div class="card-header" style="padding: 24px 24px 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-				<h3 class="a-dashboard-wrapper_title" style="font-size: 1.6rem;">
-					<i class="fas fa-sliders-h"></i>
-					Configuration des Droits d'Accès Granulaires
-				</h3>
-				<button class="c-btn-action btn-success">
-					<i class="fa-solid fa-floppy-disk"></i>
-					Enregistrer les permissions</button>
+		{# --- MATRICE DES DROITS GRANULAIRES --- #}
+		<div class="agency-permission-card">
+			<div class="agency-card-topbar">
+				<div>
+					<h3 class="agency-card-heading">Permissions Granulaires : Gestion des flux</h3>
+					<p class="agency-card-subheading">Ajustez les privilèges d'exécution de l'agent sur chaque segment métier de la succursale.</p>
+				</div>
 			</div>
 
-			<div style="padding: 24px;">
-				<div class="table-responsive">
-					<table class="custom-table c-fine-permissions-table" style="width: 100%; border-collapse: collapse;">
-						<thead>
-							<tr>
-								<th>Module / Fonctionnalité</th>
-								<th style="text-align: center; width: 150px;">Aucun Accès</th>
-								<th style="text-align: center; width: 150px;">Lecture Seule</th>
-								<th style="text-align: center; width: 150px;">Action / Écriture</th>
-							</tr>
-						</thead>
-						<tbody>
+			{# Zone de défilement horizontal sécurisé #}
+			<div class="responsive-permission-table">
+				<table class="agency-permission-table">
+					<thead>
+						<tr>
+							<th>Module du Menu & Droits Métiers</th>
+							<th class="column-radio-center">Aucun Accès</th>
+							<th class="column-radio-center">Lecture Seule</th>
+							<th class="column-radio-center">Écriture Seule</th>
+							<th class="column-radio-center">Lecture / Écriture</th>
+						</tr>
+					</thead>
+					<tbody>
 
-							{# Module Réservations (Cas demandé : Voir mais pas encaisser) #}
-							<tr class="branch-row">
-								<td>
-									<div class="module-info">
-										<i class="fa-solid fa-book-bookmark"></i>
-										<div>
-											<strong>Gestion des Réservations</strong>
-											<p>Consultation des listes d'attente et édition des fiches passagers.</p>
-										</div>
-									</div>
-								</td>
-								<td style="text-align: center;"><input type="radio" name="perm_reservation" value="none" class="c-permission-radio"></td>
-								<td style="text-align: center;"><input type="radio" name="perm_reservation" value="read" class="c-permission-radio" checked></td>
-								<td style="text-align: center;"><input type="radio" name="perm_reservation" value="write" class="c-permission-radio"></td>
-							</tr>
+						{# 1. Dashboard #}
+						<tr class="agency-permission-row">
+							<td>
+								<div class="agency-feature-description">
+									<span class="module-icon-inline">
+										<i class="fa-solid fa-gauge"></i>
+									</span>
+									<strong>Dashboard</strong>
+									<p>Vue d'ensemble des statistiques de vente de la journée et graphiques d'évolution.</p>
+								</div>
+							</td>
+							<td class="column-radio-center"><input type="radio" name="perm_dashboard" value="none" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_dashboard" value="read" class="agency-custom-radio" checked></td>
+							<td class="column-radio-center"><input type="radio" name="perm_dashboard" value="write" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_dashboard" value="read_write" class="agency-custom-radio"></td>
+						</tr>
 
-							{# Module Encaissements #}
-							<tr class="branch-row">
-								<td>
-									<div class="module-info">
-										<i class="fa-solid fa-money-bill-wave"></i>
-										<div>
-											<strong>Encaissements & Ventes directes</strong>
-											<p>Encaisser le montant du billet (FC/USD) et valider définitivement la place.</p>
-										</div>
-									</div>
-								</td>
-								<td style="text-align: center;"><input type="radio" name="perm_cash" value="none" class="c-permission-radio" checked></td>
-								<td style="text-align: center;"><input type="radio" name="perm_cash" value="read" class="c-permission-radio"></td>
-								<td style="text-align: center;"><input type="radio" name="perm_cash" value="write" class="c-permission-radio"></td>
-							</tr>
+						{# 2. Branch #}
+						<tr class="agency-permission-row">
+							<td>
+								<div class="agency-feature-description">
+									<span class="module-icon-inline">
+										<i class="fa-solid fa-folder-tree"></i>
+									</span>
+									<strong>Branch (Succursales)</strong>
+									<p>Consulter ou modifier l'arborescence, les fiches et les états des autres succursales.</p>
+								</div>
+							</td>
+							<td class="column-radio-center"><input type="radio" name="perm_branches" value="none" class="agency-custom-radio" checked></td>
+							<td class="column-radio-center"><input type="radio" name="perm_branches" value="read" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_branches" value="write" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_branches" value="read_write" class="agency-custom-radio"></td>
+						</tr>
 
-							{# Module Planification des Bus #}
-							<tr class="branch-row">
-								<td>
-									<div class="module-info">
-										<i class="fa-solid fa-bus"></i>
-										<div>
-											<strong>Assignation & Horaires des Bus</strong>
-											<p>Modifier l'heure de départ, changer de chauffeur ou remplacer un véhicule en panne.</p>
-										</div>
-									</div>
-								</td>
-								<td style="text-align: center;"><input type="radio" name="perm_bus" value="none" class="c-permission-radio" checked></td>
-								<td style="text-align: center;"><input type="radio" name="perm_bus" value="read" class="c-permission-radio"></td>
-								<td style="text-align: center;"><input type="radio" name="perm_bus" value="write" class="c-permission-radio"></td>
-							</tr>
+						{# 3. Agents #}
+						<tr class="agency-permission-row">
+							<td>
+								<div class="agency-feature-description">
+									<span class="module-icon-inline">
+										<i class="fa-solid fa-users"></i>
+									</span>
+									<strong>Agents (Utilisateurs)</strong>
+									<p>Gestion des comptes du personnel, des affectations et consultation de leurs fiches.</p>
+								</div>
+							</td>
+							<td class="column-radio-center"><input type="radio" name="perm_agents" value="none" class="agency-custom-radio" checked></td>
+							<td class="column-radio-center"><input type="radio" name="perm_agents" value="read" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_agents" value="write" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_agents" value="read_write" class="agency-custom-radio"></td>
+						</tr>
 
-							{# Module Clôture de Caisse #}
-							<tr class="branch-row">
-								<td>
-									<div class="module-info">
-										<i class="fa-solid fa-vault"></i>
-										<div>
-											<strong>Clôture de Session Financière</strong>
-											<p>Générer le rapport financier de fin de journée et valider le coffre local.</p>
-										</div>
-									</div>
-								</td>
-								<td style="text-align: center;"><input type="radio" name="perm_cloture" value="none" class="c-permission-radio"></td>
-								<td style="text-align: center;"><input type="radio" name="perm_cloture" value="read" class="c-permission-radio"></td>
-								<td style="text-align: center;"><input type="radio" name="perm_cloture" value="write" class="c-permission-radio" checked></td>
-							</tr>
+						{# 4. Bus #}
+						<tr class="agency-permission-row">
+							<td>
+								<div class="agency-feature-description">
+									<span class="module-icon-inline">
+										<i class="fa-solid fa-bus-simple"></i>
+									</span>
+									<strong>Bus</strong>
+									<p>Gestion de la flotte automobile, fiches techniques des véhicules et assignations.</p>
+								</div>
+							</td>
+							<td class="column-radio-center"><input type="radio" name="perm_bus" value="none" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_bus" value="read" class="agency-custom-radio" checked></td>
+							<td class="column-radio-center"><input type="radio" name="perm_bus" value="write" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_bus" value="read_write" class="agency-custom-radio"></td>
+						</tr>
 
-						</tbody>
-					</table>
-				</div>
+						{# 5. Trajets #}
+						<tr class="agency-permission-row">
+							<td>
+								<div class="agency-feature-description">
+									<span class="module-icon-inline">
+										<i class="fa-solid fa-route"></i>
+									</span>
+									<strong>Trajets (Lignes de transport)</strong>
+									<p>Configuration des lignes, des arrêts intermédiaires et de la planification horaire.</p>
+								</div>
+							</td>
+							<td class="column-radio-center"><input type="radio" name="perm_routes" value="none" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_routes" value="read" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_routes" value="write" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_routes" value="read_write" class="agency-custom-radio" checked></td>
+						</tr>
+
+						{# 6. Réservations #}
+						<tr class="agency-permission-row">
+							<td>
+								<div class="agency-feature-description">
+									<span class="module-icon-inline">
+										<i class="fa-solid fa-file-circle-check"></i>
+									</span>
+									<strong>Réservations</strong>
+									<p>Consultation des listes d'attente, enregistrement et validation des billets passagers.</p>
+								</div>
+							</td>
+							<td class="column-radio-center"><input type="radio" name="perm_reservations" value="none" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_reservations" value="read" class="agency-custom-radio" checked></td>
+							<td class="column-radio-center"><input type="radio" name="perm_reservations" value="write" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_reservations" value="read_write" class="agency-custom-radio"></td>
+						</tr>
+
+						{# 7. Colis #}
+						<tr class="agency-permission-row">
+							<td>
+								<div class="agency-feature-description">
+									<span class="module-icon-inline">
+										<i class="fa-solid fa-box-open"></i>
+									</span>
+									<strong>Colis (Fret / Messagerie)</strong>
+									<p>Enregistrement des colis au départ, suivi de livraison et gestion des réceptions.</p>
+								</div>
+							</td>
+							<td class="column-radio-center"><input type="radio" name="perm_colis" value="none" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_colis" value="read" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_colis" value="write" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_colis" value="read_write" class="agency-custom-radio" checked></td>
+						</tr>
+
+						{# 8. Caisse #}
+						<tr class="agency-permission-row">
+							<td>
+								<div class="agency-feature-description">
+									<span class="module-icon-inline">
+										<i class="fa-solid fa-cash-register"></i>
+									</span>
+									<strong>Caisse</strong>
+									<p>Ouverture, suivi des flux d'espèces physiques du guichet et clôtures journalières.</p>
+								</div>
+							</td>
+							<td class="column-radio-center"><input type="radio" name="perm_caisse" value="none" class="agency-custom-radio" checked></td>
+							<td class="column-radio-center"><input type="radio" name="perm_caisse" value="read" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_caisse" value="write" class="agency-custom-radio"></td>
+							<td class="column-radio-center"><input type="radio" name="perm_routes" value="read_write" class="agency-custom-radio" checked></td>
+						</tr>
+
+
+					</tbody>
+
+
+				</table>
 			</div>
 		</div>
 	</div>

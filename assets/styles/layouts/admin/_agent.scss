@@ -413,6 +413,7 @@
         justify-content: center;
       }
     }//.c-table-actions
+
   }//@media max 768px
 } //user-wrapper
 
@@ -501,10 +502,173 @@
 
 }//add-agent
 
+// ===== Agency-agent-permission-wrapper ====
+.agency-agent-permission-wrapper {
+  padding: 2.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
 
+  // --- COMPOSANTS D'EN-TÊTE ---
+  .agency-permission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
 
+    .agency-profile-block {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
 
+      .agency-back-action {
+        color: $gray;
+        font-size: 1.5rem;
+        text-decoration: none;
+        &:hover { color: $success; }
+      }
 
+      .agency-profile-name {
+        font-size: 2rem;
+        margin: 0;
+        font-weight: 700;
+        color: $dark;
+      }
+
+      .agency-profile-badge-row {
+        display: flex;
+        gap: 0.8rem;
+        margin-top: 0.3rem;
+        align-items: center;
+
+        .agency-badge-role {
+          background: rgba($gray, 0.1);
+          color: darken($gray, 20%);
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-size: 0.85rem;
+          font-weight: 600;
+        }
+
+        .agency-agent-serial {
+          font-size: 0.85rem;
+          color: $gray;
+        }
+      }
+    }
+
+    .agency-btn-control {
+      padding: 10px 20px;
+      border-radius: $radius-input;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      &.btn-save {
+        background: $success;
+        color: $white;
+        &:hover { opacity: 0.9; }
+      }
+    }
+  }
+
+  // --- BANNIÈRE DE SÉCURITÉ ---
+  .agency-security-notice {
+    background: rgba($primary, 0.08);
+    border-left: 4px solid $primary;
+    padding: 12px 20px;
+    border-radius: 4px;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    i { color: $primary; font-size: 1.3rem; }
+    p { margin: 0; font-size: 0.95rem; color: darken($gray, 15%); line-height: 1.4; }
+  }
+
+  // --- CARTE ET STRUCTURE DU TABLEAU ---
+  .agency-permission-card {
+    background: $white;
+    border: 1px solid $mute;
+    border-radius: $radius-card;
+    overflow: hidden;
+
+    .agency-card-topbar {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba($mute, 0.15);
+
+      .agency-card-heading { margin: 0; font-size: 1.25rem; color: $dark; font-weight: 600; }
+      .agency-card-subheading { margin: 4px 0 0 0; font-size: 0.9rem; color: $gray; }
+    }
+  }
+
+  // --- LE CONTENEUR SCROLLABLE ---
+  .responsive-permission-table {
+    width: 100%;
+    overflow-x: auto; // Active le défilement de gauche à droite
+    -webkit-overflow-scrolling: touch;
+    padding: 0 24px 20px 24px;
+
+    // Scrollbar fine sur mobile
+    &::-webkit-scrollbar { height: 5px; }
+    &::-webkit-scrollbar-track { background: rgba($mute, 0.05); }
+    &::-webkit-scrollbar-thumb { background: rgba($mute, 0.2); border-radius: 4px; }
+  }
+
+  // --- LA TABLE DES PERMISSIONS ---
+  .agency-permission-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    // Fige la largeur pour forcer un défilement propre sans écraser le texte sur mobile
+    @media (max-width: 768px) {
+      min-width: 750px;
+    }
+
+    th, td {
+      padding: 16px 12px;
+      border-bottom: 1px solid rgba($mute, 0.12);
+      vertical-align: middle;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.95rem;
+      color: $dark;
+      font-weight: 600;
+    }
+
+    // Gestion de la largeur fixe des colonnes d'options radio
+    th:not(:first-child),
+    td:not(:first-child) {
+      width: 130px;
+    }
+
+    .column-radio-center {
+      text-align: center;
+    }
+
+    .agency-permission-row {
+      &:last-child td { border-bottom: none; }
+    }
+
+    .agency-feature-description {
+      strong { font-size: 1.05rem; color: $dark; display: block; }
+      p { margin: 3px 0 0 0; font-size: 0.85rem; color: $gray; line-height: 1.4; }
+    }
+
+    .agency-custom-radio {
+      accent-color: $success;
+      transform: scale(1.25);
+      cursor: pointer;
+    }
+  }
+}
+// === Agency-agent-permission-wrapper ===
 
 .dark{
 
@@ -595,5 +759,44 @@
 
     }//add-agent
 
+    .agency-agent-permission-wrapper {
+        .agency-permission-header {
+        .agency-profile-name { color: lighten($success, 25%); }
+        .agency-profile-badge-row .agency-badge-role { background: rgba($white, 0.05); color: $mute; }
+        .agency-back-action { color: $mute; &:hover { color: lighten($success, 25%); } }
+        }
+
+        .agency-security-notice {
+            background: rgba($primary, 0.04);
+            p { color: $mute; }
+        }
+
+        .agency-permission-card {
+        background: $dm-bg !important;
+        border-color: $mute !important;
+
+        .agency-card-topbar {
+            border-color: rgba($mute, 0.15);
+            .agency-card-heading { color: lighten($success, 20%) !important; }
+            .agency-card-subheading { color: $mute; }
+        }
+        }
+
+        .agency-permission-table {
+        th { color: lighten($success, 25%) !important; border-color: rgba($mute, 0.15); }
+        td { border-color: rgba($mute, 0.15); }
+        
+        .agency-feature-description {
+            strong { color: $white; }
+            p { color: $mute; }
+        }
+        }
+    }//agency-agent-permission-wrapper
+
 }//dark
+
+
+
+
+
 

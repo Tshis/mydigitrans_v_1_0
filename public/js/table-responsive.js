@@ -1,0 +1,1 @@
+document.querySelectorAll(".table-responsive").forEach(function(e){let l=[];e.querySelectorAll("th").forEach(function(e){l.push(e.innerText)}),e.querySelectorAll("td").forEach(function(e,t){e.setAttribute("data-label",l[t%l.length])})});
