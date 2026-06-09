@@ -505,7 +505,7 @@
 // ===== Agency-agent-permission-wrapper ====
 .agency-agent-permission-wrapper {
   padding: 2.5rem;
-  font-family: system-ui, -apple-system, sans-serif;
+  //font-family: system-ui, -apple-system, sans-serif;
 
   // --- COMPOSANTS D'EN-TÊTE ---
   .agency-permission-header {
@@ -601,8 +601,8 @@
       padding: 20px 24px;
       border-bottom: 1px solid rgba($mute, 0.15);
 
-      .agency-card-heading { margin: 0; font-size: 1.25rem; color: $dark; font-weight: 600; }
-      .agency-card-subheading { margin: 4px 0 0 0; font-size: 0.9rem; color: $gray; }
+      .agency-card-heading { margin: 0; font-size: 1.5rem; color: $dark; font-weight: 600; }
+      .agency-card-subheading { margin: 4px 0 0 0; font-size: 1.15rem; color: $gray; }
     }
   }
 
@@ -637,7 +637,7 @@
 
     th {
       text-align: left;
-      font-size: 0.95rem;
+      font-size: 1.25rem;
       color: $dark;
       font-weight: 600;
     }
@@ -657,8 +657,8 @@
     }
 
     .agency-feature-description {
-      strong { font-size: 1.05rem; color: $dark; display: block; }
-      p { margin: 3px 0 0 0; font-size: 0.85rem; color: $gray; line-height: 1.4; }
+      strong { font-size: 1.25rem; color: $dark; display: block; }
+      p { margin: 3px 0 0 0; font-size: 0.95rem; color: $gray; line-height: 1.4; }
     }
 
     .agency-custom-radio {
