@@ -1,0 +1,264 @@
+@use '../../abstract/variables' as *;
+
+// --- CONTENEUR GLOBAL ---
+.agency-fleet-management-wrapper {
+  padding: 2.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+
+  // --- HEADER DE LA PAGE ---
+  .agency-fleet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+
+    .agency-fleet-main-title {
+      font-size: 2rem;
+      margin: 0;
+      font-weight: 700;
+      color: $dark;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      i { color: $success; }
+    }
+
+    .agency-fleet-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; }
+
+    .agency-btn-control {
+      padding: 10px 20px;
+      border-radius: $radius-input;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      &.btn-add-bus {
+        background: $success;
+        color: $white;
+        &:hover { opacity: 0.9; }
+      }
+    }
+  }
+
+  // --- BARRE DE FILTRES ---
+  .agency-filter-card {
+    background: $white;
+    border: 1px solid $mute;
+    border-radius: $radius-card;
+    padding: 20px;
+    margin-bottom: 1.5rem;
+
+    .agency-filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      align-items: flex-end;
+
+      @media (min-width: 992px) {
+        grid-template-columns: 1fr 1fr 2fr; // Donne plus de place à la recherche
+      }
+    }
+
+    .agency-filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .agency-filter-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: $dark;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .agency-filter-select, .agency-filter-input {
+      padding: 10px 14px;
+      border: 1px solid $mute;
+      border-radius: $radius-input;
+      background: $white;
+      color: darken($gray, 20%);
+      font-size: 0.95rem;
+      outline: none;
+      width: 100%;
+      
+      &:focus { border-color: $success; }
+    }
+
+    .agency-search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      i {
+        position: absolute;
+        left: 14px;
+        color: $gray;
+      }
+
+      .agency-filter-input {
+        padding-left: 38px;
+      }
+    }
+  }
+
+  // --- COMPTEUR ---
+  .agency-fleet-counter {
+    margin-bottom: 1rem;
+    p { margin: 0; font-size: 0.9rem; color: $gray; font-weight: 500; }
+    span { font-weight: 700; color: $dark; }
+  }
+
+  // --- COMPOSANT DE LA TABLE ---
+  .agency-fleet-card {
+    background: $white;
+    border: 1px solid $mute;
+    border-radius: $radius-card;
+    overflow: hidden;
+  }
+
+  .responsive-fleet-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 24px 20px 24px;
+
+    &::-webkit-scrollbar { height: 6px; }
+    &::-webkit-scrollbar-track { background: rgba($mute, 0.05); }
+    &::-webkit-scrollbar-thumb { background: rgba($mute, 0.2); border-radius: 4px; }
+  }
+
+  .agency-fleet-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    @media (max-width: 992px) { min-width: 850px; }
+
+    th, td {
+      padding: 16px 12px;
+      border-bottom: 1px solid rgba($mute, 0.12);
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    th {
+      font-size: 0.95rem;
+      color: $dark;
+      font-weight: 600;
+      background: rgba($gray, 0.01);
+    }
+
+    .text-center { text-align: center; }
+
+    .agency-fleet-row {
+      &:last-child td { border-bottom: none; }
+      &:hover { background: rgba($gray, 0.01); }
+    }
+
+    // Métadonnées du bus
+    .agency-bus-meta {
+      strong { font-size: 1.1rem; color: $dark; display: block; }
+      p { margin: 2px 0 0 0; font-size: 0.85rem; color: $gray; }
+    }
+
+    // Badges de Succursales
+    .agency-branch-tag {
+      background: rgba($gray, 0.08);
+      color: darken($gray, 20%);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    // Statuts d'exploitation
+    .agency-status-badge {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: inline-block;
+
+      &.status-available { background: rgba($success, 0.1); color: $success; }
+      &.status-on-route { background: rgba(#3498db, 0.1); color: #3498db; }
+      &.status-loading { background: rgba(#f39c12, 0.1); color: #f39c12; }
+      &.status-maintenance { background: rgba($primary, 0.1); color: $primary; }
+    }
+
+    // Bouton d'action de la ligne
+    .agency-action-trigger {
+      color: $gray;
+      font-size: 1.2rem;
+      text-decoration: none;
+      padding: 6px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      
+      &:hover {
+        background: rgba($gray, 0.08);
+        color: $success;
+      }
+    }
+  }
+
+  // Fallback si vide
+  .agency-table-fallback {
+    text-align: center;
+    padding: 40px 24px;
+    color: $gray;
+
+    i { font-size: 3rem; color: $mute; margin-bottom: 12px; }
+    p { margin: 0; font-size: 1.1rem; font-weight: 500; }
+  }
+}
+
+// --- SUPPORT THÈME SOMBRE (.dark) ---
+.dark {
+  .agency-fleet-management-wrapper {
+    .agency-fleet-header {
+      .agency-fleet-main-title { color: lighten($success, 25%); }
+      .agency-fleet-subtitle { color: $mute; }
+    }
+
+    .agency-filter-card {
+      background: $dm-bg !important;
+      border-color: $mute !important;
+
+      .agency-filter-label { color: lighten($success, 20%) !important; }
+      .agency-filter-select, .agency-filter-input {
+        background: darken($dm-bg, 4%);
+        border-color: rgba($mute, 0.2);
+        color: $mute;
+        &:focus { border-color: $success; }
+      }
+    }
+
+    .agency-fleet-counter span { color: #fff; }
+
+    .agency-fleet-card {
+      background: $dm-bg !important;
+      border-color: $mute !important;
+    }
+
+    .agency-fleet-table {
+      th { color: lighten($success, 25%) !important; border-color: rgba($mute, 0.15); background: transparent; }
+      td { border-color: rgba($mute, 0.15); }
+      .agency-fleet-row:hover { background: rgba($white, 0.01); }
+
+      .agency-bus-meta strong { color: #fff; }
+      .agency-bus-meta p { color: $mute; }
+      .agency-branch-tag { background: rgba($white, 0.05); color: $mute; }
+      
+      .agency-action-trigger {
+        color: $mute;
+        &:hover { background: rgba($white, 0.04); color: lighten($success, 20%); }
+      }
+    }
+  }
+}

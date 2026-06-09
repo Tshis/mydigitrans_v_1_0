@@ -1,0 +1,186 @@
+{% extends "admin/base.html.twig" %}
+
+
+{% block body %}
+
+	{# templates/agency/bus/index.html.twig #}
+	<div
+		class="agency-fleet-management-wrapper">
+
+		{# --- EN-TÊTE DE PAGE & ACTIONS --- #}
+		<header class="agency-fleet-header">
+			<div class="agency-fleet-title-block">
+				<h2 class="agency-fleet-main-title">
+					<i class="fa-solid fa-bus-simple"></i>
+					Gestion de la Flotte</h2>
+				<p class="agency-fleet-subtitle">Suivi en temps réel des véhicules et de leur déploiement opérationnel.</p>
+			</div>
+			<div class="agency-fleet-actions">
+				<button class="agency-btn-control btn-add-bus">
+					<i class="fa-solid fa-plus"></i>
+					Ajouter un véhicule</button>
+			</div>
+		</header>
+
+		{# --- ZONE DE FILTRES DYNAMIQUES --- #}
+		<section class="agency-filter-card">
+			<div
+				class="agency-filter-grid">
+
+				{# Filtre par Succursale #}
+				<div class="agency-filter-group">
+					<label for="filter-branch" class="agency-filter-label">Filtrer par Succursale</label>
+					<select id="filter-branch" class="agency-filter-select">
+						<option value="all">Toutes les succursales</option>
+						<option value="Limete">Limete (Kinshasa)</option>
+						<option value="Matadi">Matadi</option>
+						<option value="Boma">Boma</option>
+					</select>
+				</div>
+
+				{# Filtre par Statut #}
+				<div class="agency-filter-group">
+					<label for="filter-status" class="agency-filter-label">Filtrer par Statut</label>
+					<select id="filter-status" class="agency-filter-select">
+						<option value="all">Tous les statuts</option>
+						<option value="available">Disponible au garage</option>
+						<option value="on-route">En route</option>
+						<option value="loading">Au chargement</option>
+						<option value="maintenance">En maintenance</option>
+					</select>
+				</div>
+
+				{# Barre de Recherche #}
+				<div class="agency-filter-group search-group">
+					<label for="search-bus" class="agency-filter-label">Recherche rapide</label>
+					<div class="agency-search-input-wrapper">
+						<i class="fa-solid fa-magnifying-glass"></i>
+						<input type="text" id="search-bus" class="agency-filter-input" placeholder="Plaque, Chauffeur, Modèle...">
+					</div>
+				</div>
+
+			</div>
+		</section>
+
+		{# --- COMPTEUR DE VÉHICULES FILTRÉS --- #}
+		<div class="agency-fleet-counter">
+			<p>
+				<span id="visible-count">3</span>
+				véhicule(s) affiché(s) sur
+				<span id="total-count">3</span>
+				au total.</p>
+		</div>
+
+		{# --- MATRICE / TABLEAU DE LA FLOTTE --- #}
+		<div class="agency-fleet-card">
+			<div class="responsive-fleet-table">
+				<table class="agency-fleet-table" id="fleet-table-data">
+					<thead>
+						<tr>
+							<th>Code & Modèle</th>
+							<th>Immatriculation</th>
+							<th>Succursale Actuelle</th>
+							<th>Chauffeur assigné</th>
+							<th class="text-center">Capacité</th>
+							<th>Statut opérationnel</th>
+							<th class="text-center">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						{# Véhicule 1 #}
+						<tr class="agency-fleet-row" data-branch="Limete" data-status="on-route">
+							<td>
+								<div class="agency-bus-meta">
+									<strong>BUS-012</strong>
+									<p>Mercedes-Benz Marcopolo</p>
+								</div>
+							</td>
+							<td class="searchable-field">5412AB/01 (Kinshasa)</td>
+							<td>
+								<span class="agency-branch-tag">Limete</span>
+							</td>
+							<td class="searchable-field">Ilunga Dieudonné</td>
+							<td class="text-center">
+								<strong>45</strong>
+								<small>places</small>
+							</td>
+							<td>
+								<span class="agency-status-badge status-on-route">En route</span>
+							</td>
+							<td class="text-center">
+								<a href="#" class="agency-action-trigger" data-tooltip="Fiche Technique">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</td>
+						</tr>
+
+						{# Véhicule 2 #}
+						<tr class="agency-fleet-row" data-branch="Matadi" data-status="loading">
+							<td>
+								<div class="agency-bus-meta">
+									<strong>BUS-045</strong>
+									<p>Toyota Coaster (VIP)</p>
+								</div>
+							</td>
+							<td class="searchable-field">8943AC/02 (Kongo-Central)</td>
+							<td>
+								<span class="agency-branch-tag">Matadi</span>
+							</td>
+							<td class="searchable-field">Mvumbi Blaise</td>
+							<td class="text-center">
+								<strong>24</strong>
+								<small>places</small>
+							</td>
+							<td>
+								<span class="agency-status-badge status-loading">Au chargement</span>
+							</td>
+							<td class="text-center">
+								<a href="#" class="agency-action-trigger" data-tooltip="Fiche Technique">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</td>
+						</tr>
+
+						{# Véhicule 3 #}
+						<tr class="agency-fleet-row" data-branch="Boma" data-status="maintenance">
+							<td>
+								<div class="agency-bus-meta">
+									<strong>BUS-009</strong>
+									<p>Scania Touring K410</p>
+								</div>
+							</td>
+							<td class="searchable-field">2376AA/02 (Kongo-Central)</td>
+							<td>
+								<span class="agency-branch-tag">Boma</span>
+							</td>
+							<td class="searchable-field">Nsimba Gabriel</td>
+							<td class="text-center">
+								<strong>55</strong>
+								<small>places</small>
+							</td>
+							<td>
+								<span class="agency-status-badge status-maintenance">En maintenance</span>
+							</td>
+							<td class="text-center">
+								<a href="#" class="agency-action-trigger" data-tooltip="Fiche Technique">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+
+				{# Message si aucun bus ne correspond #}
+				<div id="no-bus-fallback" class="agency-table-fallback" style="display: none;">
+					<i class="fa-solid fa-bus-simple"></i>
+					<p>Aucun bus ne correspond aux critères de recherche actuels.</p>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+{% endblock %}

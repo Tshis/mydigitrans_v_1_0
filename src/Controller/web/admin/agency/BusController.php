@@ -8,11 +8,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class BusController extends AbstractController
 {
-    #[Route('/admin/agency/bus/dashboard', name: 'admin_agency_agent_index')]
+    #[Route('/admin/agency/bus/list', name: 'admin_agency_bus_index')]
     public function index(): Response
     {
-        return $this->render('admin/agency/agent/index.html.twig', [
-            'page' => 'agent',
+        return $this->render('admin/agency/bus/index.html.twig', [
+            'page' => 'bus',
         ]);
     } //index
 
