@@ -1,5 +1,9 @@
 {% extends "admin/base.html.twig" %}
 
+{% block javascripts %}
+	{{parent()}}
+	<script src="/js/admin/bus.js" defer></script>
+{% endblock %}
 
 {% block body %}
 
@@ -180,7 +184,37 @@
 
 			</div>
 		</div>
+
+		{# --- NOUVEAU : BLOC DE PAGINATION & CONTRÔLE --- #}
+		<div class="agency-pagination-footer">
+			<div class="agency-pagination-per-page">
+				<label for="per-page-select">Afficher</label>
+				<select id="per-page-select" class="agency-pagination-select">
+					<option value="10" selected>10</option>
+					<option value="25">25</option>
+					<option value="50">50</option>
+				</select>
+				<span>bus par page</span>
+			</div>
+
+			<div class="agency-pagination-controls">
+				<button id="btn-prev-page" class="agency-pagination-btn" disabled>
+					<i class="fa-solid fa-chevron-left"></i>
+					Précédent
+				</button>
+
+				{# Ce conteneur va recevoir les numéros de page dynamiquement via le JS #}
+				<div id="page-numbers-container" class="agency-page-numbers"></div>
+
+				<button id="btn-next-page" class="agency-pagination-btn">
+					Suivant
+					<i class="fa-solid fa-chevron-right"></i>
+				</button>
+			</div>
+		</div>
+
 	</div>
+	<!--agency-fleet-management-wrapper-->
 
 
 {% endblock %}

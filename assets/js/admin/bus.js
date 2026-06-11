@@ -1,64 +1,125 @@
 document.addEventListener('DOMContentLoaded', () => {
-    alert("hjkfjj")
-    // 1. Récupération des éléments du DOM
+    // Éléments des filtres
     const selectBranch = document.getElementById('filter-branch');
     const selectStatus = document.getElementById('filter-status');
     const inputSearch = document.getElementById('search-bus');
     
-    const tableRows = document.querySelectorAll('.agency-fleet-row');
-    const fallbackMessage = document.getElementById('no-bus-fallback');
+    // Éléments de la pagination
+    const selectPerPage = document.getElementById('per-page-select');
+    const btnPrev = document.getElementById('btn-prev-page');
+    const btnNext = document.getElementById('btn-next-page');
+    const containerPages = document.getElementById('page-numbers-container');
     
+    // Éléments de données
+    const tableRows = Array.from(document.querySelectorAll('.agency-fleet-row'));
+    const fallbackMessage = document.getElementById('no-bus-fallback');
     const visibleCounter = document.getElementById('visible-count');
     const totalCounter = document.getElementById('total-count');
 
-    // Initialisation du compteur total
+    // Variables d'état de la pagination
+    let currentPage = 1;
+    let filteredRows = [];
+
     if(totalCounter) totalCounter.textContent = tableRows.length;
 
-    // 2. Fonction principale de filtrage
-    function filterFleet() {
+    // 1. Étape clé : Filtrage complet des bus
+    function updateFleetState() {
         const branchValue = selectBranch.value;
         const statusValue = selectStatus.value;
         const searchValue = inputSearch.value.toLowerCase().trim();
         
-        let visibleCount = 0;
-
-        tableRows.forEach(row => {
-            // Lecture des attributs de données de la ligne
+        // On isole uniquement les lignes qui matchent nos critères
+        filteredRows = tableRows.filter(row => {
             const rowBranch = row.getAttribute('data-branch');
             const rowStatus = row.getAttribute('data-status');
             
-            // Collecte du contenu textuel des champs de recherche (Chauffeur, plaque...)
             let searchContent = '';
             row.querySelectorAll('.searchable-field, .agency-bus-meta strong, .agency-bus-meta p').forEach(el => {
                 searchContent += el.textContent.toLowerCase() + ' ';
             });
 
-            // Validation des critères (Vrai ou Faux)
             const matchBranch = (branchValue === 'all' || rowBranch === branchValue);
             const matchStatus = (statusValue === 'all' || rowStatus === statusValue);
             const matchSearch = (searchValue === '' || searchContent.includes(searchValue));
 
-            // Si toutes les conditions sont remplies, on affiche la ligne
-            if (matchBranch && matchStatus && matchSearch) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none'; // Sinon on la masque
-            }
+            return matchBranch && matchStatus && matchSearch;
         });
 
-        // 3. Mise à jour des compteurs et gestion du fallback si vide
-        if (visibleCounter) visibleCounter.textContent = visibleCount;
+        if (visibleCounter) visibleCounter.textContent = filteredRows.length;
         
-        if (visibleCount === 0) {
-            fallbackMessage.style.display = 'block';
-        } else {
-            fallbackMessage.style.display = 'none';
+        // Si le filtre modifie les données, on repart à la première page
+        currentPage = 1; 
+        
+        renderPagination();
+    }
+
+    // 2. Étape clé : Affichage segmenté par page
+    function renderPagination() {
+        const itemsPerPage = parseInt(selectPerPage.value);
+        const totalItems = filteredRows.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+        // Sécurité pour la page courante
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        // Index de découpage
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+
+        // CORRIGÉ : Masquer absolument TOUS les bus de la table d'abord
+        tableRows.forEach(row => row.style.display = 'none');
+
+        // CORRIGÉ : Afficher uniquement les bus de la plage de la page active
+        filteredRows.slice(startIndex, endIndex).forEach(row => {
+            row.style.display = '';
+        });
+
+        // CORRIGÉ : Gestion du fallback si aucun bus n'est visible
+        fallbackMessage.style.display = (totalItems === 0) ? 'block' : 'none';
+
+        // Activer / Désactiver les boutons Précédent et Suivant
+        btnPrev.disabled = (currentPage === 1);
+        btnNext.disabled = (currentPage === totalPages);
+
+        // Générer dynamiquement les petits boutons de numéros
+        containerPages.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.classList.add('page-num');
+            if (i === currentPage) pageButton.classList.add('active');
+            pageButton.textContent = i;
+            
+            pageButton.addEventListener('click', () => {
+                currentPage = i;
+                renderPagination();
+            });
+            containerPages.appendChild(pageButton);
         }
     }
 
-    // 4. Écouteurs d'événements (Déclenchement instantané)
-    selectBranch.addEventListener('change', filterFleet);
-    selectStatus.addEventListener('change', filterFleet);
-    inputSearch.addEventListener('input', filterFleet);
+    // 3. Écouteurs d'événements pour les boutons Précédent / Suivant
+    btnPrev.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderPagination();
+        }
+    });
+
+    btnNext.addEventListener('click', () => {
+        const itemsPerPage = parseInt(selectPerPage.value);
+        const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderPagination();
+        }
+    });
+
+    // Écouteurs d'événements pour les filtres et changement de taille de page
+    selectBranch.addEventListener('change', updateFleetState);
+    selectStatus.addEventListener('change', updateFleetState);
+    inputSearch.addEventListener('input', updateFleetState);
+    selectPerPage.addEventListener('change', updateFleetState);
+
+    // Lancement initial au chargement de la page
+    updateFleetState();
 });

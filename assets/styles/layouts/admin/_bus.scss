@@ -121,7 +121,105 @@
     border: 1px solid $mute;
     border-radius: $radius-card;
     overflow: hidden;
+    
+    }//agency-fleet-card
+
+// Style de la barre de pagination
+.agency-pagination-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba($gray, 0.02);
+  border-top: 1px solid rgba($mute, 0.15);
+  flex-wrap: wrap;
+  gap: 1.5rem;
+
+  @media (max-width: 576px) {
+    justify-content: center;
+    text-align: center;
   }
+
+  .agency-pagination-per-page {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: $gray;
+
+    .agency-pagination-select {
+      padding: 6px 12px;
+      border: 1px solid $mute;
+      border-radius: $radius-input;
+      background: $white;
+      color: $dark;
+      outline: none;
+      cursor: pointer;
+      font-weight: 600;
+      &:focus { border-color: $success; }
+    }
+  }
+
+  .agency-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .agency-pagination-btn {
+    padding: 8px 14px;
+    border: 1px solid $mute;
+    background: $white;
+    color: darken($gray, 20%);
+    border-radius: $radius-input;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      border-color: $success;
+      color: $success;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  .agency-page-numbers {
+    display: flex;
+    gap: 6px;
+
+    .page-num {
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid $mute;
+      border-radius: $radius-input;
+      background: $white;
+      color: $dark;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover:not(.active) { border-color: $success; color: $success; }
+
+      &.active {
+        background: $success;
+        border-color: $success;
+        color: $white;
+      }
+    }
+  }
+}//agency-pagination-footer
 
   .responsive-fleet-table {
     width: 100%;
@@ -186,9 +284,9 @@
       display: inline-block;
 
       &.status-available { background: rgba($success, 0.1); color: $success; }
-      &.status-on-route { background: rgba(#3498db, 0.1); color: #3498db; }
-      &.status-loading { background: rgba(#f39c12, 0.1); color: #f39c12; }
-      &.status-maintenance { background: rgba($primary, 0.1); color: $primary; }
+      &.status-on-route { background: rgba($success, 0.1); color: $success; }
+      &.status-loading { background: rgba($primary, 0.1); color: $primary; }
+      &.status-maintenance { background: rgba($danger, 0.1); color: $danger; }
     }
 
     // Bouton d'action de la ligne
@@ -216,49 +314,82 @@
     i { font-size: 3rem; color: $mute; margin-bottom: 12px; }
     p { margin: 0; font-size: 1.1rem; font-weight: 500; }
   }
-}
+
+}//agency-fleet-management-wrapper
+
+
+
 
 // --- SUPPORT THÈME SOMBRE (.dark) ---
 .dark {
-  .agency-fleet-management-wrapper {
-    .agency-fleet-header {
-      .agency-fleet-main-title { color: lighten($success, 25%); }
-      .agency-fleet-subtitle { color: $mute; }
-    }
+    .agency-fleet-management-wrapper {
+        .agency-fleet-header {
+        .agency-fleet-main-title { color: lighten($success, 25%); }
+        .agency-fleet-subtitle { color: $mute; }
+        }//agency-fleet-header
 
-    .agency-filter-card {
-      background: $dm-bg !important;
-      border-color: $mute !important;
+        .agency-filter-card {
+        background: $dm-bg !important;
+        border-color: $mute !important;
 
-      .agency-filter-label { color: lighten($success, 20%) !important; }
-      .agency-filter-select, .agency-filter-input {
-        background: darken($dm-bg, 4%);
-        border-color: rgba($mute, 0.2);
-        color: $mute;
-        &:focus { border-color: $success; }
-      }
-    }
+        .agency-filter-label { color: lighten($success, 20%) !important; }
+        .agency-filter-select, .agency-filter-input {
+            background: darken($dm-bg, 4%);
+            border-color: rgba($mute, 0.2);
+            color: $mute;
+            &:focus { border-color: $success; }
+        }
 
-    .agency-fleet-counter span { color: #fff; }
+            
+        }//agency-filter-card
 
-    .agency-fleet-card {
-      background: $dm-bg !important;
-      border-color: $mute !important;
-    }
+        .agency-fleet-counter span { color: $white; }
 
-    .agency-fleet-table {
-      th { color: lighten($success, 25%) !important; border-color: rgba($mute, 0.15); background: transparent; }
-      td { border-color: rgba($mute, 0.15); }
-      .agency-fleet-row:hover { background: rgba($white, 0.01); }
+        .agency-fleet-card {
+            background: $dm-bg !important;
+            border-color: $mute !important;
+        }//agency-fleet-card
 
-      .agency-bus-meta strong { color: #fff; }
-      .agency-bus-meta p { color: $mute; }
-      .agency-branch-tag { background: rgba($white, 0.05); color: $mute; }
-      
-      .agency-action-trigger {
-        color: $mute;
-        &:hover { background: rgba($white, 0.04); color: lighten($success, 20%); }
-      }
-    }
-  }
-}
+        .agency-fleet-table {
+        th { color: lighten($success, 25%) !important; border-color: rgba($mute, 0.15); background: transparent; }
+        td { border-color: rgba($mute, 0.15); }
+        .agency-fleet-row:hover { background: rgba($white, 0.01); }
+
+        .agency-bus-meta strong { color: $white; }
+        .agency-bus-meta p { color: $mute; }
+        .agency-branch-tag { background: rgba($white, 0.05); color: $mute; }
+        
+        .agency-action-trigger {
+            color: $mute;
+            &:hover { background: rgba($white, 0.04); color: lighten($success, 20%); }
+        }
+        }//.agency-fleet-table
+
+        .agency-pagination-footer {
+            border-color: rgba($mute, 0.15) !important;
+            background: transparent !important;
+
+            .agency-pagination-per-page {
+            color: $mute;
+            .agency-pagination-select { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $mute; }
+            }
+
+            .agency-pagination-btn, .page-num {
+            background: darken($dm-bg, 2%) !important;
+            border-color: rgba($mute, 0.2) !important;
+            color: $mute !important;
+
+            &:hover:not(:disabled):not(.active) {
+                border-color: lighten($success, 15%) !important;
+                color: lighten($success, 15%) !important;
+            }
+            &.active {
+                background: $success !important;
+                border-color: $success !important;
+                color: $white !important;
+            }
+            }
+        }//agency-pagination-footer
+
+    }//.agency-fleet-management-wrapper
+}//dark
