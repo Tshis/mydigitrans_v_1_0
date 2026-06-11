@@ -1,0 +1,105 @@
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+
+	{# templates/agency/bus/new_bus.html.twig #}
+	<div
+		class="agency-bus-add-container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="agency-bus-add-header">
+			<div class="agency-profile-block">
+				<a href="{{path('admin_agency_bus_index')}}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="agency-profile-meta">
+					<h2 class="agency-bus-add-title">
+						<i class="fa-solid fa-bus"></i>
+						Enregistrer un Véhicule</h2>
+					<p class="agency-bus-add-subtitle">Ajout d'une unité à la flotte opérationnelle et liaison à son gabarit technique.</p>
+				</div>
+			</div>
+		</header>
+
+		{# --- CONTENEUR PROTECTEUR DU FORMULAIRE --- #}
+		<div class="agency-bus-add-card">
+			<div class="agency-bus-add-form-wrapper">
+				<form id="agency-add-bus-form" class="agency-bus-add-form" method="POST" action="#">
+
+					<div class="agency-bus-add-form-layout">
+
+						<div class="field mb-20">
+							<label class="agency-bus-add-form-label">Code Interne du Bus (Optionnel)</label>
+							<input type="text" name="bus_code" class="agency-bus-add-form-input" placeholder="Ex: BUS-012">
+						</div>
+
+						<div class="field mb-20">
+							<label class="agency-bus-add-form-label">Nom commercial (Optionnel)</label>
+							<input type="text" name="bus_name" class="agency-bus-add-form-input" placeholder="Ex: Marcopolo VIP">
+						</div>
+
+						<div class="field mb-20">
+							<label class="agency-bus-add-form-label">Numéro de Plaque d'Immatriculation (Unique)</label>
+							<input type="text" name="plate_number" class="agency-bus-add-form-input" placeholder="Ex: 5412AB/01" required>
+						</div>
+
+						<div class="field-group">
+							<div class="field mb-20">
+								<label class="agency-bus-add-form-label">Marque</label>
+								<input type="text" name="brand" class="agency-bus-add-form-input" placeholder="Ex: Mercedes-Benz" required>
+							</div>
+
+							<div class="field mb-20">
+								<label class="agency-bus-add-form-label">Modèle</label>
+								<input type="text" name="model" class="agency-bus-add-form-input" placeholder="Ex: Scania Touring" required>
+							</div>
+						</div>
+
+						<div class="field-group">
+							<div class="field mb-20">
+								<label class="agency-bus-add-form-label">Année de fabrication</label>
+								<input type="number" name="year" class="agency-bus-add-form-input" placeholder="Ex: 2022" min="1990" max="2027" required>
+							</div>
+
+							<div class="field mb-20">
+								<label class="agency-bus-add-form-label">Modèle de configuration (Gabarit des Sièges)</label>
+								<select name="bus_layout_id" class="agency-bus-add-form-select" required>
+									<option value="" disabled selected>Choisir la disposition des places...</option>
+									<option value="1">Modèle Standard Coaster (2-2 avec strapontins)</option>
+									<option value="2">Modèle Grand Scania (2-2 avec WC au fond)</option>
+									<option value="3">Modèle VIP (2-1 Fauteuils larges)</option>
+									<option value="4">Modèle Urbain (3-2 Banquettes)</option>
+								</select>
+							</div>
+						</div>
+
+						{# --- ZONE D'ACTION --- #}
+						<div class="agency-bus-add-action-zone">
+							<a href="/admin/agency/dashboard" class="btn btn-gray">Annuler</a>
+							<button type="submit" class="btn btn-success">
+								<i class="fa-solid fa-circle-check"></i>
+								Finaliser l'enregistrement
+							</button>
+						</div>
+
+					</div>
+				</form>
+			</div>
+		</div>
+
+		{# --- APPERÇU DU MOTEUR DE RENDU AUTOMATIQUE (SIMULATION AVANT RESERVATION) --- #}
+		<div class="agency-bus-view-scroll-box" style="margin-top: 3rem; display: none;" id="preview-layout-zone">
+			<div class="agency-bus-view-shell">
+				<div class="agency-bus-view-cockpit">Avant du véhicule (Cabine de route)</div>
+
+				{# La grille injectera sa variable de colonne --grid-cols via du JS ou Twig #}
+				<div
+					class="agency-bus-view-matrix" id="bus-preview-matrix" style="--grid-cols: 4;">{# Généré dynamiquement en fonction du Layout sélectionné #}
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+
+{% endblock %}

@@ -1,6 +1,6 @@
 @use '../../abstract/variables' as *;
 
-// --- CONTENEUR GLOBAL ---
+// --- CONTENEUR GLOBAL Management---
 .agency-fleet-management-wrapper {
   padding: 2.5rem;
   font-family: system-ui, -apple-system, sans-serif;
@@ -318,10 +318,163 @@
 }//agency-fleet-management-wrapper
 
 
+//=========PAGE D'AJOUT DE BUS==================
+// --- CONTENEUR GLOBAL ---
+.agency-bus-add-container {
+    padding: 2.5rem;
+
+    // En-tête de la page
+    .agency-bus-add-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+
+        .agency-profile-block {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .agency-back-action {
+            color: $gray;
+            font-size: 1.5rem;
+            text-decoration: none;
+            &:hover { color: $success; }
+        }
+
+        .agency-bus-add-title {
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 700;
+            color: $dark;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            i { color: $success; }
+        }
+
+        .agency-bus-add-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; }
+    }//.agency-bus-add-header
+
+    // Structure de la carte formulaire
+    .agency-bus-add-card {
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        max-width: 700px;
+        margin: 0 auto;
+    }//agency-bus-add-card
+
+    .agency-bus-add-form-wrapper {
+        padding: 30px;
+    }//agency-bus-add-form-wrapper 
+
+    .agency-bus-add-form-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }//agency-bus-add-form-layout
+
+    .agency-bus-add-form-label {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: $dark;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }//.agency-bus-add-form-label
+
+
+    // Zone des boutons d'actions
+    .agency-bus-add-action-zone {
+        text-align: right;
+        margin-top: 10px;
+        border-top: 1px solid rgba($mute, 0.15);
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }//.agency-bus-add-action-zone
+
+    .agency-bus-add-btn {
+        padding: 10px 20px;
+        border-radius: $radius-input;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        transition: opacity 0.2s;
+
+        &:hover { opacity: 0.9; }
+        &--submit { background: $success; color: $white; }
+        &--cancel { background: rgba($gray, 0.1); color: darken($gray, 20%); }
+    }
+
+    // --- MOTEUR DE RENDU : SHAPE ET MATRICE DU BUS ---
+    .agency-bus-view-scroll-box {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+    }
+
+    .agency-bus-view-shell {
+        background: #f8f9fa;
+        border: 2px solid #dcdde1;
+        border-radius: 16px 16px 8px 8px;
+        padding: 20px;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+
+    .agency-bus-view-cockpit {
+        text-align: center;
+        background: #dcdde1;
+        color: darken($gray, 20%);
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 6px;
+        border-radius: 8px 8px 4px 4px;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+    }
+
+    .agency-bus-view-matrix {
+        display: grid;
+        grid-template-columns: repeat(var(--grid-cols), 1fr);
+        gap: 10px;
+        justify-content: center;
+    }
+
+    // Les cellules des sièges et ses modificateurs
+    .agency-bus-view-seat {
+        width: 44px;
+        height: 44px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border: 1px solid rgba(0,0,0,0.1);
+
+        &--normal { background-color: #2ece71; color: white; }
+        &--vip { background-color: #9b59b6; color: white; border-color: #8e44ad; }
+        &--extra { background-color: #3498db; color: white; }
+        &--driver { background-color: #e74c3c; color: white; }
+        &--wc { background-color: #34495e; color: white; }
+    }
+
+}//agency-bus-add-container
+
 
 
 // --- SUPPORT THÈME SOMBRE (.dark) ---
 .dark {
+
     .agency-fleet-management-wrapper {
         .agency-fleet-header {
         .agency-fleet-main-title { color: lighten($success, 25%); }
@@ -392,4 +545,30 @@
         }//agency-pagination-footer
 
     }//.agency-fleet-management-wrapper
+
+    .agency-bus-add-container {
+        .agency-bus-add-title { color: lighten($success, 25%); }
+        .agency-bus-add-subtitle { color: $mute; }
+        .agency-bus-add-card { background: $dm-bg !important; border-color: $mute !important; }
+        .agency-bus-add-form-label { color: lighten($success, 20%) !important; }
+        
+        .agency-bus-add-form-input, 
+        .agency-bus-add-form-select {
+            background: darken($dm-bg, 4%);
+            border-color: rgba($mute, 0.2);
+            color: $mute;
+            &:focus { border-color: $success; }
+        }//agency-bus-add-form-select
+
+        .agency-bus-add-btn--cancel { background: rgba($white, 0.05); color: $mute; }
+        
+        // Zone du bus simulé en mode sombre
+        .agency-bus-view-shell {
+            background: darken($dm-bg, 3%);
+            border-color: $mute;
+            .agency-bus-view-cockpit { background: $mute; color: $white; }
+        }//agency-bus-view-shell
+
+    }//agency-bus-add-container
+
 }//dark
