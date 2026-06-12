@@ -24,4 +24,12 @@ final class BusController extends AbstractController
         ]);
     } //add
 
+    #[Route('/admin/agency/bus/{code}/details', name: 'admin_agency_bus_show')]
+    public function show(): Response
+    {
+        return $this->render('admin/agency/bus/show.html.twig', [
+            'page' => 'bus',
+        ]);
+    } //show
+
 }
