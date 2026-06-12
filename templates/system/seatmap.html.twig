@@ -1,0 +1,31 @@
+{# templates/system/seatmap.html.twig #}
+<div class="agency-seatmap-render-scope">
+	<div class="agency-bus-shell">
+
+		<div class="agency-bus-cockpit">
+			<span class="agency-bus-cockpit-text">Avant du Véhicule</span>
+		</div>
+
+		{# La grille lit dynamiquement le nombre de colonnes calculé par le contrôleur ou le service #}
+		<div class="agency-bus-matrix" style="--grid-cols: {{ seatmap.total_columns }};">
+			{% for seat in seatmap.seats %}
+				<div class="agency-bus-cell agency-bus-cell--{{ seat.type }} {% if seat.is_booked %}is-booked{% endif %}" data-seat-id="{{ seat.id | default(seat.row ~ '-' ~ seat.column) }}" data-seat-number="{{ seat.seat_label }}" style="grid-row: {{ seat.row }}; grid-column: {{ seat.column }};" {% if seat.type != 'driver' and seat.type != 'wc' and seat.type != 'aisle' and not seat.is_booked %} onclick="selectSeat(this)" {% endif %}>
+
+					<div class="agency-cell-content">
+						{% if seat.type == 'driver' %}
+							<i class="fa-solid fa-id-card"></i>
+						{% elseif seat.type == 'wc' %}
+							<i class="fa-solid fa-restroom"></i>
+						{% elseif seat.type == 'door' %}
+							<i class="fa-solid fa-door-open"></i>
+						{% else %}
+							<span class="agency-cell-number">{{ seat.seat_label }}</span>
+						{% endif %}
+					</div>
+
+				</div>
+			{% endfor %}
+		</div>
+
+	</div>
+</div>

@@ -1,0 +1,206 @@
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{parent()}}
+	<script src="/js/admin/bus_profil.js" defer></script>
+{% endblock %}
+
+{% block body %}
+
+
+	{# templates/agency/bus/profile.html.twig #}
+	<div class="agency-bus-profile-scope">
+
+		<div
+			class="agency-bus-profile-container">
+
+			{# --- EN-TÊTE --- #}
+			<header class="agency-bus-profile-header">
+
+				<a href="{{path('admin_agency_bus_index')}}" class="agency-bus-profile-back">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+
+				<div class="bus-info text-center">
+					<h2 class="agency-bus-profile-title">Fiche Véhicule : BUS-012</h2>
+					<p class="agency-bus-profile-subtitle">Gabarit : Modèle Grand Scania (2-2 avec WC)</p>
+					<p class="text-dark text-size-13 my-10">Ligne : Matadi - Kinshasa</p>
+				</div>
+				<!--bus-info-->
+
+
+				<div class="agency-bus-profile-status-badge-zone">
+					<span class="agency-bus-state-badge agency-bus-state-badge--on-route" id="current-global-status">
+						En route
+					</span>
+				</div>
+			</header>
+
+			{# --- FORMULAIRES & BLOCS --- #}
+			<div
+				class="agency-bus-profile-layout">
+
+				{# COLONNE GAUCHE : FORMULAIRE #}
+				<div class="agency-bus-profile-column">
+					<div class="agency-bus-profile-card">
+						<h3 class="agency-bus-profile-card-title">
+							<i class="fa-solid fa-pen-to-square"></i>
+							Modifier les informations du Bus
+						</h3>
+
+						<form id="agency-bus-update-form" class="agency-bus-profile-form" method="POST" action="#">
+
+							<div class="field mb-20">
+								<label class="agency-bus-profile-form-label">Numéro de Plaque d'Immatriculation</label>
+								<input type="text" name="update_plate" class="agency-bus-profile-form-input" value="5412AB/01" required>
+							</div>
+
+							<div class="field mb-20">
+								<label class="agency-bus-profile-form-label">Marque & Modèle Commercial</label>
+								<input type="text" name="update_model" class="agency-bus-profile-form-input" value="Mercedes-Benz Marcopolo" required>
+							</div>
+
+							<div class="field-group">
+								<div class="field mb-20">
+									<label class="agency-bus-profile-form-label">Succursale Actuelle</label>
+									<select name="mutate_branch" class="agency-bus-profile-form-select">
+										<option value="Limete" selected>Limete (Kinshasa)</option>
+										<option value="Matadi">Matadi</option>
+										<option value="Boma">Boma</option>
+									</select>
+								</div>
+
+								<div class="field mb-20">
+									<label class="agency-bus-profile-form-label">Chauffeur Titulaire</label>
+									<select name="assign_driver" class="agency-bus-profile-form-select">
+										<option value="1" selected>Ilunga Dieudonné</option>
+										<option value="2">Mvumbi Blaise</option>
+										<option value="3">Nsimba Gabriel</option>
+										<option value="none">-- Aucun --</option>
+									</select>
+								</div>
+							</div>
+
+							{# MISE À JOUR : Ajout du champ d'affectation de ligne régulière #}
+							<div class="field mb-20" style="margin-top: 0.5rem;">
+								<label class="agency-bus-profile-form-label">Ligne / Trajet Régulier Affecté</label>
+								<select name="assign_route" class="agency-bus-profile-form-select">
+									<option value="kin-mat" selected>Kinshasa ⇄ Matadi (Route Nationale 1)</option>
+									<option value="kin-bom">Kinshasa ⇄ Boma</option>
+									<option value="mat-bom">Matadi ⇄ Boma</option>
+									<option value="kin-kik">Kinshasa ⇄ Kikwit</option>
+									<option value="none">-- En réserve (Aucune ligne fixe) --</option>
+								</select>
+								<small style="color:gray; font-size:0.95rem;">Définir une ligne par défaut pré-remplira
+																																																																								                                automatiquement ce bus lors de la création d'un voyage.</small>
+							</div>
+
+							<div class="agency-bus-profile-form-action-zone">
+								<button type="submit" class="btn btn-success">
+									<i class="fa-solid fa-floppy-disk"></i>
+									Enregistrer les modifications
+								</button>
+							</div>
+
+						</form>
+					</div>
+				</div>
+				<!--agency-bus-profile-column-->
+
+				{# COLONNE DROITE : STATS & MAINTENANCE #}
+				<div class="agency-bus-profile-column">
+
+					<div class="agency-bus-profile-card" style="margin-bottom: 2rem;">
+						<h3 class="agency-bus-profile-card-title">
+							<i class="fa-solid fa-chart-simple"></i>
+							Performances Mensuelles
+						</h3>
+						<div class="field-group">
+							<div class="agency-bus-metric-block">
+								<span class="label">Voyages</span>
+								<strong class="value">24</strong>
+							</div>
+							<div class="agency-bus-metric-block">
+								<span class="label">Remplissage</span>
+								<strong class="value text-success">89%</strong>
+							</div>
+						</div>
+						<div class="agency-bus-metric-full">
+							<span class="label">Recettes totales générées</span>
+							<strong class="value">4.800.000 FC
+								<small>/ 2.100 USD</small>
+							</strong>
+						</div>
+					</div>
+
+					{# --- BLOC 3 : LE JOURNAL DE MAINTENANCE & SIGNALEMENT / RÉSOLUTION DE PANNE --- #}
+					<div class="agency-bus-profile-column">
+						<div class="agency-bus-profile-card">
+							<h3 class="agency-bus-profile-card-title" id="maintenance-card-title" style="color:#e74c3c;">
+								<i class="fa-solid fa-wrench"></i>
+								État Technique & Garage
+							</h3>
+
+							{# CONTENEUR A : SI LE BUS EST OPÉRATIONNEL (Affiche l'action de déclaration de panne) #}
+							<div id="bus-operational-box" class="agency-bus-maintenance-status-box">
+								<p>Le véhicule est actuellement opérationnel sur le réseau national.</p>
+								<button type="button" id="btn-trigger-panic" class="agency-bus-profile-btn agency-bus-profile-btn--danger">
+									<i class="fa-solid fa-triangle-exclamation"></i>
+									Déclarer une panne / Envoyer au garage
+								</button>
+							</div>
+
+							{# CONTENEUR B : SI LE BUS EST EN PANNE (Affiche l'action de résolution - Masqué par défaut si le bus est actif) #}
+							<div id="bus-broken-box" class="agency-bus-maintenance-status-box border-danger" style="display: none;">
+								<p style="color:#e74c3c;">⚠️
+									<strong>Immobilisé :</strong>
+									<span id="current-fault-text">Panne d'alternateur sur la RN1.</span>
+								</p>
+								<button type="button" id="btn-trigger-resolve" class="agency-bus-profile-btn agency-bus-profile-btn--save" style="width: 100%; justify-content: center;">
+									<i class="fa-solid fa-circle-check"></i>
+									Résoudre la panne / Remettre en service
+								</button>
+							</div>
+
+							{# VOLET MASQUÉ 1 : DÉCLARATION DE PANNE #}
+							<div id="panic-action-panel" class="agency-bus-panic-panel" style="display: none;">
+								<div class="agency-bus-profile-form-group">
+									<label class="agency-bus-profile-form-label" style="color:#e74c3c;">Nature de l'avarie</label>
+									<textarea id="maintenance-reason" class="agency-bus-profile-form-textarea" placeholder="Détaillez la panne (ex: Problème d'embrayage sur la RN1)..." rows="3"></textarea>
+								</div>
+								<div class="agency-bus-panic-actions">
+									<button type="button" id="btn-cancel-panic" class="agency-bus-profile-btn agency-bus-profile-btn--cancel">Annuler</button>
+									<button type="button" id="btn-confirm-maintenance" class="agency-bus-profile-btn agency-bus-profile-btn--danger">Confirmer le garage</button>
+								</div>
+							</div>
+
+							{# VOLET MASQUÉ 2 : NOUVEAU : RÉSOLUTION DE PANNE #}
+							<div id="resolve-action-panel" class="agency-bus-panic-panel" style="display: none; border-top-color: #2ece71;">
+								<div class="agency-bus-profile-form-group">
+									<label class="agency-bus-profile-form-label" style="color:#2ece71;">Rapport de réparation / Clôture</label>
+									<textarea id="resolution-reason" class="agency-bus-profile-form-textarea" placeholder="Indiquez les réparations faites (ex: Remplacement de la pièce, test ok)..." rows="3"></textarea>
+								</div>
+								<div class="agency-bus-panic-actions">
+									<button type="button" id="btn-cancel-resolve" class="agency-bus-profile-btn agency-bus-profile-btn--cancel">Annuler</button>
+									<button type="button" id="btn-confirm-resolution" class="agency-bus-profile-btn agency-bus-profile-btn--save" style="width: 50%; justify-content: center;">Valider la sortie</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+				<!--agency-bus-profile-column-->
+
+			</div>
+			<!--agency-bus-profile-layout-->
+
+		</div>
+		<!--agency-bus-profile-container-->
+
+		{{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
+
+
+	</div>
+	<!--agency-bus-profile-scope-->
+{% endblock %}

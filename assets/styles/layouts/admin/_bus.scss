@@ -471,17 +471,20 @@
 }//agency-bus-add-container
 
 
-//===============PAGE DE DETAILS BUS==========
+//=============== PAGE DE DETAILS BUS =================
 
-// --- CONTENEUR PARENT UNIQUE DÉDIÉ AU PROFIL ---
 .agency-bus-profile-scope {
-
   padding: 2rem;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, sans-serif;
+
+  * { box-sizing: border-box; }
 
   .agency-bus-profile-container {
     padding: 2.5rem;
-  }//agency-bus-profile-container
+  }
 
+  // --- EN-TÊTE DU PROFIL ---
   .agency-bus-profile-header {
     display: flex;
     justify-content: space-between;
@@ -492,12 +495,45 @@
     flex-wrap: wrap;
     gap: 1.5rem;
 
-    .agency-bus-profile-identity { display: flex; align-items: center; gap: 1.2rem; }
-    .agency-bus-profile-back { color: $gray; font-size: 1.6rem; text-decoration: none; &:hover { color: $success; } }
-    .agency-bus-profile-title { font-size: 2rem; margin: 0; font-weight: 700; color: $dark; }
-    .agency-bus-profile-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; font-weight: 500; }
+    .dark & { border-color: rgba($mute, 0.15); }
+
+    .agency-bus-profile-identity {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .agency-bus-profile-back {
+      color: $gray;
+      font-size: 1.6rem;
+      text-decoration: none;
+      transition: color 0.2s ease;
+      
+      &:hover { color: $success; }
+      .dark & { 
+        color: $mute; 
+        &:hover { color: lighten($success, 25%); }
+      }
+    }
+
+    .agency-bus-profile-title {
+      font-size: 2rem;
+      margin: 0;
+      font-weight: 700;
+      color: $dark;
+      .dark & { color: lighten($success, 25%); }
+    }
+
+    .agency-bus-profile-subtitle {
+      margin: 4px 0 0 0;
+      font-size: 0.95rem;
+      color: $gray;
+      font-weight: 500;
+      .dark & { color: $mute; }
+    }
   }
 
+  // --- BADGES D'ÉTAT ---
   .agency-bus-state-badge {
     padding: 6px 16px;
     border-radius: 30px;
@@ -505,25 +541,36 @@
     font-weight: 700;
     text-transform: uppercase;
     display: inline-block;
+
     &--available { background-color: rgba($success, 0.1); color: $success; }
     &--on-route { background-color: rgba($primary, 0.1); color: $primary; }
     &--maintenance { background-color: rgba($danger, 0.1); color: $danger; }
-  }//agency-bus-state-badge
+  }
 
+  // --- DISPOSITION EN GRILLE (RESPONSIVE) ---
   .agency-bus-profile-layout {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
     gap: 2rem;
     align-items: start;
-    @media (max-width: 992px) { grid-template-columns: 1fr; }
-  }//agency-bus-profile-layout 
 
+    @media (max-width: 992px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // --- COMPOSANT COMPOSITE : CARTES ---
   .agency-bus-profile-card {
     background: $white;
     border: 1px solid $mute;
     border-radius: $radius-card;
     padding: 24px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.01);
+
+    .dark & {
+      background: $dm-bg !important;
+      border-color: $mute !important;
+    }
 
     .agency-bus-profile-card-title {
       margin: 0 0 20px 0;
@@ -533,18 +580,31 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      
       i { color: $success; }
-    }//agency-bus-profile-card-title
+      .dark & { color: lighten($success, 20%) !important; }
+    }
+  }
 
-  }//agency-bus-profile-card
-
-  .agency-bus-profile-form-label { font-size: 1rem; font-weight: 700; color: $dark; text-transform: uppercase; }
+  // --- COMPOSANTS DE FORMULAIRE ---
+  .agency-bus-profile-form-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $dark;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+    .dark & { color: lighten($success, 20%) !important; }
+  }
 
   .agency-bus-profile-form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.2rem;
-    @media (max-width: 576px) { grid-template-columns: 1fr; }
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
   }
 
   .agency-bus-profile-form-input, 
@@ -558,7 +618,24 @@
     font-size: 0.95rem;
     outline: none;
     width: 100%;
+    transition: border-color 0.2s ease;
+
     &:focus { border-color: $success; }
+    
+    .dark & {
+      background: darken($dm-bg, 4%);
+      border-color: rgba($mute, 0.2);
+      color: $mute;
+      &:focus { border-color: $success; }
+    }
+  }
+
+  .agency-bus-help-text {
+    color: $gray;
+    font-size: 0.95rem;
+    display: block;
+    margin-top: 4px;
+    .dark & { color: rgba($mute, 0.6) !important; }
   }
 
   .agency-bus-profile-form-action-zone {
@@ -567,6 +644,7 @@
     border-top: 1px solid rgba($mute, 0.15);
   }
 
+  // --- STATISTIQUES & METRIQUES ---
   .agency-bus-metric-block {
     background: rgba($gray, 0.03);
     padding: 12px;
@@ -575,11 +653,22 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+
+    .dark & {
+      background: rgba($white, 0.01);
+      border-color: rgba($mute, 0.1);
+    }
   }
 
-  .agency-bus-metric-block, .agency-bus-metric-full {
+  .agency-bus-metric-block, 
+  .agency-bus-metric-full {
     .label { font-size: 0.8rem; font-weight: 700; color: $gray; text-transform: uppercase; }
-    .value { font-size: 1.3rem; font-weight: 700; color: $dark; }
+    .value { 
+      font-size: 1.3rem; 
+      font-weight: 700; 
+      color: $dark; 
+      .dark & { color: #fff; }
+    }
     .text-success { color: $success; }
   }
 
@@ -590,15 +679,35 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    .value { font-size: 1.6rem; color: $success; small { color: $gray; font-size: 0.95rem; font-weight: 500; } }
+
+    .value {
+      font-size: 1.6rem;
+      color: $success;
+      
+      small {
+        color: $gray;
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+    }
   }
 
+  // --- CASIER DE GARAGE & MAINTENANCE ---
   .agency-bus-maintenance-status-box {
     background: rgba($gray, 0.02);
     border: 1px dashed rgba($mute, 0.3);
     padding: 15px;
     border-radius: 6px;
-    p { margin: 0 0 15px 0; font-size: 0.95rem; color: darken($gray, 15%); line-height: 1.4; }
+
+    .dark & { background: rgba($white, 0.01); }
+
+    p {
+      margin: 0 0 15px 0;
+      font-size: 0.95rem;
+      color: darken($gray, 15%);
+      line-height: 1.4;
+      .dark & { color: $mute; }
+    }
   }
 
   .agency-bus-panic-panel {
@@ -608,9 +717,15 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    .agency-bus-panic-actions { display: flex; gap: 10px; .agency-bus-profile-btn { width: 50%; justify-content: center; } }
+
+    .agency-bus-panic-actions {
+      display: flex;
+      gap: 10px;
+      .agency-bus-profile-btn { width: 50%; justify-content: center; }
+    }
   }
 
+  // --- BOUTONS ---
   .agency-bus-profile-btn {
     padding: 11px 20px;
     border-radius: $radius-input;
@@ -621,34 +736,29 @@
     align-items: center;
     gap: 8px;
     border: none;
-    transition: opacity 0.15s;
+    transition: opacity 0.15s ease;
+
     &:hover { opacity: 0.9; }
+
     &--save { background-color: $success; color: $white; }
-    &--danger { background-color: $primary; color: $white; width: 100%; justify-content: center; }
-    &--cancel { background-color: rgba($gray, 0.1); color: darken($gray, 25%); }
+    
+    &--danger { 
+      background-color: $primary; 
+      color: $white; 
+      width: 100%; 
+      justify-content: center; 
+    }
+    
+    &--cancel { 
+      background-color: rgba($gray, 0.1); 
+      color: darken($gray, 25%); 
+      .dark & { background: rgba($white, 0.05); color: $mute; }
+    }
   }
 }
 
-// --- RENDU MODE SOMBRE DÉDIÉ DANS LE SCOPE ---
-.dark .agency-bus-profile-scope {
-  .agency-bus-profile-header {
-    border-color: rgba($mute, 0.15);
-    .agency-bus-profile-title { color: lighten($success, 25%); }
-    .agency-bus-profile-subtitle { color: $mute; }
-    .agency-bus-profile-back { color: $mute; &:hover { color: lighten($success, 25%); } }
-  }
-  .agency-bus-profile-card { background: $dm-bg !important; border-color: $mute !important; .agency-bus-profile-card-title { color: lighten($success, 20%) !important; } }
-  .agency-bus-profile-form-label { color: lighten($success, 20%) !important; }
-  .agency-bus-profile-form-input, .agency-bus-profile-form-select, .agency-bus-profile-form-textarea { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $mute; &:focus { border-color: $success; } }
-  .agency-bus-metric-block { background: rgba($white, 0.01); border-color: rgba($mute, 0.1); .value { color: #fff; } }
-  .agency-bus-maintenance-status-box { background: rgba($white, 0.01); p { color: $mute; } }
-  .agency-bus-profile-btn--cancel { background: rgba($white, 0.05); color: $mute; }
-}
+//=============== FIN PROFIL BUS =================
 
-
-
-
-//================fin profil bus=================
 
 
 
@@ -753,3 +863,6 @@
     }//agency-bus-add-container
 
 }//dark
+
+
+

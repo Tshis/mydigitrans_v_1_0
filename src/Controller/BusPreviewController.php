@@ -1,28 +1,14 @@
 <?php
+// src/Controller/Admin/BusPreviewController.php
 
-namespace App\Controller\web\admin\agency;
+namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class BusController extends AbstractController
+class BusPreviewController extends AbstractController
 {
-    #[Route('/admin/agency/bus/list', name: 'admin_agency_bus_index')]
-    public function index(): Response
-    {
-        return $this->render('admin/agency/bus/index.html.twig', [
-            'page' => 'bus',
-        ]);
-    } //index
-
-    #[Route('/admin/agency/bus/add', name: 'admin_agency_bus_add')]
-    public function add(): Response
-    {
-        return $this->render('admin/agency/bus/form.html.twig', [
-            'page' => 'bus',
-        ]);
-    } //add
 
     #[Route('/admin/agency/bus/{code}/details', name: 'admin_agency_bus_show')]
     public function show(string $code): Response
@@ -38,7 +24,7 @@ final class BusController extends AbstractController
             'bus_code' => $code,
             'buses' => $mockBuses,
         ]);
-    } //show()
+    }
 
     private function createMockVIPCoaster(): array
     {
@@ -56,7 +42,7 @@ final class BusController extends AbstractController
             $seats[] = ['id' => uniqid(), 'row' => $r, 'column' => 3, 'type' => 'vip', 'seat_label' => 'V' . ++$seatLabelIndex, 'is_booked' => false];
         }
         return ['id' => 1, 'name' => 'Toyota Coaster VIP', 'total_columns' => $cols, 'seats' => $seats];
-    } //createMockVIPCoaster
+    }
 
     private function createMockGrandScaniaWithWC(): array
     {
@@ -64,39 +50,31 @@ final class BusController extends AbstractController
         $rows = 12;
         $cols = 5;
         $seatNum = 1;
-
         for ($r = 1; $r <= $rows; $r++) {
-
             for ($c = 1; $c <= $cols; $c++) {
-
                 if ($r === 1 && $c === 1) {
                     $seats[] = ['id' => uniqid(), 'row' => 1, 'column' => 1, 'type' => 'driver', 'seat_label' => 'CH', 'is_booked' => false];
                     continue;
                 }
-
                 if ($r === 1 && $c === 2) {
                     $seats[] = ['id' => uniqid(), 'row' => 1, 'column' => 2, 'type' => 'door', 'seat_label' => 'PORT', 'is_booked' => false];
                     continue;
                 }
-
                 if ($r === 7 && ($c === 4 || $c === 5)) {
                     if ($c === 4) {
                         $seats[] = ['id' => uniqid(), 'row' => 7, 'column' => 4, 'type' => 'wc', 'seat_label' => 'WC', 'is_booked' => false];
                     }
                     continue;
                 }
-
                 if ($c === 3 && $r < $rows) {
                     $seats[] = ['id' => uniqid(), 'row' => $r, 'column' => 3, 'type' => 'aisle', 'seat_label' => '', 'is_booked' => false];
                     continue;
                 }
-
                 $seats[] = ['id' => uniqid(), 'row' => $r, 'column' => $c, 'type' => 'normal', 'seat_label' => (string)$seatNum++, 'is_booked' => false];
             }
         }
-
         return ['id' => 2, 'name' => 'Scania K410 (Avec WC)', 'total_columns' => $cols, 'seats' => $seats];
-    } //createMockGrandScaniaWithWC
+    }
 
     private function createMockBusWithBookedSeats(): array
     {
@@ -119,5 +97,5 @@ final class BusController extends AbstractController
             }
         }
         return ['id' => 3, 'name' => 'Mercedes Sprinter (Ventes en cours)', 'total_columns' => $cols, 'seats' => $seats];
-    } //createMockBusWithBookedSeats
+    }
 }
