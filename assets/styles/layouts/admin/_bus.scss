@@ -317,158 +317,144 @@
 
 }//agency-fleet-management-wrapper
 
+// ================= PAGE D'AJOUT / CREATION BUS =================
 
-//=========PAGE D'AJOUT DE BUS==================
-// --- CONTENEUR GLOBAL ---
+// ================= PAGE D'AJOUT / CREATION BUS =================
+
 .agency-bus-add-container {
-    padding: 2.5rem;
+  padding: 2.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
 
-    // En-tête de la page
-    .agency-bus-add-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
+  * { box-sizing: border-box; }
 
-        .agency-profile-block {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-        }
+  // --- EN-TÊTE DE LA PAGE ---
+  .agency-bus-add-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
 
-        .agency-back-action {
-            color: $gray;
-            font-size: 1.5rem;
-            text-decoration: none;
-            &:hover { color: $success; }
-        }
+    .agency-profile-block { display: flex; align-items: center; gap: 1.2rem; }
+    .agency-back-action {
+      color: $gray; font-size: 1.5rem; text-decoration: none; transition: color 0.2s;
+      &:hover { color: $success; }
+      .dark & { color: $mute; &:hover { color: lighten($success, 25%); } }
+    }
+    .agency-bus-add-title { font-size: 2rem; margin: 0; font-weight: 700; color: $dark; .dark & { color: lighten($success, 25%); } }
+    .agency-bus-add-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; .dark & { color: $mute; } }
+  }
 
-        .agency-bus-add-title {
-            font-size: 2rem;
-            margin: 0;
-            font-weight: 700;
-            color: $dark;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            i { color: $success; }
-        }
+  // --- COULOIR D'AFFICHAGE HYBRIDE ---
+  .agency-bus-setup-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: start;
+    max-width: 700px;
+    margin: 0 auto;
+    transition: all 0.3s ease-in-out;
 
-        .agency-bus-add-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; }
-    }//.agency-bus-add-header
-
-    // Structure de la carte formulaire
-    .agency-bus-add-card {
-        background: $white;
-        border: 1px solid $mute;
-        border-radius: $radius-card;
-        max-width: 700px;
-        margin: 0 auto;
-    }//agency-bus-add-card
-
-    .agency-bus-add-form-wrapper {
-        padding: 30px;
-    }//agency-bus-add-form-wrapper 
-
-    .agency-bus-add-form-layout {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }//agency-bus-add-form-layout
-
-    .agency-bus-add-form-label {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: $dark;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }//.agency-bus-add-form-label
-
-
-    // Zone des boutons d'actions
-    .agency-bus-add-action-zone {
-        text-align: right;
-        margin-top: 10px;
-        border-top: 1px solid rgba($mute, 0.15);
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-    }//.agency-bus-add-action-zone
-
-    .agency-bus-add-btn {
-        padding: 10px 20px;
-        border-radius: $radius-input;
-        font-weight: 600;
-        font-size: 0.95rem;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border: none;
-        transition: opacity 0.2s;
-
-        &:hover { opacity: 0.9; }
-        &--submit { background: $success; color: $white; }
-        &--cancel { background: rgba($gray, 0.1); color: darken($gray, 20%); }
+    &:has(#custom-layout-builder-column[style*="display: block"]) {
+      grid-template-columns: 1fr 1.2fr;
+      max-width: 100%;
     }
 
-    // --- MOTEUR DE RENDU : SHAPE ET MATRICE DU BUS ---
-    .agency-bus-view-scroll-box {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 10px;
+    @media (max-width: 992px) {
+      grid-template-columns: 1fr !important;
+      max-width: 700px !important;
     }
+  }
 
-    .agency-bus-view-shell {
-        background: #f8f9fa;
-        border: 2px solid #dcdde1;
-        border-radius: 16px 16px 8px 8px;
-        padding: 20px;
-        max-width: 450px;
-        margin: 0 auto;
+  .agency-bus-add-card, 
+  .agency-bus-setup-card-builder {
+    background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.01);
+    .dark & { background: $dm-bg !important; border-color: $mute !important; }
+  }
+
+  .agency-bus-setup-card-builder {
+    border-color: $success;
+    .agency-setup-card-title { margin: 0 0 4px 0; font-size: 1.25rem; font-weight: 600; color: $dark; .dark & { color: lighten($success, 20%) !important; } }
+    .agency-setup-card-subtitle { margin: 0 0 20px 0; font-size: 0.85rem; color: $gray; .dark & { color: $mute; } }
+  }
+
+  .agency-bus-add-form-layout { display: flex; flex-direction: column; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .mb-20 { margin-bottom: 20px; }
+  .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; @media (max-width: 576px) { grid-template-columns: 1fr; } }
+  .agency-bus-add-form-label { font-size: 0.85rem; font-weight: 700; color: $dark; text-transform: uppercase; .dark & { color: lighten($success, 20%) !important; } }
+
+  .agency-bus-add-form-input, 
+  .agency-bus-add-form-select {
+    padding: 11px 14px; border: 1px solid $mute; border-radius: $radius-input; background: $white; color: $dark; font-size: 0.95rem; outline: none; width: 100%;
+    &:focus { border-color: $success; }
+    .dark & { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $mute; }
+  }
+
+  .agency-setup-select-action-zone { display: flex; gap: 10px; select { flex: 1; } }
+  .agency-bus-help-text { color: $gray; font-size: 0.85rem; margin-top: 4px; display: block; .dark & { color: rgba($mute, 0.6) !important; } }
+  .agency-bus-add-action-zone, .agency-bus-profile-form-action-zone { text-align: right; padding-top: 15px; border-top: 1px solid rgba($mute, 0.15); margin-top: 10px; }
+
+  // --- PANNEAU CONTEXTUEL POPOVER ---
+  .agency-cell-customizer-panel {
+    background: rgba($success, 0.03); border: 1px solid rgba($success, 0.2); border-radius: 8px; padding: 16px; margin-bottom: 20px;
+    .dark & { background: rgba($white, 0.02); border-color: rgba($mute, 0.2); }
+    .customizer-title { margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; color: $dark; .dark & { color: lighten($success, 20%); } }
+    .customizer-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 12px; @media (max-width: 576px) { grid-template-columns: 1fr; } }
+    .customizer-field { display: flex; flex-direction: column; gap: 4px; label { font-size: 0.8rem; font-weight: 700; color: $gray; text-transform: uppercase; } }
+    .customizer-actions { text-align: right; button { padding: 8px 16px; font-size: 0.85rem; } }
+  }
+
+  // --- LA ZONE CARROSSERIE ET LE CENTRAGE RIGIDE ---
+  .agency-builder-dimensions-bar {
+    display: flex; gap: 12px; align-items: flex-end; background: rgba($gray, 0.03); padding: 12px; border-radius: 6px; margin-bottom: 20px;
+    .dark & { background: rgba($white, 0.02); }
+    .dimension-field {
+      display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; font-weight: 600; color: $gray; .dark & { color: $mute; }
+      input { width: 70px; padding: 6px; border: 1px solid $mute; border-radius: 4px; text-align: center; .dark & { background: darken($dm-bg, 4%); color: #fff; border-color: rgba($mute, 0.2); } }
     }
+  }
 
-    .agency-bus-view-cockpit {
-        text-align: center;
-        background: #dcdde1;
-        color: darken($gray, 20%);
-        font-size: 0.8rem;
-        font-weight: 700;
-        padding: 6px;
-        border-radius: 8px 8px 4px 4px;
-        margin-bottom: 25px;
-        text-transform: uppercase;
+  .agency-builder-canvas {
+    background: #f8f9fa; border: 2px solid #dcdde1; border-radius: 16px 16px 8px 8px; padding: 20px; max-width: 360px; margin: 0 auto;
+    .dark & { background: darken($dm-bg, 3%); border-color: $mute; }
+    .agency-builder-cockpit { text-align: center; background: #dcdde1; color: darken($gray, 20%); font-size: 0.75rem; font-weight: 700; padding: 5px; border-radius: 6px; margin-bottom: 20px; text-transform: uppercase; .dark & { background: $mute; color: #fff; } }
+  }
+
+  // RESOLUTION : Alignement parfait au milieu
+  .agency-layout-builder-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), 42px); // Fige la taille pour bloquer le décalage
+    gap: 8px;
+    justify-content: center; // Centre la matrice horizontalement
+    align-content: center; // Centre la matrice verticalement
+    margin: 0 auto;
+    padding: 10px;
+
+    .builder-cell {
+      width: 42px; height: 42px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); user-select: none; transition: all 0.15s ease;
+      &.is-editing { box-shadow: 0 0 0 3px #f39c12; transform: scale(1.05); z-index: 5; }
+
+      // RESOLUTION : Application des styles pour TOUS les types spéciaux demandés
+      &[data-type="seat"] { background-color: #2ece71; color: white; }
+      &[data-type="vip"] { background-color: #9b59b6; color: white; border-color: #8e44ad; }
+      &[data-type="driver"] { background-color: #e74c3c; color: white; }
+      &[data-type="wc"] { background-color: #34495e; color: white; }
+      &[data-type="door"] { background-color: #f1c40f; color: #2c3e50; border-radius: 0 6px 6px 0; }
+      &[data-type="aisle"] { background-color: #f1f2f6; border: 1px dashed #ced6e0; color: transparent; .dark & { background-color: rgba($white, 0.02); border-color: rgba($mute, 0.15); } }
     }
+  }
 
-    .agency-bus-view-matrix {
-        display: grid;
-        grid-template-columns: repeat(var(--grid-cols), 1fr);
-        gap: 10px;
-        justify-content: center;
-    }
+  .agency-bus-profile-btn {
+    padding: 10px 16px; border-radius: $radius-input; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; transition: opacity 0.15s;
+    &:hover { opacity: 0.9; }
+    &--save { background-color: $success; color: $white; }
+    &--cancel { background-color: rgba($gray, 0.1); color: darken($gray, 25%); .dark & { background: rgba($white, 0.05); color: $mute; } }
+  }
+}
 
-    // Les cellules des sièges et ses modificateurs
-    .agency-bus-view-seat {
-        width: 44px;
-        height: 44px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.85rem;
-        font-weight: 700;
-        border: 1px solid rgba(0,0,0,0.1);
 
-        &--normal { background-color: #2ece71; color: white; }
-        &--vip { background-color: #9b59b6; color: white; border-color: #8e44ad; }
-        &--extra { background-color: #3498db; color: white; }
-        &--driver { background-color: #e74c3c; color: white; }
-        &--wc { background-color: #34495e; color: white; }
-    }
-
-}//agency-bus-add-container
+//===Fin  Bus Add======
 
 
 //=============== PAGE DE DETAILS BUS =================
@@ -758,6 +744,9 @@
 }
 
 //=============== FIN PROFIL BUS =================
+
+
+
 
 
 
