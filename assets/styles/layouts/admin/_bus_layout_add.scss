@@ -1,0 +1,124 @@
+@use'../../abstract/variables' as *;
+
+
+// --- FILE: _layout_manager.scss ---
+.agency-layout-manager-scope {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, sans-serif;
+
+  * { box-sizing: border-box; }
+  .agency-layout-manager-container { padding: 2.5rem; }
+
+  // En-tête
+  .agency-layout-manager-header {
+    margin-bottom: 2.5rem;
+    .agency-profile-block { display: flex; align-items: center; gap: 1.2rem; }
+    .agency-back-action { color: $gray; font-size: 1.5rem; text-decoration: none; &:hover { color: $success; } }
+    .agency-layout-manager-title { font-size: 2rem; margin: 0; font-weight: 700; color: $dark; }
+    .agency-layout-manager-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; }
+  }
+
+  // Grille 2 colonnes
+  .agency-layout-manager-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 2rem;
+    align-items: start;
+    @media (max-width: 992px) { grid-template-columns: 1fr; }
+  }
+
+  .agency-layout-manager-card {
+    background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 24px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.01);
+    &.card-highlight { border-color: $success; }
+    
+    .card-inner-title { margin: 0 0 6px 0; font-size: 1.3rem; font-weight: 600; color: $dark; }
+    .card-inner-subtitle { margin: 0 0 20px 0; font-size: 0.85rem; color: $gray; }
+  }
+
+  // Formulaire
+  .agency-layout-manager-form { display: flex; flex-direction: column; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .mb-20 { margin-bottom: 20px; }
+  .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .agency-layout-manager-label { font-size: 0.85rem; font-weight: 700; color: $dark; text-transform: uppercase; }
+
+  .agency-layout-manager-input, 
+  .agency-layout-manager-select {
+    padding: 11px 14px; border: 1px solid $mute; border-radius: $radius-input; background: $white; color: $dark; font-size: 0.95rem; outline: none; width: 100%;
+    &:focus { border-color: $success; }
+  }
+
+  // Checkbox custom
+  .checkbox-container {
+    display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 600; color: $dark; cursor: pointer;
+    input { display: none; }
+    .checkmark { width: 18px; height: 18px; border: 2px solid $mute; border-radius: 4px; display: inline-block; position: relative; }
+    input:checked + .checkmark { background: $success; border-color: $success;
+      &::after { content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #fff; font-size: 0.7rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    }
+  }
+
+  // --- INTERFACE POPOVER DE SELECTION DES SIEGES SPECIAUX ---
+  .agency-layout-context-panel {
+    background: rgba($success, 0.04); border: 1px solid rgba($success, 0.2); padding: 15px; border-radius: 8px; margin-bottom: 20px;
+    animation: slideIn 0.2s ease-out;
+
+    .context-header { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: $dark; margin-bottom: 10px; }
+    .context-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .context-actions { text-align: right; }
+  }
+
+  // --- GRILLE D'AFFICHAGE DU BUS (CENTRÉE ET RIGIDE) ---
+  .agency-bus-frame {
+    background: #f8f9fa; border: 2px solid #dcdde1; border-radius: 20px 20px 10px 10px; padding: 20px; max-width: 380px; margin: 0 auto;
+    
+    .agency-bus-dashboard { text-align: center; background: #dcdde1; color: darken($gray, 20%); font-size: 0.75rem; font-weight: 700; padding: 6px; border-radius: 6px; margin-bottom: 20px; text-transform: uppercase; }
+  }
+
+  .agency-bus-grid-matrix {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), 40px); // Fige la taille des colonnes
+    gap: 8px;
+    justify-content: center;
+    align-content: center;
+
+    .cell-unit {
+      width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; user-select: none; transition: transform 0.1s;
+      &.active-editing { box-shadow: 0 0 0 3px #f39c12; transform: scale(1.05); }
+
+      // Modificateurs de types conformes au MCD
+      &[data-type="seat"] { background-color: #2ece71; color: #fff; }
+      &[data-type="vip"] { background-color: #9b59b6; color: #fff; }
+      &[data-type="driver"] { background-color: #e74c3c; color: #fff; }
+      &[data-type="wc"] { background-color: #34495e; color: #fff; }
+      &[data-type="door"] { background-color: #f1c40f; color: #2c3e50; }
+      &[data-type="aisle"] { background-color: #f1f2f6; border: 1px dashed #ced6e0; color: transparent; }
+    }
+  }
+
+  .agency-layout-manager-action-zone { text-align: right; padding-top: 20px; border-top: 1px solid rgba($mute, 0.15); margin-top: 20px; }
+
+  // Boutons
+  .agency-layout-btn {
+    padding: 11px 20px; border-radius: $radius-input; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px;
+    &--generate { background: #3498db; color: #fff; justify-content: center; }
+    &--save { background: $success; color: #fff; }
+  }
+}
+
+@keyframes slideIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+// Mode Sombre
+.dark .agency-layout-manager-scope {
+  .agency-layout-manager-title { color: lighten($success, 25%); }
+  .agency-layout-manager-card { background: $dm-bg; border-color: $mute; .card-inner-title { color: #fff; } }
+  .agency-layout-manager-label { color: lighten($success, 15%); }
+  .agency-layout-manager-input, .agency-layout-manager-select { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $mute; }
+  .checkbox-container { color: $mute; }
+  .agency-layout-context-panel { background: rgba($white, 0.02); border-color: rgba($mute, 0.2); .context-header { color: #fff; } }
+  .agency-bus-frame { background: darken($dm-bg, 3%); border-color: $mute; .agency-bus-dashboard { background: $mute; color: #fff; } }
+  .agency-bus-grid-matrix .cell-unit[data-type="aisle"] { background-color: rgba($white, 0.02); border-color: rgba($mute, 0.15); }
+  .session-layouts-list { color: $mute !important; }
+}

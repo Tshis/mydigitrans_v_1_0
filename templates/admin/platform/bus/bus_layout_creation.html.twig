@@ -1,0 +1,142 @@
+{# templates/admin/agency/layout/form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/admin/layout_builder.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div class="agency-layout-manager-scope">
+		<div
+			class="agency-layout-manager-container">
+
+			{# --- EN-TÊTE --- #}
+			<header class="agency-layout-manager-header">
+				<div class="agency-profile-block">
+					<a href="{{ path('admin_agency_bus_add') }}" class="agency-back-action">
+						<i class="fa-solid fa-arrow-left"></i>
+					</a>
+					<div class="agency-profile-meta">
+						<h2 class="agency-layout-manager-title">
+							<i class="fa-solid fa-compass-drafting"></i>
+							Concepteur de Gabarits</h2>
+						<p class="agency-layout-manager-subtitle">Créez des plans de sièges réutilisables pour votre flotte de véhicules.</p>
+					</div>
+				</div>
+			</header>
+
+			<div
+				class="agency-layout-manager-grid-layout">
+
+				{# --- COMPOSANT GAUCHE : PARAMÈTRES DU GABARIT --- #}
+				<div class="agency-layout-manager-column">
+					<div class="agency-layout-manager-card">
+						<h3 class="card-inner-title">
+							<i class="fa-solid fa-sliders"></i>
+							Configuration Technique</h3>
+
+						<div class="agency-layout-manager-form">
+							<div class="field mb-20">
+								<label class="agency-layout-manager-label">Nom du modèle / Gabarit</label>
+								<input type="text" id="layout-name" class="agency-layout-manager-input" placeholder="Ex: Yutong 55 places standard" required>
+							</div>
+
+							<div class="field-group mb-20">
+								<div class="field">
+									<label class="agency-layout-manager-label">Nombre de Rangées</label>
+									<input type="number" id="layout-rows" class="agency-layout-manager-input" value="11" min="2" max="22">
+								</div>
+								<div class="field">
+									<label class="agency-layout-manager-label">Colonnes de Sièges</label>
+									<input type="number" id="layout-cols" class="agency-layout-manager-input" value="4" min="2" max="6">
+								</div>
+							</div>
+
+							<div class="field mb-20">
+								<label class="agency-layout-manager-label">Position du couloir central (Aisles)</label>
+								<select id="layout-aisle-pos" class="agency-layout-manager-select">
+									<option value="2">Après la colonne 2 (Configuration standard 2-2)</option>
+									<option value="1">Après la colonne 1 (Configuration VIP 1-2)</option>
+									<option value="3">Après la colonne 3 (Configuration Grand Volume 3-2)</option>
+								</select>
+							</div>
+
+							<div class="field mb-20 toggle-field">
+								<label class="checkbox-container">
+									<input type="checkbox" id="layout-back-extra" checked>
+									<span class="checkmark"></span>
+									Banquette complète au fond (hasBackExtraSeat)
+								</label>
+							</div>
+
+							<button type="button" id="btn-generate-matrix" class="agency-layout-btn agency-layout-btn--generate">
+								<i class="fa-solid fa-arrows-rotate"></i>
+								Générer la Grille de Dessin
+							</button>
+						</div>
+					</div>
+
+					{# LISTE DES MODÈLES DÉJÀ EXISTANTS EN SESSION (POUR APPRECIER LE STOCKAGE) #}
+					<div class="agency-layout-manager-card" style="margin-top: 20px;">
+						<h3 class="card-inner-title" style="font-size: 1.1rem; color: gray;">
+							<i class="fa-solid fa-folder-open"></i>
+							Gabarits actifs en Session</h3>
+						<ul class="session-layouts-list" style="padding-left: 20px; margin: 10px 0 0 0; font-size: 0.9rem; line-height: 1.6; color: var(--dark);">
+							{% for layout in existing_layouts %}
+								<li>
+									<strong>{{ layout.name }}</strong>
+									({{ layout.rows }}x{{ layout.columns }})</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+				{# --- COMPOSANT DROITE : SCHÉMA INTERACTIF DE L'AUTOCAR --- #}
+				<div class="agency-layout-manager-column">
+					<div class="agency-layout-manager-card card-highlight">
+						<h3 class="card-inner-title">
+							<i class="fa-solid fa-bus"></i>
+							Carrosserie & Aménagement</h3>
+						<p class="card-inner-subtitle">Cliquez sur une cellule pour basculer : Siège ➔ Allée ➔ WC ➔ Porte</p>
+
+						{# Zone Popover d'Édition Contextuelle d'un Siège Spécial #}
+						<div id="cell-context-panel" class="agency-layout-context-panel" style="display: none;">
+							<div class="context-header">Option de la cellule [R<span id="ctx-r">0</span>, C<span id="ctx-c">0</span>]</div>
+							<div class="context-row">
+								<select id="ctx-type-select" class="agency-layout-manager-select">
+									<option value="seat">Siège Passager Normal</option>
+									<option value="vip">Siège Passager VIP</option>
+									<option value="driver">Chauffeur</option>
+									<option value="wc">Toilettes (WC)</option>
+									<option value="door">Portière / Escalier</option>
+									<option value="aisle">Allée vide</option>
+								</select>
+								<input type="text" id="ctx-label-input" class="agency-layout-manager-input" placeholder="Numéro/Label">
+							</div>
+							<div class="context-actions">
+								<button type="button" id="btn-apply-ctx" class="agency-layout-btn agency-layout-btn--save">Appliquer</button>
+							</div>
+						</div>
+
+						{# L'autocar physique #}
+						<div class="agency-bus-frame">
+							<div class="agency-bus-dashboard">Avant du véhicule</div>
+							<div
+								id="layout-interactive-grid" class="agency-bus-grid-matrix">{# Construit dynamiquement par le script #}
+							</div>
+						</div>
+
+						<div class="agency-layout-manager-action-zone">
+							<button type="button" id="btn-submit-layout" class="agency-layout-btn agency-layout-btn--save">
+								<i class="fa-solid fa-cloud-arrow-up"></i>
+								Enregistrer ce Modèle en Session
+							</button>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+{% endblock %}
