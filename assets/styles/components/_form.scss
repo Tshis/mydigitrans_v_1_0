@@ -26,15 +26,15 @@ form{
     input:not([type=checkbox]),
     select,
     textarea{
-        //border: .11rem solid $dark;
-        border: 1px solid rgba($color: $dark, $alpha: .35);
-        border-radius: .5rem;
-        padding: 1rem;
-        color: $dark;
-        background: inherit ;
-        font-size: 1.4rem;
-        font-weight: 500;
-        transition: .3s;
+
+        padding: 11px 14px; 
+        border: 1px solid $mute; 
+        border-radius: $radius-input; 
+        background: $white; 
+        color: $dark; 
+        font-size: 1.3rem; 
+        outline: none; 
+        &:focus { border-color: $success; }
     
         &.w-full{
             width: 100%;
@@ -60,6 +60,10 @@ form{
         display: block;
         padding: 0 1rem;
         color: $dark;
+        font-size: 0.95rem; 
+        font-weight: 700; 
+        color: $dark; 
+        text-transform: uppercase;
     }//label
 
     /* --- INTEGRATION SYMFONY UX AUTOCOMPLETE (TOM SELECT) --- */

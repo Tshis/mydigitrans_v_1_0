@@ -2,25 +2,25 @@
 
 
 // --- FILE: _layout_manager.scss ---
-.agency-layout-manager-scope {
+.admin-bus-layout-add-scope {
   width: 100%;
   box-sizing: border-box;
   font-family: system-ui, -apple-system, sans-serif;
 
   * { box-sizing: border-box; }
-  .agency-layout-manager-container { padding: 2.5rem; }
+  .admin-bus-layout-add-container { padding: 2.5rem; }
 
   // En-tête
-  .agency-layout-manager-header {
+  .admin-bus-layout-add-header {
     margin-bottom: 2.5rem;
     .agency-profile-block { display: flex; align-items: center; gap: 1.2rem; }
     .agency-back-action { color: $gray; font-size: 1.5rem; text-decoration: none; &:hover { color: $success; } }
-    .agency-layout-manager-title { font-size: 2rem; margin: 0; font-weight: 700; color: $dark; }
-    .agency-layout-manager-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; }
+    .admin-bus-layout-add-title { font-size: 2rem; margin: 0; font-weight: 700; color: $dark; }
+    .admin-bus-layout-add-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; }
   }
 
   // Grille 2 colonnes
-  .agency-layout-manager-grid-layout {
+  .admin-bus-layout-add-grid-layout {
     display: grid;
     grid-template-columns: 1fr 1.3fr;
     gap: 2rem;
@@ -28,7 +28,7 @@
     @media (max-width: 992px) { grid-template-columns: 1fr; }
   }
 
-  .agency-layout-manager-card {
+  .admin-bus-layout-add-card {
     background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 24px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.01);
     &.card-highlight { border-color: $success; }
@@ -38,17 +38,11 @@
   }
 
   // Formulaire
-  .agency-layout-manager-form { display: flex; flex-direction: column; }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .mb-20 { margin-bottom: 20px; }
-  .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
-  .agency-layout-manager-label { font-size: 0.85rem; font-weight: 700; color: $dark; text-transform: uppercase; }
-
-  .agency-layout-manager-input, 
-  .agency-layout-manager-select {
-    padding: 11px 14px; border: 1px solid $mute; border-radius: $radius-input; background: $white; color: $dark; font-size: 0.95rem; outline: none; width: 100%;
-    &:focus { border-color: $success; }
-  }
+  .field-group{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+  }  
 
   // Checkbox custom
   .checkbox-container {
@@ -98,7 +92,7 @@
     }
   }
 
-  .agency-layout-manager-action-zone { text-align: right; padding-top: 20px; border-top: 1px solid rgba($mute, 0.15); margin-top: 20px; }
+  .admin-bus-layout-add-action-zone { text-align: right; padding-top: 20px; border-top: 1px solid rgba($mute, 0.15); margin-top: 20px; }
 
   // Boutons
   .agency-layout-btn {
@@ -106,16 +100,58 @@
     &--generate { background: #3498db; color: #fff; justify-content: center; }
     &--save { background: $success; color: #fff; }
   }
+
+
+  .js-special-cell-wrapper, .js-aisle {
+  background: rgba($gray, 0.02);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba($mute, 0.15);
+  .dark & { background: rgba($white, 0.01); border-color: rgba($mute, 0.2); }
 }
+
+.border-top-dashed {
+  border-top: 1px dashed rgba($mute, 0.3);
+  padding-top: 15px;
+  margin-top: 15px;
+  position: relative;
+  &:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+}
+
+.button-right {
+  text-align: right;
+  margin-top: 10px;
+}
+
+// Bouton supprimer une option
+.btn-remove-dynamic-row {
+  background: rgba($danger, 0.1);
+  color: $danger;
+  border: 1px solid rgba($danger, 0.2);
+  padding: 4px 10px;
+  border-radius: $radius-input;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  float: right;
+  margin-top: -10px;
+  &:hover { background: $danger; color: #fff; }
+}
+
+
+}
+
+
+
 
 @keyframes slideIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
 // Mode Sombre
-.dark .agency-layout-manager-scope {
-  .agency-layout-manager-title { color: lighten($success, 25%); }
-  .agency-layout-manager-card { background: $dm-bg; border-color: $mute; .card-inner-title { color: #fff; } }
-  .agency-layout-manager-label { color: lighten($success, 15%); }
-  .agency-layout-manager-input, .agency-layout-manager-select { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $mute; }
+.dark .admin-bus-layout-add-scope {
+  .admin-bus-layout-add-title { color: lighten($success, 25%); }
+  .admin-bus-layout-add-card { background: $dm-bg; border-color: $mute; .card-inner-title { color: #fff; } }
+  .admin-bus-layout-add-label { color: lighten($success, 15%); }
+  .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $mute; }
   .checkbox-container { color: $mute; }
   .agency-layout-context-panel { background: rgba($white, 0.02); border-color: rgba($mute, 0.2); .context-header { color: #fff; } }
   .agency-bus-frame { background: darken($dm-bg, 3%); border-color: $mute; .agency-bus-dashboard { background: $mute; color: #fff; } }
