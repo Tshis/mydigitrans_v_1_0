@@ -32,3 +32,19 @@
         color: $white !important;
     }
 }//btn-white
+
+
+.button-right{
+    display: flex;
+    justify-content: end;
+}//button-right
+
+.button-left{
+    display: flex;
+    justify-content: start;
+}//button-left
+
+.button-center{
+    display: flex;
+    justify-content: center;
+}//button-center
