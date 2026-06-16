@@ -25,11 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const block = document.createElement('div');
             block.classList.add('js-special-cell', 'border-top-dashed');
             block.innerHTML = `
-                <button type="button" class="btn-remove-dynamic-row"><i class="fa-solid fa-trash"></i> Retirer</button>
+                <button type="button" class="btn-remove-dynamic-row mb-10"><i class="fa-solid fa-trash"></i> Retirer</button>
                 <div class="field mb-20">
                   <label class="admin-bus-layout-add-label">Type de la cellule</label>
                   <select class="admin-bus-layout-add-select dynamic-ctx-type">
-                    <option value="driver">Chauffeur</option>
+                    <option >Faite votre choix</option>
+                    <option value="driver" selected>Chauffeur</option>
                     <option value="wc">Toilettes (WC)</option>
                     <option value="door">Portière / Escalier</option>
                     <option value="vip">Siège Passager VIP</option>
@@ -66,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             block.innerHTML = `
                 <button type="button" class="btn-remove-dynamic-row"><i class="fa-solid fa-trash"></i></button>
                 <label class="admin-bus-layout-add-label">Après la colonne :</label>
-                <input placeholder="Ex : 2" class="admin-bus-layout-add-input dynamic-aisle-pos" type="number" min="1" max="6">
+                <input placeholder="Ex : 2" class="admin-bus-layout-add-input dynamic-aisle-pos" type="number" min="1" max="7">
             `;
             block.querySelector('.btn-remove-dynamic-row').addEventListener('click', () => block.remove());
             containerAisles.appendChild(block);
@@ -80,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function generateLayoutFromFormData() {
         if (!gridContainer) return;
 
-        const totalRows = parseInt(inputRows.value) || 11;
-        const totalSeatCols = parseInt(inputCols.value) || 4;
+        const totalRows = parseInt(inputRows.value) || 0;
+        const totalSeatCols = parseInt(inputCols.value) || 0;
 
         // A. Extraction des couloirs déclarés
         const aislePositions = [];
@@ -166,5 +167,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     btnGenerate.addEventListener('click', generateLayoutFromFormData);
-    generateLayoutFromFormData(); // Premier lancement automatique
+    //generateLayoutFromFormData(); // Premier lancement automatique
 });

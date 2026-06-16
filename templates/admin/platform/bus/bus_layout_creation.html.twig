@@ -50,20 +50,20 @@
                         <div class="field-group mb-20">
                             <div class="field">
                                 <label class="admin-bus-layout-add-label">Nombre de Rangées</label>
-                                <input type="number" id="layout-main-rows" class="admin-bus-layout-add-input w-full"
-                                    value="11" min="2" max="22">
+                                <input type="number" id="layout-main-rows" class="admin-bus-layout-add-input" min="2"
+                                    max="22" placeholder="Ex: 12">
                             </div>
                             <div class="field">
                                 <label class="admin-bus-layout-add-label">Colonnes de Sièges</label>
-                                <input type="number" id="layout-main-cols" class="admin-bus-layout-add-input w-full"
-                                    value="4" min="2" max="6">
+                                <input type="number" id="layout-main-cols" class="admin-bus-layout-add-inpul" min="2"
+                                    max="7" placeholder="Ex: 4">
                             </div>
                         </div>
 
                         <div class="field mb-20 toggle-field">
                             <label class="checkbox-container">
                                 <input type="checkbox" id="layout-back-extra" checked>
-                                <span class="checkmark"></span> Banquette complète au fond (hasBackExtraSeat)
+                                <span class="checkmark"></span> Banquette complète au fond
                             </label>
                         </div>
 
@@ -116,12 +116,14 @@
                 {# LISTE DES MODÈLES DÉJÀ EXISTANTS #}
                 <div class="admin-bus-layout-add-card" style="margin-top: 20px;">
                     <h3 class="card-inner-title" style="font-size: 1.1rem; color: gray;">
-                        <i class="fa-solid fa-folder-open"></i> Gabarits actifs en Session
+                        <i class="fa-solid fa-folder-open"></i> Gabarits actifs dans le système
                     </h3>
                     <ul class="session-layouts-list"
                         style="padding-left: 20px; margin: 10px 0 0 0; font-size: 0.9rem; line-height: 1.6; color: var(--dark);">
                         {% for layout in existing_layouts %}
-                        <li> <strong>{{ layout.name }}</strong> ({{ layout.rows }}x{{ layout.columns }}) </li>
+                        <li class="mb-4"> <a href=""> <strong>{{ layout.name }}</strong> ({{ layout.rows }}x{{
+                                layout.columns }})
+                            </a></li>
                         {% endfor %}
                     </ul>
                 </div>
