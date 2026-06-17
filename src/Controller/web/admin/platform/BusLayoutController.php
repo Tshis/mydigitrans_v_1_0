@@ -11,23 +11,70 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class BusLayoutController extends AbstractController
 {
-    #[Route('/admin/platform/bus-layout/add', name: 'admin_platform_bus_layout_add', methods: ['GET'])]
+    #[Route('/admin/platform/bus-layout/add', name: 'admin_platform_bus_layout_add')]
     public function add(Request $request): Response
     {
         $session = $request->getSession();
 
-        // Initialisation de la session avec des gabarits standards si elle est vide
-        if (!$session->has('mock_layouts')) {
-            $session->set('mock_layouts', [
-                1 => ['id' => 1, 'name' => 'Modèle Standard Coaster (2-2)', 'columns' => 4, 'rows' => 8],
-                2 => ['id' => 2, 'name' => 'Modèle Grand Scania (2-2 + WC)', 'columns' => 5, 'rows' => 12],
-                3 => ['id' => 3, 'name' => 'Modèle VIP (2-1)', 'columns' => 3, 'rows' => 8]
-            ]);
+        //Soumission du formulaire
+        if ($request->isMethod('POST')) {
+
+            // Récupérer TOUTES les données sous forme de tableau
+            $allData = $request->request->all();
+
+            // Construction des Special Position
+            $specialPositions = [];
+
+            if ($allData) {
+
+
+                $types = $allData['specialPositionType'] ?? [];
+                $rows = $allData['specialPositionRow'] ?? [];
+                $cols = $allData['specialPositionCol'] ?? [];
+
+                foreach ($types as $index => $type) {
+                    $specialPositions[] = [
+                        'type' => $type,
+                        'row'  => (int) ($rows[$index] ?? 0),
+                        'col'  => (int) ($cols[$index] ?? 0),
+                    ];
+                }
+            }
+
+            //Insertion dans la session => A SUPPRIMER UNE FOIS LA BD Mise en place
+            $layouts = $session->get('bus_layout', []);
+            $newId = empty($layouts)  ? 1 : max(array_keys($layouts)) + 1;
+            //==============================================================//
+
+            //Construction de Bus Layout
+            $busLayout = [
+                'id' => $newId,
+                'name' => $allData['name'],
+                'agency' => null,
+                'rows' => (int) $allData['rows'],
+                'columns' => (int) $allData['columns'],
+                'aisles' => array_map('intval', $allData['aisles'] ?? []),
+                'specialPositions' => $specialPositions,
+                'hasBackExtraSeat' => isset($allData['backExtraSeat']),
+                'isValided' => false,
+                'createdAt' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+                'resolvedAt' => null,
+            ];
+
+
+            //Insertion dans la session => A SUPPRIMER UNE FOIS LA BD Mise en place
+            // ajout du nouveau layout
+            $layouts[$newId] = $busLayout;
+
+            // sauvegarde en session
+            $session->set('bus_layout', $layouts);
+            //==============================================================//
         }
 
+        //Rendu du formulaire de creation de buslayout
         return $this->render('admin/platform/bus/bus_layout_creation.html.twig', [
             'page' => 'bus',
-            'existing_layouts' => $session->get('mock_layouts')
+
         ]);
     } //add
 
@@ -35,9 +82,9 @@ final class BusLayoutController extends AbstractController
     public function saveAjax(Request $request): JsonResponse
     {
         $session = $request->getSession();
-        $data = json_decode($request->getContent(), true);
+        $allData = json_decode($request->getContent(), true);
 
-        if (!$data || !isset($data['name'])) {
+        if (!$allData || !isset($allData['name'])) {
             return new JsonResponse(['success' => false, 'message' => 'Données invalides'], 400);
         }
 
@@ -50,12 +97,12 @@ final class BusLayoutController extends AbstractController
         // Stockage du gabarit complet conforme aux colonnes de ton MCD
         $layouts[$newId] = [
             'id' => $newId,
-            'name' => $data['name'],
-            'rows' => (int)$data['rows'],
-            'columns' => (int)$data['columns'],
-            'aisles' => $data['aisles'], // Tableau JSON ex: ["2"]
-            'hasBackExtraSeat' => (bool)$data['hasBackExtraSeat'],
-            'matrix' => $data['matrix'] // Les coordonnées individuelles dessinées
+            'name' => $allData['name'],
+            'rows' => (int)$allData['rows'],
+            'columns' => (int)$allData['columns'],
+            'aisles' => $allData['aisles'], // Tableau JSON ex: ["2"]
+            'hasBackExtraSeat' => (bool)$allData['hasBackExtraSeat'],
+            'matrix' => $allData['matrix'] // Les coordonnées individuelles dessinées
         ];
 
         // Écriture en session
@@ -64,7 +111,7 @@ final class BusLayoutController extends AbstractController
         return new JsonResponse([
             'success' => true,
             'id' => $newId,
-            'name' => $data['name']
+            'name' => $allData['name']
         ]);
     } //saveAjax
 }

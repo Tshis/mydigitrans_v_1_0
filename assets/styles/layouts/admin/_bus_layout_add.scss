@@ -102,8 +102,9 @@
   // Boutons
   .agency-layout-btn {
     padding: 11px 20px; border-radius: $radius-input; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px;
-    &--generate { background: #3498db; color: #fff; justify-content: center; }
+    &--generate { background: $success; color: #fff; justify-content: center; &:hover{background: darken($color: $success, $amount: 15);} }
     &--save { background: $success; color: #fff; }
+    &--full{width: 100%;}
   }
 
 

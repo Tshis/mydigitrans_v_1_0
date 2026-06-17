@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
+    console.log('layout_builder chargé');
+
     const scope = document.querySelector('.admin-bus-layout-add-scope');
     if (!scope) return;
 
@@ -28,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button type="button" class="btn-remove-dynamic-row mb-10"><i class="fa-solid fa-trash"></i> Retirer</button>
                 <div class="field mb-20">
                   <label class="admin-bus-layout-add-label">Type de la cellule</label>
-                  <select class="admin-bus-layout-add-select dynamic-ctx-type">
+                  <select class="admin-bus-layout-add-select dynamic-ctx-type" name="specialPositionType[]">
                     <option >Faite votre choix</option>
                     <option value="driver" selected>Chauffeur</option>
                     <option value="wc">Toilettes (WC)</option>
@@ -40,11 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="field-group mb-5">
                   <div class="field">
                     <label class="admin-bus-layout-add-label">La rangée numéro</label>
-                    <input type="number" class="admin-bus-layout-add-input dynamic-ctx-row" value="1" min="1" max="25">
+                    <input name="specialPositionRow[]" type="number" class="admin-bus-layout-add-input dynamic-ctx-row" value="1" min="1" max="25">
                   </div>
                   <div class="field">
                     <label class="admin-bus-layout-add-label">Colonne numéro</label>
-                    <input type="number" class="admin-bus-layout-add-input dynamic-ctx-col" value="1" min="1" max="7">
+                    <input name="specialPositionCol[]" type="number" class="admin-bus-layout-add-input dynamic-ctx-col" value="1" min="1" max="7">
                   </div>
                 </div>
             `;
@@ -52,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             containerSpecialCells.appendChild(block);
         });
         btnAddSpecialCell.click(); // Initialise une ligne par défaut (Chauffeur)
+        console.log(document.querySelectorAll('.js-special-cell').length);
     }
 
     // --- AUTOMATISATION DES CHAMPS REPETABLES (BOUTON + COULOIR) ---
@@ -67,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             block.innerHTML = `
                 <button type="button" class="btn-remove-dynamic-row"><i class="fa-solid fa-trash"></i></button>
                 <label class="admin-bus-layout-add-label">Après la colonne :</label>
-                <input placeholder="Ex : 2" class="admin-bus-layout-add-input dynamic-aisle-pos" type="number" min="1" max="7">
+                <input name="aisles[]" placeholder="Ex : 2" class="admin-bus-layout-add-input dynamic-aisle-pos" type="number" min="1" max="7">
             `;
             block.querySelector('.btn-remove-dynamic-row').addEventListener('click', () => block.remove());
             containerAisles.appendChild(block);
@@ -168,4 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnGenerate.addEventListener('click', generateLayoutFromFormData);
     //generateLayoutFromFormData(); // Premier lancement automatique
+
+   
+    
+    
 });
