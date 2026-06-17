@@ -2,6 +2,7 @@
 
 namespace App\Controller\web\admin\agency;
 
+use App\Service\BusLayoutGridBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,21 +26,33 @@ final class BusController extends AbstractController
         ]);
     } //add
 
+
     #[Route('/admin/agency/bus/{code}/details', name: 'admin_agency_bus_show')]
-    public function show(string $code, Request $request): Response
+    public function show(string $code, Request $request, BusLayoutGridBuilder $busLayoutGridBuilder): Response
     {
         $session = $request->getSession();
 
         $layouts = $session->get('bus_layout', []);
 
-        dd($layouts);
+        // simulation bus -> layout
+        $busToLayoutMap = [
+            'bus-001' => 1,
+            'bus-002' => 2,
+        ];
+
+        $layoutId = $busToLayoutMap[$code] ?? null;
+
+        $busLayout = $layouts[$layoutId] ?? null;
+
+        if (!$busLayout) {
+            throw $this->createNotFoundException('Bus layout introuvable');
+        }
+
 
         return $this->render('admin/agency/bus/show.html.twig', [
             'page' => 'bus',
             'bus_code' => $code,
-            'busLayout' => $layouts,
+            'seatmap' => $busLayoutGridBuilder->build($busLayout),
         ]);
-    } //show()
-
-
+    } ////show()
 }
