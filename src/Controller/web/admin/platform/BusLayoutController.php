@@ -6,7 +6,6 @@ namespace App\Controller\web\admin\platform;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class BusLayoutController extends AbstractController
@@ -78,40 +77,5 @@ final class BusLayoutController extends AbstractController
         ]);
     } //add
 
-    #[Route('/admin/platform/bus-layout/save-ajax', name: 'admin_platform_bus_layout_save_ajax', methods: ['POST'])]
-    public function saveAjax(Request $request): JsonResponse
-    {
-        $session = $request->getSession();
-        $allData = json_decode($request->getContent(), true);
 
-        if (!$allData || !isset($allData['name'])) {
-            return new JsonResponse(['success' => false, 'message' => 'Données invalides'], 400);
-        }
-
-        // Récupération de l'historique en session
-        $layouts = $session->get('mock_layouts', []);
-
-        // Génération d'un ID auto-incrémenté artificiel
-        $newId = count($layouts) > 0 ? max(array_keys($layouts)) + 1 : 1;
-
-        // Stockage du gabarit complet conforme aux colonnes de ton MCD
-        $layouts[$newId] = [
-            'id' => $newId,
-            'name' => $allData['name'],
-            'rows' => (int)$allData['rows'],
-            'columns' => (int)$allData['columns'],
-            'aisles' => $allData['aisles'], // Tableau JSON ex: ["2"]
-            'hasBackExtraSeat' => (bool)$allData['hasBackExtraSeat'],
-            'matrix' => $allData['matrix'] // Les coordonnées individuelles dessinées
-        ];
-
-        // Écriture en session
-        $session->set('mock_layouts', $layouts);
-
-        return new JsonResponse([
-            'success' => true,
-            'id' => $newId,
-            'name' => $allData['name']
-        ]);
-    } //saveAjax
 }
