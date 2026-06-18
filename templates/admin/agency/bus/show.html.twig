@@ -4,6 +4,7 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/admin/bus_profil.js" defer></script>
+	<script src="/js/seatmap.js" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -83,7 +84,7 @@
 									<option value="none">-- En réserve (Aucune ligne fixe) --</option>
 								</select>
 								<small class="agency-bus-help-text">Définir une ligne par défaut pré-remplira
-																		                                automatiquement ce bus lors de la création d'un voyage.</small>
+																											                                automatiquement ce bus lors de la création d'un voyage.</small>
 							</div>
 
 							<div class="agency-bus-profile-form-action-zone">
@@ -159,7 +160,7 @@
 							<div class="agency-bus-panic-actions">
 								<button type="button" id="btn-cancel-panic" class="agency-bus-profile-btn agency-bus-profile-btn--cancel">Annuler</button>
 								<button type="button" id="btn-confirm-maintenance" class="agency-bus-profile-btn agency-bus-profile-btn--danger">Confirmer le
-																		                                garage</button>
+																											                                garage</button>
 							</div>
 						</div>
 
@@ -167,13 +168,13 @@
 						<div id="resolve-action-panel" class="agency-bus-panic-panel panel-border-success">
 							<div class="agency-bus-profile-form-group">
 								<label class="agency-bus-profile-form-label label-success">Rapport de réparation /
-																		                                Clôture</label>
+																											                                Clôture</label>
 								<textarea id="resolution-reason" class="agency-bus-profile-form-textarea" placeholder="Indiquez les réparations faites..." rows="3"></textarea>
 							</div>
 							<div class="agency-bus-panic-actions">
 								<button type="button" id="btn-cancel-resolve" class="agency-bus-profile-btn agency-bus-profile-btn--cancel">Annuler</button>
 								<button type="button" id="btn-confirm-resolution" class="agency-bus-profile-btn agency-bus-profile-btn--save-half">Valider la
-																		                                sortie</button>
+																											                                sortie</button>
 							</div>
 						</div>
 

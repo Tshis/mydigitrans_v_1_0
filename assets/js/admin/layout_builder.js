@@ -172,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnGenerate.addEventListener('click', generateLayoutFromFormData);
     //generateLayoutFromFormData(); // Premier lancement automatique
+    
 
    
     

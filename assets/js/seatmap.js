@@ -1,48 +1,87 @@
-// Variable globale ou d'instance pour suivre le siège sélectionné
-let selectedSeatElement = null;
+document.addEventListener('DOMContentLoaded', () => {
 
-function selectSeat(element) {
-    // Si l'élément cliqué est déjà vendu, on refuse l'action
-    if (element.classList.contains('is-booked')) return;
+    console.log('chargé')
 
-    // Étape 1 : Si un siège était déjà sélectionné avant, on le remet à son état normal
-    if (selectedSeatElement) {
-        selectedSeatElement.classList.remove('is-currently-selected');
-    }
+    const seatmap = document.querySelector('.agency-bus-matrix');
 
-    // Étape 2 : Si l'utilisateur clique à nouveau sur le même siège, cela annule simplement la sélection
-    if (selectedSeatElement === element) {
-        selectedSeatElement = null;
-        updateTicketForm(null, null); // Vide le numéro de siège dans le formulaire
-        return;
-    }
+    if (!seatmap) return;
 
-    // Étape 3 : Appliquer le style de sélection sur le nouveau siège
-    selectedSeatElement = element;
-    element.classList.add('is-currently-selected');
+    let selectedSeat = null;
 
-    // Étape 4 : Récupérer les métadonnées de la place pour ton formulaire Symfony
-    const idSiege = element.getAttribute('data-seat-id');
-    const numeroSiege = element.getAttribute('data-seat-number');
+    seatmap.addEventListener('click', (e) => {
 
-    // Appel de la fonction de mise à jour de ton formulaire de vente
-    updateTicketForm(idSiege, numeroSiege);
-}
+        const seat = e.target.closest('[data-action="select-seat"]');
 
-// Exemple d'action de liaison avec ton formulaire de vente de billet
-function updateTicketForm(id, label) {
-    const inputId = document.getElementById('ticket-form-seat-id'); // Champ masqué dans ton form
-    const displayLabel = document.getElementById('ticket-form-seat-display'); // Zone d'affichage du texte
+        if (!seat) return;
 
-    if (inputId && displayLabel) {
-        if (id) {
-            inputId.value = id;
-            displayLabel.textContent = `Siège sélectionné : N° ${label}`;
-            displayLabel.style.color = '#2ece71';
-        } else {
-            inputId.value = '';
-            displayLabel.textContent = 'Aucun siège sélectionné';
-            displayLabel.style.color = '';
+        // sécurité : siège réservé
+        if (seat.classList.contains('is-booked') || seat.dataset.booked === "1") {
+            return;
         }
+
+        // toggle off
+        if (selectedSeat === seat) {
+
+            seat.classList.remove('is-selected');
+            selectedSeat = null;
+
+            updateTicketForm(null, null);
+            return;
+        }
+
+        // reset ancien
+        if (selectedSeat) {
+            selectedSeat.classList.remove('is-selected');
+        }
+
+        // select nouveau
+        selectedSeat = seat;
+        seat.classList.add('is-selected');
+
+        updateTicketForm(
+            seat.dataset.seatId,
+            seat.dataset.seatNumber,
+            seat.dataset.seatRow,
+            seat.dataset.seatCol,
+        );
+
+        console.log('Selected seat:', seat.dataset.seatId, seat.dataset.seatNumber,);
+
+    });
+
+});
+
+
+function updateTicketForm(id, label, row, col) {
+
+    const inputId = document.getElementById('ticket-form-seat-id');
+    const inputLabel = document.getElementById('ticket-form-seat-label');
+    const display = document.getElementById('ticket-form-seat-display');
+
+    if (!inputId || !display) return;
+
+    if (id) {
+
+        inputId.value = id;
+
+        if (inputLabel) {
+            inputLabel.value = label;
+        }
+
+        display.textContent =
+            `Siège ${label} (R${row} - C${col})`;
+
+        display.style.color = '#2e91ce';
+
+    } else {
+
+        inputId.value = '';
+
+        if (inputLabel) {
+            inputLabel.value = '';
+        }
+
+        display.textContent = 'Aucun siège sélectionné';
+        display.style.color = '';
     }
 }

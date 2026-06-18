@@ -3,14 +3,16 @@
 	<div class="agency-bus-shell">
 
 		<div class="agency-bus-cockpit">
-			<span class="agency-bus-cockpit-text">Avant du Véhicule</span>
+			<span class="agency-bus-cockpit-text">
+				Avant du Véhicule
+			</span>
 		</div>
 
 		<div class="agency-bus-matrix" style="--grid-cols: {{ seatmap.totalColumns }};">
 
 			{% for cell in seatmap.cells %}
 
-				<div class="cell-unit agency-cell agency-cell--{{ cell.type }}" data-row="{{ cell.row }}" data-col="{{ cell.col|default('') }}" data-type="{{ cell.type }}" {% if cell.type in ['seat','vip'] %} data-seat-number="{{ cell.label }}" data-action="select-seat" tabindex="0" role="button" {% endif %}>
+				<div class="cell-unit agency-cell agency-cell--{{ cell.type }}" data-type="{{ cell.type }}" data-row="{{ cell.row }}" data-col="{{ cell.col|default('') }}" {% if cell.type in ['seat', 'vip'] %} data-action="select-seat" data-seat-id="{{ cell.row ~ '-' ~ cell.col }}" data-seat-number="{{ cell.label }}" tabindex="0" role="button" {% endif %} {% if cell.type == 'seat' and cell.is_booked is defined and cell.is_booked %} data-booked="1" class="is-booked" {% endif %}>
 
 					{% if cell.type == 'driver' %}
 						<i class="fa-solid fa-id-card"></i>
@@ -22,7 +24,7 @@
 						<i class="fa-solid fa-door-open"></i>
 
 					{% elseif cell.type == 'aisle' %}
-						{# vide volontaire #}
+						{# empty #}
 
 					{% else %}
 						<span class="agency-cell-number">
