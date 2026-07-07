@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //--- Reparation des pannes ---
     const btnTriggerResolve = scope.querySelector('#btn-trigger-resolve');
     const btnCancelResolve = scope.querySelector('#btn-cancel-resolve');
-    const btnConfirmResolve = scope.querySelector('#btn-confirm-resolve');
+    const btnConfirmResolve = scope.querySelector('#btn-confirm-resolution');
      const busBrokenBox = scope.querySelector('#bus-broken-box');
     
     const resolvePanel = scope.querySelector('#resolve-action-panel');
