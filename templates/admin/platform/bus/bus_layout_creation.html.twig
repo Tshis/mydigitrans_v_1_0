@@ -1,152 +1,158 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/admin/layout_builder.js" defer></script>
+	{{ parent() }}
+	<script src="/js/admin/layout_builder.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-bus-layout-add-scope">
+	<div class="admin-bus-layout-add-scope">
 
-    <div class="admin-bus-layout-add-container">
+		<div
+			class="admin-bus-layout-add-container">
 
-        {# --- EN-TÊTE --- #}
-        <header class="admin-bus-layout-add-header">
-            <div class="agency-profile-block">
-                <a href="#" class="agency-back-action">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-                <div class="agency-profile-meta">
-                    <h2 class="admin-bus-layout-add-title">
-                        <i class="fa-solid fa-compass-drafting"></i>
-                        Concepteur de Gabarits
-                    </h2>
-                    <p class="admin-bus-layout-add-subtitle">Créez des plans de sièges réutilisables pour votre flotte
-                        de véhicules.</p>
-                </div>
-            </div>
-        </header>
+			{# --- EN-TÊTE --- #}
+			<header class="admin-bus-layout-add-header">
+				<div class="agency-profile-block">
+					<a href="#" class="agency-back-action">
+						<i class="fa-solid fa-arrow-left"></i>
+					</a>
+					<div class="agency-profile-meta">
+						<h2 class="admin-bus-layout-add-title">
+							<i class="fa-solid fa-compass-drafting"></i>
+							Concepteur de Gabarits
+						</h2>
+						<p class="admin-bus-layout-add-subtitle">Créez des plans de sièges réutilisables pour votre flotte
+														                        de véhicules.</p>
+					</div>
+				</div>
+			</header>
 
-        {# COMPOSANT DE LA PAGE #}
-        <form class="admin-bus-layout-add-grid-layout" id="bus_layout_add_form" method="post">
+			{# COMPOSANT DE LA PAGE #}
+			<form
+				class="admin-bus-layout-add-grid-layout" id="bus_layout_add_form" method="post">
 
-            {# --- COMPOSANT GAUCHE : PARAMÈTRES DU GABARIT --- #}
-            <div class="admin-bus-layout-add-column">
+				{# --- COMPOSANT GAUCHE : PARAMÈTRES DU GABARIT --- #}
+				<div class="admin-bus-layout-add-column">
 
-                <div class="admin-bus-layout-add-card">
+					<div class="admin-bus-layout-add-card">
 
-                    <h3 class="card-inner-title mb-20">
-                        <i class="fa-solid fa-sliders"></i> Configuration Technique
-                    </h3>
+						<h3 class="card-inner-title mb-20">
+							<i class="fa-solid fa-sliders"></i>
+							Configuration Technique
+						</h3>
 
-                    <div class="admin-bus-layout-add-form">
+						<div class="admin-bus-layout-add-form">
 
-                        <div class="field mb-20">
-                            <label class="admin-bus-layout-add-label">Nom du modèle / Gabarit</label>
-                            <input type="text" id="layout-name" class="admin-bus-layout-add-input"
-                                placeholder="Ex: Yutong 55 places standard" required name="name">
-                        </div>
+							<div class="field mb-20">
+								<label class="admin-bus-layout-add-label">Nom du modèle / Gabarit</label>
+								<input type="text" id="layout-name" class="admin-bus-layout-add-input" placeholder="Ex: Yutong 55 places standard" required name="name">
+							</div>
 
-                        <div class="field-group mb-20">
-                            <div class="field">
-                                <label class="admin-bus-layout-add-label">Nombre de Rangées</label>
-                                <input type="number" id="layout-main-rows" class="admin-bus-layout-add-input" min="2"
-                                    max="22" placeholder="Ex: 12" name="rows">
-                            </div>
-                            <div class="field">
-                                <label class="admin-bus-layout-add-label">Colonnes de Sièges</label>
-                                <input type="number" id="layout-main-cols" class="admin-bus-layout-add-inpul" min="2"
-                                    max="7" placeholder="Ex: 4" name="columns">
-                            </div>
-                        </div>
+							<div class="field-group mb-20">
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Nombre de Rangées</label>
+									<input type="number" id="layout-main-rows" class="admin-bus-layout-add-input" min="2" max="22" placeholder="Ex: 12" name="rows">
+								</div>
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Colonnes de Sièges</label>
+									<input type="number" id="layout-main-cols" class="admin-bus-layout-add-inpul" min="2" max="7" placeholder="Ex: 4" name="columns">
+								</div>
+							</div>
 
-                        <div class="field mb-20 toggle-field">
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="layout-back-extra" checked name="backExtraSeat">
-                                <span class="checkmark"></span> Banquette complète au fond
-                            </label>
-                        </div>
+							<div class="field mb-20 toggle-field">
+								<label class="checkbox-container">
+									<input type="checkbox" id="layout-back-extra" checked name="backExtraSeat">
+									<span class="checkmark"></span>
+									Banquette complète au fond
+								</label>
+							</div>
 
-                        {# --- ZONE 1 : BLOC REPETABLE CELLULES SPÉCIALES --- #}
-                        <h3 class="card-inner-title mb-20">
-                            <i class="fa-solid fa-chair"></i> Configuration Cellule spéciales (wc, chauffeur, etc)
-                        </h3>
+							{# --- ZONE 1 : BLOC REPETABLE CELLULES SPÉCIALES --- #}
+							<h3 class="card-inner-title mb-20">
+								<i class="fa-solid fa-chair"></i>
+								Configuration Cellule spéciales (wc, chauffeur, etc)
+							</h3>
 
-                        <div class="js-special-cell-wrapper mb-20">
-                            <div id="special-cells-container">
-                                {# Le JavaScript va ajouter et cloner les lignes ici #}
-                            </div>
+							<div class="js-special-cell-wrapper mb-20">
+								<div
+									id="special-cells-container">{# Le JavaScript va ajouter et cloner les lignes ici #}
+								</div>
 
-                            <div class="button-right">
-                                <button type="button" id="btn-add-special-cell" class="agency-layout-btn">
-                                    <i class="fa-solid fa-plus"></i> une autre cellule
-                                </button>
-                            </div>
-                        </div>
+								<div class="button-right">
+									<button type="button" id="btn-add-special-cell" class="agency-layout-btn">
+										<i class="fa-solid fa-plus"></i>
+										une autre cellule
+									</button>
+								</div>
+							</div>
 
-                        {# --- ZONE 2 : BLOC REPETABLE COULOIRS (AISLES) --- #}
-                        <div class="field mb-20 toggle-field">
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="layout-aisle-toggle" checked>
-                                <span class="checkmark"></span> Présence d'un ou plusieurs couloirs
-                            </label>
-                        </div>
+							{# --- ZONE 2 : BLOC REPETABLE COULOIRS (AISLES) --- #}
+							<div class="field mb-20 toggle-field">
+								<label class="checkbox-container">
+									<input type="checkbox" id="layout-aisle-toggle" checked>
+									<span class="checkmark"></span>
+									Présence d'un ou plusieurs couloirs
+								</label>
+							</div>
 
-                        <div class="js-aisle mb-20" id="aisle-logic-block">
-                            <div id="aisles-container">
-                                {# Le JavaScript va ajouter et cloner les lignes ici #}
-                            </div>
+							<div class="js-aisle mb-20" id="aisle-logic-block">
+								<div
+									id="aisles-container">{# Le JavaScript va ajouter et cloner les lignes ici #}
+								</div>
 
-                            <div class="button-right">
-                                <button type="button" id="btn-add-aisle" class="agency-layout-btn">
-                                    <i class="fa-solid fa-plus"></i> un autre couloir
-                                </button>
-                            </div>
-                        </div>
+								<div class="button-right">
+									<button type="button" id="btn-add-aisle" class="agency-layout-btn">
+										<i class="fa-solid fa-plus"></i>
+										un autre couloir
+									</button>
+								</div>
+							</div>
 
-                        <button type="button" id="btn-generate-matrix"
-                            class="agency-layout-btn agency-layout-btn--generate agency-layout-btn--full">
-                            <i class="fa-solid fa-arrows-rotate"></i> Générer la Grille de Dessin
-                        </button>
-                    </div>
+							<button type="button" id="btn-generate-matrix" class="agency-layout-btn agency-layout-btn--generate agency-layout-btn--full">
+								<i class="fa-solid fa-arrows-rotate"></i>
+								Générer la Grille de Dessin
+							</button>
+						</div>
 
-                </div>
-                <!--admin-bus-layout-add-card-->
-
-
-            </div>
-
-            {# --- COMPOSANT DROITE : SCHÉMA INTERACTIF DE L'AUTOCAR --- #}
-            <div class="admin-bus-layout-add-column">
-                <div class="admin-bus-layout-add-card card-highlight">
-                    <h3 class="card-inner-title">
-                        <i class="fa-solid fa-bus"></i>
-                        Carrosserie & Aménagement
-                    </h3>
+					</div>
+					<!--admin-bus-layout-add-card-->
 
 
-                    {# L'autocar physique #}
-                    <div class="agency-bus-frame">
-                        <div class="agency-bus-dashboard">Avant du véhicule</div>
-                        <div id="layout-interactive-grid" class="agency-bus-grid-matrix">{# Construit dynamiquement par
-                            le script #}
-                        </div>
-                    </div>
+				</div>
 
-                    <div class="admin-bus-layout-add-action-zone">
-                        <button type="submit" id="btn-submit-layout" class="agency-layout-btn agency-layout-btn--save">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            Enregistrer ce Modèle en Session
-                        </button>
-                    </div>
-                </div>
-            </div>
+				{# --- COMPOSANT DROITE : SCHÉMA INTERACTIF DE L'AUTOCAR --- #}
+				<div class="admin-bus-layout-add-column">
+					<div class="admin-bus-layout-add-card card-highlight">
+						<h3 class="card-inner-title">
+							<i class="fa-solid fa-bus"></i>
+							Carrosserie & Aménagement
+						</h3>
 
-        </form>
 
-    </div>
-    <!--admin-bus-layout-add-container-->
+						{# L'autocar physique #}
+						<div class="agency-bus-frame">
+							<div class="agency-bus-dashboard">Avant du véhicule</div>
+							<div
+								id="layout-interactive-grid" class="agency-bus-grid-matrix">{# Construit dynamiquement par
+																		                            le script #}
+							</div>
+						</div>
 
-</div>
-<!--admin-bus-layout-add-scope-->
+						<div class="admin-bus-layout-add-action-zone">
+							<button type="submit" id="btn-submit-layout" class="agency-layout-btn agency-layout-btn--save text-size-12">
+								<i class="fa-solid fa-cloud-arrow-up"></i>
+								Enregistrer ce Modèle en Session
+							</button>
+						</div>
+					</div>
+				</div>
+
+			</form>
+
+		</div>
+		<!--admin-bus-layout-add-container-->
+
+	</div>
+	<!--admin-bus-layout-add-scope-->
 {% endblock %}
