@@ -155,9 +155,18 @@
 
 }//seatmap-card
 
+//seatmap-section
+.seatmap-section-title{
+	text-align: center;
+	padding-block: 1.5rem;
+}////seatmap-section
+  
+  
+
 
 .dark{
 	.seatmap-card,.seatmap-legend-bar{background-color: $dm-bg;}
+	.seatmap-section-title{color: $success;}
 }//.dark
 
 

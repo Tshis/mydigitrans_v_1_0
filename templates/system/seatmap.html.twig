@@ -6,30 +6,33 @@
 
 		{% for cell in seatmap.cells %}
 
-		{% if cell.type in ['seat', 'vip'] %}
+			{% if cell.type in ['seat', 'vip'] %}
 
-		<input type="radio" name="seat" id="seat-{{ cell.row }}-{{ cell.col }}" value="{{ cell.row }}-{{ cell.col }}"
-			class="seat-radio">
+				<input type="radio" name="seat" id="seat-{{ cell.row }}-{{ cell.col }}" value="{{ cell.row }}-{{ cell.col }}" class="seat-radio">
 
-		<label for="seat-{{ cell.row }}-{{ cell.col }}" class="cell-unit" data-type="{{ cell.type }}">
-			<span class="-number">
-				{{ cell.label }}
-			</span>
-		</label>
+				<label for="seat-{{ cell.row }}-{{ cell.col }}" class="cell-unit" data-type="{{ cell.type }}">
+					<span class="-number">
+						{{ cell.label }}
+					</span>
+				</label>
 
-		{% else %}
+			{% else %}
 
-		<div class="cell-unit" data-type="{{ cell.type }}">
-			{% if cell.type == 'driver' %}
-			<i class="fa-solid fa-id-card"></i>
-			{% elseif cell.type == 'wc' %}
-			<i class="fa-solid fa-restroom"></i>
-			{% elseif cell.type == 'door' %}
-			<i class="fa-solid fa-door-open"></i>
+				<div class="cell-unit" data-type="{{ cell.type }}">
+					{% if cell.type == 'driver' %}
+						<i class="fa-solid fa-id-card"></i>
+					{% elseif cell.type == 'wc' %}
+						<i class="fa-solid fa-restroom"></i>
+					{% elseif cell.type == 'door' %}
+						<i class="fa-solid fa-door-open"></i>
+					{% elseif cell.type == 'cashier' %}
+						<i class="fa-solid fa-hand-holding-dollar"></i>
+					{% elseif cell.type == 'porter' %}
+						<i class="fa-solid fa-image-portrait"></i>
+					{% endif %}
+				</div>
+
 			{% endif %}
-		</div>
-
-		{% endif %}
 
 		{% endfor %}
 
