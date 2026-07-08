@@ -59,43 +59,6 @@
     }
   }
 
-
-  // --- GRILLE D'AFFICHAGE DU BUS (CENTRÉE ET RIGIDE) ---
-  .agency-bus-frame {
-    background: #e4d371; 
-    border: 2px solid #dcdde1; 
-    border-radius: 20px 20px 10px 10px; 
-    padding: 20px; max-width: 380px; margin: 0 auto;
-    
-    .agency-bus-dashboard { text-align: center; 
-      background: #dcdde1; color: darken($gray, 20%); 
-      font-size: 0.75rem; font-weight: 700; padding: 6px; 
-      border-radius: 6px; margin-bottom: 20px; 
-      text-transform: uppercase; 
-    }
-  }
-
-  .agency-bus-grid-matrix {
-    display: grid;
-    grid-template-columns: repeat(var(--grid-cols), 40px); // Fige la taille des colonnes
-    gap: 8px;
-    justify-content: center;
-    align-content: center;
-
-    .cell-unit {
-      width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; user-select: none; transition: transform 0.1s;
-      &.active-editing { box-shadow: 0 0 0 3px #f39c12; transform: scale(1.05); }
-
-      // Modificateurs de types conformes au MCD
-      &[data-type="seat"] { background-color: #2ece71; color: #fff; }
-      &[data-type="vip"] { background-color: #9b59b6; color: #fff; }
-      &[data-type="driver"] { background-color: #e74c3c; color: #fff; }
-      &[data-type="wc"] { background-color: #34495e; color: #fff; }
-      &[data-type="door"] { background-color: #f1c40f; color: #2c3e50; }
-      &[data-type="aisle"] { background-color: #f1f2f6; border: 1px dashed #ced6e0; color: transparent; }
-    }
-  }
-
   .admin-bus-layout-add-action-zone { 
     text-align: right; 
     padding-top: 20px; 

@@ -65,26 +65,9 @@
 				<div class="card">
 					<h2>Choix du siège</h2>
 
-					<p class="legend">
-						<span class="available">
-							Disponible</span>
+					{# Rendu dynamique des plans des bus en incluant le composant autonome #}
+					{{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
 
-						<span class="selected">Sélectionné</span>
-
-						<span class="booked">Occupé</span>
-					</p>
-					<!--legend-->
-
-					<div class="seats">
-						<span class="seat available">1</span>
-						<span class="seat available">2</span>
-						<span class="seat booked">3</span>
-						<span class="seat available">4</span>
-						<span class="seat selected">5</span>
-						<span class="seat available">6</span>
-						<span class="seat booked">7</span>
-						<span class="seat available">8</span>
-					</div>
 				</div>
 				<!--siege-->
 
