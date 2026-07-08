@@ -1,0 +1,112 @@
+{# templates/admin/agency/line/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/table-responsive.js" defer></script>
+{% endblock %}
+
+
+{% block body %}
+<div class="admin-lines-wrapper container">
+
+
+
+    {# --- EN-TÊTE DE LA PAGE --- #}
+    <header class="header mb-20">
+        <div class="title">
+            <h2>
+                <i class="fa-solid fa-route"></i>
+                Gestion des Trajets / Lignes
+            </h2>
+            <p>Définissez et gérez les itinéraires, distances et tarifs de base de votre réseau.</p>
+        </div>
+        {# --- ZONE D'ACTIONS --- #}
+        <div class="admin-bus-layout-add-action-zone">
+            <a href="{{ path('admin_agency_line_add') }}" class="btn btn-success text-size-12">
+                <i class="fa-solid fa-plus"></i>
+                Créer une nouvelle ligne
+            </a>
+        </div>
+    </header>
+
+    <div class="card">
+
+        {# --- COMPOSANT TABLEAU GÉNÉRIQUE ET RESPONSIVE --- #}
+        <table class="table table-responsive table-stripped">
+            <thead>
+                <tr>
+                    <th>Itinéraire (Départ → Arrivée)</th>
+                    <th>Distance</th>
+                    <th>Tarif de Base</th>
+                    <th>Statut</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {# Ligne Statique 1 #}
+                <tr>
+                    <td>
+                        <strong>
+                            <span class="main-text">Kinshasa</span>
+                            <i class="fa-solid fa-arrow-right-long"></i>
+                            <span>Matadi</span>
+                        </strong>
+                    </td>
+                    <td>365 Km</td>
+                    <td>
+                        <strong>25 000 CDF</strong>
+                    </td>
+                    <td>
+                        <span class="badge badge-success px-5 py-2 text-white border-radius-5">Opérationnelle</span>
+                    </td>
+                    <td class="actions">
+                        <a href="#" class="table-action-trigger" title="Détails">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a href="#" class="table-action-trigger" title="Modifier">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <a href="#" class="table-action-trigger btn-delete" title="Supprimer">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                {# Ligne Statique 2 #}
+                <tr class="table-row">
+                    <td class="table-meta-cell">
+                        <strong>
+                            <span class="main-text">Kinshasa</span>
+                            <i class="fa-solid fa-arrow-right-long"></i>
+                            <span>Kikwit</span>
+                        </strong>
+                    </td>
+                    <td>520 Km</td>
+                    <td>
+                        <strong>40 000 CDF</strong>
+                    </td>
+                    <td>
+                        <span class="badge badge-danger px-5 py-2 text-white border-radius-5">Supendu</span>
+                    </td>
+                    <td class="actions">
+                        <a href="#" class="table-action-trigger" title="Détails">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a href="#" class="table-action-trigger" title="Modifier">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <a href="#" class="table-action-trigger btn-delete" title="Supprimer">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+{# admin-lines-wrapper #}
+{% endblock %}

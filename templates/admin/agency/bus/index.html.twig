@@ -213,6 +213,15 @@
 			</div>
 		</div>
 
+		{% if buses is defined and buses|length > 0 %}
+			{# --- ÉTAT VIDE (FALLBACK UX) --- #}
+			<div class="table-empty-state">
+				<i class="fa-solid fa-bus"></i>
+				<p>Aucun véhicule n'est actuellement enregistré dans la flotte.</p>
+			</div>
+		{% endif %}
+
+
 	</div>
 	<!--agency-fleet-management-wrapper-->
 

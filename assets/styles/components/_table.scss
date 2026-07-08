@@ -1,0 +1,193 @@
+@use '../abstract/variables' as *;
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td, th {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 0.1rem solid $mute;
+        vertical-align: middle;
+    }
+
+    thead, tfoot {
+        font-size: 14px;
+    }
+
+    tbody {
+        font-size: 12px;
+    }
+
+    // --- VARIANTE : LIGNES ALTERNÉES (STRIPED) ---
+    &.table-striped {
+        tr:nth-child(even) {
+            background: rgba($color: $mute, $alpha: 0.15);
+        }
+    }
+
+    // --- COMPOSANT D'ACTIONS DANS LES CELLULES ---
+    .table-action {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none; // Sécurité pour supprimer les puces d'éventuels <ul>
+        margin: 0;
+        padding: 0;
+
+        li {
+            a {
+                padding: 0.5rem;
+                color: $white;
+                border-radius: 0.4rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: 0.3s all ease;
+
+                &:hover {
+                    i {
+                        cursor: pointer;
+                        opacity: 0.85;
+                    }
+                }
+            }
+        }
+    }
+
+    .actions{
+        display: flex;
+        gap: 1rem ;
+       justify-content: end;
+
+       a{
+            transition: all .3s;
+
+            &:hover{
+                transform: scale(1.5);
+            }
+       }
+
+    }//actions
+
+    // --- VARIANTES DE COULEURS DE THÉMATIQUE (EN-TÊTE / PIED) ---
+    &.table-dark {
+        thead, tfoot {
+            th {
+                background: $dark;
+                color: $white;
+            }
+        }
+    }
+
+    &.table-primary {
+        thead, tfoot {
+            th {
+                background: $primary;
+                color: $white;
+            }
+        }
+    }
+
+    &.table-mute {
+        thead, tfoot {
+            th {
+                background: rgba($color: $mute, $alpha: 0.25);
+                color: $black;
+                border: 0;
+            }
+        }
+        thead { border-bottom: 1.5px solid $black; }
+        tfoot { border-top: 1.5px solid $black; }
+    }
+}
+
+// --- CONFIGURATION RESPONSIVE : EMPILEMENT EN COMPOSANTS (STACKED REWRIRE) ---
+@media screen and (max-width: 768px) {
+    .table {
+        &.table-responsive {
+            display: block;
+
+            thead, tbody, tr, th, td {
+                display: block;
+            }
+
+            tfoot, thead {
+                display: none; // Masque les vrais en-têtes
+            }
+
+            tr {
+                margin: 3rem auto;
+                border-bottom: 0.2rem solid $black;
+                border-bottom-left-radius: 1rem;
+                border-bottom-right-radius: 1rem;
+                background: $white; // Protège le fond de la carte mobile
+            }
+
+            td {
+                padding-left: 150px;
+                position: relative;
+                margin-top: -1px; // Évite l'empilement des bordures
+                min-height: 3rem; // Sécurité si la cellule est vide
+                display: flex;
+                align-items: center;
+
+                // Génération de l'en-tête imaginaire à gauche via HTML data-label="..."
+                &::before {
+                    padding: 1rem;
+                    content: attr(data-label);
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    width: 130px; // Largeur fixe pour aligner la colonne d'en-têtes mobiles
+                    display: flex;
+                    align-items: center;
+                    font-weight: bold;
+                    background: rgba($color: $mute, $alpha: 0.1); // Optionnel : donne un aspect structuré à gauche
+                    border-right: 1px solid rgba($color: $mute, $alpha: 0.2);
+                }
+            }
+        }
+    }
+}
+
+// --- ADAPTATION TOTALE AU MODE SOMBRE (DARK MODE) ---
+.dark {
+    .table {
+        td, th {
+            border-bottom-color: rgba($mute, 0.2);
+            color: $mute;
+        }
+
+        &.table-striped tr:nth-child(even) {
+            background: rgba($white, 0.02);
+        }
+
+        &.table-mute {
+            thead, tfoot {
+                th {
+                    background: rgba($white, 0.05);
+                    color: #ffffff;
+                }
+            }
+            thead { border-bottom-color: rgba($white, 0.3); }
+            tfoot { border-top-color: rgba($white, 0.3); }
+        }
+    }
+
+    // Version mobile empilée en mode sombre
+    @media screen and (max-width: 768px) {
+        .table.table-responsive {
+            tr {
+                background: $dm-bg;
+                border-bottom-color: rgba($white, 0.2);
+            }
+            td::before {
+                background: rgba($white, 0.03);
+                border-right-color: rgba($white, 0.1);
+                color: #ffffff;
+            }
+        }
+    }
+}
