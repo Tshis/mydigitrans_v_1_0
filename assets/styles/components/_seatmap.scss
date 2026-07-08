@@ -3,6 +3,7 @@
 .seatmap-card{
 
 	width: max-content;
+	min-width: 300px;
 	background: $white;
 	padding-inline: 2rem;
 	padding-bottom: 2rem;
@@ -42,16 +43,16 @@
 	
 		/* état sélectionné */
 		.seat-radio:checked + label {
-			outline: 3px solid $success;
-			background: $success;
-			color: $white;
+			outline: 3px solid $success !important;
+			background: $success !important;
+			color: $white !important;
 			transform: scale(1.08);
 			z-index: 2;
 		}
 	
 		/* booked */
 		.seat-radio:disabled + label {
-			background: #9ca3af;
+			background: $gray;
 			cursor: not-allowed;
 			opacity: 0.5;
 		}

@@ -59,21 +59,20 @@
     }
   }
 
-  // --- INTERFACE POPOVER DE SELECTION DES SIEGES SPECIAUX ---
-  .agency-layout-context-panel {
-    background: rgba($success, 0.04); border: 1px solid rgba($success, 0.2); padding: 15px; border-radius: 8px; margin-bottom: 20px;
-    animation: slideIn 0.2s ease-out;
-
-    .context-header { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: $dark; margin-bottom: 10px; }
-    .context-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; margin-bottom: 10px; }
-    .context-actions { text-align: right; }
-  }
 
   // --- GRILLE D'AFFICHAGE DU BUS (CENTRÉE ET RIGIDE) ---
   .agency-bus-frame {
-    background: #f8f9fa; border: 2px solid #dcdde1; border-radius: 20px 20px 10px 10px; padding: 20px; max-width: 380px; margin: 0 auto;
+    background: #e4d371; 
+    border: 2px solid #dcdde1; 
+    border-radius: 20px 20px 10px 10px; 
+    padding: 20px; max-width: 380px; margin: 0 auto;
     
-    .agency-bus-dashboard { text-align: center; background: #dcdde1; color: darken($gray, 20%); font-size: 0.75rem; font-weight: 700; padding: 6px; border-radius: 6px; margin-bottom: 20px; text-transform: uppercase; }
+    .agency-bus-dashboard { text-align: center; 
+      background: #dcdde1; color: darken($gray, 20%); 
+      font-size: 0.75rem; font-weight: 700; padding: 6px; 
+      border-radius: 6px; margin-bottom: 20px; 
+      text-transform: uppercase; 
+    }
   }
 
   .agency-bus-grid-matrix {
@@ -97,7 +96,14 @@
     }
   }
 
-  .admin-bus-layout-add-action-zone { text-align: right; padding-top: 20px; border-top: 1px solid rgba($mute, 0.15); margin-top: 20px; }
+  .admin-bus-layout-add-action-zone { 
+    text-align: right; 
+    padding-top: 20px; 
+    border-top: 1px solid rgba($mute, 0.15); 
+    margin-top: 20px;
+    width: max-content; 
+    margin-inline: auto;
+  }
 
   // Boutons
   .agency-layout-btn {

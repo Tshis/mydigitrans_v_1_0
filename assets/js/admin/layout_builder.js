@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
     console.log('layout_builder chargé');
-
     const scope = document.querySelector('.admin-bus-layout-add-scope');
     if (!scope) return;
 
@@ -22,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const containerAisles = scope.querySelector('#aisles-container');
     const btnAddAisle = scope.querySelector('#btn-add-aisle');
 
-    // --- AUTOMATISATION DES CHAMPS REPETABLES (BOUTON + CELULLE) ---
+    // --- AUTOMATISATION DES CHAMPS REPETABLES (BOUTON + CELLULE SPECIALE) ---
     if (btnAddSpecialCell && containerSpecialCells) {
         btnAddSpecialCell.addEventListener('click', () => {
             const block = document.createElement('div');
@@ -30,32 +28,33 @@ document.addEventListener('DOMContentLoaded', () => {
             block.innerHTML = `
                 <button type="button" class="btn-remove-dynamic-row mb-10"><i class="fa-solid fa-trash"></i> Retirer</button>
                 <div class="field mb-20">
-                  <label class="admin-bus-layout-add-label">Type de la cellule</label>
-                  <select class="admin-bus-layout-add-select dynamic-ctx-type" name="specialPositionType[]">
-                    <option >Faite votre choix</option>
-                    <option value="driver" selected>Chauffeur</option>
-                    <option value="wc">Toilettes (WC)</option>
-                    <option value="door">Portière / Escalier</option>
-                    <option value="vip">Siège Passager VIP</option>
-                    <option value="aisle">Allée vide</option>
-                  </select>
+                    <label class="admin-bus-layout-add-label">Type de la cellule</label>
+                    <select class="admin-bus-layout-add-select dynamic-ctx-type" name="specialPositionType[]">
+                        <option value="" disabled>Faites votre choix</option>
+                        <option value="driver" selected>Chauffeur</option>
+                        <option value="cashier">Receveur (Cashier)</option>
+                        <option value="porter">Convoyeur (Porter)</option>
+                        <option value="wc">Toilettes (WC)</option>
+                        <option value="door">Portière / Escalier</option>
+                        <option value="vip">Siège Passager VIP</option>
+                        <option value="aisle">Allée vide</option>
+                    </select>
                 </div>
                 <div class="field-group mb-5">
-                  <div class="field">
-                    <label class="admin-bus-layout-add-label">La rangée numéro</label>
-                    <input name="specialPositionRow[]" type="number" class="admin-bus-layout-add-input dynamic-ctx-row" value="1" min="1" max="25">
-                  </div>
-                  <div class="field">
-                    <label class="admin-bus-layout-add-label">Colonne numéro</label>
-                    <input name="specialPositionCol[]" type="number" class="admin-bus-layout-add-input dynamic-ctx-col" value="1" min="1" max="7">
-                  </div>
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">La rangée numéro</label>
+                        <input name="specialPositionRow[]" type="number" class="admin-bus-layout-add-input dynamic-ctx-row" value="1" min="1" max="25">
+                    </div>
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Colonne numéro</label>
+                        <input name="specialPositionCol[]" type="number" class="admin-bus-layout-add-input dynamic-ctx-col" value="1" min="1" max="7">
+                    </div>
                 </div>
             `;
             block.querySelector('.btn-remove-dynamic-row').addEventListener('click', () => block.remove());
             containerSpecialCells.appendChild(block);
         });
         btnAddSpecialCell.click(); // Initialise une ligne par défaut (Chauffeur)
-        console.log(document.querySelectorAll('.js-special-cell').length);
     }
 
     // --- AUTOMATISATION DES CHAMPS REPETABLES (BOUTON + COULOIR) ---
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         aisleToggle.addEventListener('change', () => {
             aisleLogicBlock.style.display = aisleToggle.checked ? 'block' : 'none';
         });
-
+        
         btnAddAisle.addEventListener('click', () => {
             const block = document.createElement('div');
             block.classList.add('field', 'mb-5', 'border-top-dashed');
@@ -77,14 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
             containerAisles.appendChild(block);
         });
         btnAddAisle.click(); // Initialise une ligne par défaut (Allée centrale)
+        
         const firstAisle = containerAisles.querySelector('.dynamic-aisle-pos');
-        if(firstAisle) firstAisle.value = 2; // Valeur 2 par défaut
+        if (firstAisle) firstAisle.value = 2; // Valeur 2 par défaut
     }
 
     // --- ALGORITHME DE RENDU GRAPHIQUE SELON LES CRITÈRES CONFIGURÉS ---
     function generateLayoutFromFormData() {
         if (!gridContainer) return;
-
         const totalRows = parseInt(inputRows.value) || 0;
         const totalSeatCols = parseInt(inputCols.value) || 0;
 
@@ -108,14 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = cellBlock.querySelector('.dynamic-ctx-type').value;
             const r = parseInt(cellBlock.querySelector('.dynamic-ctx-row').value);
             const c = parseInt(cellBlock.querySelector('.dynamic-ctx-col').value);
-            if (r > 0 && c > 0) { specialCells.push({ r: r, c: c, type: type }); }
+            if (r > 0 && c > 0) {
+                specialCells.push({ r: r, c: c, type: type });
+            }
         });
 
         // C. Boucle de génération de la matrice
         for (let r = 1; r <= totalRows; r++) {
             let seatColIndex = 0;
-            let appliedAislesCount = 0;
-
             for (let c = 1; c <= totalGridCols; c++) {
                 const cell = document.createElement('div');
                 cell.classList.add('cell-unit');
@@ -124,12 +123,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Vérification si cette colonne de la grille correspond à un couloir déclaré
                 const isBackRow = (r === totalRows);
                 const shouldDrawAisle = aislePositions.includes(seatColIndex);
-
+                
                 if (shouldDrawAisle && (!isBackRow || !checkboxBackExtra.checked)) {
                     cell.setAttribute('data-type', 'aisle');
                     gridContainer.appendChild(cell);
                     aislePositions.splice(aislePositions.indexOf(seatColIndex), 1); // Évite les doublons sur la même ligne
-                    appliedAislesCount++;
                     continue;
                 }
 
@@ -142,10 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (matchSpecial) {
                     cell.setAttribute('data-type', matchSpecial.type);
                 }
-
                 gridContainer.appendChild(cell);
             }
-            
+
             // Recharge les positions des couloirs pour la rangée suivante
             if (aisleToggle.checked) {
                 scope.querySelectorAll('.dynamic-aisle-pos').forEach(input => {
@@ -157,24 +154,48 @@ document.addEventListener('DOMContentLoaded', () => {
         reindexSeats();
     }
 
+    // --- LOGIQUE D'INDEXATION ET INJECTION DES ICONES FONT AWESOME ---
     function reindexSeats() {
         const cells = gridContainer.querySelectorAll('.cell-unit');
         let seatNum = 1;
+
         cells.forEach(cell => {
             const type = cell.getAttribute('data-type');
-            if (type === 'seat' || type === 'vip') { cell.textContent = seatNum++; }
-            else if (type === 'driver') { cell.textContent = 'CH'; }
-            else if (type === 'wc') { cell.textContent = 'WC'; }
-            else if (type === 'door') { cell.textContent = 'PORT'; }
-            else { cell.textContent = ''; }
+            cell.innerHTML = ''; // Vide le contenu précédent (le texte brut) pour pouvoir insérer du HTML
+
+            if (type === 'seat' || type === 'vip') {
+                // Structure exacte pour les sièges : le texte numéroté à l'intérieur d'un span.-number
+                const spanNum = document.createElement('span');
+                spanNum.classList.add('-number');
+                spanNum.textContent = seatNum++;
+                cell.appendChild(spanNum);
+            } else {
+                // Création de la balise d'icône Font Awesome pour les types spéciaux
+                const icon = document.createElement('i');
+                
+                if (type === 'driver') {
+                    icon.className = 'fa-solid fa-id-card';
+                    cell.appendChild(icon);
+                } else if (type === 'wc') {
+                    icon.className = 'fa-solid fa-restroom';
+                    cell.appendChild(icon);
+                } else if (type === 'door') {
+                    icon.className = 'fa-solid fa-door-open';
+                    cell.appendChild(icon);
+                } else if (type === 'cashier') {
+                    icon.className = 'fa-solid fa-hand-holding-dollar';
+                    cell.appendChild(icon);
+                } else if (type === 'porter') {
+                    icon.className = 'fa-solid fa-image-portrait';
+                    cell.appendChild(icon);
+                }
+                
+                // Pour 'aisle' (l'allée vide), cell.innerHTML reste vide, ton SCSS dessine le cadre pointillé
+        if (type !== 'aisle') {
+            cell.appendChild(icon);}}
         });
+
     }
-
+    
     btnGenerate.addEventListener('click', generateLayoutFromFormData);
-    //generateLayoutFromFormData(); // Premier lancement automatique
-    
-
-   
-    
-    
 });
