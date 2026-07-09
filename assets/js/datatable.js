@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Cible toutes les tables configurées pour être réactives et automatisées
-    const targetTables = document.querySelectorAll('table.table.table-responsive');
+    
+    // Ici On cible uniquement les tables qui ont explicitement la classe .js-datatable
+    const targetTables = document.querySelectorAll('table.js-datatable');
 
     targetTables.forEach((table, index) => {
         const tableBody = table.querySelector('tbody');
