@@ -1,93 +1,94 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{# Conserve vos scripts globaux existants #}
-{{ parent() }}
+	{# Conserve vos scripts globaux existants #}
+	{{ parent() }}
 
-{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
-{{ importmap('app') }}
+	{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
+	{{ importmap('app') }}
 {% endblock %}
 
 {% block body %}
-<div class="branch-wrapper">
+	<div
+		class="branch-wrapper">
 
-	{# 1. EN-TÊTE DE LA PAGE #}
-	<header class="branch-wrapper_header">
-		<h2 class="branch-wrapper_title">
-			<i class="fas fa-plus-circle"></i>
-			Ajouter une succursale
-		</h2>
-		<a href="{{path('admin_agency_branch_index')}}" class="btn btn-dark border-radius-5">
-			<i class="fas fa-arrow-left"></i>
-			Retour à la liste
-		</a>
-	</header>
+		{# 1. EN-TÊTE DE LA PAGE #}
+		<header class="branch-wrapper_header">
+			<h2 class="branch-wrapper_title">
+				<i class="fas fa-plus-circle"></i>
+				Ajouter une succursale
+			</h2>
+			<a href="{{path('admin_agency_branch_index')}}" class="btn btn-dark border-radius-5">
+				<i class="fas fa-arrow-left"></i>
+				Retour à la liste
+			</a>
+		</header>
 
-	{# 2. LE FORMULAIRE DÉDIÉ #}
-	<div class="c-form-card my-20">
+		{# 2. LE FORMULAIRE DÉDIÉ #}
+		<div class="c-form-card my-20">
 
-		{{ form_start(form, {'method': 'POST','attr': {'class': 'c-form-card_form'} }) }}
+			{{ form_start(form, {'method': 'POST','attr': {'class': 'c-form-card_form'} }) }}
 
-		{# Section : Informations Générales #}
-		<div class="c-form-card_section">
-			<h3 class="c-form-card_section-title">
-				<i class="fas fa-info-circle"></i>
-				Informations de la succursale
-			</h3>
+			{# Section : Informations Générales #}
+			<div class="c-form-card_section">
+				<h3 class="c-form-card_section-title">
+					<i class="fas fa-info-circle"></i>
+					Informations de la succursale
+				</h3>
 
-			<div class="field mb-20">
-				<label for="">Nom de la succursale</label>
-				<input type="text" placeholder="Ex: Agence de limete">
-			</div>
-
-
-			<div class="field-group">
-				<div class="field">
-					<label for="">Ville de la succursale</label>
-					<input type="text" placeholder="Ex: Kinshasa">
-				</div>
-				<div class="field">
-					<label for="">Pays de la succursale</label>
-					{# <input type="text" placeholder="Ex: RDCongo"> #}
-					{{ form_widget(form.pays) }}
-				</div>
-			</div>
-		</div>
-
-		{# Section :Responsable #}
-		<div class="c-form-card_section">
-			<h3 class="c-form-card_section-title">
-				<i class="fas fa-user-circle"></i>
-				Gestionnaire
-			</h3>
-
-			<div class="field mb-20">
-				<div class="c-form-card_group">
-					<label for="branch_city">
-						Gerant (Directeur d'agence)
-					</label>
-					<select id="branch_city" required>
-						<option value="">Billy Branham</option>
-						<option value="kinshasa">Dieudonné Okito</option>
-					</select>
+				<div class="field mb-20">
+					<label for="">Nom de la succursale</label>
+					<input type="text" placeholder="Ex: Agence de limete">
 				</div>
 
+
+				<div class="field-group">
+					<div class="field">
+						<label for="">Ville de la succursale</label>
+						<input type="text" placeholder="Ex: Kinshasa">
+					</div>
+					<div class="field">
+						<label for="">Pays de la succursale</label>
+						{# <input type="text" placeholder="Ex: RDCongo"> #}
+						{{ form_widget(form.pays) }}
+					</div>
+				</div>
 			</div>
 
+			{# Section :Responsable #}
+			<div class="c-form-card_section">
+				<h3 class="c-form-card_section-title">
+					<i class="fas fa-user-circle"></i>
+					Gestionnaire
+				</h3>
 
+				<div class="field mb-20">
+					<div class="c-form-card_group">
+						<label for="branch_city">
+							Gerant (Directeur d'agence)
+						</label>
+						<select id="branch_city" required>
+							<option value="">Billy Branham</option>
+							<option value="kinshasa">Dieudonné Okito</option>
+						</select>
+					</div>
+
+				</div>
+
+
+			</div>
+
+			{# 3. ACTIONS DU FORMULAIRE #}
+			<div class="c-form-card_actions">
+				<a href="{{path('admin_agency_branch_index')}}" class="btn btn-danger border-radius-5">Annuler</a>
+				<button type="button" class="btn btn-success border-radius-5">
+					<i class="fas fa-check"></i>
+					Créer la succursale
+				</button>
+			</div>
+
+			{{ form_end(form) }}
 		</div>
 
-		{# 3. ACTIONS DU FORMULAIRE #}
-		<div class="c-form-card_actions">
-			<a href="{{path('admin_agency_branch_index')}}" class="btn btn-danger border-radius-5">Annuler</a>
-			<button type="button" class="btn btn-success border-radius-5">
-				<i class="fas fa-check"></i>
-				Créer la succursale
-			</button>
-		</div>
-
-		{{ form_end(form) }}
 	</div>
-
-</div>
 {% endblock %}

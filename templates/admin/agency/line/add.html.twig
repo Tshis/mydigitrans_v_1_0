@@ -1,0 +1,129 @@
+{# templates/admin/agency/route/new.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+
+{% block javascripts %}
+{# Conserve vos scripts globaux existants #}
+{{ parent() }}
+
+{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
+{{ importmap('app') }}
+{% endblock %}
+
+
+{% block body %}
+<div class="admin-bus-layout-add-scope">
+    <div class="admin-bus-layout-add-container">
+
+        {# --- EN-TÊTE --- #}
+        <header class="admin-bus-layout-add-header">
+            <div class="agency-profile-block">
+                <a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h2 class="admin-bus-layout-add-title">Configuration d'un nouvel Itinéraire</h2>
+                    <p class="admin-bus-layout-add-subtitle">Enregistrez un nouvel axe routier commercial et sa
+                        tarification initiale.</p>
+                </div>
+            </div>
+        </header>
+
+        {# --- FORMULAIRE DE CRÉATION --- #}
+        <div class="admin-bus-layout-add-grid-layout" style="grid-template-columns: 1fr;">
+            <div class="admin-bus-layout-add-card">
+                <h3 class="card-inner-title">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    Paramètres de la Route
+                </h3>
+                <p class="card-inner-subtitle">Veuillez renseigner précisément les villes et les informations techniques
+                    du trajet.</p>
+
+                {{ form_start(form) }}
+
+                {# Segment 1 : Géographie #}
+                <div class="field-group">
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Ville de Départ</label>
+                        <input type="text" name="departure_city" class="admin-bus-layout-add-input"
+                            placeholder="Ex: Kinshasa" required>
+                    </div>
+                    <div class="field mb-20">
+                        <label for="">Pays de Départ</label>
+                        {# <input type="text" placeholder="Ex: RDCongo"> #}
+                        {{ form_widget(form.paysOrigine) }}
+                    </div>
+                </div>
+
+                <div class="field-group" style="margin-top: 1.5rem;">
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Ville d'Arrivée</label>
+                        <input type="text" name="arrival_city" class="admin-bus-layout-add-input"
+                            placeholder="Ex: Matadi" required>
+                    </div>
+                    <div class="field">
+                        <label for="">Pays d'arrivé</label>
+                        {# <input type="text" placeholder="Ex: RDCongo"> #}
+                        {{ form_widget(form.paysDepart) }}
+                    </div>
+                </div>
+
+                {# Segment 2 : Données Techniques & Financières #}
+                <div class="field-group border-top-dashed" style="margin-top: 2rem;">
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Distance Totale (Km)</label>
+                        <input type="number" name="distance" class="admin-bus-layout-add-input" placeholder="Ex: 365"
+                            min="1" required>
+                    </div>
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Durée Estimée du Trajet</label>
+                        <input type="text" name="duration" class="admin-bus-layout-add-input" placeholder="Ex: 06h30"
+                            required>
+                    </div>
+                </div>
+
+                <div class="field-group" style="margin-top: 1.5rem;">
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Tarif de Base Initial</label>
+                        <input type="number" name="initial_price" class="admin-bus-layout-add-input"
+                            placeholder="Ex: 25000" min="0" required>
+                    </div>
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Devise de la Ligne</label>
+                        <select name="currency_code" class="admin-bus-layout-add-select">
+                            <option value="CDF" selected>Franc Congolais (CDF)</option>
+                            <option value="USD">Dollar Américain (USD)</option>
+                        </select>
+                    </div>
+                </div>
+
+                {# Segment 3 : Statuts et Options #}
+                <div class="field-g" style="margin-top: 1.5rem; align-items: center;">
+                    <div class="field mb-20">
+                        <label class="checkbox-container">
+                            <input type="checkbox" name="is_available" value="1" checked>
+                            <span class="checkmark"></span>
+                            Rendre cette ligne immédiatement active et opérationnelle
+                        </label>
+                    </div>
+                </div>
+
+                {# Barre d'actions finale #}
+                <div class="field-group">
+                    <a href="{{ path('admin_agency_line_index') }}" class="btn btn-dark"> Annuler </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Enregistrer l'itinéraire
+                    </button>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+        {# /admin-bus-layout-add-grid-layout #}
+
+    </div>
+    {# /admin-bus-layout-add-container #}
+</div>
+{# /admin-bus-layout-add-scope #}
+{% endblock %}
