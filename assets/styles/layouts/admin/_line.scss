@@ -17,4 +17,118 @@
 
     }//header
 
-}
+
+
+    // --- GRILLE DES CARTES DE STATISTIQUES ---
+    .stats-overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        width: 100%;
+
+        // --- STRUCTURE DE LA CARTE DE STATISTIQUE ---
+        .stat-card {
+            background: $white;
+            border: 1px solid $mute;
+            border-radius: $radius-card;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.006);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03);
+            }
+    
+            // Bloc de l'icône
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.3rem;
+    
+                &--primary {
+                    background: rgba($primary, 0.1);
+                    color: $primary;
+                }
+    
+                &--success {
+                    background: rgba($success, 0.1);
+                    color: $success;
+                }
+    
+                &--danger {
+                    background: rgba($danger, 0.1);
+                    color: $danger;
+                }
+            }
+    
+            // Bloc des données textuelles
+            .stat-details {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+    
+                .stat-label {
+                    font-size: 0.85rem;
+                    color: $gray;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+    
+                .stat-value {
+                    font-size: 1.6rem;
+                    font-weight: 800;
+                    color: $dark;
+                    line-height: 1.2;
+                }
+            }
+        }//stat-card 
+
+    }//stats-overview-grid
+
+
+    
+    
+}//admin-lines-wrapper
+
+// --- ADAPTATION AU MODE SOMBRE (DARK MODE) ---
+.dark {
+    .stat-card {
+        background: $dm-bg !important;
+        border-color: rgba($mute, 0.25) !important;
+
+        .stat-details {
+            .stat-label {
+                color: $mute !important;
+            }
+            .stat-value {
+                color: $white !important;
+            }
+        }//stat-details
+
+        // Amélioration du contraste des icônes en mode sombre
+        .stat-icon {
+            &--primary {
+                background: rgba($primary, 0.15) !important;
+                color: lighten($primary, 10%) !important;
+            }
+            &--success {
+                background: rgba($success, 0.15) !important;
+                color: lighten($success, 15%) !important;
+            }
+            &--danger {
+                background: rgba($danger, 0.15) !important;
+                color: lighten($danger, 15%) !important;
+            }
+        }//.stat-icon
+    }//start-card
+}//dark

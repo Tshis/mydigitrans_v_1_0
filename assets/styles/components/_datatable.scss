@@ -1,0 +1,222 @@
+@use '../abstract/variables' as *;
+
+// --- LE CONTENEUR GÉNÉRÉ PAR LE JS ---
+.table-card {
+    padding-inline: 2rem;
+    background: $white;
+    border: 1px solid $mute;
+    border-radius: $radius-card;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.006);
+}
+
+// --- BARRE DE RECHERCHE SUPÉRIEURE INJECTÉE ---
+.table-search-bar-zone {
+    padding: 1rem 1.5rem;
+    background: rgba($gray, 0.01);
+    border-bottom: 2px solid $mute;
+    display: flex;
+    justify-content: flex-end;
+
+    .search-input-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 320px;
+        @media (max-width: 576px) { max-width: 100%; }
+
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            color: $gray;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.5rem;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: $white;
+            color: $dark;
+            outline: none;
+            transition: all 0.2s ease;
+
+            &:focus {
+                border-color: $success;
+                box-shadow: 0 0 0 3px rgba($success, 0.1);
+            }
+        }
+    }
+}
+
+// --- LA STRUCTURE DU TABLEAU SÉMANTIQUE ---
+.table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td, th {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 0.1rem solid $mute;
+        vertical-align: middle;
+    }
+    thead, tfoot { font-size: 14px; }
+    tbody { font-size: 12px; }
+
+    &.table-striped tr:nth-child(even) {
+        background: rgba($color: $mute, $alpha: 0.15) !important;
+    }
+}
+
+// --- BLOC PAGINATION INJECTÉ ---
+.table-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: rgba($gray, 0.02);
+    border-top: 1px solid rgba($mute, 0.15);
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    @media (max-width: 576px) { justify-content: center; }
+
+    .per-page-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: $gray;
+
+        select {
+            padding: 6px 12px;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
+            background: $white;
+            color: $dark;
+            font-weight: 600;
+            outline: none;
+        }
+    }
+
+    .pagination-nav { display: flex; align-items: center; gap: 10px; }
+    
+    .nav-btn {
+        padding: 8px 14px;
+        border: 1px solid $mute;
+        background: $white;
+        color: darken($gray, 20%);
+        border-radius: $radius-input;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        &:disabled { opacity: 0.4; cursor: not-allowed; }
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 6px;
+
+        .page-item {
+            width: 27px;
+            height: 27px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
+            background: $white;
+            color: $dark;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .3s;
+
+            &.active {
+                background: $success;
+                border-color: $success;
+                color: $white;
+            }
+
+            &:hover{
+                background: darken($color: $success, $amount: 15%) !important;
+            }
+        }
+    }
+}
+
+// --- VERSION EMPILEMENT RESPONSIVE MOBILE ---
+@media screen and (max-width: 768px) {
+    .table.table-responsive {
+        display: block;
+        thead, tbody, tr, th, td { display: block; }
+        tfoot, thead { display: none; }
+
+        tr {
+            margin: 1.5rem 1rem;
+            border: 1px solid $mute;
+            border-bottom: 0.2rem solid $black;
+            border-radius: 0.6rem;
+            background: $white;
+            overflow: hidden;
+        }
+
+        td {
+            padding-left: 140px;
+            position: relative;
+            margin-top: -1px;
+            min-height: 3.5rem;
+            display: flex;
+            align-items: center;
+
+            &::before {
+                content: attr(data-label);
+                position: absolute;
+                top: 0; left: 0; bottom: 0;
+                width: 120px;
+                padding-left: 1rem;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                background: rgba($color: $mute, $alpha: 0.08);
+                border-right: 1px solid rgba($color: $mute, $alpha: 0.15);
+            }
+        }
+    }
+}
+
+// --- ADAPTATION INTÉGRALE AU MODE SOMBRE ---
+.dark {
+    .table-card { background: $dm-bg; border-color: rgba($mute, 0.25); }
+    .table-search-bar-zone {
+        border-bottom-color: rgba($mute, 0.2);
+        input { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.25); color: #fff; }
+    }
+    .table {
+        td, th { border-bottom-color: rgba($mute, 0.2); color: $mute; }
+        &.table-striped tr:nth-child(even) { background: rgba($white, 0.015); }
+    }
+    .table-pagination {
+        background: rgba($white, 0.005); border-top-color: rgba($mute, 0.2);
+        .per-page-selector { color: $mute; }
+        select, .nav-btn, .page-item {
+            background: darken($dm-bg, 4%); border-color: rgba($mute, 0.25); color: $mute;
+            &.active { background: $success; border-color: $success; color: #fff; }
+        }
+    }
+    @media screen and (max-width: 768px) {
+        .table.table-responsive {
+            tr { background: $dm-bg; border-color: rgba($mute, 0.2); border-bottom-color: rgba($white, 0.2); }
+            td::before { background: rgba($white, 0.02); border-right-color: rgba($white, 0.1); color: #fff; }
+        }
+    }
+}

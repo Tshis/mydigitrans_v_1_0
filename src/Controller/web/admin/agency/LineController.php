@@ -17,7 +17,7 @@ class LineController extends AbstractController
         ]);
     } //index
 
-    #[Route('/add', name: 'admin_agency_line_add', methods: ['GET', 'POST'])]
+    #[Route('/admin/agency/add', name: 'admin_agency_line_add')]
     public function add(Request $request): Response
     {
         if ($request->isMethod('POST')) {

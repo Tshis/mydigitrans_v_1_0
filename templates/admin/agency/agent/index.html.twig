@@ -1,5 +1,9 @@
 {% extends "admin/base.html.twig" %}
 
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/admin/agentDataTable.js" defer></script>
+{% endblock %}
 
 {% block body %}
 
@@ -28,9 +32,9 @@
 				<div class="c-datatable_filters">
 					<select class="c-datatable_select">
 						<option value="">Toutes les succursales</option>
-						<option value="1">Limete (Kinshasa)</option>
-						<option value="2">Gombe (Kinshasa)</option>
-						<option value="3">Matadi Centre</option>
+						<option value="limete">Limete (Kinshasa)</option>
+						<option value="gombe">Gombe (Kinshasa)</option>
+						<option value="matadi">Matadi Centre</option>
 					</select>
 
 					<select class="c-datatable_select">
