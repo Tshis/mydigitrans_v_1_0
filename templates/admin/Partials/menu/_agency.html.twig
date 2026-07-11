@@ -1,75 +1,95 @@
-<a href="{{path('admin_agency_dashboard')}}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Dashboard">
+{# 1. OPÉRATIONS QUOTIDIENNES #}
+<a href="{{path('admin_agency_dashboard')}}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Tableau de bord">
 	<span class="icon">
 		<i class="fa-solid fa-gauge"></i>
 	</span>
 	<span class="text">Dashboard</span>
 </a>
 
-<a href="{{path('admin_agency_branch_index')}}" class="menu-link {{ page is same as('branch') ? 'active' : '' }}" data-tooltip="Branches">
+{# NOUVEAU : Planification des départs réels (MCD table 12) #}
+<a href="#" class="menu-link {{ page is same as('trip') ? 'active' : '' }}" data-tooltip="Gestion des Voyages">
 	<span class="icon">
-		<i class="fa-solid fa-folder-tree"></i>
+		<i class="fa-solid fa-calendar-days"></i>
 	</span>
-	<span class="text">Branch</span>
+	<span class="text">Voyages</span>
 </a>
 
-<a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Agents">
-	<span class="icon">
-		<i class="fa-solid fa-users"></i>
-	</span>
-	<span class="text">Agents</span>
-</a>
-
-<a href="{{path('admin_agency_bus_index')}}" class="menu-link {{ page is same as('bus') ? 'active' : '' }}" data-tooltip="Bus">
-	<span class="icon">
-		<i class="fa-solid fa-bus-simple"></i>
-	</span>
-	<span class="text">Bus</span>
-</a>
-
-<a href="{{path('admin_agency_line_index')}}" class="menu-link {{ page is same as('line') ? 'active' : '' }}" data-tooltip="Utilisateurs">
-	<span class="icon">
-		<i class="fa-solid fa-route"></i>
-	</span>
-	<span class="text">Trajets</span>
-</a>
-
-
-<a href="#" class="menu-link" data-tooltip="Réservations">
+<a href="#" class="menu-link" data-tooltip="Réservations & Billetterie">
 	<span class="icon">
 		<i class="fa-solid fa-file-circle-check"></i>
 	</span>
 	<span class="text">Réservations</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Colis">
+<a href="#" class="menu-link" data-tooltip="Gestion des Colis">
 	<span class="icon">
 		<i class="fa-solid fa-box-open"></i>
 	</span>
 	<span class="text">Colis</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Colis">
+{# 2. FINANCES #}
+<a href="#" class="menu-link" data-tooltip="Gestion des Caisses">
 	<span class="icon">
 		<i class="fa-solid fa-cash-register"></i>
 	</span>
 	<span class="text">Caisse</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Colis">
+<a href="#" class="menu-link" data-tooltip="Paiements & Dépenses">
 	<span class="icon">
 		<i class="fa-solid fa-hand-holding-dollar"></i>
 	</span>
 	<span class="text">Paiements</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Colis">
+{# 3. LOGISTIQUE & CONFIGURATION #}
+<a href="{{path('admin_agency_line_index')}}" class="menu-link {{ page is same as('line') ? 'active' : '' }}" data-tooltip="Lignes et Arrêts">
+	<span class="icon">
+		<i class="fa-solid fa-route"></i>
+	</span>
+	<span class="text">Trajets</span>
+</a>
+
+{# NOUVEAU : Grille tarifaire (MCD table 17) #}
+<a href="#" class="menu-link {{ page is same as('fare') ? 'active' : '' }}" data-tooltip="Grille Tarifaire">
+	<span class="icon">
+		<i class="fa-solid fa-tags"></i>
+	</span>
+	<span class="text">Tarifs</span>
+</a>
+
+<a href="{{path('admin_agency_bus_index')}}" class="menu-link {{ page is same as('bus') ? 'active' : '' }}" data-tooltip="Flotte de Bus">
+	<span class="icon">
+		<i class="fa-solid fa-bus-simple"></i>
+	</span>
+	<span class="text">Bus</span>
+</a>
+
+{# 4. RESSOURCES HUMAINES & STRUCTURE #}
+<a href="{{path('admin_agency_branch_index')}}" class="menu-link {{ page is same as('branch') ? 'active' : '' }}" data-tooltip="Succursales">
+	<span class="icon">
+		<i class="fa-solid fa-folder-tree"></i>
+	</span>
+	<span class="text">Branches</span>
+</a>
+
+<a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Rôles et Personnels">
+	<span class="icon">
+		<i class="fa-solid fa-users"></i>
+	</span>
+	<span class="text">Agents & Chauffeurs</span>
+</a>
+
+{# 5. PILOTAGE #}
+<a href="#" class="menu-link" data-tooltip="Rapports & Statistiques">
 	<span class="icon">
 		<i class="fa-solid fa-newspaper"></i>
 	</span>
 	<span class="text">Rapports</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Colis">
+<a href="#" class="menu-link" data-tooltip="Paramètres Généraux">
 	<span class="icon">
 		<i class="fa-solid fa-gear"></i>
 	</span>

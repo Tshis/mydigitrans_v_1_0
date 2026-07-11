@@ -27,7 +27,7 @@ class LineController extends AbstractController
                 'placeholder' => 'Rechercher un pays...',
                 'autocomplete' => true, // Option Symfony UX
             ])
-            ->add('paysDepart', CountryType::class, [
+            ->add('paysArrive', CountryType::class, [
                 'placeholder' => 'Rechercher un pays...',
                 'autocomplete' => true, // Option Symfony UX
             ])

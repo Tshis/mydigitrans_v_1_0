@@ -100,6 +100,190 @@
     
 }//admin-lines-wrapper
 
+
+//====LINE ADD======
+.admin-agency-lines-add-scope{
+   
+    padding-inline: 8%;
+    padding-block: 2rem;
+
+    .header{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem;
+        max-width: 600px;
+        margin: auto;
+    }//header
+    
+    .text{
+        h2{font-size: 1.8rem;}
+        p{font-size: 1rem; color: $gray;}
+        margin-bottom: 2.5rem;
+    }//text
+
+    .form-line-add-container{
+        display: block;
+        background: $white;
+        box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+        padding: 2rem;
+        max-width: 600px;
+        margin: auto;
+        border-radius: 1rem;
+
+        //===from gimini====
+        // À imbriquer ou chaîner avec vos styles de formulaires .form-line-add-container
+        .border-top-dashed {
+            border-top: 1px dashed $mute;
+            padding-top: 1.5rem;
+        }
+
+        .stops-manager-section {
+            .stops-manager-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                
+                .btn-add-stop-trigger {
+                    background: rgba($primary, 0.1);
+                    color: $primary;
+                    border: none;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    transition: all 0.2s ease;
+                    
+                    &:hover {
+                        background: $primary;
+                        color: $white;
+                    }
+                }
+            }
+
+            .stops-dynamic-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+                position: relative;
+                padding-left: 10px;
+
+                // Ligne verticale décorative rappelant un tracé d'itinéraire
+                &::before {
+                    content: '';
+                    position: absolute;
+                    left: 24px;
+                    top: 20px;
+                    bottom: 20px;
+                    width: 2px;
+                    background: dashed $mute;
+                    z-index: 1;
+                }
+
+                .stop-row-card {
+                    background: $white;
+                    border: 1px solid $mute;
+                    border-radius: 6px;
+                    padding: 0.8rem 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    position: relative;
+                    z-index: 2;
+
+                    &--first { border-left: 3px solid $primary; background: #fafafa; }
+                    &--last { border-left: 3px solid $success; background: #fafafa; }
+
+                    .stop-order-indicator {
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 50%;
+                        background: $dark;
+                        color: $white;
+                        font-weight: bold;
+                        font-size: 0.85rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .stop-fields-grid {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap; // Permet de passer proprement à la ligne sur mobile si l'écran est trop petit
+            gap: 1rem;
+            
+            .field {
+                flex: 1;
+                min-width: 130px; // Empêche le champ de devenir trop minuscule
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                
+                label {
+                    color: $gray;
+                    font-weight: 600;
+                    white-space: nowrap; // Évite que le texte du label se coupe en deux
+                }
+            }
+                    }
+
+
+                    .input-unit-wrapper {
+                        position: relative;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        
+                        input { padding-right: 40px; width: 100%; }
+                        
+                        .unit-label {
+                            position: absolute;
+                            right: 12px;
+                            font-size: 0.75rem;
+                            color: $gray;
+                            font-weight: bold;
+                        }
+                    }
+
+                    .stop-row-action {
+                        width: 30px;
+                        display: flex;
+                        justify-content: center;
+                        
+                        .action-btn-delete {
+                            background: none;
+                            border: none;
+                            color: $danger;
+                            cursor: pointer;
+                            font-size: 1rem;
+                            opacity: 0.7;
+                            transition: opacity 0.2s;
+                            
+                            &:hover { opacity: 1; }
+                        }
+                    }
+                }
+            }
+        }
+
+        .field-group--actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 1.5rem;
+        }
+
+
+
+    }//form-line-add-container
+
+}//.admin-agency-lines-add-scope
+
 // --- ADAPTATION AU MODE SOMBRE (DARK MODE) ---
 .dark {
     .stat-card {
@@ -131,4 +315,15 @@
             }
         }//.stat-icon
     }//start-card
+
+    .text{
+        h2{color: $success !important;}
+        p{color: $mute;}
+    }
+
+    .form-line-add-container{
+        background: $dm-bg;
+        border: 1px solid $mute;
+
+    }
 }//dark

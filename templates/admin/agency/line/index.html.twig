@@ -3,145 +3,147 @@
 
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/table-responsive.js" defer></script>
-<script src="/js/datatable.js" defer></script>
+	{{ parent() }}
+	<script src="/js/table-responsive.js" defer></script>
+	<script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 
 {% block body %}
-<div class="admin-lines-wrapper container">
+	<div
+		class="admin-lines-wrapper container">
 
 
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-20">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-route"></i>
+					Gestion des Trajets / Lignes
+				</h2>
+				<p>Définissez et gérez les itinéraires, distances et tarifs de base de votre réseau.</p>
+			</div>
+			{# --- ZONE D'ACTIONS --- #}
+			<div class="admin-bus-layout-add-action-zone">
+				<a href="{{ path('admin_agency_line_add') }}" class="btn btn-success text-size-12">
+					<i class="fa-solid fa-plus"></i>
+					Créer une nouvelle ligne
+				</a>
+			</div>
+		</header>
 
-    {# --- EN-TÊTE DE LA PAGE --- #}
-    <header class="header mb-20">
-        <div class="title">
-            <h2>
-                <i class="fa-solid fa-route"></i>
-                Gestion des Trajets / Lignes
-            </h2>
-            <p>Définissez et gérez les itinéraires, distances et tarifs de base de votre réseau.</p>
-        </div>
-        {# --- ZONE D'ACTIONS --- #}
-        <div class="admin-bus-layout-add-action-zone">
-            <a href="{{ path('admin_agency_line_add') }}" class="btn btn-success text-size-12">
-                <i class="fa-solid fa-plus"></i>
-                Créer une nouvelle ligne
-            </a>
-        </div>
-    </header>
+		{# --- COMPOSANT DE STATISTIQUES (CARDS) --- #}
+		<div
+			class="stats-overview-grid">
+			{# Carte 1 : Total #}
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-route"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Total des lignes</span>
+					{# Remplacer le chiffre par {{ lines|length }} si dynamique #}
+					<strong class="stat-value">2</strong>
+				</div>
+			</div>
 
-    {# --- COMPOSANT DE STATISTIQUES (CARDS) --- #}
-    <div class="stats-overview-grid">
-        {# Carte 1 : Total #}
-        <div class="stat-card">
-            <div class="stat-icon stat-icon--primary">
-                <i class="fa-solid fa-route"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-label">Total des lignes</span>
-                {# Remplacer le chiffre par {{ lines|length }} si dynamique #}
-                <strong class="stat-value">2</strong>
-            </div>
-        </div>
+			{# Carte 2 : Opérationnelles #}
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-circle-check"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Lignes Actives / Opérationnelles</span>
+					<strong class="stat-value">2</strong>
+				</div>
+			</div>
 
-        {# Carte 2 : Opérationnelles #}
-        <div class="stat-card">
-            <div class="stat-icon stat-icon--success">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-label">Lignes Actives / Opérationnelles</span>
-                <strong class="stat-value">2</strong>
-            </div>
-        </div>
+			{# Carte 3 : Suspendues #}
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--danger">
+					<i class="fa-solid fa-circle-xmark"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Lignes Suspendues</span>
+					<strong class="stat-value">0</strong>
+				</div>
+			</div>
+		</div>
 
-        {# Carte 3 : Suspendues #}
-        <div class="stat-card">
-            <div class="stat-icon stat-icon--danger">
-                <i class="fa-solid fa-circle-xmark"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-label">Lignes Suspendues</span>
-                <strong class="stat-value">0</strong>
-            </div>
-        </div>
-    </div>
+		<!--COMPOSANT DE DONNEES DATATABLE-->
+		<div
+			class="card">
 
-    <!--COMPOSANT DE DONNEES DATATABLE-->
-    <div class="card">
+			{# --- COMPOSANT TABLEAU GÉNÉRIQUE ET RESPONSIVE --- #}
+			<table class="table table-responsive table-stripped js-datatable">
+				<thead>
+					<tr>
+						<th>Itinéraire (Départ → Arrivée)</th>
+						<th>Distance</th>
+						<th>Tarif de Base</th>
+						<th>Statut</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{# Ligne Statique 1 #}
+					<tr>
+						<td>
+							<strong>
+								<span class="main-text">Kinshasa</span>
+								<i class="fa-solid fa-arrow-right-long"></i>
+								<span>Matadi</span>
+							</strong>
+						</td>
+						<td>365 Km</td>
+						<td>
+							<strong>25 000 CDF</strong>
+						</td>
+						<td>
+							<span class="badge badge-success px-5 py-2 text-white border-radius-5">Opérationnelle</span>
+						</td>
+						<td class="actions">
+							<a href="#" class="table-action-trigger" title="Détails">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+							<a href="#" class="table-action-trigger" title="Modifier">
+								<i class="fa-solid fa-pen"></i>
+							</a>
 
-        {# --- COMPOSANT TABLEAU GÉNÉRIQUE ET RESPONSIVE --- #}
-        <table class="table table-responsive table-stripped js-datatable">
-            <thead>
-                <tr>
-                    <th>Itinéraire (Départ → Arrivée)</th>
-                    <th>Distance</th>
-                    <th>Tarif de Base</th>
-                    <th>Statut</th>
-                    <th class="text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {# Ligne Statique 1 #}
-                <tr>
-                    <td>
-                        <strong>
-                            <span class="main-text">Kinshasa</span>
-                            <i class="fa-solid fa-arrow-right-long"></i>
-                            <span>Matadi</span>
-                        </strong>
-                    </td>
-                    <td>365 Km</td>
-                    <td>
-                        <strong>25 000 CDF</strong>
-                    </td>
-                    <td>
-                        <span class="badge badge-success px-5 py-2 text-white border-radius-5">Opérationnelle</span>
-                    </td>
-                    <td class="actions">
-                        <a href="#" class="table-action-trigger" title="Détails">
-                            <i class="fa-solid fa-eye"></i>
-                        </a>
-                        <a href="#" class="table-action-trigger" title="Modifier">
-                            <i class="fa-solid fa-pen"></i>
-                        </a>
+						</td>
+					</tr>
 
-                    </td>
-                </tr>
+					{# Ligne Statique 2 #}
+					<tr class="table-row">
+						<td class="table-meta-cell">
+							<strong>
+								<span class="main-text">Kinshasa</span>
+								<i class="fa-solid fa-arrow-right-long"></i>
+								<span>Kikwit</span>
+							</strong>
+						</td>
+						<td>520 Km</td>
+						<td>
+							<strong>40 000 CDF</strong>
+						</td>
+						<td>
+							<span class="badge badge-danger px-5 py-2 text-white border-radius-5">Supendu</span>
+						</td>
+						<td class="actions">
+							<a href="#" class="table-action-trigger" title="Détails">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+							<a href="#" class="table-action-trigger" title="Modifier">
+								<i class="fa-solid fa-pen"></i>
+							</a>
 
-                {# Ligne Statique 2 #}
-                <tr class="table-row">
-                    <td class="table-meta-cell">
-                        <strong>
-                            <span class="main-text">Kinshasa</span>
-                            <i class="fa-solid fa-arrow-right-long"></i>
-                            <span>Kikwit</span>
-                        </strong>
-                    </td>
-                    <td>520 Km</td>
-                    <td>
-                        <strong>40 000 CDF</strong>
-                    </td>
-                    <td>
-                        <span class="badge badge-danger px-5 py-2 text-white border-radius-5">Supendu</span>
-                    </td>
-                    <td class="actions">
-                        <a href="#" class="table-action-trigger" title="Détails">
-                            <i class="fa-solid fa-eye"></i>
-                        </a>
-                        <a href="#" class="table-action-trigger" title="Modifier">
-                            <i class="fa-solid fa-pen"></i>
-                        </a>
-
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
 
-</div>
-{# admin-lines-wrapper #}
+	</div>
+	{# admin-lines-wrapper #}
 {% endblock %}
