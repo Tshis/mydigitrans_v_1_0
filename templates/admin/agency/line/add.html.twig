@@ -2,171 +2,173 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-{{ importmap('app') }}
-<script src="/js/admin/line_add.js" defer></script>
+	{{ parent() }}
+	{{ importmap('app') }}
+	<script src="/js/admin/line_add.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-agency-lines-add-scope">
+	<div
+		class="admin-agency-lines-add-scope">
 
-    {# --- EN-TÊTE --- #}
-    <header class="header">
-        <a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-        <div class="text">
-            <h2 class="admin-bus-layout-add-title">Configuration d'un nouvel Itinéraire</h2>
-            <p class="admin-bus-layout-add-subtitle">Définissez l'axe commercial général et l'enchaînement de ses
-                escales.</p>
-        </div>
-    </header>
+		{# --- EN-TÊTE --- #}
+		<header class="header">
+			<a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="text">
+				<h2 class="admin-bus-layout-add-title">Configuration d'un nouvel Itinéraire</h2>
+				<p class="admin-bus-layout-add-subtitle">Définissez l'axe commercial général et l'enchaînement de ses
+					                escales.</p>
+			</div>
+		</header>
 
-    {# --- FORMULAIRE DE CRÉATION --- #}
-    <div class="form-line-add-container">
+		{# --- FORMULAIRE DE CRÉATION --- #}
+		<div class="form-line-add-container">
 
-        <div class="text">
-            <h2 class="card-inner-title">
-                <i class="fa-solid fa-map-location-dot"></i>
-                Paramètres de la Route
-            </h2>
-            <p class="card-inner-subtitle">Nommez votre ligne globale, puis ordonnez vos arrêts du départ au terminus.
-            </p>
-        </div>
+			<div class="text">
+				<h2 class="card-inner-title">
+					<i class="fa-solid fa-map-location-dot"></i>
+					Paramètres de la Route
+				</h2>
+				<p class="card-inner-subtitle">Nommez votre ligne globale, puis ordonnez vos arrêts du départ au terminus.
+				</p>
+			</div>
 
-        {{ form_start(form) }}
+			{{ form_start(form) }}
 
-        {# Segment 1 : Identité de la Ligne globale #}
-        <div class="field-group mb-20">
-            <div class="field" style="grid-column: span 2;">
-                <label class="admin-bus-layout-add-label">Nom commercial de la ligne <span
-                        class="text-danger">*</span></label>
-                <input type="text" name="route_name" class="admin-bus-layout-add-input"
-                    placeholder="Ex: Kinshasa - Kikwit via Kenge" required>
-                <small class="text-muted" style="display: block; margin-top: 4px; color: #6c757d;">Ce nom servira de
-                    référence pour les clients et sur les billets.</small>
-            </div>
-        </div>
+			{# Segment 1 : Identité de la Ligne globale #}
+			<div class="field-group mb-20">
+				<div class="field" style="grid-column: span 2;">
+					<label class="admin-bus-layout-add-label">Nom commercial de la ligne
+						<span class="text-danger">*</span>
+					</label>
+					<input type="text" name="route_name" class="admin-bus-layout-add-input" placeholder="Ex: Kinshasa - Kikwit via Kenge" required>
+					<small class="text-muted" style="display: block; margin-top: 4px; color: #6c757d;">Ce nom servira de
+						                    référence pour les clients et sur les billets.</small>
+				</div>
+			</div>
 
-        {# Segment 2 : Les Escales & Arrêts #}
-        <div class="stops-manager-section mb-25 border-top-dashed">
-            <div class="stops-manager-header mb-15">
-                <h3 class="text-size-14 text-dark">
-                    <i class="fa-solid fa-layer-group text-primary"></i> Itinéraire & Escales de la ligne
-                </h3>
-                <button type="button" class="btn-add-stop-trigger" id="add-stop-btn">
-                    <i class="fa-solid fa-plus-circle"></i> Ajouter un arrêt
-                </button>
-            </div>
+			{# Segment 2 : Les Escales & Arrêts #}
+			<div class="stops-manager-section mb-25 border-top-dashed">
+				<div class="stops-manager-header mb-15">
+					<h3 class="text-size-14 text-dark">
+						<i class="fa-solid fa-layer-group text-primary"></i>
+						Itinéraire & Escales de la ligne
+					</h3>
+					<button type="button" class="btn-add-stop-trigger" id="add-stop-btn">
+						<i class="fa-solid fa-plus-circle"></i>
+						Ajouter un arrêt
+					</button>
+				</div>
 
-            {# Conteneur dynamique des arrêts #}
-            <div class="stops-dynamic-list" id="stops-container">
+				{# Conteneur dynamique des arrêts #}
+				<div
+					class="stops-dynamic-list" id="stops-container">
 
-                {# ARRÊT 1 : LE DÉPART (Rendu officiel par le formulaire Symfony) #}
-                <div class="stop-row-card stop-row-card--first">
-                    <div class="stop-order-indicator">1</div>
-                    <div class="stop-fields-grid">
-                        <div class="field">
-                            <label class="text-size-11">Ville de Départ</label>
-                            <input type="text" name="stops[0][city]" class="admin-bus-layout-add-input" value="Kinshasa"
-                                placeholder="Ex: Kinshasa" required>
-                        </div>
-                        <div class="field">
-                            <label class="text-size-11">Pays de Départ</label>
-                            {{ form_widget(form.paysOrigine, {'attr': {'name': 'stops[0][country]'}}) }}
-                        </div>
-                    </div>
-                    <div class="stop-row-action">
-                        <i class="fa-solid fa-lock text-muted" title="Point d'origine requis"></i>
-                    </div>
-                </div>
+					{# ARRÊT 1 : LE DÉPART (Rendu officiel par le formulaire Symfony) #}
+					<div class="stop-row-card stop-row-card--first">
+						<div class="stop-order-indicator">1</div>
+						<div class="stop-fields-grid">
+							<div class="field">
+								<label class="text-size-11">Ville de Départ</label>
+								<input type="text" name="stops[0][city]" class="admin-bus-layout-add-input" value="Kinshasa" placeholder="Ex: Kinshasa" required>
+							</div>
+							<div class="field">
+								<label class="text-size-11">Pays de Départ</label>
+								{{ form_widget(form.paysOrigine, {'attr': {'name': 'stops[0][country]'}}) }}
+							</div>
+						</div>
+						<div class="stop-row-action">
+							<i class="fa-solid fa-lock text-muted" title="Point d'origine requis"></i>
+						</div>
+					</div>
 
-                {# LE TERMINUS FINAL (Le script le repoussera automatiquement à la fin lors de l'ajout d'escales) #}
-                <div class="stop-row-card stop-row-card--last" id="terminus-card">
-                    <div class="stop-order-indicator" id="terminus-number">2</div>
-                    <div class="stop-fields-grid">
-                        <div class="field">
-                            <label class="text-size-11">Terminus Final</label>
-                            <input type="text" name="terminus_city" class="admin-bus-layout-add-input"
-                                placeholder="Ex: Kikwit" required>
-                        </div>
-                        <div class="field">
-                            <label class="text-size-11">Pays Arrivé</label>
-                            {{ form_widget(form.paysArrive, {'attr': {'name': 'terminus_country'}}) }}
-                        </div>
-                        <div class="field">
-                            <label class="text-size-11">Distance Totale</label>
-                            <div class="input-unit-wrapper">
-                                <input type="number" name="terminus_distance" class="admin-bus-layout-add-input"
-                                    placeholder="Ex: 520" required>
-                                <span class="unit-label">Km</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stop-row-action">
-                        <i class="fa-solid fa-flag-checkered text-success" title="Terminus de la ligne"></i>
-                    </div>
-                </div>
+					{# LE TERMINUS FINAL (Le script le repoussera automatiquement à la fin lors de l'ajout d'escales) #}
+					<div class="stop-row-card stop-row-card--last" id="terminus-card">
+						<div class="stop-order-indicator" id="terminus-number">2</div>
+						<div class="stop-fields-grid">
+							<div class="field">
+								<label class="text-size-11">Terminus Final</label>
+								<input type="text" name="terminus_city" class="admin-bus-layout-add-input" placeholder="Ex: Kikwit" required>
+							</div>
+							<div class="field">
+								<label class="text-size-11">Pays Arrivé</label>
+								{{ form_widget(form.paysArrive, {'attr': {'name': 'terminus_country'}}) }}
+							</div>
+							<div class="field">
+								<label class="text-size-11">Distance Totale</label>
+								<div class="input-unit-wrapper">
+									<input type="number" name="terminus_distance" class="admin-bus-layout-add-input" placeholder="Ex: 520" required>
+									<span class="unit-label">Km</span>
+								</div>
+							</div>
+						</div>
+						<div class="stop-row-action">
+							<i class="fa-solid fa-flag-checkered text-success" title="Terminus de la ligne"></i>
+						</div>
+					</div>
 
-            </div>
-        </div>
+				</div>
+			</div>
 
-        {# Segment 3 : Statuts et Options #}
-        <div class="field-group mb-20 border-top-dashed">
-            <div class="field">
-                <label class="checkbox-container">
-                    <input type="checkbox" name="is_available" value="1" checked>
-                    <span class="checkmark"></span>
-                    Rendre cette ligne immédiatement active et disponible à la planification
-                </label>
-            </div>
-        </div>
+			{# Segment 3 : Statuts et Options #}
+			<div class="field-group mb-20 border-top-dashed">
+				<div class="field">
+					<label class="checkbox-container">
+						<input type="checkbox" name="is_available" value="1" checked>
+						<span class="checkmark"></span>
+						Rendre cette ligne immédiatement active et disponible à la planification
+					</label>
+				</div>
+			</div>
 
-        {# Barre d'actions finale #}
-        <div class="field-group field-group--actions mb-20">
-            <a href="{{ path('admin_agency_line_index') }}" class="btn btn-dark"> Annuler </a>
-            <button type="submit" class="btn btn-success">
-                <i class="fa-solid fa-floppy-disk"></i> Enregistrer l'itinéraire
-            </button>
-        </div>
+			{# Barre d'actions finale #}
+			<div class="field-group field-group--actions mb-20">
+				<a href="{{ path('admin_agency_line_index') }}" class="btn btn-dark">
+					Annuler
+				</a>
+				<button type="submit" class="btn btn-success">
+					<i class="fa-solid fa-floppy-disk"></i>
+					Enregistrer l'itinéraire
+				</button>
+			</div>
 
-        {{ form_end(form) }}
+			{{ form_end(form) }}
 
-    </div>
-</div>
+		</div>
+	</div>
 
-{# GABARIT HTML INVISIBLE : MODÈLE CLONÉ EN JAVASCRIPT (SANS CRASH TWIG) #}
-<template id="stop-template">
-    <div class="stop-row-card intermediate-stop">
-        <div class="stop-order-indicator">X</div>
-        <div class="stop-fields-grid">
-            <div class="field">
-                <label class="text-size-11">Ville Escale</label>
-                <input type="text" name="stops[INDEX][city]" class="admin-bus-layout-add-input" placeholder="Ex: Kenge"
-                    required>
-            </div>
-            <div class="field">
-                <label class="text-size-11">Pays Escale</label>
-                <select name="stops[INDEX][country]" class="admin-bus-layout-add-select" required>
-                    <option value="CD" selected>République Démocratique du Congo</option>
-                    <option value="CG">Congo-Brazzaville</option>
-                    <option value="AO">Angola</option>
-                </select>
-            </div>
-            <div class="field">
-                <label class="text-size-11">Distance (depuis départ)</label>
-                <div class="input-unit-wrapper">
-                    <input type="number" name="stops[INDEX][distance]" class="admin-bus-layout-add-input"
-                        placeholder="Ex: 260" required>
-                    <span class="unit-label">Km</span>
-                </div>
-            </div>
-        </div>
-        <div class="stop-row-action">
-            <button type="button" class="action-btn-delete remove-stop-btn">
-                <i class="fa-solid fa-trash-can"></i>
-            </button>
-        </div>
-    </div>
-</template>
+	{# GABARIT HTML INVISIBLE : MODÈLE CLONÉ EN JAVASCRIPT (SANS CRASH TWIG) #}
+	<template id="stop-template">
+		<div class="stop-row-card intermediate-stop">
+			<div class="stop-order-indicator">X</div>
+			<div class="stop-fields-grid">
+				<div class="field">
+					<label class="text-size-11">Ville Escale</label>
+					<input type="text" name="stops[INDEX][city]" class="admin-bus-layout-add-input" placeholder="Ex: Kenge" required>
+				</div>
+				<div class="field">
+					<label class="text-size-11">Pays Escale</label>
+					<select name="stops[INDEX][country]" class="admin-bus-layout-add-select" required>
+						<option value="CD" selected>République Démocratique du Congo</option>
+						<option value="CG">Congo-Brazzaville</option>
+						<option value="AO">Angola</option>
+					</select>
+				</div>
+				<div class="field">
+					<label class="text-size-11">Distance (depuis départ)</label>
+					<div class="input-unit-wrapper">
+						<input type="number" name="stops[INDEX][distance]" class="admin-bus-layout-add-input" placeholder="Ex: 260" required>
+						<span class="unit-label">Km</span>
+					</div>
+				</div>
+			</div>
+			<div class="stop-row-action">
+				<button type="button" class="action-btn-delete remove-stop-btn">
+					<i class="fa-solid fa-trash-can"></i>
+				</button>
+			</div>
+		</div>
+	</template>
 {% endblock %}

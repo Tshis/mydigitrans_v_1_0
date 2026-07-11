@@ -52,11 +52,11 @@
 </a>
 
 {# NOUVEAU : Grille tarifaire (MCD table 17) #}
-<a href="#" class="menu-link {{ page is same as('fare') ? 'active' : '' }}" data-tooltip="Grille Tarifaire">
+<a href="{{path('admin_agency_fare_add')}}" class="menu-link {{ page is same as('fare') ? 'active' : '' }}" data-tooltip="Grille Tarifaire">
 	<span class="icon">
 		<i class="fa-solid fa-tags"></i>
 	</span>
-	<span class="text">Tarifs</span>
+	<span class="text">Ajouter tarifs</span>
 </a>
 
 <a href="{{path('admin_agency_bus_index')}}" class="menu-link {{ page is same as('bus') ? 'active' : '' }}" data-tooltip="Flotte de Bus">

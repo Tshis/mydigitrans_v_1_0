@@ -1,0 +1,199 @@
+{# templates/admin/agency/fare/new.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ importmap('app') }}
+
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+const routeSelect = document.getElementById('fare-route-select');
+const segmentsBody = document.getElementById('fare-segments-body');
+
+// Dictionnaire de simulation des segments selon la ligne choisie
+const routesData = {
+"1": [
+{
+id: "1_2",
+from: "Kinshasa",
+to: "Kenge",
+desc: "Segment initial (Arrêt 1 → 2)",
+placeholder: "15000"
+}, {
+id: "1_3",
+from: "Kinshasa",
+to: "Kikwit",
+desc: "Ligne complète (Arrêt 1 → 3)",
+placeholder: "40000"
+}, {
+id: "2_3",
+from: "Kenge",
+to: "Kikwit",
+desc: "Fin de parcours (Arrêt 2 → 3)",
+placeholder: "25000"
+}
+],
+"2": [
+{
+id: "4_5",
+from: "Kinshasa",
+to: "Matadi",
+desc: "Ligne directe (Arrêt 1 → 2)",
+placeholder: "25000"
+}
+]
+};
+
+// Fonction pour générer dynamiquement les lignes du tableau
+function renderSegments(routeId) {
+segmentsBody.innerHTML = '';
+const segments = routesData[routeId];
+
+if (! segments) {
+segmentsBody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: #4b5563; padding: 20px;">Aucun segment disponible pour cette ligne.</td></tr>`;
+return;
+}
+
+segments.forEach(segment => {
+const row = document.createElement('tr');
+row.innerHTML = `
+						<td style="padding: 12px 10px;">
+							<strong>${
+segment.from
+}</strong> 
+							<i class="fa-solid fa-arrow-right-long text-muted" style="margin-inline: 8px;"></i> 
+							<strong>${
+segment.to
+}</strong>
+							<span class="text-muted" style="font-size: 11px; display: block; margin-top: 2px;">${
+segment.desc
+}</span>
+						</td>
+						<td style="padding: 6px 10px;">
+							<div class="input-unit-wrapper">
+								<input type="number" name="fares[${
+segment.id
+}]" class="admin-bus-layout-add-input" placeholder="Ex: ${
+segment.placeholder
+}" min="0" required>
+							</div>
+						</td>
+					`;
+segmentsBody.appendChild(row);
+});
+}
+
+// Écouteur sur le changement de ligne
+routeSelect.addEventListener('change', (e) => {
+renderSegments(e.target.value);
+});
+
+// Initialisation au chargement de la page
+if (routeSelect.value) {
+renderSegments(routeSelect.value);
+}
+});
+	</script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-agency-lines-add-scope">
+		{# --- EN-TÊTE --- #}
+		<header class="header">
+			<div class="text">
+				<h2 class="admin-bus-layout-add-title">Ajouter une Grille Tarifaire</h2>
+				<p class="admin-bus-layout-add-subtitle">Définissez simultanément les prix de tous les segments générés par
+																																							vos escales.</p>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE DE CRÉATION --- #}
+		<div class="form-line-add-container">
+
+			<div class="text">
+				<h2 class="card-inner-title">
+					<i class="fa-solid fa-tags"></i>
+					Configuration de la Tarification
+				</h2>
+				<p class="card-inner-subtitle">Saisissez les montants pour chaque portion de la ligne commerciale
+																																							sélectionnée.</p>
+			</div>
+
+			<form
+				action="#" method="POST">
+
+				{# Segment 1 : Sélection de la Ligne globale #}
+				<div class="field-group mb-20">
+					<div class="field" style="grid-column: span 2;">
+						<label class="admin-bus-layout-add-label">Ligne Commerciale Concernée
+							<span class="text-danger">*</span>
+						</label>
+
+
+						<select name="fare_route" class="admin-bus-layout-add-select" id="fare-route-select" required>
+							<option value="1" {{ slug is same as('kinshasa-matadi-direct') ? '' : 'selected'}}>Kinshasa - Kikwit via Kenge</option>
+							<option value="2" {{ slug is same as('kinshasa-matadi-direct') ? 'selected' : ''}}>Kinshasa - Matadi (Direct)</option>
+						</select>
+					</div>
+				</div>
+
+				{# Segment 2 : Configuration Globale des Catégories #}
+				<div class="field-group mb-20 border-top-dashed">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Type de Tarif / Catégorie de Siège
+							<span class="text-danger">*</span>
+						</label>
+						<select name="fare_type" class="admin-bus-layout-add-select" required>
+							<option value="standard" selected>Siège Standard</option>
+							<option value="vip">Siège VIP</option>
+							<option value="child">Tarif Enfant</option>
+							<option value="shipment">Colis / Bagage (Kilo de base)</option>
+						</select>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Devise de Facturation
+							<span class="text-danger">*</span>
+						</label>
+						<select name="currency" class="admin-bus-layout-add-select" required>
+							<option value="CDF" selected>Franc Congolais (CDF)</option>
+							<option value="USD">Dollar Américain (USD)</option>
+						</select>
+					</div>
+				</div>
+
+				{# Segment 3 : Tableau des Segments Physiques (Injecté via JS) #}
+				<div class="field-group mb-20 border-top-dashed" style="display: block;">
+					<label class="admin-bus-layout-add-label mb-10" style="display: block;">Montants par Segment de
+																																															Voyage</label>
+
+					<table class="table" style="width: 100%; border-collapse: collapse;">
+						<thead>
+							<tr style="text-align: left;">
+								<th style="padding: 10px; border-bottom: 1px solid #edf2f7;">Section de parcours</th>
+								<th style="padding: 10px; border-bottom: 1px solid #edf2f7; width: 250px;">Tarif appliqué
+								</th>
+							</tr>
+						</thead>
+						<tbody
+							id="fare-segments-body">{# Rempli dynamiquement par le script JavaScript #}
+						</tbody>
+					</table>
+				</div>
+
+				{# Barre d'actions finale #}
+				<div class="field-group field-group--actions mb-20 border-top-dashed">
+					<a href="#" class="btn btn-dark">
+						Annuler
+					</a>
+					<button type="submit" class="btn btn-success">
+						<i class="fa-solid fa-floppy-disk"></i>
+						Enregistrer la grille
+					</button>
+				</div>
+
+			</form>
+
+		</div>
+	</div>
+{% endblock %}
