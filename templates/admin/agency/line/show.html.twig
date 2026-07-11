@@ -1,0 +1,176 @@
+{# templates/admin/agency/route/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div class="admin-agency-line-show-scope container">
+
+    {# --- EN-TÊTE DE NAVIGATION --- #}
+    <header class="header mb-25">
+        <div class="text">
+            <a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <h2>{{ route_name|default('Kinshasa - Kikwit via Kenge') }}</h2>
+                <div class="mt-5 d-flex align-center gap-10">
+                    <span
+                        class="badge badge-success px-5 py-2 text-white text-size-11 border-radius-5">Opérationnelle</span>
+                    <span class="text-gray text-size-13">Axe routier principal</span>
+                </div>
+            </div>
+        </div>
+
+        {# Actions de sécurité : Suspendre au lieu de modifier l'itinéraire #}
+        <div class="admin-action-zone">
+            <button type="button" class="btn btn-danger text-size-12" onclick="confirmSuspension()">
+                <i class="fa-solid fa-ban"></i>
+                Suspendre la ligne (Archiver)
+            </button>
+        </div>
+    </header>
+
+    {# --- GRILLE PRINCIPALE (DASHBOARD DE LA LIGNE) --- #}
+    <div class="show-grid-container">
+
+        {# --- COLONNE GAUCHE (1/3) : LA FRISE CHRONOLOGIQUE DES ARRÊTS --- #}
+        <div class="col-span-1">
+            <div class="card">
+
+                <div class="card-header mb-15">
+                    <h3>
+                        <i class="fa-solid fa-map-marked-alt text-primary"></i>
+                        Itinéraire & Escales
+                    </h3>
+                    <p class="text-gray text-size-12 mt-5">Ordre de passage physique des véhicules.</p>
+                </div>
+
+                <div class="route-timeline-vertical">
+
+                    {# ARRÊT 1 : DÉPART #}
+                    <div class="timeline-step timeline-step--start">
+                        <div class="step-marker">1</div>
+                        <div class="step-content">
+                            <strong class="text-dark">Kinshasa</strong>
+                            <span class="text-gray text-size-12 d-block">Point d'origine (RDC)</span>
+                            <span class="badge badge-ligh distance mt-5">0 Km · Terminus de départ</span>
+                        </div>
+                    </div>
+
+                    {# ARRÊT 2 : ESCALE #}
+                    <div class="timeline-step">
+                        <div class="step-marker">2</div>
+                        <div class="step-content">
+                            <strong class="text-dark">Kenge</strong>
+                            <span class="text-gray text-size-12 d-block">Ville Escale (RDC)</span>
+                            <span class="badge badge-primary-ligh distance mt-5">+ 260 Km (depuis le départ)</span>
+                        </div>
+                    </div>
+
+                    {# ARRÊT 3 : TERMINUS #}
+                    <div class="timeline-step timeline-step--end">
+                        <div class="step-marker">3</div>
+                        <div class="step-content">
+                            <strong class="text-dark">Kikwit</strong>
+                            <span class="text-gray text-size-12 d-block">Terminus d'arrivée (RDC)</span>
+                            <span class="badge badge-success-ligh distance mt-5">520 Km au total</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {# --- COLONNE DROITE (2/3) : TARIFS SEGMENTÉS ET STATISTIQUES --- #}
+        <div class="col-span-2">
+            {# BLOC B : LA GRILLE TARIFAIRE CONFIGURÉE (MCD TABLE 17. FARE) #}
+            <div class="card">
+                <div class="card-header d-flex justify-between align-center mb-15">
+                    <div>
+                        <h3>
+                            <i class="fa-solid fa-tags text-success"></i>
+                            Grille Tarifaire par Segment
+                        </h3>
+                        <p class="text-gray text-size-12 mt-5">Prix appliqués selon la gare de montée et de descente du
+                            passager.</p>
+                    </div>
+                    <a href="#" class="btn btn-primary text-size-11">
+                        <i class="fa-solid fa-plus"></i>
+                        Ajuster les tarifs
+                    </a>
+                </div>
+
+                <table class="table table-stripped">
+                    <thead>
+                        <tr>
+                            <th>Gare de Montée (Départ)</th>
+                            <th>Gare de Descente (Arrivée)</th>
+                            <th>Type de Siège</th>
+                            <th class="text-right">Tarif Actuel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Kinshasa</strong>
+                                (Arrêt 1)
+                            </td>
+                            <td>
+                                <strong>Kenge</strong>
+                                (Arrêt 2)
+                            </td>
+                            <td>
+                                <span class="text-gray">Standard</span>
+                            </td>
+                            <td class="text-right">
+                                <strong>15 000 CDF</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Kinshasa</strong>
+                                (Arrêt 1)
+                            </td>
+                            <td>
+                                <strong>Kikwit</strong>
+                                (Arrêt 3)
+                            </td>
+                            <td>
+                                <span class="text-gray">Standard</span>
+                            </td>
+                            <td class="text-right">
+                                <strong class="text-primary">40 000 CDF</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Kenge</strong>
+                                (Arrêt 2)
+                            </td>
+                            <td>
+                                <strong>Kikwit</strong>
+                                (Arrêt 3)
+                            </td>
+                            <td>
+                                <span class="text-gray">Standard</span>
+                            </td>
+                            <td class="text-right">
+                                <strong>25 000 CDF</strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function confirmSuspension() {
+        if (confirm("Attention : Suspendre cette ligne empêchera toute nouvelle planification de voyage sur cet itinéraire. Les voyages déjà programmés et l'historique financier resteront intacts. Voulez-vous continuer ?")) { // Logique de redirection ou soumission de formulaire pour passer isAvailable à false
+            alert("Ligne suspendue avec succès.");
+        }
+    }
+</script>
+{% endblock %}

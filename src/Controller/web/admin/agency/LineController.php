@@ -18,7 +18,7 @@ class LineController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/add', name: 'admin_agency_line_add')]
+    #[Route('/admin/agency/line/add', name: 'admin_agency_line_add')]
     public function add(Request $request): Response
     {
         // 1. Création du formulaire à la volée (sans entité)
@@ -42,6 +42,16 @@ class LineController extends AbstractController
         return $this->render('admin/agency/line/add.html.twig', [
             'page' => 'line',
             'form' => $form->createView(),
+        ]);
+    } //add
+
+    #[Route('/admin/agency/line/{slug}/details', name: 'admin_agency_line_show')]
+    public function show(): Response
+    {
+
+
+        return $this->render('admin/agency/line/show.html.twig', [
+            'page' => 'line',
         ]);
     } //add
 }
