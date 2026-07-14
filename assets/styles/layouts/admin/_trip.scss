@@ -1,0 +1,239 @@
+//=== TRIP MODULE (INDEX & SHOW) ===
+@use '../../abstract/variables' as *;
+
+// Global Utilitaires pour les sous-textes des tables
+.sub-meta-text {
+    display: block;
+    font-size: 11px;
+    color: $gray;
+    margin-top: 2px;
+}
+
+.table-container-responsive {
+    width: 100%;
+    overflow-x: auto; // Force l'apparition d'une barre de défilement horizontale propre sur petit écran
+    -webkit-overflow-scrolling: touch;
+}
+
+// --- CARTE DES FILTRES DE L'INDEX ---
+.trip-filters-card {
+    background: $white;
+    border: 1px solid $mute;
+    border-radius: $radius-card;
+    padding: 1.25rem;
+
+    .field-group {
+        display: flex;
+        flex-wrap: wrap; // Permet aux champs de s'empiler sur mobile
+        gap: 1rem;
+        align-items: flex-end;
+        width: 100%;
+
+        .field {
+            flex: 1;
+            min-width: 200px; // Empêche l'écrasement des inputs
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .field-actions {
+            flex: 0;
+            min-width: auto;
+
+            .btn-reset {
+                white-space: nowrap;
+                height: 38px;
+                padding-inline: 15px;
+                background: $gray;
+                color: $white;
+                border: none;
+                border-radius: $radius-input;
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+// --- BADGES DE STATUT SPÉCIFIQUES ---
+.badge-warning-status {
+    background-color: $primary;
+    color: $white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-status-confirmed {
+    background-color: $success;
+    color: $white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-status-pending {
+    background-color: rgba($primary, 0.15);
+    color: $primary;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+// ==========================================
+// === STRUCTURE DE LA PAGE DETAIL (SHOW) ===
+// ==========================================
+.admin-agency-trip-show-scope {
+    padding-block: 1.5rem;
+
+    .header {
+        display: flex;
+        flex-wrap: wrap; // Évite les collisions d'en-tête sur mobile
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+
+        .header-main-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sub-header-flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-print-manifest {
+            background: $success;
+            color: $white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: $radius-input;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    }
+
+    // --- BARRE DU WORKFLOW DE STATUT ---
+    .trip-workflow-card {
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        padding: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+
+        .workflow-steps-indicator {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+
+            .step-badge {
+                font-size: 11px;
+                padding: 4px 8px;
+                border-radius: 4px;
+                background: rgba($gray, 0.1);
+                color: $gray;
+
+                &--passed {
+                    background: rgba($success, 0.1);
+                    color: $success;
+                }
+
+                &--active {
+                    background: $primary;
+                    color: $white;
+                    font-weight: bold;
+                }
+            }
+
+            .arrow-divider {
+                font-size: 10px;
+                color: $gray;
+                opacity: 0.5;
+            }
+        }
+
+        .workflow-actions-buttons {
+            display: flex;
+            gap: 8px;
+
+            .btn { border: none; border-radius: $radius-input; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+            .btn-success-action { @extend .btn; background: $primary; color: $white; }
+            .btn-danger-action { @extend .btn; background: $danger; color: $white; }
+        }
+    }
+
+    // --- GRILLE EN DOUBLE COLONNE DU DASHBOARD ---
+    .trip-dashboard-layout {
+        display: grid;
+        grid-template-columns: 1fr; // Par défaut sur 1 seule colonne (Mobile First)
+        gap: 1.5rem;
+
+        // Devient un layout à deux colonnes asymétriques à partir des tablettes et ordinateurs
+        @media (min-width: 992px) {
+            grid-template-columns: 1fr 2fr;
+        }
+
+        .card-inner-box {
+            background: $white;
+            border: 1px solid $mute;
+            border-radius: $radius-card;
+            padding: 1.25rem;
+            height: 100%;
+
+            .box-title {
+                color: $dark;
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+
+        // Sidebar : Fiche technique
+        .layout-sidebar-card {
+            .info-section-row {
+                margin-bottom: 12px;
+
+                .section-micro-label {
+                    font-size: 10px;
+                    font-weight: 700;
+                    color: $gray;
+                    letter-spacing: 0.5px;
+                    display: block;
+                    margin-bottom: 4px;
+                }
+
+                .info-text {
+                    font-size: 13px;
+                    margin-block: 3px;
+                    color: $black;
+                }
+
+                &.bordered-divider {
+                    border-top: 1px dashed $mute;
+                    padding-top: 12px;
+                }
+            }
+        }
+
+        // Main Content : Tableau Manifeste
+        .layout-main-card {
+            width: 100%;
+            overflow: hidden; // Sécurise la grille de la table
+        }
+    }
+}
