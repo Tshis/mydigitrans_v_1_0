@@ -1,0 +1,179 @@
+{# templates/admin/agency/trip/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-agency-line-show-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header mb-25">
+			<div class="d-flex align-center gap-15">
+				<a href="{{path('admin_agency_trip_index')}}" class="agency-back-action" title="Retour à la liste">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h2>Voyage N° TRP-2026-0042</h2>
+					<div class="mt-5 d-flex align-center gap-10">
+						<span class="badge badge-success px-5 py-2 text-white text-size-11 border-radius-5" style="background-color: #ef6e17;">Embarquement en cours</span>
+						<span class="text-muted text-size-13">Ligne : Kinshasa - Kikwit via Kenge</span>
+					</div>
+				</div>
+			</div>
+			<div class="admin-action-zone">
+				<button type="button" class="btn btn-success text-size-12" style="background-color: #1684c5;">
+					<i class="fa-solid fa-print"></i>
+					Imprimer le Manifeste de Bord
+				</button>
+			</div>
+		</header>
+
+		<!-- BARRE DE PILOTAGE DU STATUT DU VOYAGE -->
+		<div
+			class="field-group mb-20" style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #afd3e7;">
+
+			<!-- Affichage de l'état actuel -->
+			<div style="display: flex; align-items: center; gap: 10px;">
+				<span class="text-muted" style="font-size: 13px; font-weight: 600;">ÉTAPES DU VOYAGE :</span>
+				<div style="display: flex; gap: 5px; align-items: center;">
+					<span class="badge" style="background-color: #1684c5; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; opacity: 0.5;">1. Planifié</span>
+					<i class="fa-solid fa-chevron-right text-muted" style="font-size: 10px;"></i>
+					<span class="badge" style="background-color: #ef6e17; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">2. Embarquement</span>
+					<i class="fa-solid fa-chevron-right text-muted" style="font-size: 10px;"></i>
+					<span class="badge" style="background-color: #4b5563; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; opacity: 0.3;">3. En Route</span>
+					<i class="fa-solid fa-chevron-right text-muted" style="font-size: 10px;"></i>
+					<span class="badge" style="background-color: #4b5563; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; opacity: 0.3;">4. Arrivé</span>
+				</div>
+			</div>
+
+			<!-- Boutons d'actions pour changer le statut -->
+			<div
+				style="display: flex; gap: 10px;">
+				<!-- Bouton visible si le voyage est en embarquement pour passer à 'En Route' -->
+				<button type="button" class="btn btn-success" style="background-color: #ef6e17; white-space: nowrap;" onclick="changeTripStatus('on_route')">
+					<i class="fa-solid fa-circle-play"></i>
+					Clôturer l'embarquement & Faire partir le bus
+				</button>
+
+				<!-- Bouton d'annulation d'urgence -->
+				<button type="button" class="btn btn-dark" style="background-color: #d94516; white-space: nowrap;" onclick="changeTripStatus('cancelled')">
+					<i class="fa-solid fa-rectangle-xmark"></i>
+					Annuler le voyage
+				</button>
+			</div>
+		</div>
+
+
+		{# --- CONTENU EN DEUX COLONNES --- #}
+		<div
+			class="grid grid-cols-3 gap-20">
+
+			{# COLONNE GAUCHE (1/3) : LOGISTIQUE ET FICHE TECHNIQUE #}
+			<div class="col-span-1">
+				<div class="card" style="background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #afd3e7;">
+					<h3 class="mb-15" style="color: #0c326d;">
+						<i class="fa-solid fa-circle-info"></i>
+						Détails Logistiques</h3>
+
+					<div style="margin-bottom: 15px;">
+						<label class="text-muted" style="font-size: 12px; font-weight: 600;">PLANIFICATION HORAIRE</label>
+						<p style="margin-top: 5px;">
+							<strong>Départ :</strong>
+							14/07/2026 à 14h30</p>
+						<p>
+							<strong>Arrivée estimée :</strong>
+							14/07/2026 à 22h30</p>
+					</div>
+
+					<div style="margin-bottom: 15px; border-top: 1px dashed #afd3e7; padding-top: 15px;">
+						<label class="text-muted" style="font-size: 12px; font-weight: 600;">AFFECTATION MATÉRIELLE</label>
+						<p style="margin-top: 5px;">
+							<strong>Bus :</strong>
+							N°01 (Mercedes Marcopolo)</p>
+						<p>
+							<strong>Capacité :</strong>
+							54 Sièges configurés</p>
+					</div>
+
+					<div style="margin-bottom: 5px; border-top: 1px dashed #afd3e7; padding-top: 15px;">
+						<label class="text-muted" style="font-size: 12px; font-weight: 600;">ÉQUIPAGE EN MISSION</label>
+						<p style="margin-top: 5px;">
+							<strong>Chauffeur Principal :</strong>
+							Jean Mukendi</p>
+						<p>
+							<strong>Co-Chauffeur :</strong>
+							Daddy Tshimanga</p>
+					</div>
+				</div>
+			</div>
+
+			{# COLONNE DROITE (2/3) : MANIFESTE DES PASSAGERS (TICKETS EMIS) #}
+			<div class="col-span-2">
+				<div class="card" style="background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #afd3e7;">
+					<div class="mb-15">
+						<h3 style="color: #0c326d;">
+							<i class="fa-solid fa-users"></i>
+							Manifeste des Voyageurs</h3>
+						<p class="text-muted" style="font-size: 12px; margin-top: 4px;">Liste nominative des passagers ayant validé leur embarquement.</p>
+					</div>
+
+					<table class="table" style="width: 100%; border-collapse: collapse;">
+						<thead>
+							<tr style="text-align: left; border-bottom: 1px solid #afd3e7;">
+								<th style="padding: 10px;">N° Siège</th>
+								<th style="padding: 10px;">Nom complet du passager</th>
+								<th style="padding: 10px;">Segment (Trajet)</th>
+								<th style="padding: 10px;">Téléphone</th>
+								<th style="padding: 10px; text-right">Statut</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td style="padding: 12px 10px;">
+									<strong>01</strong>
+									<span class="text-muted">(VIP)</span>
+								</td>
+								<td style="padding: 12px 10px;">
+									<strong>Kabila Dieudonné</strong>
+								</td>
+								<td style="padding: 12px 10px;">Kinshasa → Kikwit</td>
+								<td style="padding: 12px 10px;">+243 812 345 678</td>
+								<td style="padding: 12px 10px; text-align: right;">
+									<span class="badge" style="background-color: #1684c5; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Confirmé</span>
+								</td>
+							</tr>
+							<tr>
+								<td style="padding: 12px 10px;">
+									<strong>02</strong>
+									<span class="text-muted">(VIP)</span>
+								</td>
+								<td style="padding: 12px 10px;">
+									<strong>Mputu Antoinette</strong>
+								</td>
+								<td style="padding: 12px 10px;">Kinshasa → Kenge</td>
+								<td style="padding: 12px 10px;">+243 897 112 233</td>
+								<td style="padding: 12px 10px; text-align: right;">
+									<span class="badge" style="background-color: #1684c5; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Confirmé</span>
+								</td>
+							</tr>
+							<tr>
+								<td style="padding: 12px 10px;">
+									<strong>03</strong>
+									<span class="text-muted">(Std)</span>
+								</td>
+								<td style="padding: 12px 10px;">
+									<strong>Ilunga Christian</strong>
+								</td>
+								<td style="padding: 12px 10px;">Kenge → Kikwit</td>
+								<td style="padding: 12px 10px;">+243 824 556 677</td>
+								<td style="padding: 12px 10px; text-align: right;">
+									<span class="badge" style="background-color: #ef6e17; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Réservé</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}

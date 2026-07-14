@@ -1,0 +1,203 @@
+{# templates/admin/agency/trip/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/table-responsive.js" defer></script>
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-lines-wrapper container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-20">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-calendar-days"></i>
+					Gestion des Voyages / Départs
+				</h2>
+				<p>Planifiez les occurrences de départs, suivez les embarquements et archivez les trajets passés.</p>
+			</div>
+			<div class="admin-bus-layout-add-action-zone">
+				<a href="{{path('admin_agency_trip_add')}}" class="btn btn-success text-size-12">
+					<i class="fa-solid fa-plus"></i>
+					Planifier un voyage
+				</a>
+			</div>
+		</header>
+
+		{# --- CARTES DE STATISTIQUES --- #}
+		<div class="stats-overview-grid">
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-clock"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Voyages Planifiés</span>
+					<strong class="stat-value">5</strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-bus"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">En cours / Embarquement</span>
+					<strong class="stat-value">1</strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--danger">
+					<i class="fa-solid fa-circle-check"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Voyages Terminés</span>
+					<strong class="stat-value">124</strong>
+				</div>
+			</div>
+		</div>
+
+		<!-- FILTRES DE RECHERCHE AVANCÉE (À placer juste au-dessus du tableau) -->
+		<div
+			class="field-group mb-20" style="display: flex; gap: 15px; align-items: flex-end; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #afd3e7;">
+
+			<!-- Filtre Date Spécifique -->
+			<div class="field" style="flex: 1;">
+				<label class="admin-bus-layout-add-label" style="font-size: 12px; font-weight: 600; margin-bottom: 5px;">Rechercher par date exacte</label>
+				<input type="date" id="filter-trip-date" class="admin-bus-layout-add-input">
+			</div>
+
+			<!-- Filtre Statut Opérationnel -->
+			<div class="field" style="flex: 1;">
+				<label class="admin-bus-layout-add-label" style="font-size: 12px; font-weight: 600; margin-bottom: 5px;">Filtrer par état</label>
+				<select id="filter-trip-status" class="admin-bus-layout-add-select">
+					<option value="">-- Tous les états --</option>
+					<option value="scheduled">Planifiés (Futurs)</option>
+					<option value="boarding">En Embarquement</option>
+					<option value="completed">Terminés (Passés)</option>
+				</select>
+			</div>
+
+			<!-- Bouton de réinitialisation -->
+			<div style="flex: 0;">
+				<button type="button" class="btn btn-dark" id="reset-filters" style="white-space: nowrap; height: 38px;">
+					<i class="fa-solid fa-rotate-left"></i>
+					Réinitialiser
+				</button>
+			</div>
+		</div>
+
+
+		{# --- TABLEAU DES VOYAGES --- #}
+		<div class="card">
+			<table class="table table-responsive table-stripped js-datatable">
+				<thead>
+					<tr>
+						<th>Date & Heure Départ</th>
+						<th>Ligne / Itinéraire</th>
+						<th>Véhicule & Équipage</th>
+						<th>Remplissage</th>
+						<th>Statut</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{# Exemple 1 : Voyage en cours d'embarquement #}
+					<tr>
+						<td>
+							<strong>14/07/2026</strong>
+							<span class="text-muted" style="display: block; font-size: 11px;">À 14h30</span>
+						</td>
+						<td>
+							<strong>Kinshasa → Kikwit</strong>
+							<span class="text-muted" style="display: block; font-size: 11px;">via Kenge</span>
+						</td>
+						<td>
+							<strong>Bus 01</strong>
+							(Marcolopo)
+							<span class="text-muted" style="display: block; font-size: 11px;">Chauffeur : Jean Mukendi</span>
+						</td>
+						<td>
+							<strong>42 / 54</strong>
+							places
+							<span class="text-muted" style="display: block; font-size: 11px;">(77%)</span>
+						</td>
+						<td>
+							<span class="badge badge-success px-5 py-2 text-white border-radius-5" style="background-color: #ef6e17;">Embarquement</span>
+						</td>
+						<td class="actions">
+							<a href="{{path('admin_agency_trip_show',{'code':'trip-03-26-0001-01'})}}" class="table-action-trigger" title="Détails / Liste des passagers">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+
+					{# Exemple 2 : Voyage planifié futur #}
+					<tr>
+						<td>
+							<strong>15/07/2026</strong>
+							<span class="text-muted" style="display: block; font-size: 11px;">À 07h00</span>
+						</td>
+						<td>
+							<strong>Kinshasa → Matadi</strong>
+							<span class="text-muted" style="display: block; font-size: 11px;">Direct</span>
+						</td>
+						<td>
+							<strong>Bus 02</strong>
+							(Coaster)
+							<span class="text-muted" style="display: block; font-size: 11px;">Chauffeur : Alain Kabeya</span>
+						</td>
+						<td>
+							<strong>12 / 30</strong>
+							places
+							<span class="text-muted" style="display: block; font-size: 11px;">(40%)</span>
+						</td>
+						<td>
+							<span class="badge badge-success px-5 py-2 text-white border-radius-5">Planifié</span>
+						</td>
+						<td class="actions">
+							<a href="#" class="table-action-trigger" title="Détails">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+
+					{# Exemple 3 : Voyage Passé / Terminé #}
+					<tr>
+						<td>
+							<strong>12/07/2026</strong>
+							<span class="text-muted" style="display: block; font-size: 11px;">À 08h00</span>
+						</td>
+						<td>
+							<strong>Kinshasa → Kikwit</strong>
+							<span class="text-muted" style="display: block; font-size: 11px;">via Kenge</span>
+						</td>
+						<td>
+							<strong>Bus 01</strong>
+							(Marcolopo)
+							<span class="text-muted" style="display: block; font-size: 11px;">Chauffeur : Jean Mukendi</span>
+						</td>
+						<td>
+							<strong>54 / 54</strong>
+							places
+							<span class="text-muted" style="display: block; font-size: 11px;">(100%)</span>
+						</td>
+						<td>
+							<span class="badge badge-danger px-5 py-2 text-white border-radius-5" style="background-color: #4b5563;">Terminé</span>
+						</td>
+						<td class="actions">
+							<a href="#" class="table-action-trigger" title="Détails">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}

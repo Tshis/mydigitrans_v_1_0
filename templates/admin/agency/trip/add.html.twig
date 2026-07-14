@@ -1,0 +1,134 @@
+{# templates/admin/agency/trip/new.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-agency-lines-add-scope">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header">
+			<a href="{{path('admin_agency_trip_index')}}" class="agency-back-action" title="Retour à la liste">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="text">
+				<h2 class="admin-bus-layout-add-title">Planifier un nouveau Voyage</h2>
+				<p class="admin-bus-layout-add-subtitle">Ouvrez une occurrence de voyage, assignez un véhicule et son équipage.</p>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE DE CRÉATION --- #}
+		<div class="form-line-add-container">
+
+			<div class="text">
+				<h2 class="card-inner-title">
+					<i class="fa-solid fa-calendar-days"></i>
+					Paramètres du Voyage (Trip)
+				</h2>
+				<p class="card-inner-subtitle">Renseignez les horaires et affectez le personnel de route pour ce départ.</p>
+			</div>
+
+			<form
+				action="#" method="POST">
+
+				{# Segment 1 : Ligne & Bus #}
+				<div class="field-group mb-20">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Ligne / Itinéraire
+							<span class="text-danger">*</span>
+						</label>
+						<select name="trip_route" class="admin-bus-layout-add-select" required>
+							<option value="" disabled selected>-- Choisir l'itinéraire --</option>
+							<option value="1">Kinshasa - Kikwit via Kenge</option>
+							<option value="2">Kinshasa - Matadi (Direct)</option>
+						</select>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Bus Assigné
+							<span class="text-danger">*</span>
+						</label>
+						<select name="trip_bus" class="admin-bus-layout-add-select" required>
+							<option value="" disabled selected>-- Choisir le véhicule --</option>
+							<option value="1">Bus 01 - Mercedes MarcoPolo (54 places)</option>
+							<option value="2">Bus 02 - Toyota Coaster (30 places)</option>
+						</select>
+					</div>
+				</div>
+
+				{# Segment 2 : Équipage (Chauffeurs issus de la table User du MCD) #}
+				<div class="field-group mb-20 border-top-dashed">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Chauffeur Principal
+							<span class="text-danger">*</span>
+						</label>
+						<select name="trip_driver" class="admin-bus-layout-add-select" required>
+							<option value="" disabled selected>-- Sélectionner le chauffeur --</option>
+							<option value="10">Jean Mukendi</option>
+							<option value="11">Alain Kabeya</option>
+						</select>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Co-Chauffeur / Convoyeur</label>
+						<select name="trip_co_driver" class="admin-bus-layout-add-select">
+							<option value="" selected>-- Aucun (Optionnel) --</option>
+							<option value="12">Daddy Tshimanga</option>
+							<option value="13">Patrick Mwamba</option>
+						</select>
+					</div>
+				</div>
+
+				{# Segment 3 : Planification Horaires #}
+				<div class="field-group mb-20 border-top-dashed">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Date de Départ
+							<span class="text-danger">*</span>
+						</label>
+						<input type="date" name="departure_date" class="admin-bus-layout-add-input" required>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Heure de Départ
+							<span class="text-danger">*</span>
+						</label>
+						<input type="time" name="departure_time" class="admin-bus-layout-add-input" required>
+					</div>
+				</div>
+
+				<div class="field-group mb-20">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Date d'Arrivée Estimée
+							<span class="text-danger">*</span>
+						</label>
+						<input type="date" name="arrival_date" class="admin-bus-layout-add-input" required>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Heure d'Arrivée Estimée
+							<span class="text-danger">*</span>
+						</label>
+						<input type="time" name="arrival_time" class="admin-bus-layout-add-input" required>
+					</div>
+				</div>
+
+				{# Segment 4 : Statut Initial #}
+				<div class="field-group mb-20 border-top-dashed">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Statut du Voyage</label>
+						<select name="trip_status" class="admin-bus-layout-add-select" required>
+							<option value="scheduled" selected>Planifié (Ouvert aux réservations)</option>
+							<option value="boarding">Embarquement en cours</option>
+						</select>
+					</div>
+				</div>
+
+				{# Barre d'actions finale #}
+				<div class="field-group field-group--actions mb-20 border-top-dashed">
+					<a href="#" class="btn btn-dark">Annuler</a>
+					<button type="submit" class="btn btn-success">
+						<i class="fa-solid fa-floppy-disk"></i>
+						Planifier le voyage
+					</button>
+				</div>
+
+			</form>
+
+		</div>
+	</div>
+{% endblock %}
