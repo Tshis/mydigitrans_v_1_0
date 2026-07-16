@@ -1,87 +1,186 @@
 //=== TRIP MODULE (INDEX & SHOW) ===
 @use '../../abstract/variables' as *;
 
-// Global Utilitaires pour les sous-textes des tables
-.sub-meta-text {
-    display: block;
-    font-size: 11px;
-    color: $gray;
-    margin-top: 2px;
-}
 
-.table-container-responsive {
-    width: 100%;
-    overflow-x: auto; // Force l'apparition d'une barre de défilement horizontale propre sur petit écran
-    -webkit-overflow-scrolling: touch;
-}
 
-// --- CARTE DES FILTRES DE L'INDEX ---
-.trip-filters-card {
-    background: $white;
-    border: 1px solid $mute;
-    border-radius: $radius-card;
-    padding: 1.25rem;
+.admin-trip-wrapper{
 
-    .field-group {
+    .header {
         display: flex;
-        flex-wrap: wrap; // Permet aux champs de s'empiler sur mobile
-        gap: 1rem;
-        align-items: flex-end;
-        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        padding-block: 2rem;
+        flex-wrap: wrap;
+        gap: 20px;
 
-        .field {
-            flex: 1;
-            min-width: 200px; // Empêche l'écrasement des inputs
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        .title{
+
+            h2{ font-size: 1.5rem;}
+            p{font-size: 1rem; color: $gray;}
         }
 
-        .field-actions {
-            flex: 0;
-            min-width: auto;
+    }//header
 
-            .btn-reset {
-                white-space: nowrap;
-                height: 38px;
-                padding-inline: 15px;
-                background: $gray;
-                color: $white;
-                border: none;
-                border-radius: $radius-input;
-                cursor: pointer;
+    // --- GRILLE DES CARTES DE STATISTIQUES ---
+    .stats-overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        width: 100%;
+
+        // --- STRUCTURE DE LA CARTE DE STATISTIQUE ---
+        .stat-card {
+            background: $white;
+            border: 1px solid $mute;
+            border-radius: $radius-card;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.006);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03);
+            }
+    
+            // Bloc de l'icône
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.3rem;
+    
+                &--primary {
+                    background: rgba($primary, 0.1);
+                    color: $primary;
+                }
+    
+                &--success {
+                    background: rgba($success, 0.1);
+                    color: $success;
+                }
+    
+                &--danger {
+                    background: rgba($danger, 0.1);
+                    color: $danger;
+                }
+            }
+    
+            // Bloc des données textuelles
+            .stat-details {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+    
+                .stat-label {
+                    font-size: 0.85rem;
+                    color: $gray;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+    
+                .stat-value {
+                    font-size: 1.6rem;
+                    font-weight: 800;
+                    color: $dark;
+                    line-height: 1.2;
+                }
+            }
+        }//stat-card 
+
+    }//stats-overview-grid
+    
+    // Global Utilitaires pour les sous-textes des tables
+    .sub-meta-text {
+        display: block;
+        font-size: 11px;
+        color: $gray;
+        margin-top: 2px;
+    }
+    
+    .table-container-responsive {
+        width: 100%;
+        overflow-x: auto; // Force l'apparition d'une barre de défilement horizontale propre sur petit écran
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    // --- CARTE DES FILTRES DE L'INDEX ---
+    .trip-filters-card {
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        padding: 1.25rem;
+    
+        .field-group {
+            display: flex;
+            flex-wrap: wrap; // Permet aux champs de s'empiler sur mobile
+            gap: 1rem;
+            align-items: flex-end;
+            width: 100%;
+    
+            .field {
+                flex: 1;
+                min-width: 200px; // Empêche l'écrasement des inputs
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+    
+            .field-actions {
+                flex: 0;
+                min-width: auto;
+    
+                .btn-reset {
+                    white-space: nowrap;
+                    height: 38px;
+                    padding-inline: 15px;
+                    background: $gray;
+                    color: $white;
+                    border: none;
+                    border-radius: $radius-input;
+                    cursor: pointer;
+                }
             }
         }
     }
-}
+    
+    // --- BADGES DE STATUT SPÉCIFIQUES ---
+    .badge-warning-status {
+        background-color: $primary;
+        color: $white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    
+    .badge-status-confirmed {
+        background-color: $success;
+        color: $white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    
+    .badge-status-pending {
+        background-color: rgba($primary, 0.15);
+        color: $primary;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    
+}//admin-trip-wrapper
 
-// --- BADGES DE STATUT SPÉCIFIQUES ---
-.badge-warning-status {
-    background-color: $primary;
-    color: $white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.badge-status-confirmed {
-    background-color: $success;
-    color: $white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.badge-status-pending {
-    background-color: rgba($primary, 0.15);
-    color: $primary;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-}
 
 
 // ==========================================
