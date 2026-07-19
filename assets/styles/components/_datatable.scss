@@ -6,10 +6,19 @@
     background: $white;
     border: 1px solid $mute;
     border-radius: $radius-card;
-    overflow: hidden;
     margin-bottom: 2rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.006);
+    
+    // Règle absolue pour le scroll horizontal
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
 }
+
+// Règle globale absolue pour la pagination et la recherche du JS
+tr.is-hidden {
+    display: none !important;
+}
+
 
 // --- BARRE DE RECHERCHE SUPÉRIEURE INJECTÉE ---
 .table-search-bar-zone {
@@ -154,8 +163,25 @@
     }
 }
 
-// --- VERSION EMPILEMENT RESPONSIVE MOBILE ---
+// --- CONFIGURATIONS RESPONSIVES (MÉDIA QUERIES) ---
 @media screen and (max-width: 768px) {
+    
+    // VARIANTE 1 : Mode scrollable horizontal (Nouveau)
+    .table.table-scrollable {
+        display: table !important; /* Maintient l'affichage en tableau natif */
+        width: 100% !important;
+        min-width: 800px !important; /* Force le débordement horizontal */
+        white-space: nowrap !important; /* Empêche les retours à la ligne */
+
+        thead, tbody, tr, th, td {
+            display: table-cell !important;
+        }
+        tr {
+            display: table-row !important;
+        }
+    }
+
+    // VARIANTE 2 : Votre mode d'empilement vertical d'origine (Inchangé)
     .table.table-responsive {
         display: block;
         thead, tbody, tr, th, td { display: block; }
@@ -213,6 +239,7 @@
             &.active { background: $success; border-color: $success; color: #fff; }
         }
     }
+    
     @media screen and (max-width: 768px) {
         .table.table-responsive {
             tr { background: $dm-bg; border-color: rgba($mute, 0.2); border-bottom-color: rgba($white, 0.2); }

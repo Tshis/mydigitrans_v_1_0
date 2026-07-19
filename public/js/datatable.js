@@ -1,9 +1,9 @@
-document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll("table.js-datatable").forEach((e,t)=>{let m=e.querySelector("tbody");if(m){let i=Array.from(m.querySelectorAll("tr:not(.no-result-row)")),c=1,s=10,d=[...i];var a=document.createElement("div"),n=(a.className="table-card",e.parentNode.insertBefore(a,e),document.createElement("div")),e=(n.className="table-search-bar-zone",n.innerHTML=`
+document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll("table.js-datatable").forEach((e,t)=>{let m=e.querySelector("tbody");if(m){let o=Array.from(m.querySelectorAll("tr:not(.no-result-row)")),s=1,c=10,d=[...o];var a=document.createElement("div"),n=(a.className="table-card",e.parentNode.insertBefore(a,e),document.createElement("div")),l=(n.className="table-search-bar-zone",n.innerHTML=`
             <div class="search-input-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" id="custom-search-${t}" placeholder="Rechercher..." autocomplete="off">
             </div>
-        `,a.appendChild(n),a.appendChild(e),document.createElement("div")),a=(e.className="table-pagination",e.innerHTML=`
+        `,a.appendChild(n),document.createElement("div")),l=(l.className="table-responsive-wrapper",a.appendChild(l),l.appendChild(e),document.createElement("div")),e=(l.className="table-pagination",l.innerHTML=`
             <div class="per-page-selector">
                 <label for="per_page-${t}">Éléments par page :</label>
                 <select id="per_page-${t}">
@@ -22,9 +22,9 @@ document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll("tab
                     Suivant <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
-        `,a.appendChild(e),n.querySelector("input")),n=e.querySelector("select");let p=e.querySelector("#prev-"+t),u=e.querySelector("#next-"+t),v=e.querySelector("#pages-"+t);function h(){var e=d.length,t=Math.ceil(e/s)||1,a=((c=c>t?t:c)-1)*s,n=a+s;i.forEach(e=>e.style.display="none"),d.slice(a,n).forEach(e=>{e.style.display=""});let l=m.querySelector(".no-result-row");0===e?l||((l=document.createElement("tr")).className="no-result-row",l.innerHTML=`
-                        <td colspan="10" style="text-align: center; padding: 30px; color: var(--gray);">
+        `,a.appendChild(l),n.querySelector("input")),a=l.querySelector("select");let p=l.querySelector("#prev-"+t),u=l.querySelector("#next-"+t),v=l.querySelector("#pages-"+t);function h(){var e=d.length,t=Math.ceil(e/c)||1,a=((s=s>t?t:s)-1)*c,n=a+c;o.forEach(e=>{e.classList.add("is-hidden")}),d.slice(a,n).forEach(e=>{e.classList.remove("is-hidden")});let l=m.querySelector(".no-result-row");0===e?l||((l=document.createElement("tr")).className="no-result-row",l.innerHTML=`
+                        <td colspan="10" style="text-align: center; padding: 30px;">
                             <i class="fa-solid fa-circle-question" style="font-size: 1.5rem; margin-bottom: 8px; display: block;"></i>
                             Aucun résultat trouvé pour cette recherche.
                         </td>
-                    `,m.appendChild(l)):l&&l.remove();var r=t;v.innerHTML="",p.disabled=1===c,u.disabled=c===r;for(let e=1;e<=r;e++){var o=document.createElement("button");o.type="button",o.className="page-item "+(e===c?"active":""),o.textContent=e,o.addEventListener("click",()=>{c=e,h()}),v.appendChild(o)}}a.addEventListener("input",e=>{let t=e.target.value.toLowerCase().trim();d=i.filter(e=>e.textContent.toLowerCase().includes(t)),c=1,h()}),n.addEventListener("change",e=>{s=parseInt(e.target.value,10),c=1,h()}),p.addEventListener("click",()=>{1<c&&(c--,h())}),u.addEventListener("click",()=>{var e=Math.ceil(d.length/s)||1;c<e&&(c++,h())}),h()}})});
+                    `,m.appendChild(l)):l&&l.remove();var r=t;v.innerHTML="",p.disabled=1===s,u.disabled=s===r;for(let e=1;e<=r;e++){var i=document.createElement("button");i.type="button",i.className="page-item "+(e===s?"active":""),i.textContent=e,i.addEventListener("click",()=>{s=e,h()}),v.appendChild(i)}}e.addEventListener("input",e=>{let t=e.target.value.toLowerCase().trim();d=o.filter(e=>e.textContent.toLowerCase().includes(t)),s=1,h()}),a.addEventListener("change",e=>{c=parseInt(e.target.value,10),s=1,h()}),p.addEventListener("click",()=>{1<s&&(s--,h())}),u.addEventListener("click",()=>{var e=Math.ceil(d.length/c)||1;s<e&&(s++,h())}),h()}})});

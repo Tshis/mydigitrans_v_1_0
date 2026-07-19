@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Ici On cible uniquement les tables qui ont explicitement la classe .js-datatable
+    // On cible uniquement les tables qui ont explicitement la classe .js-datatable
     const targetTables = document.querySelectorAll('table.js-datatable');
 
     targetTables.forEach((table, index) => {
@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- ÉTAPE A : ENCAPSULATION ET CRÉATION DU COMPOSANT (DOM MANIPULATION) ---
         
-        // Création de l'enveloppe de carte globale (.table-card)
+        // 1. Création de l'enveloppe de carte globale (.table-card)
         const tableCard = document.createElement('div');
         tableCard.className = 'table-card';
         table.parentNode.insertBefore(tableCard, table);
 
-        // Création de la zone de recherche supérieure
+        // 2. Création de la zone de recherche supérieure
         const searchZone = document.createElement('div');
         searchZone.className = 'table-search-bar-zone';
         searchZone.innerHTML = `
@@ -30,10 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         tableCard.appendChild(searchZone);
 
-        // Déplacement de la table à l'intérieur de la carte
-        tableCard.appendChild(table);
+        // 3. Création du conteneur de scroll hermétique pour la table
+        const scrollWrapper = document.createElement('div');
+        scrollWrapper.className = 'table-responsive-wrapper';
+        tableCard.appendChild(scrollWrapper);
 
-        // Création du bloc de pagination inférieur
+        // 4. Déplacement de la table à l'INTÉRIEUR du conteneur de scroll
+        scrollWrapper.appendChild(table);
+
+        // 5. Création du bloc de pagination inférieur
         const paginationZone = document.createElement('div');
         paginationZone.className = 'table-pagination';
         paginationZone.innerHTML = `
@@ -58,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         tableCard.appendChild(paginationZone);
 
-        // Récupération des éléments fraîchement créés pour les lier aux événements
+        // Récupération des éléments pour les lier aux événements
         const searchInput = searchZone.querySelector('input');
         const perPageSelect = paginationZone.querySelector('select');
         const prevBtn = paginationZone.querySelector(`#prev-${index}`);
@@ -76,22 +81,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
 
-            // Masquer toutes les lignes physiques du tableau
-            allRows.forEach(row => row.style.display = 'none');
-
-            // Afficher uniquement les lignes de la portion paginée active
-            filteredRows.slice(startIndex, endIndex).forEach(row => {
-                row.style.display = '';
+            // 1. On masque toutes les lignes en leur ajoutant une classe CSS
+            allRows.forEach(row => {
+                row.classList.add('is-hidden');
             });
 
-            // Message d'erreur "Aucun résultat"
+            // 2. On affiche uniquement les lignes actives en retirant cette classe
+            filteredRows.slice(startIndex, endIndex).forEach(row => {
+                row.classList.remove('is-hidden');
+            });
+
+            // 3. Message d'erreur "Aucun résultat"
             let emptyMessage = tableBody.querySelector('.no-result-row');
             if (totalRows === 0) {
                 if (!emptyMessage) {
                     emptyMessage = document.createElement('tr');
                     emptyMessage.className = 'no-result-row';
                     emptyMessage.innerHTML = `
-                        <td colspan="10" style="text-align: center; padding: 30px; color: var(--gray);">
+                        <td colspan="10" style="text-align: center; padding: 30px;">
                             <i class="fa-solid fa-circle-question" style="font-size: 1.5rem; margin-bottom: 8px; display: block;"></i>
                             Aucun résultat trouvé pour cette recherche.
                         </td>
@@ -130,8 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
+            
+            // Filtre les lignes du tableau dont le contenu textuel contient le mot recherché
             filteredRows = allRows.filter(row => row.textContent.toLowerCase().includes(query));
-            currentPage = 1;
+            
+            currentPage = 1; // Renvoyer l'utilisateur à la première page de résultats
             updateTableDisplay();
         });
 
@@ -150,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentPage < totalPages) { currentPage++; updateTableDisplay(); }
         });
 
-        // Premier rendu au chargement
+        // Premier rendu au chargement de la page
         updateTableDisplay();
     });
 });

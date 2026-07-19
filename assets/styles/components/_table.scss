@@ -11,13 +11,8 @@
         vertical-align: middle;
     }
 
-    thead, tfoot {
-        font-size: 14px;
-    }
-
-    tbody {
-        font-size: 12px;
-    }
+    thead, tfoot { font-size: 14px; }
+    tbody { font-size: 12px; }
 
     // --- VARIANTE : LIGNES ALTERNÉES (STRIPED) ---
     &.table-striped {
@@ -31,7 +26,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        list-style: none; // Sécurité pour supprimer les puces d'éventuels <ul>
+        list-style: none;
         margin: 0;
         padding: 0;
 
@@ -46,153 +41,208 @@
                 transition: 0.3s all ease;
 
                 &:hover {
-                    i {
-                        cursor: pointer;
-                        opacity: 0.85;
-                    }
+                    i { cursor: pointer; opacity: 0.85; }
                 }
             }
         }
     }
 
-    .actions{
+    .actions {
         display: flex;
-        gap: 1rem ;
-       justify-content: end;
+        gap: 1rem;
+        justify-content: end;
 
-       a{
+        a {
             transition: all .3s;
-
             background: $mute;
             display: block;
             padding: 8px;
             border-radius: 5px;
 
-            &:hover{
-                transform: scale(1.5);
-            }
-       }
-
-    }//actions
-
-    // --- VARIANTES DE COULEURS DE THÉMATIQUE (EN-TÊTE / PIED) ---
-    &.table-dark {
-        thead, tfoot {
-            th {
-                background: $dark;
-                color: $white;
-            }
+            &:hover { transform: scale(1.5); }
         }
     }
 
+    // --- VARIANTES DE COULEURS DE THÉMATIQUE ---
+    &.table-dark {
+        thead, tfoot { th { background: $dark; color: $white; } }
+    }
+
     &.table-primary {
-        thead, tfoot {
-            th {
-                background: $primary;
-                color: $white;
-            }
-        }
+        thead, tfoot { th { background: $primary; color: $white; } }
     }
 
     &.table-mute {
         thead, tfoot {
-            th {
-                background: rgba($color: $mute, $alpha: 0.25);
-                color: $black;
-                border: 0;
-            }
+            th { background: rgba($color: $mute, $alpha: 0.25); color: $black; border: 0; }
         }
         thead { border-bottom: 1.5px solid $black; }
         tfoot { border-top: 1.5px solid $black; }
     }
 }
 
-// --- CONFIGURATION RESPONSIVE : EMPILEMENT EN COMPOSANTS (STACKED REWRIRE) ---
+// --- LE CONTENEUR FIXE À L'ÉCRAN ---
+.table-card {
+    background: $white;
+    border: 1px solid $mute;
+    border-radius: $radius-card;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.006);
+    overflow: hidden !important; /* Empêche la carte entière de casser le layout */
+}
+
+// --- LE CONTENEUR DÉDIÉ AU SCROLL HORIZONTAL AVEC SCROLLBAR DISCRÈTE ---
+.table-responsive-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important; /* Active la barre de défilement horizontal */
+    -webkit-overflow-scrolling: touch !important; /* Défilement fluide sur iOS */
+ 
+    // Configuration Webkit (Chrome, Edge, Safari, Opera)
+    &::-webkit-scrollbar {
+        height: 5px !important; /* Force la hauteur à 5px */
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba($mute, 0.2) !important;
+        border-radius: 10px !important;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba($primary, 0.5) !important; 
+        border-radius: 10px !important;
+        
+        &:hover {
+            background: rgba($primary, 0.8) !important; 
+        }
+    }
+
+    // Configuration Firefox
+    scrollbar-width: thin !important; 
+    scrollbar-color: rgba($primary, 0.5) rgba($mute, 0.2) !important; 
+}
+
+// --- CONFIGURATIONS RESPONSIVES (MÉDIA QUERIES) ---
 @media screen and (max-width: 768px) {
-    .table {
-        &.table-responsive {
-            display: block;
+    
+    // VARIANTE 2 : Votre mode d'empilement vertical (Placé en premier pour être écrasé si besoin)
+    .table.table-responsive {
+        display: block !important;
+        thead, tbody, tr, th, td { display: block !important; }
+        tfoot, thead { display: none !important; }
+        
+        tr {
+            margin: 1.5rem 1rem;
+            border: 1px solid $mute;
+            border-bottom: 0.2rem solid $black;
+            border-radius: 0.6rem;
+            background: $white;
+            overflow: hidden;
+        }
 
-            thead, tbody, tr, th, td {
-                display: block;
-            }
+        td {
+            padding-left: 140px;
+            position: relative;
+            margin-top: -1px;
+            min-height: 3.5rem;
+            display: flex;
+            align-items: center;
 
-            tfoot, thead {
-                display: none; // Masque les vrais en-têtes
-            }
-
-            tr {
-                margin: 3rem auto;
-                border-bottom: 0.2rem solid $black;
-                border-bottom-left-radius: 1rem;
-                border-bottom-right-radius: 1rem;
-                background: $white; // Protège le fond de la carte mobile
-            }
-
-            td {
-                padding-left: 150px;
-                position: relative;
-                margin-top: -1px; // Évite l'empilement des bordures
-                min-height: 3rem; // Sécurité si la cellule est vide
+            &::before {
+                content: attr(data-label);
+                position: absolute;
+                top: 0; left: 0; bottom: 0;
+                width: 120px;
+                padding-left: 1rem;
+                font-weight: bold;
                 display: flex;
                 align-items: center;
-
-                // Génération de l'en-tête imaginaire à gauche via HTML data-label="..."
-                &::before {
-                    padding: 1rem;
-                    content: attr(data-label);
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    bottom: 0;
-                    width: 130px; // Largeur fixe pour aligner la colonne d'en-têtes mobiles
-                    display: flex;
-                    align-items: center;
-                    font-weight: bold;
-                    background: rgba($color: $mute, $alpha: 0.1); // Optionnel : donne un aspect structuré à gauche
-                    border-right: 1px solid rgba($color: $mute, $alpha: 0.2);
-                }
+                background: rgba($color: $mute, $alpha: 0.08);
+                border-right: 1px solid rgba($color: $mute, $alpha: 0.15);
             }
+        }
+    }
+
+    // VARIANTE 1 : Votre mode de défilement horizontal (Placé en dernier pour GAGNER la priorité CSS)
+    .table.table-scrollable {
+        display: table !important;
+        width: max-content !important; 
+        min-width: 100% !important;
+        table-layout: auto !important;
+        white-space: nowrap !important; 
+
+        thead { display: table-header-group !important; }
+        tbody { display: table-row-group !important; }
+        tr { display: table-row !important; }
+        th, td { display: table-cell !important; }
+    }
+}
+
+// --- FORCE MAXIMALE POUR LA TABLE SCROLLABLE (CORRIGÉ POUR LE FILTRE JS) ---
+@media screen and (max-width: 768px) {
+    div.table-card div.table-responsive-wrapper table.table-scrollable {
+        display: table !important;
+        width: max-content !important; 
+        min-width: 100% !important;
+        table-layout: auto !important;
+        white-space: nowrap !important; 
+
+        thead { display: table-header-group !important; }
+        tbody { display: table-row-group !important; }
+        
+        // CORRECTION ICI : On applique le style UNIQUEMENT aux lignes qui ne sont pas masquées
+        tr:not(.is-hidden) { 
+            display: table-row !important; 
+            width: auto !important; 
+        }
+        
+        // Les lignes masquées restent masquées à 100% quoi qu'il arrive
+        tr.is-hidden {
+            display: none !important;
+        }
+        
+        th, td { 
+            display: table-cell !important; 
+            width: auto !important; 
+            white-space: nowrap !important; 
         }
     }
 }
 
 // --- ADAPTATION TOTALE AU MODE SOMBRE (DARK MODE) ---
 .dark {
+    .table-card { background: $dm-bg; border-color: rgba($mute, 0.25); }
+    
+    // Adaptation de la scrollbar fine au mode sombre
+    .table-responsive-wrapper {
+        &::-webkit-scrollbar-track {
+            background: rgba($white, 0.05) !important;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: rgba($white, 0.2) !important;
+            &:hover { background: rgba($white, 0.3) !important; }
+        }
+        scrollbar-color: rgba($white, 0.2) rgba($white, 0.05) !important;
+    }
+
     .table {
-        td, th {
-            border-bottom-color: rgba($mute, 0.2);
-            color: $mute;
-        }
-
-        &.table-striped tr:nth-child(even) {
-            background: rgba($white, 0.02);
-        }
-
+        td, th { border-bottom-color: rgba($mute, 0.2); color: $mute; }
+        &.table-striped tr:nth-child(even) { background: rgba($white, 0.02); }
+        
         &.table-mute {
             thead, tfoot {
-                th {
-                    background: rgba($white, 0.05);
-                    color: #ffffff;
-                }
+                th { background: rgba($white, 0.05); color: #ffffff; }
             }
             thead { border-bottom-color: rgba($white, 0.3); }
             tfoot { border-top-color: rgba($white, 0.3); }
         }
     }
 
-    // Version mobile empilée en mode sombre
     @media screen and (max-width: 768px) {
         .table.table-responsive {
-            tr {
-                background: $dm-bg;
-                border-bottom-color: rgba($white, 0.2);
-            }
-            td::before {
-                background: rgba($white, 0.03);
-                border-right-color: rgba($white, 0.1);
-                color: #ffffff;
-            }
+            tr { background: $dm-bg; border-color: rgba($mute, 0.2); border-bottom-color: rgba($white, 0.2); }
+            td::before { background: rgba($white, 0.03); border-right-color: rgba($white, 0.1); color: #ffffff; }
         }
     }
 }
+
+

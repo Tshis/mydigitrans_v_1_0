@@ -3,7 +3,6 @@
 
 {% block javascripts %}
 {{ parent() }}
-<script src="/js/table-responsive.js" defer></script>
 <script src="/js/datatable.js" defer></script>
 {% endblock %}
 
@@ -88,9 +87,10 @@
         </form>
     </div>
 
-    {# --- TABLEAU DES DONNÉES DATATABLE --- #}
-    <div class="card table-container-responsive">
-        <table class="table table-responsive table-stripped js-datatable">
+    {# --- TABLEAU DES DONNÉES DATATABLE AVEC SCROLL RESPONSIVE --- #}
+
+    <div class="table-responsive-wrapper">
+        <table class="table table-scrollable table-striped js-datatable">
             <thead>
                 <tr>
                     <th>Date & Départ</th>
@@ -112,20 +112,18 @@
                         <span class="sub-meta-text">via Kenge</span>
                     </td>
                     <td>
-                        <strong>Bus 01</strong>
-                        (Marcopolo)
+                        <strong>Bus 01</strong> (Marcopolo)
                         <span class="sub-meta-text">Chauffeur : Jean Mukendi</span>
                     </td>
                     <td>
-                        <strong>42 / 54</strong>
-                        places
+                        <strong>42 / 54</strong> places
                         <span class="sub-meta-text">(77%)</span>
                     </td>
                     <td>
                         <span class="badge badge-warning-status">Embarquement</span>
                     </td>
-                    <td class="actions">
-                        <a href="{{path('admin_agency_trip_show',{'code':'trip-07-26-0001-01'})}}"
+                    <td class="actions text-right">
+                        <a href="{{ path('admin_agency_trip_show', {'code': 'trip-07-26-0001-01'}) }}"
                             class="table-action-trigger" title="Détails du voyage">
                             <i class="fa-solid fa-eye"></i>
                         </a>
@@ -134,6 +132,7 @@
             </tbody>
         </table>
     </div>
+
 
 </div>
 {% endblock %}

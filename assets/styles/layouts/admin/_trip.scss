@@ -3,7 +3,7 @@
 
 
 
-.admin-trip-wrapper{
+.admin-trip-wrapper{   
 
     .header {
         display: flex;
@@ -105,12 +105,6 @@
         margin-top: 2px;
     }
     
-    .table-container-responsive {
-        width: 100%;
-        overflow-x: auto; // Force l'apparition d'une barre de défilement horizontale propre sur petit écran
-        -webkit-overflow-scrolling: touch;
-    }
-    
     // --- CARTE DES FILTRES DE L'INDEX ---
     .trip-filters-card {
         background: $white;
@@ -178,7 +172,7 @@
         font-size: 11px;
         font-weight: 600;
     }
-    
+
 }//admin-trip-wrapper
 
 
@@ -334,5 +328,13 @@
             width: 100%;
             overflow: hidden; // Sécurise la grille de la table
         }
+    }
+}
+
+
+
+.dark{
+    .trip-filters-card{
+        background: $dm-bg;
     }
 }
