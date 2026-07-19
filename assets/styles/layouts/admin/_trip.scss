@@ -334,6 +334,13 @@
 
 
 .dark{
+
+    .header{
+        .title{
+            h2{ color:lighten( $success, 25%);}
+        }
+    }
+
     .trip-filters-card{
         background: $dm-bg;
     }

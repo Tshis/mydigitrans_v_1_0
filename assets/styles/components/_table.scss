@@ -39,6 +39,7 @@
                 align-items: center;
                 justify-content: center;
                 transition: 0.3s all ease;
+                
 
                 &:hover {
                     i { cursor: pointer; opacity: 0.85; }
@@ -58,6 +59,9 @@
             display: block;
             padding: 8px;
             border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
             &:hover { transform: scale(1.5); }
         }
@@ -211,18 +215,6 @@
 // --- ADAPTATION TOTALE AU MODE SOMBRE (DARK MODE) ---
 .dark {
     .table-card { background: $dm-bg; border-color: rgba($mute, 0.25); }
-    
-    // Adaptation de la scrollbar fine au mode sombre
-    .table-responsive-wrapper {
-        &::-webkit-scrollbar-track {
-            background: rgba($white, 0.05) !important;
-        }
-        &::-webkit-scrollbar-thumb {
-            background: rgba($white, 0.2) !important;
-            &:hover { background: rgba($white, 0.3) !important; }
-        }
-        scrollbar-color: rgba($white, 0.2) rgba($white, 0.05) !important;
-    }
 
     .table {
         td, th { border-bottom-color: rgba($mute, 0.2); color: $mute; }
