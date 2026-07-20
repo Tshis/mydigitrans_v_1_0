@@ -1,0 +1,194 @@
+{# templates/admin/agency/booking/backoffice_index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-lines-wrapper container">
+
+    {# --- EN-TÊTE DE LA PAGE --- #}
+    <header class="header mb-20">
+        <div class="title">
+            <h2>
+                <i class="fa-solid fa-file-circle-check"></i>
+                Gestion des Billets & Réservations
+            </h2>
+            <p>Consultez l'historique des ventes, filtrez les tickets par date, et gérez les statuts de paiement des
+                voyageurs.</p>
+        </div>
+    </header>
+
+    {# --- ZONE DE BOUTONS SUPÉRIEURS --- #}
+    <div class="top-action mb-20">
+        <div class="admin-bus-layout-add-action-zone">
+            <a href="#" class="btn btn-print-manifest">
+                <i class="fa-solid fa-plus"></i>
+                Émettre un billet
+            </a>
+        </div>
+        <div class="admin-bus-layout-add-action-zone">
+            <a href="#" class="btn btn-print-manifest">
+                <i class="fa-solid fa-file-export"></i>
+                Export Excel / Rapport
+            </a>
+        </div>
+    </div>
+
+    {# --- CARTES DE STATISTIQUES DE BILLETTERIE --- #}
+    <div class="stats-overview-grid">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon--success">
+                <i class="fa-solid fa-ticket"></i>
+            </div>
+            <div class="stat-details">
+                <span class="stat-label">Billets Confirmés</span>
+                <strong class="stat-value">1,420</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon--primary">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <div class="stat-details">
+                <span class="stat-label">En attente (Réservés)</span>
+                <strong class="stat-value">28</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon--danger">
+                <i class="fa-solid fa-ban"></i>
+            </div>
+            <div class="stat-details">
+                <span class="stat-label">Annulés / Remboursés</span>
+                <strong class="stat-value">14</strong>
+            </div>
+        </div>
+    </div>
+
+    {# --- ZONE DE FILTRES AVANCÉS --- #}
+    <div class="trip-filters-card mb-20">
+        <form action="#" method="GET" class="field-group">
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Numéro de Billet / Téléphone</label>
+                <input type="text" name="search_query" class="admin-bus-layout-add-input"
+                    placeholder="Ex: TCK-2607-001">
+            </div>
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Statut du Billet</label>
+                <select name="ticket_status" class="admin-bus-layout-add-select">
+                    <option value="">-- Tous les statuts --</option>
+                    <option value="confirmed">Confirmé (Payé)</option>
+                    <option value="pending">En attente (Réservé)</option>
+                    <option value="cancelled">Annulé</option>
+                </select>
+            </div>
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Ligne Commerciale</label>
+                <select name="route_filter" class="admin-bus-layout-add-select">
+                    <option value="">-- Toutes les lignes --</option>
+                    <option value="1">Kinshasa → Kikwit</option>
+                    <option value="2">Kinshasa → Matadi</option>
+                </select>
+            </div>
+            <div class="field-actions">
+                <button type="submit" class="btn btn-reset">
+                    <i class="fa-solid fa-filter"></i>
+                    Filtrer
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {# --- TABLEAU GÉNÉRIQUE DES BILLETS --- #}
+    <table class="table table-scrollable table-striped js-datatable">
+        <thead>
+            <tr>
+                <th>Code Billet</th>
+                <th>Voyageur & Contact</th>
+                <th>Voyage / Trajet</th>
+                <th>Siège & Catégorie</th>
+                <th>Montant Payé</th>
+                <th>Statut</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {# Exemple 1 : Billet payé et validé #}
+            <tr>
+                <td>
+                    <strong>TCK-2607-0042</strong>
+                    <span class="sub-meta-text">Guichet Kinshasa</span>
+                </td>
+                <td>
+                    <strong>Kabila Dieudonné</strong>
+                    <span class="sub-meta-text">+243 812 345 678</span>
+                </td>
+                <td>
+                    <strong>14/07/2026 à 14h30</strong>
+                    <span class="sub-meta-text">Kinshasa → Kikwit</span>
+                </td>
+                <td>
+                    <strong>Siège 01</strong>
+                    <span class="sub-meta-text">Classe VIP</span>
+                </td>
+                <td>
+                    <strong>40 000 CDF</strong>
+                    <span class="sub-meta-text">Via Caisse Session #12</span>
+                </td>
+                <td class="table-badge-cell">
+                    <span class="badge-status-confirmed">Confirmé</span>
+                </td>
+                <td class="text-right table-action-buttons">
+                    <a href="#" class="table-action-trigger view" title="Voir les détails / Historique du paiement">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="#" class="table-action-trigger print" title="Imprimer le reçu de caisse">
+                        <i class="fa-solid fa-print"></i>
+                    </a>
+                </td>
+            </tr>
+
+            {# Exemple 2 : Réservation simple en attente de paiement au guichet #}
+            <tr>
+                <td>
+                    <strong>TCK-2607-0043</strong>
+                    <span class="sub-meta-text">Réservation en ligne</span>
+                </td>
+                <td>
+                    <strong>Mputu Antoinette</strong>
+                    <span class="sub-meta-text">+243 897 112 233</span>
+                </td>
+                <td>
+                    <strong>14/07/2026 à 14h30</strong>
+                    <span class="sub-meta-text">Kinshasa → Kenge</span>
+                </td>
+                <td>
+                    <strong>Siège 14</strong>
+                    <span class="sub-meta-text">Classe Standard</span>
+                </td>
+                <td>
+                    <strong>15 000 CDF</strong>
+                    <span class="sub-meta-text">En attente guichet</span>
+                </td>
+                <td class="table-badge-cell">
+                    <span class="badge-status-pending">Réservé</span>
+                </td>
+                <td class="text-right table-action-buttons">
+                    <a href="#" class="table-action-trigger validate" title="Valider et encaisser le paiement">
+                        <i class="fa-solid fa-cash-register"></i>
+                    </a>
+                    <a href="#" class="table-action-trigger cancel" title="Annuler la réservation">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

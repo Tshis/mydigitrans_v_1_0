@@ -14,7 +14,7 @@
 	<span class="text">Voyages</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Réservations & Billetterie">
+<a href="{{path('admin_agency_reservation_index')}}" class="menu-link {{ page is same as('reservation') ? 'active' : '' }}" data-tooltip="Réservations & Billetterie">
 	<span class="icon">
 		<i class="fa-solid fa-file-circle-check"></i>
 	</span>
