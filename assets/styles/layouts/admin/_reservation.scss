@@ -212,12 +212,12 @@
 // --- CONFIGURATION SPECIFIQUE SOMBRE (DARK MODE) ---
 .dark {
     .admin-lines-wrapper {
-        .header .title h2 { color: #fff; }
-        .top-action .btn-print-manifest { background: #fff; color: $dark; }
+        .header .title h2 { color: $white; }
+        .top-action .btn-print-manifest { background: $white; color: $dark; }
 
         .stats-overview-grid .stat-card {
             background: $dm-bg; border-color: rgba($mute, 0.25);
-            .stat-value { color: #fff; }
+            .stat-value { color: $white; }
             .stat-label { color: $mute; }
         }
 
@@ -225,14 +225,14 @@
             background: $dm-bg; border-color: rgba($mute, 0.25);
             .field-group .field {
                 label { color: $mute; }
-                input, select { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff; }
+                input, select { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $white; }
             }
         }
 
         .text-right.table-action-buttons .table-action-trigger {
             background: rgba($white, 0.05); color: $mute;
             &.view:hover      { color: $primary; background: rgba($primary, 0.2); }
-            &.print:hover     { color: #fff; background: rgba($white, 0.15); }
+            &.print:hover     { color: $white; background: rgba($white, 0.15); }
             &.validate:hover  { color: $success; background: rgba($success, 0.2); }
             &.cancel:hover    { color: $danger; background: rgba($danger, 0.2); }
         }
