@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // On cible uniquement les tables qui ont explicitement la classe .js-datatable
+    // Cible toutes les tables autonomes du projet
     const targetTables = document.querySelectorAll('table.js-datatable');
 
     targetTables.forEach((table, index) => {
@@ -12,33 +11,33 @@ document.addEventListener('DOMContentLoaded', () => {
         let rowsPerPage = 10;
         let filteredRows = [...allRows];
 
-        // --- ÉTAPE A : ENCAPSULATION ET CRÉATION DU COMPOSANT (DOM MANIPULATION) ---
+        // --- ÉTAPE 1 : INJECTION DES CONTENEURS AUTONOMES ---
         
-        // 1. Création de l'enveloppe de carte globale (.table-card)
+        // Création de l'enveloppe de carte globale (.table-card)
         const tableCard = document.createElement('div');
         tableCard.className = 'table-card';
         table.parentNode.insertBefore(tableCard, table);
 
-        // 2. Création de la zone de recherche supérieure
+        // Zone de recherche supérieure
         const searchZone = document.createElement('div');
         searchZone.className = 'table-search-bar-zone';
         searchZone.innerHTML = `
             <div class="search-input-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="custom-search-${index}" placeholder="Rechercher..." autocomplete="off">
+                <input type="text" id="custom-search-${index}" placeholder="Rechercher dans le tableau..." autocomplete="off">
             </div>
         `;
         tableCard.appendChild(searchZone);
 
-        // 3. Création du conteneur de scroll hermétique pour la table
+        // Conteneur de scroll hermétique isolé
         const scrollWrapper = document.createElement('div');
         scrollWrapper.className = 'table-responsive-wrapper';
         tableCard.appendChild(scrollWrapper);
 
-        // 4. Déplacement de la table à l'INTÉRIEUR du conteneur de scroll
+        // Déplacement de la table à l'intérieur de sa capsule de scroll
         scrollWrapper.appendChild(table);
 
-        // 5. Création du bloc de pagination inférieur
+        // Zone de pagination inférieure
         const paginationZone = document.createElement('div');
         paginationZone.className = 'table-pagination';
         paginationZone.innerHTML = `
@@ -48,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <option value="10" selected>10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
-                    <option value="100">100</option>
                 </select>
             </div>
             <div class="pagination-nav">
@@ -63,14 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         tableCard.appendChild(paginationZone);
 
-        // Récupération des éléments pour les lier aux événements
+        // Liaisons des éléments dynamiques
         const searchInput = searchZone.querySelector('input');
         const perPageSelect = paginationZone.querySelector('select');
         const prevBtn = paginationZone.querySelector(`#prev-${index}`);
         const nextBtn = paginationZone.querySelector(`#next-${index}`);
         const pagesContainer = paginationZone.querySelector(`#pages-${index}`);
 
-        // --- ÉTAPE B : LOGIQUE D'AFFICHAGE ET DE FILTRAGE ---
+        // --- ÉTAPE 2 : LOGIQUE FILTRAGE ET RACHRAÎCHISSEMENT ---
 
         function updateTableDisplay() {
             const totalRows = filteredRows.length;
@@ -81,26 +79,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
 
-            // 1. On masque toutes les lignes en leur ajoutant une classe CSS
-            allRows.forEach(row => {
-                row.classList.add('is-hidden');
-            });
+            // Masquage global via classe CSS
+            allRows.forEach(row => row.classList.add('is-hidden'));
 
-            // 2. On affiche uniquement les lignes actives en retirant cette classe
+            // Affichage restrictif de la tranche active
             filteredRows.slice(startIndex, endIndex).forEach(row => {
                 row.classList.remove('is-hidden');
             });
 
-            // 3. Message d'erreur "Aucun résultat"
+            // Ligne d'alerte en cas de tableau vide
             let emptyMessage = tableBody.querySelector('.no-result-row');
             if (totalRows === 0) {
                 if (!emptyMessage) {
                     emptyMessage = document.createElement('tr');
                     emptyMessage.className = 'no-result-row';
                     emptyMessage.innerHTML = `
-                        <td colspan="10" style="text-align: center; padding: 30px;">
-                            <i class="fa-solid fa-circle-question" style="font-size: 1.5rem; margin-bottom: 8px; display: block;"></i>
-                            Aucun résultat trouvé pour cette recherche.
+                        <td colspan="20" style="text-align: center; padding: 2.5rem; color: #a0aec0;">
+                            <i class="fa-solid fa-circle-question" style="font-size: 1.6rem; margin-bottom: 8px; display: block;"></i>
+                            Aucune correspondance trouvée.
                         </td>
                     `;
                     tableBody.appendChild(emptyMessage);
@@ -109,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 emptyMessage.remove();
             }
 
-            // Génération des numéros de pages
             renderPaginationControls(totalPages);
         }
 
@@ -133,15 +128,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // --- ÉTAPE C : ÉCOUTEURS D'ÉVÉNEMENTS ---
+        // --- ÉTAPE 3 : ÉCOUTEURS ---
 
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
-            
-            // Filtre les lignes du tableau dont le contenu textuel contient le mot recherché
             filteredRows = allRows.filter(row => row.textContent.toLowerCase().includes(query));
-            
-            currentPage = 1; // Renvoyer l'utilisateur à la première page de résultats
+            currentPage = 1;
             updateTableDisplay();
         });
 
@@ -160,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentPage < totalPages) { currentPage++; updateTableDisplay(); }
         });
 
-        // Premier rendu au chargement de la page
         updateTableDisplay();
     });
 });

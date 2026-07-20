@@ -1,5 +1,6 @@
 @use '../abstract/variables' as *;
 
+// --- STRUCTURE ET CELLULES DE LA TABLE COMMUNE ---
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -14,131 +15,175 @@
     thead, tfoot { font-size: 14px; }
     tbody { font-size: 12px; }
 
-    // --- VARIANTE : LIGNES ALTERNÉES (STRIPED) ---
-    &.table-striped {
-        tr:nth-child(even) {
-            background: rgba($color: $mute, $alpha: 0.15);
-        }
+    &.table-striped tr:nth-child(even) {
+        background: rgba($color: $mute, $alpha: 0.15);
     }
 
-    // --- COMPOSANT D'ACTIONS DANS LES CELLULES ---
-    .table-action {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-
-        li {
-            a {
-                padding: 0.5rem;
-                color: $white;
-                border-radius: 0.4rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                transition: 0.3s all ease;
-                
-
-                &:hover {
-                    i { cursor: pointer; opacity: 0.85; }
-                }
-            }
-        }
-    }
-
-    .actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: end;
-
-        a {
-            transition: all .3s;
-            background: $mute;
-            display: block;
-            padding: 8px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            &:hover { transform: scale(1.5); }
-        }
-    }
-
-    // --- VARIANTES DE COULEURS DE THÉMATIQUE ---
-    &.table-dark {
-        thead, tfoot { th { background: $dark; color: $white; } }
-    }
-
-    &.table-primary {
-        thead, tfoot { th { background: $primary; color: $white; } }
-    }
-
-    &.table-mute {
-        thead, tfoot {
-            th { background: rgba($color: $mute, $alpha: 0.25); color: $black; border: 0; }
-        }
-        thead { border-bottom: 1.5px solid $black; }
-        tfoot { border-top: 1.5px solid $black; }
+    .text-right {
+        text-align: right !important;
+        justify-content: flex-end !important;
     }
 }
 
-// --- LE CONTENEUR FIXE À L'ÉCRAN ---
+// --- MASQUAGE SÉCURISÉ POUR LE JAVASCRIPT ---
+tr.is-hidden {
+    display: none !important;
+}
+
+// --- CONTENEUR DE SCROLL : ACTIF DANS TOUS LES CAS (AVEC OU SANS JS) ---
+// On applique les règles de scroll à la fois sur le wrapper injecté par le JS 
+// ET sur n'importe quel élément parent direct d'une table scrollable classique.
+.table-responsive-wrapper, 
+*:has(> table.table-scrollable) {
+    width: 100% !important;
+    overflow-x: auto !important; /* Active la barre de défilement horizontal */
+    -webkit-overflow-scrolling: touch !important; /* Défilement fluide sur iOS */
+
+    // Design minimaliste de la scrollbar (Chrome, Safari, Edge)
+    &::-webkit-scrollbar { height: 5px !important; }
+    &::-webkit-scrollbar-track { background: rgba($mute, 0.2) !important; border-radius: 10px !important; }
+    &::-webkit-scrollbar-thumb { background: rgba($primary, 0.5) !important; border-radius: 10px !important; }
+
+    // Design minimaliste Firefox
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba($primary, 0.5) rgba($mute, 0.2) !important;
+}
+
+// --- LE CONTENEUR CARTE INJECTÉ (BLOC FIXE UNIQUEMENT POUR LE JS) ---
 .table-card {
     background: $white;
     border: 1px solid $mute;
     border-radius: $radius-card;
     margin-bottom: 2rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.006);
-    overflow: hidden !important; /* Empêche la carte entière de casser le layout */
+    overflow: hidden !important; 
 }
 
-// --- LE CONTENEUR DÉDIÉ AU SCROLL HORIZONTAL AVEC SCROLLBAR DISCRÈTE ---
-.table-responsive-wrapper {
-    width: 100% !important;
-    overflow-x: auto !important; /* Active la barre de défilement horizontal */
-    -webkit-overflow-scrolling: touch !important; /* Défilement fluide sur iOS */
- 
-    // Configuration Webkit (Chrome, Edge, Safari, Opera)
-    &::-webkit-scrollbar {
-        height: 5px !important; /* Force la hauteur à 5px */
-    }
+// --- CONTROLE RECHERCHE INJECTÉ (JS) ---
+.table-search-bar-zone {
+    padding: 1rem 1.5rem;
+    background: rgba($gray, 0.01);
+    border-bottom: 1px solid $mute;
+    display: flex;
+    justify-content: flex-end;
 
-    &::-webkit-scrollbar-track {
-        background: rgba($mute, 0.2) !important;
-        border-radius: 10px !important;
-    }
+    .search-input-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 320px;
+        @media (max-width: 576px) { max-width: 100%; }
 
-    &::-webkit-scrollbar-thumb {
-        background: rgba($primary, 0.5) !important; 
-        border-radius: 10px !important;
-        
-        &:hover {
-            background: rgba($primary, 0.8) !important; 
+        .search-icon {
+            position: absolute;
+            top: 50%; left: 1rem;
+            transform: translateY(-50%);
+            color: $gray;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 2.4rem;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
+            font-size: 13px;
+            font-weight: 600;
+            background: $white;
+            color: $dark;
+            outline: none;
+            transition: border-color 0.2s;
+
+            &:focus { border-color: $primary; }
+        }
+    }
+}
+
+// --- BLOC DE CONTROLE DE PAGINATION (JS) ---
+.table-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba($gray, 0.01);
+    border-top: 1px solid rgba($mute, 0.5);
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    @media (max-width: 576px) { justify-content: center; }
+
+    .per-page-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: $gray;
+
+        select {
+            padding: 5px 10px;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
+            background: $white;
+            font-weight: 600;
+            outline: none;
         }
     }
 
-    // Configuration Firefox
-    scrollbar-width: thin !important; 
-    scrollbar-color: rgba($primary, 0.5) rgba($mute, 0.2) !important; 
+    .pagination-nav { display: flex; align-items: center; gap: 8px; }
+    
+    .nav-btn {
+        padding: 6px 12px;
+        border: 1px solid $mute;
+        background: $white;
+        color: $dark;
+        border-radius: $radius-input;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+
+        &:disabled { opacity: 0.4; cursor: not-allowed; }
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 4px;
+
+        .page-item {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
+            background: $white;
+            color: $dark;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+
+            &.active {
+                background: $primary;
+                border-color: $primary;
+                color: $white;
+            }
+        }
+    }
 }
 
-// --- CONFIGURATIONS RESPONSIVES (MÉDIA QUERIES) ---
+// --- LOGIQUE MEDIA QUERY : CAS RESPONSIVES ---
 @media screen and (max-width: 768px) {
     
-    // VARIANTE 2 : Votre mode d'empilement vertical (Placé en premier pour être écrasé si besoin)
+    // Variante A : Empilement sous forme de cartes d'historique
     .table.table-responsive {
         display: block !important;
         thead, tbody, tr, th, td { display: block !important; }
         tfoot, thead { display: none !important; }
         
         tr {
-            margin: 1.5rem 1rem;
+            margin: 1rem;
             border: 1px solid $mute;
-            border-bottom: 0.2rem solid $black;
-            border-radius: 0.6rem;
+            border-bottom: 0.15rem solid $dark;
+            border-radius: 6px;
             background: $white;
             overflow: hidden;
         }
@@ -146,8 +191,7 @@
         td {
             padding-left: 140px;
             position: relative;
-            margin-top: -1px;
-            min-height: 3.5rem;
+            min-height: 3rem;
             display: flex;
             align-items: center;
 
@@ -160,30 +204,17 @@
                 font-weight: bold;
                 display: flex;
                 align-items: center;
-                background: rgba($color: $mute, $alpha: 0.08);
-                border-right: 1px solid rgba($color: $mute, $alpha: 0.15);
+                background: rgba($mute, 0.08);
+                border-right: 1px solid rgba($mute, 0.15);
             }
         }
     }
-
-    // VARIANTE 1 : Votre mode de défilement horizontal (Placé en dernier pour GAGNER la priorité CSS)
-    .table.table-scrollable {
-        display: table !important;
-        width: max-content !important; 
-        min-width: 100% !important;
-        table-layout: auto !important;
-        white-space: nowrap !important; 
-
-        thead { display: table-header-group !important; }
-        tbody { display: table-row-group !important; }
-        tr { display: table-row !important; }
-        th, td { display: table-cell !important; }
-    }
 }
 
-// --- FORCE MAXIMALE POUR LA TABLE SCROLLABLE (CORRIGÉ POUR LE FILTRE JS) ---
+// --- COMPARTIMENTATION ET FORCE MAXIMALE INDÉTRUCTIBLE ---
 @media screen and (max-width: 768px) {
-    div.table-card div.table-responsive-wrapper table.table-scrollable {
+    // Cible la table qu'elle soit dans le wrapper JS ou dans une div HTML standard
+    table.table-scrollable {
         display: table !important;
         width: max-content !important; 
         min-width: 100% !important;
@@ -193,48 +224,45 @@
         thead { display: table-header-group !important; }
         tbody { display: table-row-group !important; }
         
-        // CORRECTION ICI : On applique le style UNIQUEMENT aux lignes qui ne sont pas masquées
-        tr:not(.is-hidden) { 
-            display: table-row !important; 
-            width: auto !important; 
-        }
+        tr:not(.is-hidden) { display: table-row !important; width: auto !important; }
+        tr.is-hidden { display: none !important; }
         
-        // Les lignes masquées restent masquées à 100% quoi qu'il arrive
-        tr.is-hidden {
-            display: none !important;
-        }
-        
-        th, td { 
-            display: table-cell !important; 
-            width: auto !important; 
-            white-space: nowrap !important; 
-        }
+        th, td { display: table-cell !important; width: auto !important; white-space: nowrap !important; }
     }
 }
 
-// --- ADAPTATION TOTALE AU MODE SOMBRE (DARK MODE) ---
+// --- GESTION ADAPTATIVE COMPLÈTE DU MODE SOMBRE ---
 .dark {
     .table-card { background: $dm-bg; border-color: rgba($mute, 0.25); }
+    .table-search-bar-zone {
+        border-bottom-color: rgba($mute, 0.15);
+        input { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff; }
+    }
+    
+    .table-responsive-wrapper,
+    *:has(> table.table-scrollable) {
+        &::-webkit-scrollbar-track { background: rgba($white, 0.05) !important; }
+        &::-webkit-scrollbar-thumb { background: rgba($white, 0.2) !important; }
+        scrollbar-color: rgba($white, 0.2) rgba($white, 0.05) !important;
+    }
 
     .table {
-        td, th { border-bottom-color: rgba($mute, 0.2); color: $mute; }
+        td, th { border-bottom-color: rgba($mute, 0.15); color: $mute; }
         &.table-striped tr:nth-child(even) { background: rgba($white, 0.02); }
-        
-        &.table-mute {
-            thead, tfoot {
-                th { background: rgba($white, 0.05); color: #ffffff; }
-            }
-            thead { border-bottom-color: rgba($white, 0.3); }
-            tfoot { border-top-color: rgba($white, 0.3); }
+    }
+
+    .table-pagination {
+        border-top-color: rgba($mute, 0.15);
+        select, .nav-btn, .page-item {
+            background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $mute;
+            &.active { background: $primary; border-color: $primary; color: #fff; }
         }
     }
 
     @media screen and (max-width: 768px) {
         .table.table-responsive {
-            tr { background: $dm-bg; border-color: rgba($mute, 0.2); border-bottom-color: rgba($white, 0.2); }
-            td::before { background: rgba($white, 0.03); border-right-color: rgba($white, 0.1); color: #ffffff; }
+            tr { background: $dm-bg; border-color: rgba($mute, 0.15); border-bottom-color: rgba($white, 0.2); }
+            td::before { background: rgba($white, 0.02); border-right-color: rgba($white, 0.1); color: #fff; }
         }
     }
 }
-
-

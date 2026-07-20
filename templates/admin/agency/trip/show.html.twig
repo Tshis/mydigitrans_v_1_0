@@ -1,7 +1,10 @@
 {# templates/admin/agency/trip/show.html.twig #}
 {% extends "admin/base.html.twig" %}
 
-
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+{% endblock %}
 
 {% block body %}
 <div class="admin-agency-trip-show-scope container">
@@ -62,7 +65,6 @@
             </button>
             <button type="button" class="btn btn-danger-action"
                 onclick="return confirm('Êtes-vous sûr de vouloir annuler définitivement ce voyage ? Cette action est irréversible.');">
-
                 <i class="fa-solid fa-rectangle-xmark"></i>
                 Annuler
             </button>
@@ -83,36 +85,30 @@
                 <div class="info-section-row">
                     <label class="section-micro-label">PLANIFICATION HORAIRE</label>
                     <p class="info-text">
-                        <strong>Départ :</strong>
-                        14/07/2026 à 14h30
+                        <strong>Départ :</strong> 14/07/2026 à 14h30
                     </p>
                     <p class="info-text">
-                        <strong>Arrivée estimée :</strong>
-                        14/07/2026 à 22h30
+                        <strong>Arrivée estimée :</strong> 14/07/2026 à 22h30
                     </p>
                 </div>
 
                 <div class="info-section-row bordered-divider">
                     <label class="section-micro-label">AFFECTATION MATÉRIELLE</label>
                     <p class="info-text">
-                        <strong>Bus :</strong>
-                        N°01 (Mercedes Marcopolo)
+                        <strong>Bus :</strong> N°01 (Mercedes Marcopolo)
                     </p>
                     <p class="info-text">
-                        <strong>Capacité :</strong>
-                        54 Sièges configurés
+                        <strong>Capacité :</strong> 54 Sièges configurés
                     </p>
                 </div>
 
                 <div class="info-section-row bordered-divider">
                     <label class="section-micro-label">ÉQUIPAGE EN MISSION</label>
                     <p class="info-text">
-                        <strong>Chauffeur :</strong>
-                        Jean Mukendi
+                        <strong>Chauffeur :</strong> Jean Mukendi
                     </p>
                     <p class="info-text">
-                        <strong>Co-Chauffeur :</strong>
-                        Dummy Tshimanga
+                        <strong>Co-Chauffeur :</strong> Dummy Tshimanga
                     </p>
                 </div>
             </div>
@@ -129,55 +125,45 @@
                     <p class="text-gray text-size-12">Liste nominative des passagers enregistrés sur ce départ.</p>
                 </div>
 
-                <div class="table-responsive-wrapper">
+                <!-- NETTOYÉ : Plus de div manuelle ici, la table gère tout via le script global -->
+                <table class="table table-scrollable table-striped js-datatable">
+                    <thead>
+                        <tr>
+                            <th>N° Siège</th>
+                            <th>Nom du passager</th>
+                            <th>Segment (Trajet)</th>
+                            <th>Téléphone</th>
+                            <th class="text-right">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>01</strong>
+                                <span class="sub-meta-text">(VIP)</span>
+                            </td>
+                            <td><strong>Kabila Dieudonné</strong></td>
+                            <td>Kinshasa → Kikwit</td>
+                            <td>+243 812 345 678</td>
+                            <td class="text-right">
+                                <span class="badge-status-confirmed">Confirmé</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>03</strong>
+                                <span class="sub-meta-text">(Std)</span>
+                            </td>
+                            <td><strong>Ilunga Christian</strong></td>
+                            <td>Kenge → Kikwit</td>
+                            <td>+243 824 556 677</td>
+                            <td class="text-right">
+                                <span class="badge-status-pending">Réservé</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                    <table class="table table-reponsive table-striped">
-                        <thead>
-                            <tr>
-                                <th>N° Siège</th>
-                                <th>Nom du passager</th>
-                                <th>Segment (Trajet)</th>
-                                <th>Téléphone</th>
-                                <th class="text-right">Statut</th>
-                                <!-- Reste en text-right -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <strong>01</strong>
-                                    <span class="sub-meta-text">(VIP)</span>
-                                </td>
-                                <td>
-                                    <strong>Kabila Dieudonné</strong>
-                                </td>
-                                <td>Kinshasa → Kikwit</td>
-                                <td>+243 812 345 678</td>
-                                <td class="text-right">
-                                    <!-- Correction ici : uniquement text-right, on retire .actions -->
-                                    <span class="badge-status-confirmed">Confirmé</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <strong>03</strong>
-                                    <span class="sub-meta-text">(Std)</span>
-                                </td>
-                                <td>
-                                    <strong>Ilunga Christian</strong>
-                                </td>
-                                <td>Kenge → Kikwit</td>
-                                <td>+243 824 556 677</td>
-                                <td class="text-right">
-                                    <!-- Correction ici également -->
-                                    <span class="badge-status-pending">Réservé</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-
-                </div>
             </div>
         </div>
 
