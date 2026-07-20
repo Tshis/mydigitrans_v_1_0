@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="admin-lines-wrapper container">
+<div class="admin-reservations-wrapper container">
 
     {# --- EN-TÊTE DE LA PAGE --- #}
     <header class="header mb-20">
@@ -24,7 +24,7 @@
     {# --- ZONE DE BOUTONS SUPÉRIEURS --- #}
     <div class="top-action mb-20">
         <div class="admin-bus-layout-add-action-zone">
-            <a href="#" class="btn btn-print-manifest">
+            <a href="{{path('admin_agency_reservation_add')}}" class="btn btn-print-manifest">
                 <i class="fa-solid fa-plus"></i>
                 Émettre un billet
             </a>

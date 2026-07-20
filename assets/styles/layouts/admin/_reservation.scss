@@ -1,6 +1,8 @@
 @use '../../abstract/variables' as *;
 
-.admin-lines-wrapper {
+
+//===INDEX RESERVATION============
+.admin-reservations-wrapper {
     width: 100%;
 
     // --- VARIABLES LOCALES & UTILITIES ---
@@ -209,9 +211,97 @@
     }
 }
 
+
+//=====NEW RESERVATION========
+// À insérer à la racine de votre fichier admin pour lier les styles publics et privés
+.admin-booking-creation-scope {
+    padding-block: 2rem;
+    .reservation-container {
+        display: grid;
+        grid-template-columns: 1fr 360px; /* Conserve le format asymétrique de votre visiteur */
+        gap: 1.5rem;
+        align-items: start;
+        width: 100%;
+
+        @media (max-width: 992px) { grid-template-columns: 1fr; }
+    }
+
+    .summary-sticky-card {
+        position: sticky;
+        top: 20px;
+    }
+
+    .billing-details-list {
+        list-style: none;
+        padding: 0; margin: 0 0 1.5rem 0;
+        li { font-size: 13px; color: $gray; margin-bottom: 6px; span { color: $dark; font-weight: 600; } }
+    }
+
+    .summary-divider { border: none; border-top: 1px dashed $mute; margin-bottom: 1rem; }
+    .section-micro-label { display: block; font-size: 11px; font-weight: 700; color: darken($gray, 10%); margin-bottom: 6px; text-transform: uppercase; }
+
+    // Style pour les sélecteurs radio M-Pesa / Cash
+    .payment-method-selectors {
+        .payment-grid-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1rem; }
+        .pay-method-item {
+            cursor: pointer;
+            input[type="radio"] { display: none; }
+            .custom-box {
+                display: flex; gap: 8px; padding: 10px; border: 2px solid $mute; border-radius: $radius-input;
+                font-size: 12px; font-weight: 700; color: $dark; background: $white; justify-content: center; align-items: center;
+                i { color: $gray; }
+            }
+            input[type="radio"]:checked + .custom-box { border-color: $primary; background: rgba($primary, 0.04); color: $primary; i { color: $primary; } }
+        }
+    }
+}
+
+// Mode Sombre
+.dark {
+    .admin-booking-creation-scope {
+        .payment-method-selectors .pay-method-item .custom-box { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff; }
+        .payment-method-selectors .pay-method-item input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; }
+        .billing-details-list li span { color: #fff; }
+    }
+}
+
+
+// --- LOGIQUE D'ADAPTATION AU MODE SOMBRE (DARK MODE) ---
+.dark {
+    .admin-booking-creation-scope {
+        .header .header-main-info {
+            .agency-back-action { background: darken($dm-bg, 3%); border-color: rgba($mute, 0.2); color: #fff; }
+            .title h2 { color: #fff; }
+        }
+
+        .form-card-box {
+            background: $dm-bg; border-color: rgba($mute, 0.25);
+            .box-title { color: #fff; }
+            .field label, .payment-method-selectors .section-micro-label { color: $mute; }
+            
+            .field input, .field select, .payment-method-selectors .pay-method-item .custom-box {
+                background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff;
+            }
+
+            .payment-method-selectors .pay-method-item input[type="radio"]:checked + .custom-box {
+                border-color: $primary; background: rgba($primary, 0.1); color: $primary;
+            }
+        }
+
+        .billing-summary-zone {
+            background: rgba($white, 0.02);
+            .summary-line { color: $mute; strong { color: #fff; } &.total-price { color: #fff; } }
+            .summary-divider { border-top-color: rgba($mute, 0.15); }
+        }
+    }
+}
+
+
+
+
 // --- CONFIGURATION SPECIFIQUE SOMBRE (DARK MODE) ---
 .dark {
-    .admin-lines-wrapper {
+    .admin-reservations-wrapper {
         .header .title h2 { color: $white; }
         .top-action .btn-print-manifest { background: $white; color: $dark; }
 
