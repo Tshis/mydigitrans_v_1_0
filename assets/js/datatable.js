@@ -113,20 +113,65 @@ document.addEventListener('DOMContentLoaded', () => {
             prevBtn.disabled = currentPage === 1;
             nextBtn.disabled = currentPage === totalPages;
 
-            for (let i = 1; i <= totalPages; i++) {
+            // Nombre de boutons visibles maximum autour de la page courante
+            const maxVisibleButtons = 3; 
+            let startPage = Math.max(1, currentPage - 1);
+            let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+            // Ajustement si on est proche de la fin
+            if (endPage - startPage + 1 < maxVisibleButtons) {
+                startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+            }
+
+            // 1. Toujours afficher la PREMIÈRE PAGE si on est loin du début
+            if (startPage > 1) {
+                createPageButton(1);
+                if (startPage > 2) {
+                    createEllipsis();
+                }
+            }
+
+            // 2. Afficher les pages centrales (autour de la page active)
+            for (let i = startPage; i <= endPage; i++) {
+                createPageButton(i);
+            }
+
+            // 3. Toujours afficher la DERNIÈRE PAGE si on est loin de la fin
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    createEllipsis();
+                }
+                createPageButton(totalPages);
+            }
+
+            // Fonction interne pour générer un bouton de page clean
+            function createPageButton(pageNumber) {
                 const pageBtn = document.createElement('button');
                 pageBtn.type = 'button';
-                pageBtn.className = `page-item ${i === currentPage ? 'active' : ''}`;
-                pageBtn.textContent = i;
+                pageBtn.className = `page-item ${pageNumber === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = pageNumber;
 
                 pageBtn.addEventListener('click', () => {
-                    currentPage = i;
+                    currentPage = pageNumber;
                     updateTableDisplay();
                 });
 
                 pagesContainer.appendChild(pageBtn);
             }
+
+            // Fonction interne pour générer l'indicateur graphique "..."
+            function createEllipsis() {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                ellipsis.style.paddingInline = '6px';
+                ellipsis.style.color = 'var(--gray)';
+                ellipsis.style.fontSize = '12px';
+                ellipsis.style.fontWeight = '600';
+                pagesContainer.appendChild(ellipsis);
+            }
         }
+
 
         // --- ÉTAPE 3 : ÉCOUTEURS ---
 
