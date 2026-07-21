@@ -262,6 +262,61 @@
 
             &:hover { opacity: 0.9; }
         }
+
+        // À insérer à l'intérieur de la classe .header dans votre fichier show.scss
+        .ticket-booking-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+
+            .btn-guichet-direct {
+                padding: 10px 16px;
+                border-radius: $radius-input;
+                font-weight: 700;
+                font-size: 13px;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: transform 0.2s ease, opacity 0.2s ease;
+
+                &:hover {
+                    transform: translateY(-1px);
+                    opacity: 0.9;
+                }
+
+                &--sale {
+                    background-color: $success;
+                    color: $white;
+                }
+
+                &--booking {
+                    background-color: $primary;
+                    color: $white;
+                }
+            }
+            
+            .btn-print-manifest {
+                background: $dark;
+                color: $white;
+                border: none;
+                padding: 10px 16px;
+                border-radius: $radius-input;
+                font-weight: 600;
+                font-size: 13px;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+           @media (max-width: 400px) {
+                justify-content: center !important;
+            }
+        }
+
     }
 
     // --- BADGES DE STATUT OPÉRATIONNELS ---
@@ -440,8 +495,24 @@
     }
 }
 
+
 // --- INTEGRATION DARK MODE POUR LA PAGE SPECIFIQUE ---
 .dark {
+
+    .badge-warning-status {
+        background-color: $primary;
+        color: $white;
+    }
+    
+    .badge-status-confirmed {
+        background-color: $success;
+        color: $white;
+    }
+    
+    .badge-status-pending {
+        background-color: rgba($primary, 0.35);
+        color: $primary;
+    }
 
     .admin-agency-trip-show-scope {
 
@@ -450,7 +521,7 @@
             .header-main-info .agency-back-action {
                 background: darken($dm-bg, 3%);
                 border-color: rgba($mute, 0.2);
-                color: #fff;
+                color: $white;
                 &:hover { background: rgba($primary, 0.15); color: $primary; }
             }
 
@@ -463,6 +534,10 @@
             }
 
             .btn-print-manifest { background: $white; color: $dark; }
+
+            .ticket-booking-actions {
+                .btn-print-manifest { background: $white; color: $dark; }
+            }
         }
 
         
@@ -470,7 +545,7 @@
             background: $dm-bg; border-color: rgba($mute, 0.25);
             
             .workflow-steps-indicator .step-item {
-                &--passed .step-badge { background: #fff; border-color: #fff; color: $dark; }
+                &--passed .step-badge { background: $white; border-color: $white; color: $dark; }
                 &:not(&--passed):not(&--active) {
                     color: rgba($white, 0.4);
                     .step-badge { border-color: rgba($white, 0.2); color: rgba($white, 0.4); }
@@ -490,9 +565,9 @@
             .info-section-row.bordered-divider { border-top-color: rgba($mute, 0.15); }
             .info-section-row .info-text {
                 color: $mute;
-                strong { color: #fff; }
+                strong { color: $white; }
             }
-            .card-inner-box .box-title { color: #fff; }
+            .card-inner-box .box-title { color: $white; }
         }
     }
 

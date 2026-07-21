@@ -2,171 +2,184 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/datatable.js" defer></script>
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-agency-trip-show-scope container">
+	<div
+		class="admin-agency-trip-show-scope container">
 
-    {# --- EN-TÊTE DE LA PAGE --- #}
-    <header class="header mb-25">
-        <div class="header-main-info">
-            <a href="{{ path('admin_agency_trip_index') }}" class="agency-back-action" title="Retour à la liste">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <div class="title">
-                <h2>Voyage N° TRP-2026-0042</h2>
-                <div class="mt-5 sub-header-flex">
-                    <span class="badge badge-warning-status">Embarquement en cours</span>
-                    <span class="text-gray text-size-13 line">Ligne : Kinshasa - Kikwit via Kenge</span>
-                </div>
-            </div>
-        </div>
-        <div class="admin-action-zone">
-            <button type="button" class="btn btn-print-manifest">
-                <i class="fa-solid fa-print"></i>
-                Imprimer le Manifeste
-            </button>
-        </div>
-    </header>
+		{# --- EN-TÊTE DE LA PAGE DÉTAILS --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_trip_index') }}" class="agency-back-action" title="Retour à la liste">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h2>Voyage N° TRP-2026-0042</h2>
+					<div class="mt-5 sub-header-flex">
+						<span class="badge badge-warning-status">Embarquement en cours</span>
+						<span class="text-gray text-size-13">Ligne : Kinshasa - Kikwit via Kenge</span>
+					</div>
+				</div>
+			</div>
 
-    {# --- BARRE DE PILOTAGE DU STATUT (WORKFLOW WRAPPER) --- #}
-    <div class="trip-workflow-card mb-25">
-        <div class="workflow-steps-indicator">
-            <div class="step-item step-item--passed">
-                <span class="step-badge">1</span>
-                <span class="step-label">Planifié</span>
-            </div>
-            <i class="fa-solid fa-chevron-right arrow-divider"></i>
+			{# --- NOUVELLE ZONE : BILLETTERIE DIRECTE AU GUICHET --- #}
+			<div
+				class="admin-action-zone ticket-booking-actions">
+				{# Bouton Achat Direct #}
+				<a href="" class="btn btn-guichet-direct btn-guichet-direct--sale">
+					<i class="fa-solid fa-cart-shopping"></i>
+					Achat Direct (Billet)
+				</a>
 
-            <div class="step-item step-item--active">
-                <span class="step-badge">2</span>
-                <span class="step-label">Embarquement</span>
-            </div>
-            <i class="fa-solid fa-chevron-right arrow-divider"></i>
+				{# Bouton Réservation Pure #}
+				<a href="{{ path('admin_agency_reservation_add') }}" class="btn btn-guichet-direct btn-guichet-direct--booking">
+					<i class="fa-solid fa-file-invoice"></i>
+					Faire une Réservation
+				</a>
 
-            <div class="step-item">
-                <span class="step-badge">3</span>
-                <span class="step-label">En Route</span>
-            </div>
-            <i class="fa-solid fa-chevron-right arrow-divider"></i>
+				<button type="button" class="btn btn-print-manifest">
+					<i class="fa-solid fa-print"></i>
+					Imprimer le Manifeste
+				</button>
+			</div>
+		</header>
 
-            <div class="step-item">
-                <span class="step-badge">4</span>
-                <span class="step-label">Arrivé</span>
-            </div>
-        </div>
+		{# --- BARRE DE PILOTAGE DU STATUT (WORKFLOW) --- #}
+		<div class="trip-workflow-card mb-25">
+			<div class="workflow-steps-indicator">
+				<div class="step-item step-item--passed">
+					<span class="step-badge">1</span>
+					<span class="step-label">Planifié</span>
+				</div>
+				<i class="fa-solid fa-chevron-right arrow-divider"></i>
 
-        <div class="workflow-actions-buttons">
-            <button type="button" class="btn btn-success-action">
-                <i class="fa-solid fa-bus"></i>
-                Clôturer & Faire partir
-            </button>
-            <button type="button" class="btn btn-danger-action"
-                onclick="return confirm('Êtes-vous sûr de vouloir annuler définitivement ce voyage ? Cette action est irréversible.');">
-                <i class="fa-solid fa-rectangle-xmark"></i>
-                Annuler
-            </button>
-        </div>
-    </div>
+				<div class="step-item step-item--active">
+					<span class="step-badge">2</span>
+					<span class="step-label">Embarquement</span>
+				</div>
+				<i class="fa-solid fa-chevron-right arrow-divider"></i>
 
-    {# --- LAYOUT DEUX COLONNES RESPONSIVE --- #}
-    <div class="trip-dashboard-layout">
+				<div class="step-item">
+					<span class="step-badge">3</span>
+					<span class="step-label">En Route</span>
+				</div>
+				<i class="fa-solid fa-chevron-right arrow-divider"></i>
 
-        {# BLOC FICHE TECHNIQUE LOGISTIQUE #}
-        <div class="layout-sidebar-card">
-            <div class="card-inner-box">
-                <h3 class="box-title">
-                    <i class="fa-solid fa-circle-info"></i>
-                    Détails Logistiques
-                </h3>
+				<div class="step-item">
+					<span class="step-badge">4</span>
+					<span class="step-label">Arrivé</span>
+				</div>
+			</div>
 
-                <div class="info-section-row">
-                    <label class="section-micro-label">PLANIFICATION HORAIRE</label>
-                    <p class="info-text">
-                        <strong>Départ :</strong> 14/07/2026 à 14h30
-                    </p>
-                    <p class="info-text">
-                        <strong>Arrivée estimée :</strong> 14/07/2026 à 22h30
-                    </p>
-                </div>
+			<div class="workflow-actions-buttons">
+				<button type="button" class="btn btn-success-action">
+					<i class="fa-solid fa-bus"></i>
+					Clôturer & Faire partir
+				</button>
+				<button type="button" class="btn btn-danger-action" onclick="return confirm('Annuler définitivement ce départ ?');">
+					<i class="fa-solid fa-rectangle-xmark"></i>
+					Annuler
+				</button>
+			</div>
+		</div>
 
-                <div class="info-section-row bordered-divider">
-                    <label class="section-micro-label">AFFECTATION MATÉRIELLE</label>
-                    <p class="info-text">
-                        <strong>Bus :</strong> N°01 (Mercedes Marcopolo)
-                    </p>
-                    <p class="info-text">
-                        <strong>Capacité :</strong> 54 Sièges configurés
-                    </p>
-                </div>
+		{# --- LAYOUT DEUX COLONNES --- #}
+		<div
+			class="trip-dashboard-layout">
 
-                <div class="info-section-row bordered-divider">
-                    <label class="section-micro-label">ÉQUIPAGE EN MISSION</label>
-                    <p class="info-text">
-                        <strong>Chauffeur :</strong> Jean Mukendi
-                    </p>
-                    <p class="info-text">
-                        <strong>Co-Chauffeur :</strong> Dummy Tshimanga
-                    </p>
-                </div>
-            </div>
-        </div>
+			{# BLOC LOGISTIQUE #}
+			<div class="layout-sidebar-card">
+				<div class="card-inner-box">
+					<h3 class="box-title">
+						<i class="fa-solid fa-circle-info"></i>
+						Détails Logistiques</h3>
+					<div class="info-section-row">
+						<label class="section-micro-label">PLANIFICATION HORAIRE</label>
+						<p class="info-text">
+							<strong>Départ :</strong>
+							14/07/2026 à 14h30</p>
+						<p class="info-text">
+							<strong>Arrivée estimée :</strong>
+							14/07/2026 à 22h30</p>
+					</div>
+					<div class="info-section-row bordered-divider">
+						<label class="section-micro-label">AFFECTATION MATÉRIELLE</label>
+						<p class="info-text">
+							<strong>Bus :</strong>
+							N°01 (Mercedes Marcopolo)</p>
+						<p class="info-text">
+							<strong>Capacité :</strong>
+							54 Sièges configurés</p>
+					</div>
+					<div class="info-section-row bordered-divider">
+						<label class="section-micro-label">ÉQUIPAGE EN MISSION</label>
+						<p class="info-text">
+							<strong>Chauffeur :</strong>
+							Jean Mukendi</p>
+						<p class="info-text">
+							<strong>Co-Chauffeur :</strong>
+							Dummy Tshimanga</p>
+					</div>
+				</div>
+			</div>
 
-        {# BLOC TABLEAU DU MANIFESTE DES VOYAGEURS #}
-        <div class="layout-main-card">
-            <div class="card-inner-box">
-                <div class="box-header-title mb-15">
-                    <h3 class="box-title">
-                        <i class="fa-solid fa-users"></i>
-                        Manifeste des Voyageurs
-                    </h3>
-                    <p class="text-gray text-size-12">Liste nominative des passagers enregistrés sur ce départ.</p>
-                </div>
+			{# BLOC MANIFESTE (DEPEND DU COMPOSANT GLOBAL) #}
+			<div class="layout-main-card">
+				<div class="card-inner-box">
+					<div class="box-header-title mb-15">
+						<h3 class="box-title">
+							<i class="fa-solid fa-users"></i>
+							Manifeste des Voyageurs</h3>
+						<p class="text-gray text-size-12">Liste nominative des passagers enregistrés sur ce départ.</p>
+					</div>
 
-                <!-- NETTOYÉ : Plus de div manuelle ici, la table gère tout via le script global -->
-                <table class="table table-scrollable table-striped">
-                    <thead>
-                        <tr>
-                            <th>N° Siège</th>
-                            <th>Nom du passager</th>
-                            <th>Segment (Trajet)</th>
-                            <th>Téléphone</th>
-                            <th class="text-right">Statut</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <strong>01</strong>
-                                <span class="sub-meta-text">(VIP)</span>
-                            </td>
-                            <td><strong>Kabila Dieudonné</strong></td>
-                            <td>Kinshasa → Kikwit</td>
-                            <td>+243 812 345 678</td>
-                            <td class="text-right">
-                                <span class="badge-status-confirmed">Confirmé</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <strong>03</strong>
-                                <span class="sub-meta-text">(Std)</span>
-                            </td>
-                            <td><strong>Ilunga Christian</strong></td>
-                            <td>Kenge → Kikwit</td>
-                            <td>+243 824 556 677</td>
-                            <td class="text-right">
-                                <span class="badge-status-pending">Réservé</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+					<table class="table table-scrollable table-striped js-datatable">
+						<thead>
+							<tr>
+								<th>N° Siège</th>
+								<th>Nom du passager</th>
+								<th>Segment (Trajet)</th>
+								<th>Téléphone</th>
+								<th class="text-right">Statut</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<strong>01</strong>
+									<span class="sub-meta-text">(VIP)</span>
+								</td>
+								<td>
+									<strong>Kabila Dieudonné</strong>
+								</td>
+								<td>Kinshasa → Kikwit</td>
+								<td>+243 812 345 678</td>
+								<td class="text-right">
+									<span class="badge-status-confirmed">Confirmé</span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<strong>03</strong>
+									<span class="sub-meta-text">(Std)</span>
+								</td>
+								<td>
+									<strong>Ilunga Christian</strong>
+								</td>
+								<td>Kenge → Kikwit</td>
+								<td>+243 824 556 677</td>
+								<td class="text-right">
+									<span class="badge-status-pending">Réservé</span>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 
-            </div>
-        </div>
-
-    </div>
-</div>
+		</div>
+	</div>
 {% endblock %}
