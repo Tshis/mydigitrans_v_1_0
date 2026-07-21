@@ -1,0 +1,248 @@
+@use '../../abstract/variables' as *;
+
+.admin-shipment-wrapper {
+    width: 100%;
+    margin-block: 2rem;
+
+    // --- VARIABLES LOCALES & UTILITIES ---
+    .mb-20 { margin-bottom: 1.25rem; }
+    .text-right { text-align: right !important; }
+    
+    .sub-meta-text {
+        display: block;
+        font-size: 11px;
+        color: $gray;
+        margin-top: 2px;
+    }
+
+    // --- STYLE DE L'EN-TÊTE ---
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        padding-top: 1rem;
+
+        .title {
+            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; display: flex; align-items: center; gap: 10px; i { color: $primary; } }
+            p { font-size: 13px; color: $gray; margin-top: 4px; }
+        }
+
+        .btn-print-manifest {
+            color: $white;
+            background-color: $success;
+            border: none;
+            padding: 10px 16px;
+            border-radius: $radius-input;
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+
+            &:hover { opacity: 0.9; }
+        }
+    }
+
+    // --- GRILLE DES CARTES DE STATISTIQUES ---
+    .stats-overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        width: 100%;
+
+        .stat-card {
+            background: $white;
+            border: 1px solid $mute;
+            border-radius: $radius-card;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            transition: transform 0.2s ease;
+    
+            &:hover { transform: translateY(-2px); }
+    
+            .stat-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+    
+                &--primary { background: rgba($primary, 0.1); color: $primary; }
+                &--success { background: rgba($success, 0.1); color: $success; }
+                &--danger  { background: rgba($danger, 0.1); color: $danger; }
+            }
+    
+            .stat-details {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+    
+                .stat-label { font-size: 11px; color: $gray; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+                .stat-value { font-size: 1.5rem; font-weight: 800; color: $dark; line-height: 1.2; }
+            }
+        }
+    }
+
+    // --- ZONE DE FILTRES AVANCÉS ---
+    .trip-filters-card {
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        padding: 1.25rem 1.5rem;
+    
+        .field-group {
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 1.25rem;
+            align-items: flex-end;
+            width: 100%;
+    
+            .field {
+                flex: 1;
+                min-width: 220px; 
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+
+                .admin-bus-layout-add-label { font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; }
+                
+                .admin-bus-layout-add-input, .admin-bus-layout-add-select {
+                    width: 100%;
+                    padding: 8px 12px;
+                    border: 1px solid $mute;
+                    border-radius: $radius-input;
+                    font-size: 13px;
+                    font-weight: 600;
+                    background: $white;
+                    color: $dark;
+                    outline: none;
+                    height: 38px;
+                    box-sizing: border-box;
+                    transition: border-color 0.2s;
+
+                    &:focus { border-color: $primary; }
+                }
+            }
+    
+            .field-actions {
+                .btn-reset {
+                    white-space: nowrap;
+                    height: 38px;
+                    padding-inline: 20px;
+                    background-color: $dark;
+                    color: $white;
+                    border: none;
+                    border-radius: $radius-input;
+                    font-weight: 700;
+                    font-size: 13px;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: opacity 0.2s;
+
+                    &:hover { opacity: 0.9; }
+                }
+            }
+        }
+    }
+
+    // --- CELLULES DE STATUT ET BADGES DE FRET OPÉRATIONNELS ---
+    .table-badge-cell {
+        vertical-align: middle;
+
+        .badge-shipment {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+
+            &.pending { background-color: rgba($danger, 0.12); color: $danger; }                     
+            &.warehouse { background-color: rgba($primary, 0.12); color: $primary; }                 
+            &.transit { background-color: rgba($primary, 0.25); color: $dark; }                     
+            &.ready { background-color: rgba($mute, 0.4); color: $dark; }                       
+            &.delivered { background-color: rgba($success, 0.12); color: $success; }                 
+        }
+    }
+
+    // --- ALIGNEMENT DES BOUTONS D'ACTION DU TABLEAU ---
+    .text-right.table-action-buttons {
+        display: table-cell !important; 
+        vertical-align: middle !important; 
+        text-align: right !important; 
+        white-space: nowrap !important; 
+
+        .table-action-trigger {
+            display: inline-flex !important; 
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: rgba($gray, 0.08);
+            color: $dark;
+            font-size: 13px;
+            margin-left: 6px; 
+            float: none !important;
+            transition: all 0.2s;
+
+            &.view:hover      { background: rgba($primary, 0.12); color: $primary; }
+            &.print:hover     { background: rgba($dark, 0.12); color: $dark; }
+            &.validate:hover  { background: rgba($success, 0.12); color: $success; }
+        }
+    }
+}
+
+// --- CONFIGURATION MODE SOMBRE (DARK MODE) ---
+.dark {
+    .admin-shipment-wrapper {
+        background-color: $dm-bg-main;
+        
+        .header .title h2 { color: $white; }
+        .header .btn-print-manifest { background-color: $white; color: $dark; }
+
+        .stats-overview-grid .stat-card {
+            background: $dm-bg-surface; 
+            border-color: rgba($mute, 0.2);
+            .stat-label { color: $mute; }
+            .stat-value { color: $white; }
+        }
+
+        .trip-filters-card {
+            background: $dm-bg-surface; 
+            border-color: rgba($mute, 0.2);
+            .field-group .field {
+                label { color: $mute; }
+                input, select { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.2); color: $white; }
+            }
+            .field-actions .btn-reset { background-color: $white; color: $dark; }
+        }
+
+        .table-badge-cell .badge-shipment {
+            &.pending { background-color: rgba($danger, 0.2); }
+            &.warehouse { background-color: rgba($primary, 0.2); }
+            &.transit { background-color: rgba($primary, 0.35); color: $white; }
+            &.ready { background-color: rgba($mute, 0.2); color: $white; }
+            &.delivered { background-color: rgba($success, 0.2); }
+        }
+
+        .text-right.table-action-buttons .table-action-trigger {
+            background: rgba($white, 0.05); color: $mute;
+            &.view:hover      { color: $primary; background: rgba($primary, 0.2); }
+            &.print:hover     { color: $white; background: rgba($white, 0.15); }
+            &.validate:hover  { color: $success; background: rgba($success, 0.2); }
+        }
+    }
+}

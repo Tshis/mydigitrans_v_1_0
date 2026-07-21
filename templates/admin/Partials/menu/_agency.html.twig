@@ -21,7 +21,7 @@
 	<span class="text">Réservations</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Gestion des Colis">
+<a href="{{path('admin_agency_shipment_index')}}" class="menu-link {{ page is same as('shipment') ? 'active' : '' }}" data-tooltip="Gestion des Colis">
 	<span class="icon">
 		<i class="fa-solid fa-box-open"></i>
 	</span>

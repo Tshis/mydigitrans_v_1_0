@@ -1,0 +1,179 @@
+{# templates/admin/agency/shipment/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-shipment-wrapper container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-20">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-boxes-stacked"></i>
+					Registre de Suivi du Fret & Colis
+				</h2>
+				<p>Suivez les colis déposés, contrôlez les statuts de paiement en caisse, et validez les retraits aux terminus.</p>
+			</div>
+			<div class="admin-bus-layout-add-action-zone">
+				<a href="{{ path('admin_agency_shipment_add') }}" class="btn btn-print-manifest">
+					<i class="fa-solid fa-plus"></i>
+					Enregistrer un colis
+				</a>
+			</div>
+		</header>
+
+		{# --- CARTES DE STATISTIQUES DE FRET --- #}
+		<div class="stats-overview-grid">
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-warehouse"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">En Entrepôt (Dépôt)</span>
+					<strong class="stat-value">42</strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-truck-ramp-box"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">En Transit (Dans le bus)</span>
+					<strong class="stat-value">18</strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--danger">
+					<i class="fa-solid fa-circle-check"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Livrés / Retirés</span>
+					<strong class="stat-value">1,105</strong>
+				</div>
+			</div>
+		</div>
+
+		{# --- ZONE DE FILTRES AVANCÉS DU BACKOFFICE --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="#" method="GET" class="field-group">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Code Suivi / Téléphone Destinataire</label>
+					<input type="text" name="search_query" class="admin-bus-layout-add-input" placeholder="Ex: SHP-2607-001">
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">État du Colis</label>
+					<select name="shipment_status" class="admin-bus-layout-add-select">
+						<option value="">-- Tous les états --</option>
+						<option value="pending">En attente (Non payé)</option>
+						<option value="received">Reçu à l'entrepôt (Payé)</option>
+						<option value="in_transit">En cours de route</option>
+						<option value="available">Prêt pour retrait</option>
+						<option value="delivered">Remis au destinataire</option>
+					</select>
+				</div>
+				<div class="field-actions">
+					<button type="submit" class="btn btn-reset">
+						<i class="fa-solid fa-filter"></i>
+						Filtrer
+					</button>
+				</div>
+			</form>
+		</div>
+
+		{# --- TABLEAU GÉNÉRIQUE DES COLIS (COMPOSANT GLOBAL) --- #}
+		<table class="table table-scrollable table-striped js-datatable">
+			<thead>
+				<tr>
+					<th>Code Suivi</th>
+					<th>Expéditeur (Sender)</th>
+					<th>Destinataire (Receiver)</th>
+					<th>Caractéristiques</th>
+					<th>Paiement Fret</th>
+					<th>État Logistique</th>
+					<th class="text-right">Actions Guichet</th>
+				</tr>
+			</thead>
+			<tbody>
+				{# Exemple 1 : Colis payé en cours de voyage #}
+				<tr>
+					<td>
+						<strong>SHP-2026-8942</strong>
+						<span class="sub-meta-text">Gare Kinshasa</span>
+					</td>
+					<td>
+						<strong>Mbala Jean</strong>
+						<span class="sub-meta-text">+243 812 345 678</span>
+					</td>
+					<td>
+						<strong>Toko Dieudonné</strong>
+						<span class="sub-meta-text">+243 897 654 321</span>
+					</td>
+					<td>
+						<strong>Carton Pièces Réchange</strong>
+						<span class="sub-meta-text">Poids : 25 Kg (Fragile)</span>
+					</td>
+					<td>
+						<strong>17 500 CDF</strong>
+						<span class="sub-meta-text text-weight-700 text-success">PAYÉ (Caisse)</span>
+					</td>
+					<td class="table-badge-cell">
+						<span class="badge-shipment transit">En Transit</span>
+					</td>
+					<td class="text-right table-action-buttons">
+						<a href="#" class="table-action-trigger view" title="Voir l'historique complet du colis">
+							<i class="fa-solid fa-eye"></i>
+						</a>
+						<a href="#" class="table-action-trigger print" title="Imprimer l'étiquette de colisage">
+							<i class="fa-solid fa-tag"></i>
+						</a>
+					</td>
+				</tr>
+
+				{# Exemple 2 : Colis arrivé à destination, prêt à être retiré #}
+				<tr>
+					<td>
+						<strong>SHP-2026-8943</strong>
+						<span class="sub-meta-text">Gare Kenge</span>
+					</td>
+					<td>
+						<strong>Mukendi Pierre</strong>
+						<span class="sub-meta-text">+243 824 556 677</span>
+					</td>
+					<td>
+						<strong>Buka Marie</strong>
+						<span class="sub-meta-text">+243 815 112 233</span>
+					</td>
+					<td>
+						<strong>Sac de Vivres / Manioc</strong>
+						<span class="sub-meta-text">Poids : 50 Kg (Périssable)</span>
+					</td>
+					<td>
+						<strong>20 000 CDF</strong>
+						<span class="sub-meta-text text-weight-700 text-success">PAYÉ (Caisse)</span>
+					</td>
+					<td class="table-badge-cell">
+						<span class="badge-shipment ready">Disponible Terminus</span>
+					</td>
+					<td
+						class="text-right table-action-buttons">
+						{# Action forte de déchargement / remise physique #}
+						<a href="#" class="table-action-trigger validate" title="Confirmer le retrait physique par le destinataire" onclick="return confirm('Confirmer la remise du colis et clôturer le suivi ?');">
+							<i class="fa-solid fa-box-open"></i>
+						</a>
+						<a href="#" class="table-action-trigger view" title="Voir l'historique">
+							<i class="fa-solid fa-eye"></i>
+						</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+{% endblock %}
