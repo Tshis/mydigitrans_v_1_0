@@ -213,9 +213,48 @@
 
 
 //=====NEW RESERVATION========
-// À insérer à la racine de votre fichier admin pour lier les styles publics et privés
 .admin-booking-creation-scope {
+
     padding-block: 2rem;
+
+    .header{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .agency-back-action{
+            background: $white;
+            border: 1px solid $mute;
+            width: 3.25rem;
+            height: 3.25rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .3s;
+
+            &:hover{
+                transform: translateX(-.5rem);
+            }
+        }//agency-back-action
+
+        .title{
+
+            h2{font-size: 1.5rem;}
+            p{font-size: 1rem; color: $gray;}
+
+        }//title
+    }//header
+
+
+    //===UTILITAIRES COMMUNS===
+    .card{
+        h2{
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+    }
+
     .reservation-container {
         display: grid;
         grid-template-columns: 1fr 360px; /* Conserve le format asymétrique de votre visiteur */
@@ -224,7 +263,7 @@
         width: 100%;
 
         @media (max-width: 992px) { grid-template-columns: 1fr; }
-    }
+    }//reservation-container
 
     .summary-sticky-card {
         position: sticky;
@@ -256,31 +295,222 @@
     }
 }
 
-// Mode Sombre
+
+//=====RESERVATION SHOW========
+.admin-booking-show-scope {
+    width: 100%;
+
+    // --- VARIABLES ---
+    .mb-25 { margin-bottom: 1.6rem; }
+    .mb-20 { margin-bottom: 1.25rem; }
+    .mt-5  { margin-top: 0.35rem; }
+    .text-gray { color: $gray; }
+    .text-size-13 { font-size: 13px; }
+
+    // --- EN-TÊTE ---
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        padding-block: 1.5rem;
+
+        .header-main-info {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+
+            .agency-back-action {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: $white;
+                border: 1px solid $mute;
+                color: $dark;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+
+                &:hover { background: rgba($primary, 0.08); color: $primary; transform: translateX(-3px); }
+            }
+
+            .title {
+                h2 { font-size: 1.5rem; font-weight: 800; color: $dark; }
+                .sub-header-flex { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+            }
+        }
+
+        .btn-print-voucher {
+            background: $dark; color: $white; border: none; padding: 10px 16px; border-radius: $radius-input;
+            font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+
+            &:hover { opacity: 0.9; }
+        }
+    }
+
+    // --- BADGES DE STATUT OPÉRATIONNEL ---
+    .badge-status-pending {
+        background-color: rgba($primary, 0.12); color: $primary;
+        padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    }
+
+    // --- BARRE D'ALERTE TEMPORELLE ---
+    .booking-expiration-alert-bar {
+        background-color: rgba($danger, 0.06);
+        border: 1px solid rgba($danger, 0.15);
+        border-left: 4px solid $danger;
+        border-radius: 6px;
+        padding: 1rem 1.25rem;
+
+        .alert-message {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: darken($danger, 10%);
+
+            i { font-size: 1.1rem; }
+            strong { color: $dark; font-weight: 700; }
+        }
+    }
+
+    // --- GRID LAYOUT RESPONSIVE ---
+    .booking-details-layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 1.5rem;
+        align-items: start;
+
+        @media (max-width: 992px) { grid-template-columns: 1fr; }
+    }
+
+    // --- STYLE DES BLOCS DE CARTES ---
+    .detail-card-box {
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+
+        .box-title {
+            font-size: 13px; font-weight: 700; text-transform: uppercase; color: $dark;
+            display: flex; align-items: center; gap: 8px; margin-bottom: 1.25rem; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 6px;
+            i { color: $gray; }
+        }
+
+        &.highlight-seat-box {
+            background: linear-gradient(135deg, rgba($primary, 0.02) 0%, rgba($primary, 0.05) 100%);
+            border-color: rgba($primary, 0.2);
+        }
+    }
+
+    // --- STRUCTURE DE GRILLE DES INFORMATIONS TEXTUELLES ---
+    .info-grid-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem 1.5rem;
+
+        @media (max-width: 576px) { grid-template-columns: 1fr; gap: 1rem; }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+    }
+
+    .info-label { font-size: 10px; font-weight: 800; color: $gray; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-size: 13px; font-weight: 600; color: $dark; margin: 0; }
+
+    // --- MACRO BADGE DU NUMÉRO DE SIÈGE ---
+    .seat-badge-display {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: $primary;
+        line-height: 1;
+        margin-block: 0.5rem;
+    }
+    .seat-fare-label { font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; }
+
+    // --- ESTIMATION FINANCIÈRE ET LIENS DE SÉCURITÉ ---
+    .billing-estimation-zone {
+        .estimated-price { font-size: 1.6rem; font-weight: 800; color: $success; margin-top: 4px; }
+    }
+
+    .sidebar-action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .btn {
+            width: 100%;
+            height: 40px;
+            border-radius: $radius-input;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: opacity 0.2s;
+
+            &:hover { opacity: 0.9; }
+        }
+
+        .btn-pay-trigger { background-color: $success; color: $white; }
+        .btn-cancel-trigger { background-color: rgba($danger, 0.1); color: $danger; }
+    }
+}
+
+// --- ADAPTATION MODE SOMBRE (DARK MODE) ---
 .dark {
-    .admin-booking-creation-scope {
-        .payment-method-selectors .pay-method-item .custom-box { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff; }
-        .payment-method-selectors .pay-method-item input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; }
-        .billing-details-list li span { color: #fff; }
+    .admin-booking-show-scope {
+        .header .header-main-info {
+            .agency-back-action { background: darken($dm-bg, 3%); border-color: rgba($mute, 0.2); color: $white; }
+            .title h2 { color: $white; }
+        }
+        .header .btn-print-manifest { background: $white; color: $dark; }
+
+        .booking-expiration-alert-bar { background-color: rgba($danger, 0.12); .alert-message { color: lighten($danger, 10%); strong { color: $white; } } }
+        
+        .detail-card-box {
+            background: $dm-bg; border-color: rgba($mute, 0.25);
+            .box-title { color: $white; border-bottom-color: rgba($mute, 0.15); }
+            .info-value { color: $white; }
+            &.highlight-seat-box { background: rgba($primary, 0.05); }
+        }
+        
+        .sidebar-action-buttons .btn-cancel-trigger { background-color: rgba($danger, 0.2); }
     }
 }
 
 
+// Mode Sombre
 // --- LOGIQUE D'ADAPTATION AU MODE SOMBRE (DARK MODE) ---
 .dark {
     .admin-booking-creation-scope {
-        .header .header-main-info {
-            .agency-back-action { background: darken($dm-bg, 3%); border-color: rgba($mute, 0.2); color: #fff; }
-            .title h2 { color: #fff; }
+        .payment-method-selectors .pay-method-item .custom-box { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $white; }
+        .payment-method-selectors .pay-method-item input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; }
+        .billing-details-list li span { color: $white; }
+    }
+
+        .header {
+            .title{
+                h2 { color: $white; }
+                p{color: $mute;}
+            } 
         }
 
         .form-card-box {
             background: $dm-bg; border-color: rgba($mute, 0.25);
-            .box-title { color: #fff; }
+            .box-title { color: $white; }
             .field label, .payment-method-selectors .section-micro-label { color: $mute; }
             
             .field input, .field select, .payment-method-selectors .pay-method-item .custom-box {
-                background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff;
+                background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $white;
             }
 
             .payment-method-selectors .pay-method-item input[type="radio"]:checked + .custom-box {
@@ -290,11 +520,10 @@
 
         .billing-summary-zone {
             background: rgba($white, 0.02);
-            .summary-line { color: $mute; strong { color: #fff; } &.total-price { color: #fff; } }
+            .summary-line { color: $mute; strong { color: $white; } &.total-price { color: $white; } }
             .summary-divider { border-top-color: rgba($mute, 0.15); }
         }
-    }
-}
+}//dark
 
 
 

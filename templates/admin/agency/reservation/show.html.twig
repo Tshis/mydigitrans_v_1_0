@@ -1,0 +1,142 @@
+{# templates/admin/agency/booking/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-booking-show-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_booking_backoffice_index') }}" class="agency-back-action" title="Retour au registre">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h2>Bon de Réservation N° RVS-2026-8943</h2>
+					<div class="mt-5 sub-header-flex">
+						<span class="badge-status-pending">En attente de paiement</span>
+						<span class="text-gray text-size-13">Émis par : Guichet Kinshasa (Session #12)</span>
+					</div>
+				</div>
+			</div>
+			<div class="admin-action-zone">
+				<button type="button" class="btn btn-print-voucher">
+					<i class="fa-solid fa-print"></i>
+					Imprimer le Bon
+				</button>
+			</div>
+		</header>
+
+		{# --- BLOC ALERT TEMPOREL D'EXPIRATION --- #}
+		<div class="booking-expiration-alert-bar mb-25">
+			<div class="alert-message">
+				<i class="fa-solid fa-clock-history"></i>
+				<span>Attention : Cette réservation expirera automatiquement le
+					<strong>14/07/2026 à 12h30</strong>
+					(2h avant le départ) si aucun versement n'est enregistré.</span>
+			</div>
+		</div>
+
+		{# --- LAYOUT DEUX COLONNES RESPONSIVE --- #}
+		<div
+			class="booking-details-layout">
+
+			{# COLONNE GAUCHE : FICHE DU VOYAGEUR ET ITINÉRAIRE #}
+			<div
+				class="layout-main-panel">
+
+				{# Fiche du passager #}
+				<div class="detail-card-box mb-20">
+					<h3 class="box-title">
+						<i class="fa-solid fa-user"></i>
+						Informations du Voyageur</h3>
+					<div class="info-grid-details">
+						<div class="info-item">
+							<span class="info-label">Nom complet</span>
+							<p class="info-value">Mputu Antoinette</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Téléphone</span>
+							<p class="info-value">+243 897 112 233</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Type de document</span>
+							<p class="info-value">Carte d'électeur</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">N° de document</span>
+							<p class="info-value">1204-C001-9834</p>
+						</div>
+					</div>
+				</div>
+
+				{# Fiche du voyage #}
+				<div class="detail-card-box">
+					<h3 class="box-title">
+						<i class="fa-solid fa-route"></i>
+						Détails de l'Itinéraire</h3>
+					<div class="info-grid-details">
+						<div class="info-item">
+							<span class="info-label">Code Voyage</span>
+							<p class="info-value">TRP-2026-0042</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Trajet</span>
+							<p class="info-value">Kinshasa → Kenge</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Date & Heure</span>
+							<p class="info-value">14/07/2026 à 14h30</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Véhicule Assigné</span>
+							<p class="info-value">Bus 01 (Marcopolo)</p>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			{# COLONNE DROITE : ATTRIBUTION LOGISTIQUE ET ACTIONS DE REDIRECTION #}
+			<aside
+				class="layout-sidebar-panel">
+
+				{# Carte de Siège #}
+				<div class="detail-card-box text-center mb-20 highlight-seat-box">
+					<span class="info-label">SIÈGE ATTRIBUÉ</span>
+					<div class="seat-badge-display">14</div>
+					<span class="seat-fare-label">Classe Standard</span>
+				</div>
+
+				{# Carte d'encaissement future #}
+				<div class="detail-card-box action-routing-box">
+					<h3 class="box-title">
+						<i class="fa-solid fa-cash-register"></i>
+						Actions Guichet</h3>
+
+					<div class="billing-estimation-zone mb-20">
+						<span class="info-label">Montant à percevoir en caisse :</span>
+						<p class="estimated-price">45 000 CDF</p>
+					</div>
+
+					<div
+						class="sidebar-action-buttons">
+						{# Redirection directe vers la caisse avec l'ID du bon #}
+						<a href="#" class="btn btn-pay-trigger">
+							<i class="fa-solid fa-money-bill-transfer"></i>
+							Envoyer à la Caisse
+						</a>
+
+						{# Lien d'annulation manuelle #}
+						<a href="#" class="btn btn-cancel-trigger" onclick="return confirm('Annuler cette réservation définitivement ? Le siège sera libéré.');">
+							<i class="fa-solid fa-trash-can"></i>
+							Annuler la réservation
+						</a>
+					</div>
+				</div>
+
+			</aside>
+
+		</div>
+	</div>
+{% endblock %}
