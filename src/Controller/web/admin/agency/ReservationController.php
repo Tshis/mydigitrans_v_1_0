@@ -19,36 +19,46 @@ class ReservationController extends AbstractController
         ]);
     } //index
 
+
     #[Route('/admin/agency/reservations/add/{code}', name: 'admin_agency_reservation_add')]
-    public function add(Request $request, BusLayoutGridBuilder $busLayoutGridBuilder): Response
+    public function add(Request $request, BusLayoutGridBuilder $busLayoutGridBuilder, string $code): Response
     {
         $session = $request->getSession();
-
         $layouts = $session->get('bus_layout', []);
 
-        // simulation bus -> layout
-        $busToLayoutMap = [
-            'kin-matadi-trans-david-01' => 1,
-            'kin-matadi-trans-david-02' => 2,
-            'kin-matadi-trans-david-03' => 3,
-        ];
-
+        // Simulation : l'ID du layout dépend du code du voyage / véhicule
         $layoutId = 1;
-
         $busLayout = $layouts[$layoutId] ?? null;
 
         if (!$busLayout) {
             throw $this->createNotFoundException('Bus layout introuvable');
         }
 
+        // --- SIMULATION DES TARIFS PROVENANT DU MCD ---
+
+        // La devise peut changer dynamiquement selon le trajet ou la session d'agence
+        $currencyCode = 'CDF'; // Exemples : 'CDF', 'USD', 'XAF'
+
+        // Grille tarifaire par segment : "id_depart-id_arrivee" => Prix en CDF
+        $pricingMatrix = [
+            '1-3' => 45000, // Kinshasa -> Kikwit (Complet)
+            '1-2' => 25000, // Kinshasa -> Kenge (Partiel)
+            '2-3' => 30000  // Kenge -> Kikwit (Partiel)
+        ];
+
+        // Prix par catégorie de place
+        $fareCategories = [
+            'seat' => 0,      // Pas de surplus pour un siège Standard
+            'vip'  => 15000   // +15 000 CDF de majoration pour la classe VIP
+        ];
+
         return $this->render('admin/agency/reservation/add.html.twig', [
             'page' => 'reservation',
+            'trip_code' => $code,
             'seatmap' => $busLayoutGridBuilder->build($busLayout),
+            'pricing_matrix' => $pricingMatrix,
+            'fare_categories' => $fareCategories,
+            'currency_code' => $currencyCode,
         ]);
-    } //index
-
-
-
-
-
+    } //add
 }
