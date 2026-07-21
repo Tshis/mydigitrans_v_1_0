@@ -613,6 +613,19 @@
         .btn-pay-trigger { background-color: $success; color: $white; }
         .btn-cancel-trigger { background-color: rgba($danger, 0.1); color: $danger; }
     }
+
+    .cancellation-box{
+
+        border-top: 1px dashed $mute;
+        padding-block: 1rem;
+        display: none;
+        transition: all .3s;
+
+        &.active{
+            display: block;
+        }
+
+    }
 }
 
 

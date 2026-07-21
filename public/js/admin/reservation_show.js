@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",()=>{var e=document.getElementById("cancelBtn"),t=document.getElementById("cancel2");let n=document.getElementById("cancel-reason");function c(){n.classList.toggle("active")}e&&n&&(e.addEventListener("click",c),t.addEventListener("click",c))});
