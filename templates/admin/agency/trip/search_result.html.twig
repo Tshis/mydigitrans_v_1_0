@@ -2,141 +2,142 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/datatable.js" defer></script>
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-trip-wrapper container">
+	<div
+		class="admin-trip-wrapper container">
 
-    {# --- EN-TÊTE DE LA PAGE --- #}
-    <header class="header mb-20">
-        <div class="title">
-            <h2>
-                <i class="fa-solid fa-magnifying-glass"></i>
-                Résultats de la Recherche de Voyages
-            </h2>
-            <p>Voici les départs disponibles correspondants à vos critères de filtrage au guichet.</p>
-        </div>
-        <div class="admin-bus-layout-add-action-zone">
-            <a href="{{ path('admin_agency_trip_index') }}" class="btn btn-dark text-size-12">
-                <i class="fa-solid fa-arrow-left"></i>
-                Retour à l'index global
-            </a>
-        </div>
-    </header>
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-20">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-magnifying-glass"></i>
+					Résultats de la Recherche de Voyages
+				</h2>
+				<p>Voici les départs disponibles correspondants à vos critères de filtrage au guichet.</p>
+			</div>
+			<div class="admin-bus-layout-add-action-zone">
+				<a href="{{ path('admin_agency_trip_index') }}" class="btn btn-dark text-size-12">
+					<i class="fa-solid fa-arrow-left"></i>
+					Retour à l'index global
+				</a>
+			</div>
+		</header>
 
-    {# --- COMMODITÉ DE RECHERCHE ET DE FILTRE (CONSERVÉE POUR MODIFICATION RAPIDE) --- #}
-    <div class="trip-filters-card mb-20">
-        <form action="">
-            <div class="field-group">
-                {# Champ 1 : Date #}
-                <div class="field">
-                    <label class="admin-bus-layout-add-label">Rechercher par date exacte</label>
-                    <input type="date" name="filter_date" class="admin-bus-layout-add-input">
-                </div>
+		{# --- COMMODITÉ DE RECHERCHE ET DE FILTRE (CONSERVÉE POUR MODIFICATION RAPIDE) --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="">
+				<div
+					class="field-group">
+					{# Champ 1 : Date #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Rechercher par date exacte</label>
+						<input type="date" name="filter_date" class="admin-bus-layout-add-input">
+					</div>
 
-                {# Champ 2 : Ligne Commerciale / Itinéraire #}
-                <div class="field">
-                    <label class="admin-bus-layout-add-label">Filtrer par Ligne / Itinéraire</label>
-                    <select name="filter_route" class="admin-bus-layout-add-select">
-                        <option value="">-- Toutes les lignes commerciales --</option>
-                        <option value="1">Kinshasa → Kikwit (via Kenge)</option>
-                        <option value="2">Kinshasa → Matadi</option>
-                    </select>
-                </div>
+					{# Champ 2 : Ligne Commerciale / Itinéraire #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Filtrer par Ligne / Itinéraire</label>
+						<select name="filter_route" class="admin-bus-layout-add-select">
+							<option value="">-- Toutes les lignes commerciales --</option>
+							<option value="1">Kinshasa → Kikwit (via Kenge)</option>
+							<option value="2">Kinshasa → Matadi</option>
+						</select>
+					</div>
 
-                {# Champ 3 : État opérationnel #}
-                <div class="field">
-                    <label class="admin-bus-layout-add-label">Filtrer par état opérationnel</label>
-                    <select name="filter_status" class="admin-bus-layout-add-select">
-                        <option value="">-- Tous les états --</option>
-                        <option value="scheduled">Planifiés (Futurs)</option>
-                        <option value="boarding">En Embarquement</option>
-                        <option value="completed">Terminés (Passés)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="field-button-right mt-10">
-                <button type="submit" class="btn btn-dark">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    Filtrer à nouveau
-                </button>
-            </div>
-        </form>
-    </div>
+					{# Champ 3 : État opérationnel #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Filtrer par état opérationnel</label>
+						<select name="filter_status" class="admin-bus-layout-add-select">
+							<option value="">-- Tous les états --</option>
+							<option value="scheduled">Planifiés (Futurs)</option>
+							<option value="boarding">En Embarquement</option>
+							<option value="completed">Terminés (Passés)</option>
+						</select>
+					</div>
+				</div>
+				<div class="field-button-right mt-10">
+					<button type="submit" class="btn btn-dark">
+						<i class="fa-solid fa-magnifying-glass"></i>
+						Filtrer à nouveau
+					</button>
+				</div>
+			</form>
+		</div>
 
-    {% if result %}
+		{% if result %}
 
-    {# --- TABLEAU DES RÉSULTATS AVEC RACCOURCIS DIRECTS DE BILLETTERIE --- #}
-    <div class="table-responsive-wrapper">
-        <table class="table table-scrollable table-striped js-datatable">
-            <thead>
-                <tr>
-                    <th>Date & Départ</th>
-                    <th>Ligne / Itinéraire</th>
-                    <th>Véhicule / Équipage</th>
-                    <th>Remplissage</th>
-                    <th>Statut</th>
-                    <th class="text-right">Actions Guichet</th>
-                </tr>
-            </thead>
-            <tbody>
-                {# Exemple de résultat trouvé #}
-                <tr>
-                    <td>
-                        <strong>14/07/2026</strong>
-                        <span class="sub-meta-text">À 14h30</span>
-                    </td>
-                    <td>
-                        <strong>Kinshasa → Kikwit</strong>
-                        <span class="sub-meta-text">via Kenge</span>
-                    </td>
-                    <td>
-                        <strong>Bus 01</strong>
-                        (Marcopolo)
-                        <span class="sub-meta-text">Chauffeur : Jean Mukendi</span>
-                    </td>
-                    <td>
-                        <strong>42 / 54</strong>
-                        places
-                        <span class="sub-meta-text">(77%)</span>
-                    </td>
-                    <td>
-                        <span class="badge badge-warning-status">Embarquement</span>
-                    </td>
-                    <td class="text-right table-action-buttons">
-                        {# Bouton Achat Direct de Billet #}
-                        <a href="" class="table-action-trigger quick-sale" title="Achat direct de billet (Caisse)">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                        </a>
-                        {# Bouton Réservation Pure (Bon de réservation) #}
-                        <a href="{{path('admin_agency_reservation_add')}}" class="table-action-trigger quick-book"
-                            title="Faire une réservation (Bon)">
-                            <i class="fa-solid fa-file-invoice"></i>
-                        </a>
-                        {# Bouton Voir la fiche complète #}
-                        <a href="{{ path('admin_agency_trip_show', {'code': 'trip-07-26-0001-01'}) }}"
-                            class="table-action-trigger view" title="Détails & Manifeste">
-                            <i class="fa-solid fa-eye"></i>
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    {# BLOC SI AUCUN RÉSULTAT #}
-    <div class="no-result-row-backoffice">
-        <div class="icon">
-            <i class="fa-solid fa-circle-question"></i>
-        </div>
-        <h3>Aucun voyage disponible</h3>
-        <p>Il n'y a aucun départ planifié pour les critères sélectionnés. Veuillez modifier la date ou la ligne
-            commerciale.</p>
+			{# --- TABLEAU DES RÉSULTATS AVEC RACCOURCIS DIRECTS DE BILLETTERIE --- #}
+			<div class="table-responsive-wrapper">
+				<table class="table table-scrollable table-striped js-datatable">
+					<thead>
+						<tr>
+							<th>Date & Départ</th>
+							<th>Ligne / Itinéraire</th>
+							<th>Véhicule / Équipage</th>
+							<th>Remplissage</th>
+							<th>Statut</th>
+							<th class="text-right">Actions Guichet</th>
+						</tr>
+					</thead>
+					<tbody>
+						{# Exemple de résultat trouvé #}
+						<tr>
+							<td>
+								<strong>14/07/2026</strong>
+								<span class="sub-meta-text">À 14h30</span>
+							</td>
+							<td>
+								<strong>Kinshasa → Kikwit</strong>
+								<span class="sub-meta-text">via Kenge</span>
+							</td>
+							<td>
+								<strong>Bus 01</strong>
+								(Marcopolo)
+								<span class="sub-meta-text">Chauffeur : Jean Mukendi</span>
+							</td>
+							<td>
+								<strong>42 / 54</strong>
+								places
+								<span class="sub-meta-text">(77%)</span>
+							</td>
+							<td>
+								<span class="badge badge-warning-status">Embarquement</span>
+							</td>
+							<td
+								class="text-right table-action-buttons">
+								{# Bouton Achat Direct de Billet #}
+								<a href="" class="table-action-trigger quick-sale" title="Achat direct de billet (Caisse)">
+									<i class="fa-solid fa-cart-shopping"></i>
+								</a>
+								{# Bouton Réservation Pure (Bon de réservation) #}
+								<a href="{{path('admin_agency_reservation_add', {'code': 'trip-07-26-0001-01'})}}" class="table-action-trigger quick-book" title="Faire une réservation (Bon)">
+									<i class="fa-solid fa-file-invoice"></i>
+								</a>
+								{# Bouton Voir la fiche complète #}
+								<a href="{{ path('admin_agency_trip_show', {'code': 'trip-07-26-0001-01'}) }}" class="table-action-trigger view" title="Détails & Manifeste">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		{% else %}
+			{# BLOC SI AUCUN RÉSULTAT #}
+			<div class="no-result-row-backoffice">
+				<div class="icon">
+					<i class="fa-solid fa-circle-question"></i>
+				</div>
+				<h3>Aucun voyage disponible</h3>
+				<p>Il n'y a aucun départ planifié pour les critères sélectionnés. Veuillez modifier la date ou la ligne
+					            commerciale.</p>
 
-    </div>
-    {% endif %}
+			</div>
+		{% endif %}
 
-</div>
+	</div>
 {% endblock %}

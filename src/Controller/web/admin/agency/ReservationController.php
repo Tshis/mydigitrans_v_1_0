@@ -19,7 +19,7 @@ class ReservationController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/reservations/add', name: 'admin_agency_reservation_add')]
+    #[Route('/admin/agency/reservations/add/{code}', name: 'admin_agency_reservation_add')]
     public function add(Request $request, BusLayoutGridBuilder $busLayoutGridBuilder): Response
     {
         $session = $request->getSession();
