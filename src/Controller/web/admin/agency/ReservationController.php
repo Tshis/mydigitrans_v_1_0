@@ -20,7 +20,7 @@ class ReservationController extends AbstractController
     } //index
 
 
-    #[Route('/admin/agency/reservations/add/{code}', name: 'admin_agency_reservation_add')]
+    #[Route('/admin/agency/reservation/add/{code}', name: 'admin_agency_reservation_add')]
     public function add(Request $request, BusLayoutGridBuilder $busLayoutGridBuilder, string $code): Response
     {
         $session = $request->getSession();
@@ -61,4 +61,13 @@ class ReservationController extends AbstractController
             'currency_code' => $currencyCode,
         ]);
     } //add
+
+    #[Route('/admin/agency/reservation/{reference}', name: 'admin_agency_reservation_show')]
+    public function show(Request $request): Response
+    {
+        return $this->render('admin/agency/reservation/show.html.twig', [
+            'page' => 'reservation',
+        ]);
+    } //show
+
 }
