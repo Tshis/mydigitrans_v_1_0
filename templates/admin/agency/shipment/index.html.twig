@@ -127,7 +127,7 @@
 						<span class="badge-shipment transit">En Transit</span>
 					</td>
 					<td class="text-right table-action-buttons">
-						<a href="#" class="table-action-trigger view" title="Voir l'historique complet du colis">
+						<a href="{{path('admin_agency_shipment_show',{'reference':'SHP-XYZ-20-AB-001'})}}" class="table-action-trigger view" title="Voir l'historique complet du colis">
 							<i class="fa-solid fa-eye"></i>
 						</a>
 						<a href="#" class="table-action-trigger print" title="Imprimer l'étiquette de colisage">
@@ -167,7 +167,7 @@
 						<a href="#" class="table-action-trigger validate" title="Confirmer le retrait physique par le destinataire" onclick="return confirm('Confirmer la remise du colis et clôturer le suivi ?');">
 							<i class="fa-solid fa-box-open"></i>
 						</a>
-						<a href="#" class="table-action-trigger view" title="Voir l'historique">
+						<a href="{{path('admin_agency_shipment_show',{'reference':'SHP-XYZ-20-AB-001'})}}" class="table-action-trigger view" title="Voir l'historique">
 							<i class="fa-solid fa-eye"></i>
 						</a>
 					</td>

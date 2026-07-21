@@ -1,5 +1,7 @@
 @use '../../abstract/variables' as *;
 
+
+//===SHIPMENT INDEX======
 .admin-shipment-wrapper {
     width: 100%;
     margin-block: 2rem;
@@ -204,6 +206,210 @@
         }
     }
 }
+
+
+//=====SHIPMENT SHOW====
+.admin-shipment-show-scope {
+    padding-block: 2rem;
+    width: 100%;
+
+    // --- VARIABLES DE STRUCTURE & TEXTE ---
+    .mb-25 { margin-bottom: 1.6rem; }
+    .mb-20 { margin-bottom: 1.25rem; }
+    .mt-5  { margin-top: 0.35rem; }
+    .text-gray { color: $gray; }
+    .text-size-13 { font-size: 13px; }
+
+    .sub-meta-text {
+        display: block;
+        font-size: 11px;
+        color: $gray;
+        margin-top: 2px;
+    }
+
+    // --- STYLE DE L'EN-TÊTE ---
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+
+        .header-main-info {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+
+            .agency-back-action {
+                width: 3.25rem;
+                height: 3.25rem;
+                border-radius: 50%;
+                background: $white;
+                border: 1px solid $mute;
+                color: $dark;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background: rgba($primary, 0.05);
+                    color: $primary;
+                    transform: translateX(-0.5rem);
+                }
+            }
+
+            .title {
+                h2 { font-size: 1.5rem; font-weight: 800; color: $dark; }
+                .sub-header-flex { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+            }
+        }
+
+        .btn-print-tag {
+            background: $dark;
+            color: $white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: $radius-input;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            &:hover { opacity: 0.9; }
+        }
+    }
+
+    // --- ENCAPSULATION DES BADGES DE FLUX LOGISTIQUE COLIS ---
+    .badge-shipment {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+
+        &.pending { background-color: rgba($danger, 0.12); color: $danger; }                     
+        &.warehouse { background-color: rgba($primary, 0.12); color: $primary; }                 
+        &.transit { background-color: rgba($primary, 0.25); color: $dark; }                     
+        &.ready { background-color: rgba($mute, 0.4); color: $dark; }                       
+        &.delivered { background-color: rgba($success, 0.12); color: $success; }                 
+    }
+
+    // --- GRID LAYOUT RESPONSIVE ASYMÉTRIQUE ---
+    .shipment-details-layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 1.5rem;
+        align-items: start;
+
+        @media (max-width: 992px) { grid-template-columns: 1fr; }
+    }
+
+    // --- COMPOSANT DES CARTES BLANCHES BACKOFFICE ---
+    .detail-card-box {
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+
+        .box-title {
+            font-size: 13px; font-weight: 700; text-transform: uppercase; color: $dark;
+            display: flex; align-items: center; gap: 8px; margin-bottom: 1.25rem; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 6px;
+            i { color: $gray; }
+        }
+
+        &.highlight-finance-box {
+            background: linear-gradient(135deg, rgba($success, 0.02) 0%, rgba($success, 0.05) 100%);
+            border-color: rgba($mute, 0.8);
+        }
+    }
+
+    .info-grid-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem 1.5rem;
+
+        @media (max-width: 576px) { grid-template-columns: 1fr; gap: 1rem; }
+
+        .info-item { display: flex; flex-direction: column; gap: 4px; }
+    }
+
+    .info-label { font-size: 10px; font-weight: 800; color: $gray; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-size: 13px; font-weight: 600; color: $dark; margin: 0; }
+
+    // --- BLOC FINANCIER GÉANT ---
+    .price-badge-display {
+        font-size: 2rem;
+        font-weight: 900;
+        color: $dark;
+        line-height: 1;
+        margin-block: 0.6rem;
+    }
+    
+    .payment-status-label { 
+        font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        &.paid { color: $success; }
+        &.unpaid { color: $danger; }
+    }
+
+    // --- MODULE DE PILOTAGE LOGISTIQUE (BOUTONS) ---
+    .sidebar-action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .btn {
+            width: 100%;
+            height: 40px;
+            border-radius: $radius-input;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover { opacity: 0.9; }
+        }
+
+        .btn-pay-trigger { background-color: $primary; color: $white; }
+        .btn-cancel-trigger { background-color: rgba($danger, 0.1); color: $danger; }
+    }
+}
+
+// --- CONFIGURATION MODE SOMBRE (DARK MODE) ---
+.dark {
+    .admin-shipment-show-scope {
+        background-color: $dm-bg-main;
+        
+        .header .header-main-info {
+            .agency-back-action { background: $dm-bg-surface; border-color: rgba($mute, 0.2); color: $white; }
+            .title h2 { color: $white; }
+        }
+        .header .btn-print-tag { background: $white; color: $dark; }
+        
+        .detail-card-box {
+            background: $dm-bg-surface; border-color: rgba($mute, 0.2);
+            .box-title { color: $white; border-bottom-color: rgba($mute, 0.15); }
+            .info-value { color: $white; }
+            &.highlight-finance-box { background: rgba($success, 0.05); }
+        }
+        
+        .price-badge-display { color: $white; }
+        .sidebar-action-buttons .btn-cancel-trigger { background-color: rgba($danger, 0.2); }
+    }
+}
+
 
 // --- CONFIGURATION MODE SOMBRE (DARK MODE) ---
 .dark {

@@ -1,0 +1,120 @@
+{# templates/admin/agency/shipment/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-shipment-show-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{path('admin_agency_shipment_index')}}" class="agency-back-action" title="Retour au registre">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h2>Bordereau d'Expédition N° SHP-2026-8942</h2>
+					<div class="mt-5 sub-header-flex">
+						<span class="badge-shipment transit">En Transit</span>
+						<span class="text-gray text-size-13">Enregistré par : Guichet Kinshasa (Session #12)</span>
+					</div>
+				</div>
+			</div>
+			<div class="admin-action-zone">
+				<button type="button" class="btn btn-print-tag">
+					<i class="fa-solid fa-tag"></i>
+					Imprimer l'Étiquette Soute
+				</button>
+			</div>
+		</header>
+
+		{# --- LAYOUT DEUX COLONNES RESPONSIVE --- #}
+		<div
+			class="shipment-details-layout">
+
+			{# COLONNE GAUCHE : FLUX DES ACTEURS ET DESCRIPTION DU COLIS #}
+			<div
+				class="layout-main-panel">
+
+				{# Fiche des Acteurs (Expéditeur & Destinataire) #}
+				<div class="detail-card-box mb-20">
+					<h3 class="box-title">
+						<i class="fa-solid fa-people-arrows"></i>
+						Acteurs du Transit</h3>
+					<div class="info-grid-details">
+						<div class="info-item">
+							<span class="info-label">Expéditeur (Sender)</span>
+							<p class="info-value">Mbala Jean</p>
+							<span class="sub-meta-text">+243 812 345 678</span>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Destinataire (Receiver)</span>
+							<p class="info-value">Toko Dieudonné</p>
+							<span class="sub-meta-text">+243 897 654 321</span>
+						</div>
+					</div>
+				</div>
+
+				{# Caractéristiques Matérielles #}
+				<div class="detail-card-box">
+					<h3 class="box-title">
+						<i class="fa-solid fa-box-open"></i>
+						Spécifications Fret</h3>
+					<div class="info-grid-details">
+						<div class="info-item">
+							<span class="info-label">Contenu déclaré</span>
+							<p class="info-value">Carton de pièces de rechange</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Nature de la marchandise</span>
+							<p class="info-value">Fragile / Électronique</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Poids Facturé</span>
+							<p class="info-value">25 Kg</p>
+						</div>
+						<div class="info-item">
+							<span class="info-label">Bus de transport</span>
+							<p class="info-value">Bus 01 - Marcopolo (TRP-2026-0042)</p>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			{# COLONNE DROITE : STATUT FINANCIER ET ACTIONS COMPTOIR #}
+			<aside
+				class="layout-sidebar-panel">
+
+				{# Fiche Comptable #}
+				<div class="detail-card-box text-center mb-20 highlight-finance-box">
+					<span class="info-label">MONTANT DU FRET</span>
+					<div class="price-badge-display">17 500 CDF</div>
+					<span class="payment-status-label unpaid">NON ACQUITTÉ</span>
+				</div>
+
+				{# Actions Opérationnelles #}
+				<div class="detail-card-box action-routing-box">
+					<h3 class="box-title">
+						<i class="fa-solid fa-cash-register"></i>
+						Actions Logistiques</h3>
+
+					<div
+						class="sidebar-action-buttons">
+						{# Envoyer à la caisse si le colis est impayé #}
+						<a href="#" class="btn btn-pay-trigger">
+							<i class="fa-solid fa-money-bill-transfer"></i>
+							Encaisser le Fret
+						</a>
+
+						<a href="#" class="btn btn-cancel-trigger" onclick="return confirm('Annuler l\'expédition de ce colis ?');">
+							<i class="fa-solid fa-trash-can"></i>
+							Annuler l'enregistrement
+						</a>
+					</div>
+				</div>
+
+			</aside>
+
+		</div>
+	</div>
+{% endblock %}

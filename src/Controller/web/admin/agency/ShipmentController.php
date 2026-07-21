@@ -18,6 +18,8 @@ class ShipmentController extends AbstractController
         ]);
     } //index
 
+
+
     #[Route('/admin/agency/shipment/add', name: 'admin_agency_shipment_add')]
     public function add(Request $request): Response
     {
@@ -25,5 +27,13 @@ class ShipmentController extends AbstractController
             'page' => 'shipment',
         ]);
     } //add
+
+    #[Route('/admin/agency/shipment/{reference}', name: 'admin_agency_shipment_show')]
+    public function show(Request $request): Response
+    {
+        return $this->render('admin/agency/shipment/show.html.twig', [
+            'page' => 'shipment',
+        ]);
+    } //show
 
 }
