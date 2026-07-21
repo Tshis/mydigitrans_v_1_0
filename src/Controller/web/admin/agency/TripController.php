@@ -34,4 +34,14 @@ class TripController extends AbstractController
         ]);
     } //show
 
+    #[Route('/admin/agency/trip/search/', name: 'admin_agency_trip_search')]
+    public function search(Request $request): Response
+    {
+        $result = true;
+        return $this->render('admin/agency/trip/search_result.html.twig', [
+            'page' => 'trip',
+            'result' => $result
+        ]);
+    } //search
+
 }

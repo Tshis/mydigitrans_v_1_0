@@ -496,8 +496,153 @@
 }
 
 
+//============================================
+//=====RESULT SEARCH==========
+//======================================
+// --- STYLISATION DES BOUTONS EXCLUSIVEMENT POUR LA TABLE DES RÉSULTATS ---
+.admin-trip-wrapper {
+    
+    .text-right.table-action-buttons {
+        display: table-cell !important;
+        vertical-align: middle !important;
+        text-align: right !important;
+        white-space: nowrap !important;
+
+        .table-action-trigger {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 8px; /* Design moderne arrondi style SaaS */
+            font-size: 13px;
+            margin-left: 8px;
+            float: none !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+            // 1. Bouton Caddie / Achat direct (Vert Émeraude Translucide)
+            &.quick-sale {
+                background-color: rgba($success, 0.08) !important;
+                color: $success !important;
+                border: 1px solid rgba($success, 0.15);
+
+                &:hover {
+                    background-color: $success !important;
+                    color: $white !important;
+                    box-shadow: 0 4px 12px rgba($success, 0.25);
+                    transform: translateY(-2px);
+                }
+            }
+
+            // 2. Bouton Document / Réservation (Bleu Lagon Translucide)
+            &.quick-book {
+                background-color: rgba($primary, 0.08) !important;
+                color: $primary !important;
+                border: 1px solid rgba($primary, 0.15);
+
+                &:hover {
+                    background-color: $primary !important;
+                    color: $white !important;
+                    box-shadow: 0 4px 12px rgba($primary, 0.25);
+                    transform: translateY(-2px);
+                }
+            }
+
+            // 3. Bouton Œil / Détails Manifeste (Gris Soft)
+            &.view {
+                background-color: rgba($dark, 0.05) !important;
+                color: $dark !important;
+                border: 1px solid rgba($dark, 0.1);
+
+                &:hover {
+                    background-color: $dark !important;
+                    color: $white !important;
+                    box-shadow: 0 4px 12px rgba($dark, 0.2);
+                    transform: translateY(-2px);
+                }
+            }
+        }
+    }
+
+    // --- COMPORTEMENT EN MODE SOMBRE (DARK MODE) ---
+    &.dark, .dark & {
+        .text-right.table-action-buttons {
+            .table-action-trigger {
+                box-shadow: none;
+
+                &.quick-sale {
+                    background-color: rgba($success, 0.15) !important;
+                    border-color: rgba($success, 0.25);
+                    &:hover { background-color: $success !important; }
+                }
+
+                &.quick-book {
+                    background-color: rgba($primary, 0.15) !important;
+                    border-color: rgba($primary, 0.25);
+                    &:hover { background-color: $primary !important; }
+                }
+
+                &.view {
+                    background-color: rgba($white, 0.08) !important;
+                    color: $mute !important;
+                    border-color: rgba($white, 0.15);
+                    
+                    &:hover { 
+                        background-color: $white !important; 
+                        color: $dark !important; 
+                    }
+                }
+            }
+        }
+    }
+
+    // --- STYLE D'ÉTAT VIDE (NO RESULT STATE) ---
+    .no-result-row-backoffice {
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        max-width: 100%;
+        margin-inline: auto;
+        gap: 1rem;
+
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: 1rem;
+        padding: 2rem;
+
+        .icon{color: $danger; font-size: 3.5rem;}
+
+        h3 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: $danger;
+            margin-bottom: 6px;
+        }
+
+        p {
+            font-size: 13px;
+            color: $gray;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+       
+    }
+
+
+
+}
+
+
+
 // --- INTEGRATION DARK MODE POUR LA PAGE SPECIFIQUE ---
 .dark {
+
 
     .badge-warning-status {
         background-color: $primary;
@@ -573,5 +718,12 @@
 
     .trip-filters-card{
         background: $dm-bg;
+    }
+
+    .no-result-row-backoffice {
+        background: $dm-bg !important;
+        h3 { color: $white; }
+        p { color: $mute; }
+        .empty-icon { color: $white; background: $danger;}
     }
 }
