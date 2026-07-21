@@ -16,14 +16,12 @@
 			</div>
 		</header>
 
-		{# --- RECHERCHE ET INTERCEPTION DU BON --- #}
+		{# --- ZONE DE SOURCING DU BON (INTERCEPTION) --- #}
 		<div class="trip-filters-card mb-25">
 			<form action="#" method="GET" class="field-group">
-				<div class="field" style="flex: 2;">
+				<div class="field field-grow-2">
 					<label class="admin-bus-layout-add-label">Rechercher un Bon à encaisser</label>
-					<div style="position: relative; width: 100%;">
-						<input type="text" name="voucher_code" class="admin-bus-layout-add-input" placeholder="Saisissez la référence (Ex: RVS-2026-8943 ou SHP-2026-8942)..." autocomplete="off" value="RVS-2026-8943">
-					</div>
+					<input type="text" name="voucher_code" class="admin-bus-layout-add-input" placeholder="Saisissez la référence (Ex: RVS-2026-8943 ou SHP-2026-8942)..." autocomplete="off" value="RVS-2026-8943">
 				</div>
 				<div class="field-actions">
 					<button type="submit" class="btn btn-reset">
@@ -38,47 +36,92 @@
 		<div
 			class="reservation-container">
 
-			{# COLONNE GAUCHE : IDENTIFICATION DU DOCUMENT ET DÉTAILS MÉTIER #}
+			{# COLONNE GAUCHE : FRAGMENT INTERCEPTÉ DYNAMIQUE #}
 			<div
 				class="layout-main-panel">
 
-				{# Fiche du Document Intercepté #}
-				<div class="card">
+				{# Cas 1 : Le document intercepté est un Bon de réservation Passager #}
+				<div class="card cashier-document-card">
 					<h2>
 						<i class="fa-solid fa-file-invoice-dollar"></i>
 						Détails du Document Intercepté</h2>
 
-					<div class="field-group mb-20" style="background-color: rgba(239, 110, 23, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(239, 110, 23, 0.15);">
-						<div style="flex: 1;">
-							<span class="section-micro-label" style="color: #ef6e17;">Nature du document</span>
-							<strong style="font-size: 15px; color: #0c326d;">BON DE RÉSERVATION PASSAGER</strong>
+					<div class="field-group mb-20 status-alert-box alert-reservation">
+						<div class="meta-item">
+							<span class="section-micro-label label-reservation">Nature du document</span>
+							<strong class="text-highlight">BON DE RÉSERVATION PASSAGER</strong>
 						</div>
-						<div style="flex: 1;">
-							<span class="section-micro-label" style="color: #ef6e17;">Référence Système</span>
-							<strong style="font-size: 15px; color: #0c326d;">RVS-2026-8943</strong>
+						<div class="meta-item">
+							<span class="section-micro-label label-reservation">Référence Système</span>
+							<strong class="text-highlight">RVS-2026-8943</strong>
 						</div>
 					</div>
 
-					<div class="field-group mb-20">
+					<div class="field-group mb-20 core-info-grid">
 						<div class="field">
 							<span class="section-micro-label">Bénéficiaire / Voyageur</span>
-							<p style="font-size: 14px; font-weight: 700; color: #0c326d;">Mputu Antoinette</p>
-							<span style="font-size: 12px; color: #4b5563;">+243 897 112 233</span>
+							<p class="actor-name">Mputu Antoinette</p>
+							<span class="actor-sub-text">+243 897 112 233</span>
 						</div>
 						<div class="field">
 							<span class="section-micro-label">Logistique Associée</span>
-							<p style="font-size: 14px; font-weight: 700; color: #0c326d;">Kinshasa → Kenge</p>
-							<span style="font-size: 12px; color: #4b5563;">Bus 01 | Siège 14 (Standard)</span>
+							<p class="actor-name">Kinshasa → Kenge</p>
+							<span class="actor-sub-text">Bus 01 | Siège 14 (Standard)</span>
 						</div>
 					</div>
 
-					<div class="field-group">
+					<div class="field-group core-info-grid">
 						<div class="field">
 							<span class="section-micro-label">Planification départ</span>
-							<p style="font-size: 13px; font-weight: 600; color: #4b5563;">Départ prévu aujourd'hui à 14h30</p>
+							<p class="actor-name">Départ prévu aujourd'hui à 14h30</p>
 						</div>
 					</div>
 				</div>
+
+				{# Cas 2 : Le document intercepté est un Bon de Fret (Masqué par défaut dans cette vue complète pour l'exemple) #}
+				<div class="card cashier-document-card">
+					<h2>
+						<i class="fa-solid fa-boxes-packing"></i>
+						Détails du Fret Intercepté</h2>
+
+					<div class="field-group mb-20 status-alert-box alert-fret">
+						<div class="meta-item">
+							<span class="section-micro-label label-fret">Nature du document</span>
+							<strong class="text-highlight">BON D'EXPÉDITION DE FRET / COLIS</strong>
+						</div>
+						<div class="meta-item">
+							<span class="section-micro-label label-fret">Référence Suivi</span>
+							<strong class="text-highlight">SHP-2026-8942</strong>
+						</div>
+					</div>
+
+					<div class="field-group mb-20 core-info-grid">
+						<div class="field">
+							<span class="section-micro-label">Expéditeur (Sender)</span>
+							<p class="actor-name">Mbala Jean</p>
+							<span class="actor-sub-text">+243 812 345 678</span>
+						</div>
+						<div class="field">
+							<span class="section-micro-label">Destinataire (Receiver)</span>
+							<p class="actor-name">Toko Dieudonné</p>
+							<span class="actor-sub-text">+243 897 654 321</span>
+						</div>
+					</div>
+
+					<div class="field-group core-info-grid">
+						<div class="field">
+							<span class="section-micro-label">Marchandise Déclarée</span>
+							<p class="actor-name">Carton de pièces de rechange</p>
+							<span class="actor-sub-text">Nature : Fragile / Électronique</span>
+						</div>
+						<div class="field">
+							<span class="section-micro-label">Logistique & Pesée</span>
+							<p class="actor-name">Poids : 25 Kg</p>
+							<span class="actor-sub-text">Itinéraire : Kinshasa → Kikwit</span>
+						</div>
+					</div>
+				</div>
+
 
 			</div>
 
@@ -87,7 +130,6 @@
 				<div class="card summary-sticky-card">
 					<h2>Règlement & Caisse</h2>
 
-					{# Choix du mode de versement #}
 					<div class="payment-method-selectors mb-20">
 						<label class="section-micro-label">MODE DE RÈGLEMENT EFFECTIF</label>
 						<div class="payment-grid-buttons">
@@ -95,13 +137,15 @@
 								<input type="radio" name="payment_method" value="cash" checked>
 								<span class="custom-box">
 									<i class="fa-solid fa-money-bill-wave"></i>
-									Espèces</span>
+									Espèces
+								</span>
 							</label>
 							<label class="pay-method-item">
 								<input type="radio" name="payment_method" value="mobile_money">
 								<span class="custom-box">
 									<i class="fa-solid fa-mobile-screen"></i>
-									M-Money</span>
+									M-Money
+								</span>
 							</label>
 						</div>
 					</div>
@@ -124,7 +168,7 @@
 					<ul class="billing-details-list">
 						<li>
 							<strong>Statut d'origine :</strong>
-							<span style="background-color: rgba(239, 110, 23, 0.12); color: #ef6e17; padding: 2px 6px; border-radius: 4px; font-weight: 700;">PENDING</span>
+							<span class="badge-pending-status">PENDING</span>
 						</li>
 					</ul>
 
@@ -133,8 +177,7 @@
 						<strong>45 000 CDF</strong>
 					</div>
 
-					{# Déclencheur comptable lourd #}
-					<button class="btn btn-full mt-20 py-12" style="background-color: #1684c5 !important;">
+					<button type="submit" class="btn btn-full mt-20 py-12">
 						<i class="fa-solid fa-cash-register"></i>
 						Encaisser & Émettre le Titre
 					</button>

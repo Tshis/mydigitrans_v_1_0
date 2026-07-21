@@ -4,11 +4,11 @@
     padding-block: 2rem;
     width: 100%;
 
-    // --- UTILITIES ---
+    // --- VARIABLES DE STRUCTURE & MARGES ---
     .mb-25 { margin-bottom: 1.6rem; }
     .mb-20 { margin-bottom: 1.25rem; }
     .mb-15 { margin-bottom: 1rem; }
-    .mt-10 { margin-top: 0.6rem; }
+    .mt-20 { margin-top: 1.25rem; }
 
     // --- EN-TÊTE ---
     .header {
@@ -19,7 +19,7 @@
         }
     }
 
-    // --- ZONE DE SOURCING DU BON (FILTRES COMPTOIR) ---
+    // --- ZONE DE RECHERCHE DU COMPTOIR ---
     .trip-filters-card {
         background: $white;
         border: 1px solid $mute;
@@ -37,6 +37,8 @@
                 display: flex;
                 flex-direction: column;
                 gap: 6px;
+                
+                &.field-grow-2 { flex: 2; }
 
                 .admin-bus-layout-add-label { font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; }
                 
@@ -80,7 +82,7 @@
         }
     }
 
-    // --- PANEL GRILLE ---
+    // --- LAYOUT SQUELETTE ASYMÉTRIQUE ---
     .reservation-container {
         display: grid;
         grid-template-columns: 1fr 360px;
@@ -91,12 +93,14 @@
         @media (max-width: 992px) { grid-template-columns: 1fr; }
     }
 
+    // --- LOGIQUE COMMUNE AUX CARTES BLANCHES COMPOSANTS ---
     .card {
         background: $white;
         border: 1px solid $mute;
         border-radius: $radius-card;
         padding: 1.5rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+        box-sizing: border-box;
 
         h2 {
             font-size: 14px;
@@ -121,16 +125,16 @@
 
         @media (max-width: 576px) { flex-direction: column; gap: 1rem; }
 
-        .field {
+        .field, .meta-item {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
     }
 
     .field {
-        input, select {
+        select, input[type="text"] {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid $mute;
@@ -148,7 +152,41 @@
         }
     }
 
-    // --- VOLET COMPOSANT RECAP CAISSE (ASIDE) ---
+    // --- LES DEUX CARTES DE DOCUMENTS INTERCEPTÉS (.CASHIERS-DOCUMENT-CARD) ---
+    .cashier-document-card {
+        .status-alert-box {
+            padding: 15px; 
+            border-radius: $radius-input; 
+            box-sizing: border-box;
+
+            &.alert-reservation {
+                background-color: rgba($primary, 0.05);
+                border: 1px solid rgba($primary, 0.15);
+            }
+            &.alert-fret {
+                background-color: rgba($success, 0.05);
+                border: 1px solid rgba($success, 0.15);
+            }
+        }
+
+        .section-micro-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: $gray;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+
+            &.label-reservation { color: $primary; }
+            &.label-fret { color: $success; }
+        }
+
+        .text-highlight { font-size: 15px; color: $dark; font-weight: 800; }
+        .actor-name { font-size: 14px; font-weight: 700; color: $dark; margin: 0; }
+        .actor-sub-text { font-size: 12px; color: $gray; }
+    }
+
+    // --- MODULE DE DROITE COMPOSANT DE CAISSE DE FIN DE LIGNE (ASIDE) ---
     .summary {
         .summary-sticky-card { position: sticky; top: 20px; }
 
@@ -166,7 +204,10 @@
         .billing-details-list {
             list-style: none;
             padding: 0; margin: 0 0 1.25rem 0;
-            li { font-size: 13px; color: $gray; margin-bottom: 8px; display: flex; justify-content: space-between; }
+            li { 
+                font-size: 13px; color: $gray; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; 
+                .badge-pending-status { background-color: rgba($primary, 0.12); color: $primary; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+            }
         }
 
         .total {
@@ -180,18 +221,18 @@
             padding: 12px;
             border-radius: $radius-input;
 
-            strong { color: $dark; font-size: 16px; font-weight: 800; }
+            strong { color: $success; font-size: 16px; font-weight: 800; }
         }
 
         .btn-full {
-            width: 100%; height: 44px; color: $white; border: none; border-radius: $radius-input;
+            width: 100%; height: 44px; background-color: $success; color: $white; border: none; border-radius: $radius-input;
             font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 
             &:hover { opacity: 0.9; }
         }
     }
 
-    // M-Pesa et Cash Radio Selectors
+    // Structure des boutons Radio
     .payment-method-selectors {
         .payment-grid-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .pay-method-item {
@@ -207,7 +248,7 @@
     }
 }
 
-// --- DARK MODE ---
+// --- ADAPTATION SÉCURISÉE AU MODE SOMBRE (DARK MODE) ---
 .dark {
     .admin-cashier-scope {
         background-color: $dm-bg-main;
@@ -228,6 +269,19 @@
             .field input, .field select { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: #fff; }
         }
 
+        .cashier-document-card {
+            background: $dm-bg-surface; border-color: rgba($mute, 0.2);
+            h2 { color: $white; border-bottom-color: rgba($mute, 0.15); }
+            .text-highlight, .actor-name { color: $white; }
+            .section-micro-label:not(.label-reservation):not(.label-fret) { color: $mute; }
+            .actor-sub-text { color: $mute; }
+
+            .status-alert-box {
+                &.alert-reservation { background-color: rgba($primary, 0.12); border-color: rgba($primary, 0.25); }
+                &.alert-fret { background-color: rgba($success, 0.12); border-color: rgba($success, 0.25); }
+            }
+        }
+
         .summary {
             .billing-details-list li { color: $mute; }
             .summary-divider { border-top-color: rgba($mute, 0.15); }
@@ -235,8 +289,4 @@
             
             .payment-method-selectors .pay-method-item {
                 .custom-box { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.2); color: #fff; }
-                input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; }
-            }
-        }
-    }
-}
+input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; }}}}}
