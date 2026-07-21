@@ -29,7 +29,7 @@
 </a>
 
 {# 2. FINANCES #}
-<a href="#" class="menu-link" data-tooltip="Gestion des Caisses">
+<a href="{{path('admin_agency_cashier_index')}}" class="menu-link {{ page is same as('cashier') ? 'active' : '' }}" data-tooltip="Gestion des Caisses">
 	<span class="icon">
 		<i class="fa-solid fa-cash-register"></i>
 	</span>

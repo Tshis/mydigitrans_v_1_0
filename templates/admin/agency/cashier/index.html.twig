@@ -1,0 +1,146 @@
+{# templates/admin/agency/cashier/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-cashier-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-25">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-cash-register"></i>
+					Gestion de la Caisse Centrale
+				</h2>
+				<p>Saisissez ou scannez un code de Bon (Passager ou Colis) pour encaisser les fonds et émettre les titres officiels.</p>
+			</div>
+		</header>
+
+		{# --- RECHERCHE ET INTERCEPTION DU BON --- #}
+		<div class="trip-filters-card mb-25">
+			<form action="#" method="GET" class="field-group">
+				<div class="field" style="flex: 2;">
+					<label class="admin-bus-layout-add-label">Rechercher un Bon à encaisser</label>
+					<div style="position: relative; width: 100%;">
+						<input type="text" name="voucher_code" class="admin-bus-layout-add-input" placeholder="Saisissez la référence (Ex: RVS-2026-8943 ou SHP-2026-8942)..." autocomplete="off" value="RVS-2026-8943">
+					</div>
+				</div>
+				<div class="field-actions">
+					<button type="submit" class="btn btn-reset">
+						<i class="fa-solid fa-magnifying-glass"></i>
+						Intercepter le Bon
+					</button>
+				</div>
+			</form>
+		</div>
+
+		{# --- LAYOUT DEUX COLONNES COMPTOIR --- #}
+		<div
+			class="reservation-container">
+
+			{# COLONNE GAUCHE : IDENTIFICATION DU DOCUMENT ET DÉTAILS MÉTIER #}
+			<div
+				class="layout-main-panel">
+
+				{# Fiche du Document Intercepté #}
+				<div class="card">
+					<h2>
+						<i class="fa-solid fa-file-invoice-dollar"></i>
+						Détails du Document Intercepté</h2>
+
+					<div class="field-group mb-20" style="background-color: rgba(239, 110, 23, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(239, 110, 23, 0.15);">
+						<div style="flex: 1;">
+							<span class="section-micro-label" style="color: #ef6e17;">Nature du document</span>
+							<strong style="font-size: 15px; color: #0c326d;">BON DE RÉSERVATION PASSAGER</strong>
+						</div>
+						<div style="flex: 1;">
+							<span class="section-micro-label" style="color: #ef6e17;">Référence Système</span>
+							<strong style="font-size: 15px; color: #0c326d;">RVS-2026-8943</strong>
+						</div>
+					</div>
+
+					<div class="field-group mb-20">
+						<div class="field">
+							<span class="section-micro-label">Bénéficiaire / Voyageur</span>
+							<p style="font-size: 14px; font-weight: 700; color: #0c326d;">Mputu Antoinette</p>
+							<span style="font-size: 12px; color: #4b5563;">+243 897 112 233</span>
+						</div>
+						<div class="field">
+							<span class="section-micro-label">Logistique Associée</span>
+							<p style="font-size: 14px; font-weight: 700; color: #0c326d;">Kinshasa → Kenge</p>
+							<span style="font-size: 12px; color: #4b5563;">Bus 01 | Siège 14 (Standard)</span>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							<span class="section-micro-label">Planification départ</span>
+							<p style="font-size: 13px; font-weight: 600; color: #4b5563;">Départ prévu aujourd'hui à 14h30</p>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			{# COLONNE DROITE : MODULE ENCAISSEMENT ET VALIDATION FINANCIÈRE #}
+			<aside class="summary">
+				<div class="card summary-sticky-card">
+					<h2>Règlement & Caisse</h2>
+
+					{# Choix du mode de versement #}
+					<div class="payment-method-selectors mb-20">
+						<label class="section-micro-label">MODE DE RÈGLEMENT EFFECTIF</label>
+						<div class="payment-grid-buttons">
+							<label class="pay-method-item">
+								<input type="radio" name="payment_method" value="cash" checked>
+								<span class="custom-box">
+									<i class="fa-solid fa-money-bill-wave"></i>
+									Espèces</span>
+							</label>
+							<label class="pay-method-item">
+								<input type="radio" name="payment_method" value="mobile_money">
+								<span class="custom-box">
+									<i class="fa-solid fa-mobile-screen"></i>
+									M-Money</span>
+							</label>
+						</div>
+					</div>
+
+					<div class="field mb-15">
+						<label class="section-micro-label">Devise Encaissée</label>
+						<select name="currency_code" required>
+							<option value="CDF">CDF (Franc Congolais)</option>
+							<option value="USD">USD (Dollar Américain)</option>
+						</select>
+					</div>
+
+					<div class="field mb-20">
+						<label class="section-micro-label">Référence Transaction / Id Mobile Money</label>
+						<input type="text" name="payment_reference" placeholder="Saisir TxID si applicable..." autocomplete="off">
+					</div>
+
+					<hr class="summary-divider mb-15">
+
+					<ul class="billing-details-list">
+						<li>
+							<strong>Statut d'origine :</strong>
+							<span style="background-color: rgba(239, 110, 23, 0.12); color: #ef6e17; padding: 2px 6px; border-radius: 4px; font-weight: 700;">PENDING</span>
+						</li>
+					</ul>
+
+					<div class="total">
+						Montant net à payer :
+						<strong>45 000 CDF</strong>
+					</div>
+
+					{# Déclencheur comptable lourd #}
+					<button class="btn btn-full mt-20 py-12" style="background-color: #1684c5 !important;">
+						<i class="fa-solid fa-cash-register"></i>
+						Encaisser & Émettre le Titre
+					</button>
+				</div>
+			</aside>
+
+		</div>
+	</div>
+{% endblock %}
