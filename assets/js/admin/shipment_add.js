@@ -1,40 +1,78 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const tripSelector = document.getElementById('shipment-trip-selector');
-    const natureSelector = document.getElementById('package-nature');
-    const weightInput = document.getElementById('package-weight');
+    const shipmentForm = document.getElementById('dynamic-shipment-form');
+    if (!shipmentForm) return;
 
-    const summaryWeight = document.getElementById('summary-weight');
+    // --- EXTRACTION DES MATRICES DE PRIX TWIG ---
+    const weightMatrix = JSON.parse(shipmentForm.getAttribute('data-weight-pricing'));
+    const unitMatrix = JSON.parse(shipmentForm.getAttribute('data-unit-pricing'));
+    const natureMatrix = JSON.parse(shipmentForm.getAttribute('data-nature-pricing'));
+    const currencyCode = shipmentForm.getAttribute('data-currency-code');
+
+    const departureAgency = document.getElementById('departure-agency');
+    const arrivalAgency = document.getElementById('arrival-agency');
+    const packageNature = document.getElementById('package-nature');
+    const billingType = document.getElementById('billing-type');
+    
+    const weightInputBlock = document.getElementById('weight-input-block');
+    const weightInput = document.getElementById('package-weight');
+    
+    const unitInputBlock = document.getElementById('unit-input-block');
+    const unitSelect = document.getElementById('package-unit-type');
+
+    const summaryBillingMode = document.getElementById('summary-billing-mode');
     const summaryNature = document.getElementById('summary-nature');
     const summaryTotalPrice = document.getElementById('summary-total-price');
 
-    function calculateDynamicShipment() {
-        const weight = parseFloat(weightInput.value) || 0;
+    // --- INTERACTION 1 : BASCULE DYNAMIQUE (POIDS VS FORFAIT) ---
+    billingType.addEventListener('change', () => {
+        if (billingType.value === 'unit') {
+            weightInputBlock.classList.add('is-hidden');
+            unitInputBlock.classList.remove('is-hidden');
+            summaryBillingMode.textContent = "Forfaitaire";
+            weightInput.value = ""; // Réinitialise le poids
+        } else {
+            weightInputBlock.classList.remove('is-hidden');
+            unitInputBlock.classList.add('is-hidden');
+            summaryBillingMode.textContent = "Au Kg";
+        }
+        calculateFretPrice();
+    });
+
+    // --- INTERACTION 2 : CALCULATEUR MÉTIER ---
+    function calculateFretPrice() {
+        const start = departureAgency.value;
+        const end = arrivalAgency.value;
+        const nature = packageNature.value;
         
-        // 1. Récupération du prix au kilo configuré sur la route du voyage sélectionné
-        const selectedTrip = tripSelector.options[tripSelector.selectedIndex];
-        const pricePerKg = selectedTrip ? parseFloat(selectedTrip.getAttribute('data-route-price-kg')) : 0;
+        let basePrice = 0;
 
-        // 2. Récupération du surplus lié à la dangerosité ou fragilité de la marchandise
-        const selectedNature = natureSelector.options[natureSelector.selectedIndex];
-        const natureSurplus = selectedNature ? parseFloat(selectedNature.getAttribute('data-nature-surplus')) : 0;
+        // Récupération de la surcharge de nature depuis Twig
+        const surplus = natureMatrix[nature] || 0;
+        summaryNature.textContent = packageNature.options[packageNature.selectedIndex].text;
 
-        // Validation des étiquettes textuelles du bord droit
-        summaryWeight.textContent = `${weight} Kg`;
-        summaryNature.textContent = selectedNature ? selectedNature.text.split(' (')[0] : 'Standard';
-
-        if (weight === 0 || pricePerKg === 0) {
-            summaryTotalPrice.textContent = '0 CDF';
-            return;
+        if (billingType.value === 'weight') {
+            // Mode A : Facturation au poids (Segment * Poids Kg)
+            const weight = parseFloat(weightInput.value) || 0;
+            const segmentKey = `${start}-${end}`;
+            const pricePerKg = weightMatrix[segmentKey] || 0;
+            basePrice = weight * pricePerKg;
+        } else {
+            // Mode B : Facturation forfaitaire par type de colis
+            const unitType = unitSelect.value;
+            basePrice = unitMatrix[unitType] || 0;
         }
 
-        // 3. Calcul de la formule mathématique du fret
-        const finalFretPrice = (weight * pricePerKg) + natureSurplus;
+        // Somme finale brute
+        const finalFret = basePrice > 0 ? basePrice + surplus : 0;
 
-        summaryTotalPrice.textContent = `${finalFretPrice.toLocaleString()} CDF`;
+        // Rendu final dynamique
+        summaryTotalPrice.textContent = `${finalFret.toLocaleString()} ${currencyCode}`;
     }
 
-    // Écouteurs d'événements pour mettre à jour la facture de fret en direct
-    if (tripSelector) tripSelector.addEventListener('change', calculateDynamicShipment);
-    if (natureSelector) natureSelector.addEventListener('change', calculateDynamicShipment);
-    if (weightInput) weightInput.addEventListener('input', calculateDynamicShipment);
+    // Association des écouteurs
+    departureAgency.addEventListener('change', calculateFretPrice);
+    arrivalAgency.addEventListener('change', calculateFretPrice);
+    packageNature.addEventListener('change', calculateFretPrice);
+    weightInput.addEventListener('input', calculateFretPrice);
+    unitSelect.addEventListener('change', calculateFretPrice);
 });

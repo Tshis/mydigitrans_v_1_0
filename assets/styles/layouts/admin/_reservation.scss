@@ -410,6 +410,13 @@
             &:hover { opacity: 0.9; }
         }
     }
+
+    // À mettre tout en bas, tout seul à la fin du fichier booking_creation.scss
+    tr.is-hidden,
+    div.field.is-hidden {
+        display: none !important;
+    }
+
 }
 
 // --- ADAPTATION TOTALE AU MODE SOMBRE (DARK MODE) ---

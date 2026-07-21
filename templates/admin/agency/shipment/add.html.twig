@@ -3,57 +3,43 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	{# Ce script gère le calcul du prix du fret basé sur le poids et la nature du colis #}
-	<script src="/js/admin/shipment-calculator.js" defer></script>
+	<script src="/js/admin/shipment_add.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-shipment-creation-scope container">
+	<div class="admin-shipment-creation-scope container">
 
-		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header mb-25">
-			<a href="{{ path('admin_agency_shipment_index') }}" class="agency-back-action" title="Retour au backoffice">
+			<a href="{{ path('admin_agency_shipment_index') }}" class="agency-back-action" title="Retour au registre">
 				<i class="fa-solid fa-arrow-left"></i>
 			</a>
 			<div class="title">
 				<h2>Enregistrement de Fret & Colis (Shipment)</h2>
-				<p>Pesez la marchandise, enregistrez les contacts et émettez le Bon de chargement.</p>
+				<p>Pesez la marchandise, sélectionnez le type de tarification et émettez le Bon de chargement.</p>
 			</div>
 		</header>
 
-		{# --- FORMULAIRE D'EXPÉDITION --- #}
-		<form action="#" method="POST" class="reservation-form">
-			<div
-				class="reservation-container">
+		{# --- FORMULAIRE CONNECTÉ AUX DONNÉES DU CONTROLEUR --- #}
+		<form action="#" method="POST" class="reservation-form" id="dynamic-shipment-form" data-weight-pricing="{{ weight_matrix|json_encode }}" data-unit-pricing="{{ unit_fares|json_encode }}" data-nature-pricing="{{ nature_surcharges|json_encode }}" data-currency-code="{{ currency_code }}">
 
-				{# COLONNE GAUCHE : LOGISTIQUE, ACTEURS ET DESCRIPTION DU COLIS #}
+			<div class="reservation-container">
+
 				<div
 					class="layout-main-panel">
 
-					{# Étape 1 : Affectation au voyage #}
+					{# Section 1 : Itinéraire #}
 					<div class="card mb-20">
 						<h2>Logistique & Expédition</h2>
-						<div class="field-group mb-20">
-							<div class="field">
-								<label>Voyage / Camion / Bus Affecté</label>
-								<select name="trip_id" id="shipment-trip-selector" required>
-									<option value="">-- Choisir un départ actif --</option>
-									<option value="1" data-route-price-kg="500">TRP-2026-0042 (Kinshasa → Kikwit | 14h30)</option>
-									<option value="2" data-route-price-kg="400">TRP-2026-0043 (Kinshasa → Matadi | 08h00)</option>
-								</select>
-							</div>
-						</div>
 						<div class="field-group">
 							<div class="field">
-								<label>Lieu de Dépôt</label>
-								<select name="departure_agency_id" required>
+								<label>Origine</label>
+								<select name="departure_agency_id" id="departure-agency" required>
 									<option value="1">Kinshasa (Gare Centrale)</option>
 								</select>
 							</div>
 							<div class="field">
-								<label>Lieu de Retrait / Destination</label>
-								<select name="arrival_agency_id" required>
+								<label>Destination</label>
+								<select name="arrival_agency_id" id="arrival-agency" required>
 									<option value="3">Kikwit (Terminus)</option>
 									<option value="2">Kenge (Arrêt Principal)</option>
 								</select>
@@ -61,7 +47,7 @@
 						</div>
 					</div>
 
-					{# Étape 2 : Les Acteurs (Expéditeur et Destinataire) #}
+					{# Section 2 : Les Acteurs #}
 					<div class="card mb-20">
 						<h2>Acteurs du Fret</h2>
 						<div class="field-group mb-20">
@@ -87,59 +73,83 @@
 						</div>
 					</div>
 
-					{# Étape 3 : Spécifications de la Marchandise #}
+					{# Section 3 : Marchandise & Tarification MCD #}
 					<div class="card">
 						<h2>Nature & Caractéristiques de la marchandise</h2>
 						<div class="field mb-20">
 							<label>Description du contenu</label>
-							<input type="text" name="package_description" placeholder="Ex : Carton de pièces de rechange, sac de vêtements" required autocomplete="off">
+							<input type="text" name="package_description" placeholder="Ex : Pièces de rechange, sac de vêtements" required autocomplete="off">
 						</div>
-						<div class="field-group">
+
+						<div class="field-group mb-20">
 							<div class="field">
-								<label>Nature du Colis</label>
+								<label>Nature Logistique</label>
 								<select name="package_nature" id="package-nature" required>
-									<option value="standard" data-nature-surplus="0">Standard (Cartons, Sacs ordinaires)</option>
-									<option value="fragile" data-nature-surplus="5000">Fragile / Électronique (+5 000 CDF)</option>
-									<option value="perishable" data-nature-surplus="3000">Périssable / Vivres (+3 000 CDF)</option>
+									<option value="standard">Standard (Cartons ordinaires)</option>
+									<option value="fragile">Fragile / Électronique</option>
+									<option value="perishable">Périssable / Vivres de Kinshasa</option>
 								</select>
 							</div>
 							<div class="field">
-								<label>Poids (En Kilogrammes - Kg)</label>
-								<input type="number" name="package_weight" id="package-weight" min="1" max="500" placeholder="Ex : 25" required>
+								<label>Mode de Facturation</label>
+								<select name="billing_type" id="billing-type" required>
+									<option value="weight">Facturation au Poids (Par Kg)</option>
+									<option value="unit">Facturation Forfaitaire (Par Pièce)</option>
+								</select>
+							</div>
+						</div>
+
+						<div
+							class="field-group">
+							{# Bloc dynamique Poids #}
+							<div class="field" id="weight-input-block">
+								<label>Poids du colis (En Kg)</label>
+								<input type="number" name="package_weight" id="package-weight" min="1" max="500" placeholder="Ex : 25">
+							</div>
+							{# Bloc dynamique Forfait #}
+							<div class="field is-hidden" id="unit-input-block">
+								<label>Gabarit / Type de Pièce</label>
+								<select name="package_unit_type" id="package-unit-type">
+									<option value="box_small">Petit colis / Paquet</option>
+									<option value="box_large">Gros carton / Sac de foufou</option>
+									<option value="tv_plasma">Écran TV / Matériel Électronique</option>
+									<option value="motorbike">Moto / Engin roulant</option>
+								</select>
 							</div>
 						</div>
 					</div>
 
 				</div>
 
-				{# COLONNE DROITE : LE BON DE CHARGEMENT LOGISTIQUE #}
+				{# COLONNE DROITE : LE BON DE FRET (ASIDE) #}
 				<aside class="summary">
 					<div class="card summary-sticky-card">
-						<h2>Bon de Chargement</h2>
+						<h2>Bon de Fret & Colis</h2>
 
-						<div class="reservation-notice-zone mb-20" style="background-color: rgba(22, 163, 74, 0.05); border-left-color: #16a34a;">
-							<p class="notice-title" style="color: #16a34a;">
+						<div class="reservation-notice-zone mb-20" style="background-color: rgba(22, 163, 74, 0.05); border-left-color: #1684c5;">
+							<p class="notice-title" style="color: #1684c5;">
 								<i class="fa-solid fa-boxes-packing"></i>
-								Prise en charge fret</p>
-							<p class="notice-text">Ce reçu temporaire atteste du dépôt du colis. Il devra être présenté en caisse centrale pour acquitter le fret.</p>
+								Enregistrement Fret</p>
+							<p class="notice-text">Ce reçu temporaire atteste du dépôt du colis. La taxe devra être acquittée en caisse centrale avant l'embarquement dans le bus.</p>
 						</div>
 
 						<hr class="summary-divider mb-15">
 
 						<ul class="billing-details-list">
 							<li>
-								<strong>Poids enregistré :</strong>
-								<span id="summary-weight">0 Kg</span>
+								<strong>Mode Calcul :</strong>
+								<span id="summary-billing-mode">Au Kg</span>
 							</li>
 							<li>
-								<strong>Nature Colis :</strong>
+								<strong>Nature Fret :</strong>
 								<span id="summary-nature">Standard</span>
 							</li>
 						</ul>
 
 						<div class="total">
 							Fret estimé :
-							<strong id="summary-total-price">0 CDF</strong>
+							<strong id="summary-total-price">0
+								{{ currency_code }}</strong>
 						</div>
 
 						<button class="btn btn-primary btn-full mt-20 py-12">
