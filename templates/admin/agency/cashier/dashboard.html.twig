@@ -1,0 +1,141 @@
+{# templates/admin/agency/cashier/dashboard.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-cashier-dashboard-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-25">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-vault"></i>
+					Tableau de Bord de la Caisse</h2>
+				<p>Suivi des soldes physiques en direct, enregistrement des flux et contrôle de session.</p>
+			</div>
+			<div class="border-actions-group">
+				<a href="{{ path('admin_agency_cashier_payment') }}" class="btn btn-action-caisse btn-success-caisse">
+					<i class="fa-solid fa-cash-register"></i>
+					Encaisser un Bon
+				</a>
+				<a href="{{ path('admin_agency_cashier_expense') }}" class="btn btn-action-caisse btn-danger-caisse">
+					<i class="fa-solid fa-money-bill-transfer"></i>
+					Enregistrer une Dépense
+				</a>
+			</div>
+		</header>
+
+		{# --- LES SOLDES DU COFFRE-FORT (PAR DEVISE) --- #}
+		<div class="stats-overview-grid mb-25">
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-money-bill-wave"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Solde Coffre CDF</span>
+					<strong class="stat-value text-success">1 425 000 CDF</strong>
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-dollar-sign"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Solde Coffre USD</span>
+					<strong class="stat-value text-primary">450 USD</strong>
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--danger">
+					<i class="fa-solid fa-arrow-trend-down"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Total Dépenses (Sorties)</span>
+					<strong class="stat-value text-danger">85 000 CDF</strong>
+				</div>
+			</div>
+		</div>
+
+		{# --- GRAND LIVRE DES FLUX JOURNALIERS (COMPOSANT GLOBAL) --- #}
+		<div class="card monitoring-table-card">
+			<h2>
+				<i class="fa-solid fa-list-ol"></i>
+				Grand Livre des Flux du Jour</h2>
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Heure & Réf</th>
+						<th>Type Opération</th>
+						<th>Libellé / Motif</th>
+						<th>Mode</th>
+						<th>Flux Entrant</th>
+						<th>Flux Sortant</th>
+						<th class="text-right">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<strong>09h42</strong>
+							<span class="sub-meta-text">FLX-9834</span>
+						</td>
+						<td>
+							<span class="cash-badge badge-entry">ENCAISSEMENT</span>
+						</td>
+						<td>
+							<strong>Billet Passager : Mputu Antoinette</strong>
+							<span class="sub-meta-text">Réf: RVS-2026-8943</span>
+						</td>
+						<td>
+							<span class="text-success-mode font-weight-700">Espèces</span>
+						</td>
+						<td>
+							<strong class="text-success-mode">+45 000 CDF</strong>
+						</td>
+						<td>
+							<span class="text-muted">-</span>
+						</td>
+						<td class="text-right table-action-buttons">
+							<a href="{{ path('admin_agency_cashier_show_payment') }}" class="table-action-trigger view" title="Voir le reçu">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<strong>11h15</strong>
+							<span class="sub-meta-text">FLX-9835</span>
+						</td>
+						<td>
+							<span class="cash-badge badge-exit">DECAISSEMENT</span>
+						</td>
+						<td>
+							<strong>Carburant Bus 01 (Marcopolo)</strong>
+							<span class="sub-meta-text">Reçu Station Engen #44</span>
+						</td>
+						<td>
+							<span class="text-danger-mode font-weight-700">Espèces</span>
+						</td>
+						<td>
+							<span class="text-muted">-</span>
+						</td>
+						<td>
+							<strong class="text-danger-mode">-60 000 CDF</strong>
+						</td>
+						<td class="text-right table-action-buttons">
+							<a href="{{ path('admin_agency_cashier_show_expense') }}" class="table-action-trigger view" title="Voir la pièce justificative">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}

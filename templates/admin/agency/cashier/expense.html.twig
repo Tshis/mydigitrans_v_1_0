@@ -1,0 +1,99 @@
+{# templates/admin/agency/cashier/expense.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-cashier-expense-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header mb-25">
+			<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" title="Retour au tableau de bord">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<h2>Enregistrement de Décaissement / Dépense</h2>
+				<p>Déclarez une sortie de fonds physique du coffre pour les charges d'exploitation de la gare.</p>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE DE SORTIE --- #}
+		<form action="#" method="POST" class="reservation-form">
+			<div
+				class="reservation-container">
+
+				{# GAUCHE : MOTIF ET JUSTIFICATIFS DE LA SORTIE #}
+				<div class="layout-main-panel">
+					<div class="card">
+						<h2>
+							<i class="fa-solid fa-file-invoice"></i>
+							Nature & Motif de la Dépense</h2>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label>Motif de la sortie de fonds</label>
+								<input type="text" placeholder="Ex: Achat Gasoil Bus 01, Collation Équipage..." required autocomplete="off">
+							</div>
+						</div>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label>Bénéficiaire des fonds (Nom / Entité)</label>
+								<input type="text" placeholder="Ex: Station Total Gare, Chauffeur Jean..." required autocomplete="off">
+							</div>
+							<div class="field">
+								<label>Numéro de Pièce Justificative / Facture</label>
+								<input type="text" placeholder="Ex: FAC-ENGEN-4590" required autocomplete="off">
+							</div>
+						</div>
+
+						<div class="field-group">
+							<div class="field">
+								<label>Voyage Associé (Optionnel)</label>
+								<select>
+									<option value="">-- Non rattaché à un départ --</option>
+									<option value="1">TRP-2026-0042 (Kinshasa → Kikwit)</option>
+									<option value="2">TRP-2026-0043 (Kinshasa → Matadi)</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{# DROITE : LE COMPTAGE DES FONDS SORTIS #}
+				<aside class="summary">
+					<div class="card summary-sticky-card">
+						<h2>Comptabilité Sortie</h2>
+
+						<div class="field mb-15">
+							<label class="section-micro-label">Devise Décaissée</label>
+							<select required>
+								<option value="CDF">CDF (Franc Congolais)</option>
+								<option value="USD">USD (Dollar Américain)</option>
+							</select>
+						</div>
+
+						<div class="field mb-20">
+							<label class="section-micro-label">Montant exact à décaisser</label>
+							<input type="number" min="500" placeholder="Saisir le montant..." required>
+						</div>
+
+						<hr class="summary-divider mb-15">
+
+						<div class="reservation-notice-zone">
+							<p class="notice-title">
+								<i class="fa-solid fa-triangle-exclamation"></i>
+								Responsabilité Caisse</p>
+							<p class="notice-text">Toute sortie de fonds non appuyée par une pièce comptable valide créera un écart lors du contrôle de clôture de fin de journée.</p>
+						</div>
+
+						<button type="submit" class="btn btn-full mt-20 py-12">
+							<i class="fa-solid fa-money-bill-transfer"></i>
+							Valider le Décaissement
+						</button>
+					</div>
+				</aside>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{# templates/admin/agency/dashboard/general.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-dashboard-general-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE MANAGEMENT --- #}
+		<header class="header mb-25">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-chart-line"></i>
+					Supervision Réseau - Direction Générale</h2>
+				<p>Vue managériale consolidée : Analyse des recettes globales par succursale et par devise.</p>
+			</div>
+		</header>
+
+		{# --- GRILLE DE SYNTHÈSE TOTALE COMPAGNIE --- #}
+		<div class="stats-overview-grid mb-25">
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-building-shield"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Volume Total CDF (Réseau)</span>
+					<strong class="stat-value">4 850 000 CDF</strong>
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-dollar-sign"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Volume Total USD (Réseau)</span>
+					<strong class="stat-value">1 450 USD</strong>
+				</div>
+			</div>
+		</div>
+
+		{# --- REGISTRE DE COMPARAISON DES SUCCURSALES --- #}
+		<div class="card monitoring-table-card">
+			<h2>
+				<i class="fa-solid fa-network-wired"></i>
+				Situation des Succursales / Gares</h2>
+
+			<table class="table table-scrollable table-striped">
+				<thead>
+					<tr>
+						<th>Nom de la Succursale</th>
+						<th>Gérant Local (Manager)</th>
+						<th>Flux Billetterie</th>
+						<th>Flux Fret (Colis)</th>
+						<th>Solde CDF</th>
+						<th>Solde USD</th>
+						<th class="text-right">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<strong>Gare Centrale - Kinshasa</strong>
+						</td>
+						<td>
+							<span class="manager-name">Jean-Pierre Mwamba</span>
+						</td>
+						<td>3 200 000 CDF</td>
+						<td>850 000 CDF</td>
+						<td>
+							<strong class="text-dark">4 050 000 CDF</strong>
+						</td>
+						<td>
+							<strong class="text-dark">950 USD</strong>
+						</td>
+						<td class="text-right table-action-buttons">
+							<a href="{{ path('admin_agency_cashier_dashboard_branch') }}" class="table-action-trigger view" title="Inspecter cette gare">
+								<i class="fa-solid fa-arrow-right-to-bracket"></i>
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<strong>Terminus Principal - Kikwit</strong>
+						</td>
+						<td>
+							<span class="manager-name">Alphonse Kudia</span>
+						</td>
+						<td>600 000 CDF</td>
+						<td>200 000 CDF</td>
+						<td>
+							<strong class="text-dark">800 000 CDF</strong>
+						</td>
+						<td>
+							<strong class="text-dark">500 USD</strong>
+						</td>
+						<td class="text-right table-action-buttons">
+							<a href="#" class="table-action-trigger view" title="Inspecter cette gare">
+								<i class="fa-solid fa-arrow-right-to-bracket"></i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}

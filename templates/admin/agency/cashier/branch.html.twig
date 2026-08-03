@@ -1,0 +1,92 @@
+{# templates/admin/agency/dashboard/succursale.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-dashboard-branch-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE DE LA SUCCURSALE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="#" class="agency-back-action" title="Retour à la supervision générale">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h2>
+						<i class="fa-solid fa-building"></i>
+						Contrôle Interne : Succursale Kinshasa</h2>
+					<p>Chef de Gare :
+						<strong>Jean-Pierre Mwamba</strong>
+						| Suivi des sessions actives et des guichetiers.</p>
+				</div>
+			</div>
+		</header>
+
+		{# --- REGISTRE DE CONTRÔLE DES CAISSIERS --- #}
+		<div class="card monitoring-table-card">
+			<h2>
+				<i class="fa-solid fa-users-gear"></i>
+				Journal des Caissiers / Sessions de Guichet</h2>
+
+			<table class="table table-scrollable table-striped">
+				<thead>
+					<tr>
+						<th>Guichetier (Operator)</th>
+						<th>N° Session Caisse</th>
+						<th>Heure Ouverture</th>
+						<th>État Session</th>
+						<th>Encaissements (CDF)</th>
+						<th>Encaissements (USD)</th>
+						<th class="text-right">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{# Caissier 1 : Session ouverte active #}
+					<tr>
+						<td>
+							<strong>Mputu Antoinette</strong>
+							<span class="sub-meta-text">Guichet Principal #1</span>
+						</td>
+						<td>
+							<span class="session-code-text">CS-2026-0712</span>
+						</td>
+						<td>07h30</td>
+						<td>
+							<span class="session-badge active-status">OUVERTE</span>
+						</td>
+						<td>2 450 000 CDF</td>
+						<td>450 USD</td>
+						<td class="text-right table-action-buttons">
+							<a href="#" class="table-action-trigger view" title="Auditer le journal des ventes de ce caissier">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+
+					{# Caissier 2 : Session fermée et archivée #}
+					<tr>
+						<td>
+							<strong>Ilunga Christian</strong>
+							<span class="sub-meta-text">Guichet Fret & Colis</span>
+						</td>
+						<td>
+							<span class="session-code-text">CS-2026-0711</span>
+						</td>
+						<td>06h00</td>
+						<td>
+							<span class="session-badge closed-status">CLÔTURÉE</span>
+						</td>
+						<td>1 600 000 CDF</td>
+						<td>500 USD</td>
+						<td class="text-right table-action-buttons">
+							<a href="#" class="table-action-trigger view" title="Voir l'archive comptable">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}

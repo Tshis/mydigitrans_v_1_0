@@ -1,0 +1,89 @@
+{# templates/admin/agency/cashier/show_expense.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-cashier-show-expense-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" title="Retour">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h2>Pièce de Décaissement N° TXN-45921</h2>
+					<p>Sortie de fonds validée le 03/08/2026 à 11h15 | Statut :
+						<strong class="status-declined">Décaissé</strong>
+					</p>
+				</div>
+			</div>
+		</header>
+
+		{# --- LAYOUT DEUX COLONNES --- #}
+		<div class="reservation-container">
+			<div class="layout-main-panel">
+				<div class="card mb-20">
+					<h2>
+						<i class="fa-solid fa-file-invoice"></i>
+						Justificatif de la Charge</h2>
+					<div class="field-group mb-20">
+						<div class="field">
+							<span class="section-micro-label">Nature du Flux</span>
+							<p class="text-danger-mode bold">FLUX SORTANT (CHARGE / DÉPENSE)</p>
+						</div>
+						<div class="field">
+							<span class="section-micro-label">Motif de la dépense</span>
+							<p class="text-dark bold">Achat de Gasoil - Bus 01 (Marcopolo)</p>
+						</div>
+					</div>
+					<div class="field-group">
+						<div class="field">
+							<span class="section-micro-label">Bénéficiaire des Fonds</span>
+							<p class="text-dark bold">Station Engen Gare Centrale</p>
+						</div>
+						<div class="field">
+							<span class="section-micro-label">N° Facture Fournisseur</span>
+							<p class="text-dark bold">FAC-ENGEN-4590</p>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<h2>
+						<i class="fa-solid fa-bus"></i>
+						Imputation Logistique</h2>
+					<div class="field-group">
+						<div class="field">
+							<span class="section-micro-label">Voyage / Départ rattaché</span>
+							<p class="text-dark bold">TRP-2026-0042</p>
+							<span class="sub-meta-text">Ligne commerciale : Kinshasa → Kikwit</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<aside class="summary">
+				<div class="card summary-sticky-card">
+					<h2>Comptabilité Sortie</h2>
+					<ul class="billing-details-list">
+						<li>
+							<strong>Mode de sortie :</strong>
+							<span class="text-main bold">Espèces (Coffre)</span>
+						</li>
+						<li>
+							<strong>Devise décaissée :</strong>
+							<span class="text-main bold">CDF</span>
+						</li>
+						<li>
+							<strong>Auteur autorisation :</strong>
+							<span class="text-main bold">Gérant de Gare</span>
+						</li>
+					</ul>
+					<hr class="summary-divider mb-15">
+					<div class="total">Montant Sorti :
+						<strong class="text-danger-mode">60 000 CDF</strong>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</div>
+{% endblock %}

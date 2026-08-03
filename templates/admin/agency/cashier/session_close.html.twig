@@ -1,0 +1,89 @@
+{# templates/admin/agency/cashier/close_session.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-cashier-session-closing-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header mb-25">
+			<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" title="Retour">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<h2>Clôture de Session & Arrêt de Caisse</h2>
+				<p>Session active :
+					<strong>CS-2026-0712</strong>
+					| Veuillez compter vos billets et déclarer l'encaisse physique.</p>
+			</div>
+		</header>
+
+		{# --- LE TUNNEL DE VÉRIFICATION DES ÉCARTS --- #}
+		<form action="#" method="POST" class="reservation-form">
+			<div
+				class="reservation-container">
+
+				{# GAUCHE : LES MONTANTS THÉORIQUES ISSUS DE L'ENTITÉ CASHSESSION #}
+				<div class="layout-main-panel">
+					<div class="card mb-20">
+						<h2>
+							<i class="fa-solid fa-calculator"></i>
+							Soldes Théoriques du Système (Calculés)</h2>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<span class="section-micro-label">Total attendu en Francs (CDF)</span>
+								<p class="theoretical-value text-success-color">625 000 CDF</p>
+								<span class="sub-meta-text">Basé sur 14 billets et 2 colis encaissés</span>
+							</div>
+							<div class="field">
+								<span class="section-micro-label">Total attendu en Dollars (USD)</span>
+								<p class="theoretical-value text-primary-color">120 USD</p>
+								<span class="sub-meta-text">Basé sur les surplus VIP</span>
+							</div>
+						</div>
+					</div>
+
+					{# DÉCLARATION PHYSIQUE DES ESPÈCES PAR LE GUICHETIER #}
+					<div class="card">
+						<h2>
+							<i class="fa-solid fa-hand-holding-hand"></i>
+							Déclaration Physique (Comptage Réuel)</h2>
+						<div class="field-group">
+							<div class="field">
+								<label>Montant physique recompté en CDF</label>
+								<input type="number" name="physical_cdf" placeholder="Saisir la somme exacte en caisse..." required>
+							</div>
+							<div class="field">
+								<label>Montant physique recompté en USD</label>
+								<input type="number" name="physical_usd" placeholder="Saisir la somme exacte en caisse..." required>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{# DROITE : VALIDATION ET EXPIRATION #}
+				<aside class="summary">
+					<div class="card summary-sticky-card">
+						<h2>Fermeture Définitive</h2>
+
+						<div class="reservation-notice-zone" style="border-left-color: #ef6e17; background-color: rgba(239, 110, 23, 0.04);">
+							<p class="notice-title" style="color: #ef6e17;">
+								<i class="fa-solid fa-lock"></i>
+								Action Irréversible</p>
+							<p class="notice-text" style="font-size: 11px;">Après confirmation, votre guichet sera verrouillé. Un rapport d'arrêt de caisse sera envoyé au gérant pour validation des écarts.</p>
+						</div>
+
+						<hr class="summary-divider mb-15">
+
+						<button type="submit" class="btn btn-full mt-20 py-12" style="background-color: #0c326d !important;">
+							<i class="fa-solid fa-circle-check"></i>
+							Clôturer & Verrouiller la Caisse
+						</button>
+					</div>
+				</aside>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}
