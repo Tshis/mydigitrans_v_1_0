@@ -1,0 +1,229 @@
+{# templates/admin/agency/finance/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div class="admin-agency-finance-show-scope container">
+
+    {# --- EN-TÊTE DE LA PAGE (Structure calquée sur votre modèle) --- #}
+    <header class="header my-25 d-flex">
+        <div class="header-main-info">
+            <a href="{{ path('admin_agency_finance_index') }}" class="agency-back-action" title="Retour aux flux">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Finances & Flux</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-gray text-size-13 text-highlight">Fiche d'audit unifiée</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {# --- CARTE MAÎTRESSE UNIQUE --- #}
+    <div class="layout-main-card">
+        <div class="card-inner-box">
+
+            {# 1. BANNIÈRE FINANCIÈRE DE LA CARTE #}
+            <div class="finance-hero-banner mb-25">
+                <div class="hero-amount-zone">
+                    <span class="audit-label">Volume financier de la transaction</span>
+                    {% if type == 'payment' %}
+                    <h1 class="hero-main-amount text-success">+ 130 500 FC</h1>
+                    <span class="sub-meta-text">Contrevaleur brute : 45.00 $ (Taux : 1$ = 2 900 FC)</span>
+                    {% else %}
+                    <h1 class="hero-main-amount text-danger">- 250.00 $</h1>
+                    <span class="sub-meta-text">Contrevaleur locale : 725 000 FC (Taux : 1$ = 2 900 FC)</span>
+                    {% endif %}
+                </div>
+
+                <div class="hero-status-zone">
+                    <span class="audit-label">État du mouvement</span>
+                    {% if type == 'payment' %}
+                    <span class="badge-status-confirmed">Confirmé & Encaissé</span>
+                    {% else %}
+                    <span class="badge-status-confirmed status-exit">Caisse Décaissée</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr class="finance-divider mb-25">
+
+            {# 2. BLOC DES PARAMÈTRES ET CARACTÉRISTIQUES MÉTIER #}
+            <h3 class="box-title mb-15">
+                <i class="fa-solid fa-file-invoice"></i>
+                Fiche d'Audit & Traçabilité
+            </h3>
+
+            <div class="audit-details-grid mb-25">
+                <div class="audit-item">
+                    <span class="audit-label">Référence opération</span>
+                    <p class="audit-value">Mydigitrans-TX-{{ type == 'payment' ? '8942' : '0401' }}</p>
+                </div>
+
+                <div class="audit-item">
+                    <span class="audit-label">Horodatage de saisie</span>
+                    <p class="audit-value">Le 13/08/2026 à 10:41</p>
+                </div>
+
+                <div class="audit-item">
+                    <span class="audit-label">Nature du flux</span>
+                    <p class="audit-value">
+                        {% if type == 'payment' %}Vente de Billet (Clientèle Transit - Guichet Virtuel){% else %}Achat
+                        Carburant Bus #01 (Exploitation Ligne Interurbaine)
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="audit-item">
+                    <span class="audit-label">Succursale responsable</span>
+                    <p class="audit-value">Kinshasa Centre — Gare Centrale Principale</p>
+                </div>
+
+                <div class="audit-item">
+                    <span class="audit-label">Acteur / Tiers lié</span>
+                    <p class="audit-value">
+                        {% if type == 'payment' %}Jean Kabamba (+243 812 345 678){% else %}Chauffeur : Jean Mukendi
+                        (Véhicule Marcopolo Flotte #01)
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="audit-item">
+                    <span class="audit-label">Source / Destination comptable</span>
+                    <p class="audit-value">
+                        {% if type == 'payment' %}
+                        <i class="fa-solid fa-mobile-screen-button font-color-entry"></i>
+                        Compte Mobile Money Principal
+                        {% else %}
+                        <i class="fa-solid fa-cash-register font-color-exit"></i>
+                        Caisse Principale - Guichet 1
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="audit-item">
+                    <span class="audit-label">Initié par (createdBy)</span>
+                    <p class="audit-value">
+                        {% if type == 'payment' %}Client Authentifié (Portail Web public){% else %}Manager : Alphonse
+                        Kalonji
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="audit-item">
+                    <span class="audit-label">Confirmé par (confirmedBy)</span>
+                    <p class="audit-value">
+                        {% if type == 'payment' %}API Webhook Vodacom RDC{% else %}Guichetier principal (Session active)
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            {# 3. ZONE NOTE / DESCRIPTION COMPTABLE #}
+            <div class="audit-description-box mb-25">
+                <span class="audit-label">Description & Notes d'audit comptable</span>
+                <div class="description-text-container">
+                    {% if type == 'payment' %}
+                    Préservation de place pour le voyage Kinshasa -> Kikwit du 14/07/2026. Le siège n°12 a été réservé,
+                    fétiché et bloqué avec succès en base de données pour ce passager.
+                    {% else %}
+                    Facture de carburant émise par la Station Engen Limete (Reçu physique agrafé N°ENG-9923). Index
+                    kilométrique relevé au départ de la succursale : 142 500 km.
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr class="finance-divider mb-20">
+
+            {# 4. FOOTER ACTIONS (Utilise vos classes globales natives btn, btn-dark, btn-success) #}
+            <div class="finance-actions-footer">
+                <button class="btn btn-dark text-size-13" onclick="window.print();">
+                    <i class="fa-solid fa-print"></i>
+                    Imprimer le reçu d'audit
+                </button>
+                {% if type == 'payment' %}
+                <button class="btn btn-success btn-trigger-refund text-size-13">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                    Émettre un remboursement
+                </button>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    {# --- 5. MODALE DE REMBOURSEMENT --- #}
+    <div id="refund-modal" class="modal-wrapper">
+        <div class="trip-filters-card modal-card-content">
+            <h3 class="modal-card-title">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+                Confirmer le Remboursement
+            </h3>
+            <p class="text-gray text-size-13 mb-15">Vous vous apprêtez à annuler les effets financiers du paiement
+                <strong>#PAY-8942</strong>. Cette action générera une écriture de sortie (Dépense).
+            </p>
+
+            <form onsubmit="event.preventDefault(); document.getElementById('refund-modal').style.display='none';">
+                <div class="field mb-15">
+                    <label class="admin-bus-layout-add-label">Type de Remboursement</label>
+                    <select class="admin-bus-layout-add-select" id="refund-type">
+                        <option value="total">Remboursement Intégral (130 500 FC / 45.00 $)</option>
+                        <option value="partial">Remboursement Partiel (Retenue de frais d'annulation)</option>
+                    </select>
+                </div>
+
+                <div class="field mb-15" id="partial-amount-field">
+                    <label class="admin-bus-layout-add-label">Montant à restituer au client (FC)</label>
+                    <input type="number" class="admin-bus-layout-add-input"
+                        placeholder="Entrez le montant en Francs Congolais">
+                </div>
+
+                <div class="field mb-15">
+                    <label class="admin-bus-layout-add-label">Mode de restitution des fonds *</label>
+                    <select class="admin-bus-layout-add-select" required>
+                        <option value="cash">Espèces (Décaisser du tiroir-caisse Guichet 1)</option>
+                        <option value="momo">Retro-virement Mobile Money (Automatique via API)</option>
+                    </select>
+                </div>
+
+                <div class="field mb-15">
+                    <label class="admin-bus-layout-add-label">Motif officiel de l'annulation *</label>
+                    <textarea class="admin-bus-layout-add-input text-area-fixed"
+                        placeholder="Ex: Client malade, bus en panne, demande de report échouée..." required></textarea>
+                </div>
+
+                <div class="modal-actions-footer">
+                    <button type="button" class="btn btn-dark"
+                        onclick="document.getElementById('refund-modal').style.display='none';">Annuler</button>
+                    <button type="submit" class="btn btn-success btn-danger-refund">Valider le remboursement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const refundBtn = document.querySelector('.btn-trigger-refund');
+        const refundModal = document.getElementById('refund-modal');
+        const refundType = document.getElementById('refund-type');
+        const partialField = document.getElementById('partial-amount-field');
+
+        if (refundBtn) {
+            refundBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                refundModal.style.display = 'flex';
+            });
+        }
+
+        refundType.addEventListener('change', () => {
+            partialField.style.display = refundType.value === 'partial' ? 'block' : 'none';
+        });
+    });
+</script>
+{% endblock %}

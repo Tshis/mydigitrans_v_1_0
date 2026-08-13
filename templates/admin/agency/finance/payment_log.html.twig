@@ -1,0 +1,172 @@
+{# templates/admin/agency/cashier/payments_log.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-payments-log-wrapper container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-20">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-hand-holding-dollar"></i>
+					Historique des Paiements & Mouvements
+				</h2>
+				<p>Consultez le grand livre comptable, auditez les encaissements et contrôlez les sorties de fonds du réseau.</p>
+			</div>
+		</header>
+
+		{# --- CARTES DE SYNTHÈSE FINANCIÈRE --- #}
+		<div class="stats-overview-grid">
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-money-bill-trend-up"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Total Entrées (Recettes)</span>
+					<strong class="stat-value">5 420 000 CDF</strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--danger">
+					<i class="fa-solid fa-money-bill-transfer"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Total Sorties (Dépenses)</span>
+					<strong class="stat-value">145 000 CDF</strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-vault"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Volume Devises USD</span>
+					<strong class="stat-value">1 250 USD</strong>
+				</div>
+			</div>
+		</div>
+
+		{# --- FILTRES DE RECHERCHE AVANCÉS --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="#" method="GET" class="field-group">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Type de Mouvement</label>
+					<select name="flow_type" class="admin-bus-layout-add-select">
+						<option value="">-- Tous les mouvements --</option>
+						<option value="entry">Entrées (Encaissements)</option>
+						<option value="exit">Sorties (Décaissement)</option>
+					</select>
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Mode de Règlement</label>
+					<select name="payment_method" class="admin-bus-layout-add-select">
+						<option value="">-- Tous les modes --</option>
+						<option value="cash">Espèces</option>
+						<option value="mpesa">M-Pesa</option>
+						<option value="orange">Orange Money</option>
+						<option value="airtel">Airtel Money</option>
+					</select>
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Succursale / Gare</label>
+					<select name="branch_filter" class="admin-bus-layout-add-select">
+						<option value="">-- Toutes les gares --</option>
+						<option value="1">Kinshasa (Gare Centrale)</option>
+						<option value="2">Kikwit (Terminus)</option>
+					</select>
+				</div>
+				<div class="field-actions">
+					<button type="submit" class="btn btn-reset">
+						<i class="fa-solid fa-filter"></i>
+						Filtrer
+					</button>
+				</div>
+			</form>
+		</div>
+
+		{# --- TABLEAU GÉNÉRIQUE DES MOUVEMENTS (COMPOSANT GLOBAL) --- #}
+		<table class="table table-scrollable table-striped js-datatable">
+			<thead>
+				<tr>
+					<th>Date & Transaction</th>
+					<th>Type Flux</th>
+					<th>Libellé / Motif de l'Opération</th>
+					<th>Guichetier & Gare</th>
+					<th>Mode de Règlement</th>
+					<th>Montant Net</th>
+					<th class="text-right">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{# Exemple 1 : Encaissement Billet #}
+				<tr>
+					<td>
+						<strong>14/07/2026 à 09h42</strong>
+						<span class="sub-meta-text">TXN-45920</span>
+					</td>
+					<td class="table-badge-cell">
+						<span class="cash-badge badge-entry">Entrée</span>
+					</td>
+					<td>
+						<strong>Billet Voyageur : Kabila Dieudonné</strong>
+						<span class="sub-meta-text">Réf: TCK-2607-0042 (VIP)</span>
+					</td>
+					<td>
+						<strong>Mputu Antoinette</strong>
+						<span class="sub-meta-text">Gare Kinshasa</span>
+					</td>
+					<td>
+						<span class="method-badge text-cash">Espèces</span>
+					</td>
+					<td>
+						<strong class="amount-entry">+40 000 CDF</strong>
+					</td>
+					<td class="text-right table-action-buttons">
+						<a href="{{ path('admin_agency_cashier_show_payment') }}" class="table-action-trigger view" title="Voir les détails de l'encaissement">
+							<i class="fa-solid fa-eye"></i>
+						</a>
+					</td>
+				</tr>
+
+				{# Exemple 2 : Décaissement Dépense #}
+				<tr>
+					<td>
+						<strong>14/07/2026 à 11h15</strong>
+						<span class="sub-meta-text">TXN-45921</span>
+					</td>
+					<td class="table-badge-cell">
+						<span class="cash-badge badge-exit">Sortie</span>
+					</td>
+					<td>
+						<strong>Achat Gasoil - Bus 01</strong>
+						<span class="sub-meta-text">Facture: FAC-ENGEN-4590</span>
+					</td>
+					<td>
+						<strong>Jean-Pierre Mwamba</strong>
+						<span class="sub-meta-text">Gare Kinshasa</span>
+					</td>
+					<td>
+						<span class="method-badge text-cash">Espèces</span>
+					</td>
+					<td>
+						<strong class="amount-exit">-60 000 CDF</strong>
+					</td>
+					<td class="text-right table-action-buttons">
+						<a href="{{ path('admin_agency_cashier_show_expense') }}" class="table-action-trigger view" title="Voir les détails du décaissement">
+							<i class="fa-solid fa-eye"></i>
+						</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+{% endblock %}

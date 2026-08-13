@@ -36,12 +36,13 @@
 	<span class="text">Caisse</span>
 </a>
 
-<a href="#" class="menu-link" data-tooltip="Paiements & Dépenses">
+<a href="{{path('admin_agency_finance_index')}}" class="menu-link {{ page is same as('finances') ? 'active' : '' }}" data-tooltip="Paiements & Dépenses">
 	<span class="icon">
 		<i class="fa-solid fa-hand-holding-dollar"></i>
 	</span>
-	<span class="text">Paiements</span>
+	<span class="text">Finances / Flux</span>
 </a>
+
 
 {# 3. LOGISTIQUE & CONFIGURATION #}
 <a href="{{path('admin_agency_line_index')}}" class="menu-link {{ page is same as('line') ? 'active' : '' }}" data-tooltip="Lignes et Arrêts">

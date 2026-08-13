@@ -15,13 +15,13 @@ final class DashboardController extends AbstractController
     #[Route('/admin/agency/dashboard', name: 'admin_agency_dashboard')]
     public function index()
     {
-        $user = "super";
+        $user = "superd";
         $route = "";
 
         if ($user == "super") {
             return $this->redirectToRoute('admin_agency_main_dashboard');
         } else {
-            return $this->redirectToRoute('admin_agency_branch_dashboard');
+            return $this->redirectToRoute('admin_agency_branch_dashboard', ['slug' => 'agence-de-limete']);
         }
     } //index
 

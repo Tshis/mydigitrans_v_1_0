@@ -1,0 +1,172 @@
+{# templates/admin/agency/finance/expense_add.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-trip-wrapper container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-20">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-receipt"></i>
+					Enregistrer une Dépense / Décaissement
+				</h2>
+				<p>Saisissez les frais opérationnels ou les coûts liés aux abonnements de la plateforme.</p>
+			</div>
+			<div class="admin-bus-layout-add-action-zone">
+				<a href="{{ path('admin_agency_finance_index') }}" class="btn btn-dark text-size-12">
+					<i class="fa-solid fa-arrow-left"></i>
+					Retour aux flux
+				</a>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE DÉPENSE --- #}
+		<div class="trip-filters-card mb-20" style="padding: 2rem;">
+			<form action="#" method="POST" onsubmit="event.preventDefault(); alert('Dépense enregistrée avec succès (Donnée statique) !');">
+
+				<div
+					class="field-group mb-15">
+					{# Champ 1 : Type de Dépense (Crucial pour votre logique) #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Type de dépense *</label>
+						<select name="expense_type" id="expense-type-select" class="admin-bus-layout-add-select" required>
+							<option value="other">Frais opérationnels généraux (Carburant, Bureau, Maintenance)</option>
+							<option value="subscription">Abonnement Plateforme SaaS (Mydigitrans)</option>
+						</select>
+					</div>
+
+					{# Champ 2 : Succursale #}
+					<div class="field" id="branch-field-wrapper">
+						<label class="admin-bus-layout-add-label">Succursale bénéficiaire *</label>
+						<select name="expense_branch" id="expense-branch-select" class="admin-bus-layout-add-select" required>
+							<option value="">-- Choisir la succursale --</option>
+							<option value="1">Kinshasa Centre (Siège)</option>
+							<option value="2">Succursale Goma</option>
+							<option value="3">Succursale Matadi</option>
+						</select>
+					</div>
+				</div>
+
+				{# Champ : Nom de la dépense #}
+				<div class="field mb-15">
+					<label class="admin-bus-layout-add-label">Nom / Libellé de la dépense *</label>
+					<input type="text" name="expense_name" class="admin-bus-layout-add-input" placeholder="Ex: Achat carburant Bus #01, Abonnement SaaS Mars 2026..." required>
+				</div>
+
+				<div
+					class="field-group mb-15">
+					{# Champ : Montant #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Montant *</label>
+						<input type="number" name="expense_amount" step="0.01" class="admin-bus-layout-add-input" placeholder="0.00" required>
+					</div>
+
+					{# Champ : Devise #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Devise *</label>
+						<select name="expense_currency" class="admin-bus-layout-add-select" required>
+							<option value="USD">USD ($)</option>
+							<option value="CDF">CDF (FC)</option>
+						</select>
+					</div>
+				</div>
+
+				{# --- ZONE DYNAMIQUE : CHAMPS D'ABONNEMENT SAAS (Masqués par défaut) --- #}
+				<div class="field-group mb-15" id="subscription-dates-wrapper" style="display: none;">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Valide du (validFrom) *</label>
+						<input type="date" name="expense_valid_from" id="valid-from-input" class="admin-bus-layout-add-input">
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Valide jusqu'au (validUntil) *</label>
+						<input type="date" name="expense_valid_until" id="valid-until-input" class="admin-bus-layout-add-input">
+					</div>
+				</div>
+
+				{# À insérer dans votre formulaire juste avant le champ description #}
+
+				{# Champ : Source des Fonds #}
+				<div class="field mb-15" id="funding-source-wrapper">
+					<label class="admin-bus-layout-add-label">Source du règlement / Financement *</label>
+					<select name="expense_funding_source" id="expense-funding-source" class="admin-bus-layout-add-select" required>
+						<option value="bank">Hors Caisse (Virement bancaire, Chèque, Mobile Money Global)</option>
+						<option value="cash_register">Depuis une Caisse de guichet (Espèces physiques)</option>
+					</select>
+				</div>
+
+				{# Champ dynamique : Choix de la caisse (Masqué par défaut) #}
+				<div class="field mb-15" id="cash-session-field-wrapper" style="display: none;">
+					<label class="admin-bus-layout-add-label">Sélectionner la Caisse émettrice *</label>
+					<select name="expense_cash_session" id="expense-cash-session" class="admin-bus-layout-add-select">
+						<option value="">-- Choisir la caisse qui donne l'argent physique --</option>
+						<option value="1">Guichet Billetterie 1 (Session active : Jean M.)</option>
+						<option value="2">Guichet Colis & Fret (Session active : Marie K.)</option>
+					</select>
+					<span class="sub-meta-text" style="color: #d94516; margin-top: 5px; display: block;">
+						<i class="fa-solid fa-triangle-exclamation"></i>
+						Attention : Cela diminuera directement le solde de ce guichet.
+					</span>
+				</div>
+
+
+				{# Champ : Description / Détails #}
+				<div class="field mb-15">
+					<label class="admin-bus-layout-add-label">Description / Notes complémentaires</label>
+					<textarea name="expense_description" class="admin-bus-layout-add-input" style="height: 80px; resize: vertical;" placeholder="Ajoutez des précisions (Numéro de reçu, pièces jointes, détails de facturation...)"></textarea>
+				</div>
+
+				<div class="field-button-right mt-10">
+					<button type="submit" class="btn btn-success">
+						<i class="fa-solid fa-check"></i>
+						Enregistrer la dépense
+					</button>
+				</div>
+			</form>
+		</div>
+
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+const typeSelect = document.getElementById('expense-type-select');
+const branchWrapper = document.getElementById('branch-field-wrapper');
+const fundingWrapper = document.getElementById('funding-source-wrapper');
+const sourceSelect = document.getElementById('expense-funding-source');
+const cashWrapper = document.getElementById('cash-session-field-wrapper');
+const cashSelect = document.getElementById('expense-cash-session');
+
+// 1. Logique selon le TYPE (Subscription vs Other)
+typeSelect.addEventListener('change', () => {
+if (typeSelect.value === 'subscription') { // Un abonnement SaaS est forcément payé hors caisse (Banque/Plateforme)
+branchWrapper.style.display = 'none';
+fundingWrapper.style.display = 'none';
+cashWrapper.style.display = 'none';
+sourceSelect.value = 'bank';
+cashSelect.required = false;
+} else {
+branchWrapper.style.display = 'flex';
+fundingWrapper.style.display = 'block';
+// Déclenche la vérification de la source de financement
+sourceSelect.dispatchEvent(new Event('change'));
+}
+});
+
+// 2. Logique selon la SOURCE DE FINANCEMENT (Pour le type 'other')
+sourceSelect.addEventListener('change', () => {
+if (sourceSelect.value === 'cash_register' && typeSelect.value === 'other') {
+cashWrapper.style.display = 'block';
+cashSelect.required = true;
+} else {
+cashWrapper.style.display = 'none';
+cashSelect.required = false;
+cashSelect.value = '';
+}
+});
+});
+	</script>
+{% endblock %}
