@@ -15,6 +15,7 @@ class CashierController extends AbstractController
     public function dashboard(Request $request): Response
     {
         return $this->render('admin/agency/cashier/dashboard.html.twig', [
+            //return $this->render('admin/agency/caisse/index.html.twig', [
             'page' => 'cashier',
         ]);
     } //dashboard

@@ -17,13 +17,17 @@
             h2 { font-size: 1.5rem; font-weight: 800; color: $dark; display: flex; align-items: center; gap: 10px; i { color: $primary; } }
             p { font-size: 13px; color: $gray; margin-top: 4px; }
         }
+        .agency-back-action {
+            background: $white !important; border: 1px solid $mute; width: 3.25rem; height: 3.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: $dark; text-decoration: none; transition: all .3s;
+            &:hover { transform: translateX(-.5rem); background: rgba($primary, 0.04); color: $primary; }
+        }
         .border-actions-group {
             display: flex; gap: 10px; flex-wrap: wrap;
             .btn-action-caisse {
                 padding: 10px 16px; font-size: 13px; font-weight: 700; border-radius: $radius-input; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s;
                 &:hover { opacity: 0.9; }
                 &.btn-success-caisse { background-color: $success; color: $white; }
-                &.btn-danger-caisse { background-color: $dark; color: $white; }
+                &.btn-danger-caisse { background-color: $danger; color: $white; }
             }
         }
     }
@@ -66,6 +70,9 @@
         .table-action-trigger { display: inline-flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: rgba($gray, 0.08); color: $dark; font-size: 13px; float: none !important; transition: all 0.2s; &.view:hover { background-color: $dark !important; color: $white !important; } }
     }
 }
+
+
+
 
 .dark {
     .admin-cashier-dashboard-scope {
@@ -147,6 +154,77 @@
             input[type="radio"]:checked + .custom-box { border-color: $primary; background: rgba($primary, 0.04); color: $primary; i { color: $primary; } }
         }
     }
+
+    // Alignements structurels flexbox transverses
+    .flex-gap-15 {
+        display: flex;
+        gap: 15px;
+    }
+
+    .flex-full {
+        flex: 1;
+    }
+
+    // Bloc dédié à la gestion graphique de l'encart Remise
+    .discount-badge-container {
+        display: flex;
+        gap: 15px;
+        background-color: rgba($primary, 0.04);
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px dashed $primary;
+
+        .discount-label {
+            color: $primary;
+            font-weight: 700;
+        }
+    }
+
+    // Mise en exergue du montant Net Final calculé
+    .text-success-highlight {
+        label {
+            font-weight: 800;
+            color: $success;
+        }
+
+        .text-amount-xl {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: $success;
+        }
+    }
+
+    // Zone text-area contrainte pour l'observation
+    .text-area-fixed {
+        height: 50px;
+        resize: none;
+    }
+
+    // Bouton massif de perception du guichetier
+    .block-action-wrapper {
+        display: block !important;
+        margin-top: 1.5rem;
+
+        .btn-submit-perceive {
+            background-color: $success;
+            width: 100%;
+            justify-content: center;
+            height: 46px;
+            color: $white;
+            border: none;
+            font-weight: 700;
+            border-radius: $radius-input;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.95;
+            }
+        }
+    }
 }
 
 .dark {
@@ -159,6 +237,14 @@
         .reservation-form .card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: #fff; border-bottom-color: rgba($mute, 0.15); } .field input, .field select { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: #fff; } }
         .cashier-document-card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } .text-highlight, .actor-name { color: $white; } .section-micro-label:not(.label-reservation) { color: $mute; } .actor-sub-text { color: $mute; } .status-alert-box.alert-reservation { background-color: rgba($primary, 0.12); border-color: rgba($primary, 0.25); } }
         .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .total { background: rgba($white, 0.02); color: #fff; strong { color: $white; } } .payment-method-selectors .pay-method-item { .custom-box { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.2); color: #fff; } input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; } } }
+    
+        .discount-badge-container {
+            background-color: rgba($primary, 0.1);
+            border-color: lighten($primary, 10%);
+        }
+        .text-success-highlight .text-amount-xl {
+            color: lighten($success, 10%);
+        }
     }
 }
 

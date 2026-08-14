@@ -1,6 +1,11 @@
 {# templates/admin/agency/cashier/payment.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/cashier-payment.js" defer></script>
+{% endblock %}
+
 {% block body %}
 	<div
 		class="admin-cashier-payment-scope container">
@@ -11,103 +16,284 @@
 				<i class="fa-solid fa-arrow-left"></i>
 			</a>
 			<div class="title">
-				<h2>Guichet Unique d'Encaissement</h2>
-				<p>Régularisez les documents en attente (Billets Voyageurs ou Bordereaux de Fret).</p>
+				<h2>
+					<i class="fa-solid fa-cash-register"></i>
+					Guichet Unique d'Encaissement
+				</h2>
+				<p>Saisissez une référence pour charger le dossier, appliquer une remise et percevoir la taxe.</p>
 			</div>
 		</header>
 
-		{# --- MOTEUR D'INTERCEPTION --- #}
+		{# --- BLOC DE RECHERCHE UNIFIÉ --- #}
 		<div class="card mb-25">
-			<div class="form-search-voucher-group">
-				<div class="field">
-					<label>Saisir ou Scanner la référence du Bon</label>
-					<input type="text" placeholder="Ex: RVS-2026-8943 ou SHP-2026-8942..." class="input-search-voucher" value="RVS-2026-8943">
+			<h2>
+				<i class="fa-solid fa-magnifying-glass"></i>
+				Identification du Bon Client</h2>
+			<form class="form-search-voucher-group" id="voucher-search-form">
+				<div class="field-item-flex">
+					<label class="section-micro-label">Référence du Bon (Tapez 'BILLET' ou 'COLIS' pour tester)</label>
+					<input type="text" id="voucher-input" class="input-search-voucher" placeholder="Ex: RVS-2026-8943 ou COL-2026-0402" required>
 				</div>
-				<button type="button" class="btn btn-search-trigger">
-					<i class="fa-solid fa-magnifying-glass"></i>
-					Charger le Bon
+				<button type="submit" class="btn btn-dark btn-search-submit">
+					<i class="fa-solid fa-arrow-right-to-bracket"></i>
+					Charger le dossier
 				</button>
-			</div>
+			</form>
 		</div>
 
 		{# --- ZONE DE TRAITEMENT DEUX COLONNES --- #}
 		<div
-			class="reservation-container">
+			class="reservation-container" id="cashier-payment-container">
 
-			{# GAUCHE : L'INCLUSION DU FRAGMENT (EXEMPLE PASSAGER) #}
+			{# PANNEAU DE GAUCHE : LE CALCULATEUR DE FLUX & ENCAISSEMENT #}
+			<div class="card">
+				<h2>
+					<i class="fa-solid fa-calculator"></i>
+					RÈGLEMENT ET CALCUL DES REMISES
+				</h2>
+				<form
+					action="#" method="POST" onsubmit="event.preventDefault(); alert('Paiement encaissé avec succès ! Les titres de transport ont été générés.');">
+
+					{# Section tarification brute #}
+					<div class="field-group mb-15 flex-gap-15">
+						<div class="field flex-full">
+							<label>Tarif de base initial</label>
+							<input type="text" id="base-amount-display" class="input-search-voucher" readonly value="45 000 CDF" data-raw="45000">
+						</div>
+						<div class="field flex-full">
+							<label>Équivalence USD</label>
+							<input type="text" id="usd-amount-display" class="input-search-voucher" readonly value="15.50 USD">
+						</div>
+					</div>
+
+					{# BLOC REMISE (DISCOUNT) #}
+					<div class="field-group mb-15 discount-badge-container">
+						<div class="field flex-full">
+							<label class="discount-label">Appliquer une remise</label>
+							<input type="number" id="discount-input" class="input-search-voucher" placeholder="Ex: 10, 5000..." min="0">
+						</div>
+						<div class="field flex-full">
+							<label class="discount-label">Type de remise</label>
+							<select id="discount-type" class="input-search-voucher">
+								<option value="percent">Pourcentage (%)</option>
+								<option value="value">Valeur Fixe (CDF)</option>
+							</select>
+						</div>
+					</div>
+
+					{# Section Net à payer recalculé #}
+					<div class="field-group mb-15 flex-gap-15">
+						<div class="field flex-full text-success-highlight">
+							<label>Net à Encaisser Final</label>
+							<input type="text" id="final-amount-display" class="input-search-voucher text-amount-xl" readonly value="45 000 CDF">
+						</div>
+						<div class="field flex-full">
+							<label>Devise reçue au guichet *</label>
+							<select class="input-search-voucher" required>
+								<option value="CDF">CDF (Espèces Franc Congolais)</option>
+								<option value="USD">USD (Espèces Dollar)</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="field mb-15">
+						<label>Observation / Justificatif de la remise</label>
+						<textarea class="input-search-voucher text-area-fixed" placeholder="Obligatoire si une remise est appliquée (Ex: Geste commercial, accord gérant...)"></textarea>
+					</div>
+
+					<div class="text-right table-action-buttons block-action-wrapper">
+						<button type="submit" class="btn-search-trigger btn-submit-perceive">
+							<i class="fa-solid fa-print"></i>
+							Valider l'encaissement & Imprimer
+						</button>
+					</div>
+				</form>
+			</div>
+
+
+			{# DROITE : L'INCLUSION DU FRAGMENT (Dossier Intercepté) #}
 			<div class="layout-main-panel">
 				<div class="card cashier-document-card">
 					<h2>
 						<i class="fa-solid fa-file-invoice-dollar"></i>
-						Détails du Document Intercepté</h2>
+						Détails du Document Intercepté
+					</h2>
+
+					{# Bandeau Statut #}
 					<div class="field-group mb-20 status-alert-box alert-reservation">
-						<div class="meta-item">
+						<div class="meta-item flex-item">
 							<span class="section-micro-label label-reservation">Nature du document</span>
-							<strong class="text-highlight">BON DE RÉSERVATION PASSAGER</strong>
+							<strong class="text-highlight" id="doc-nature-text">BON DE RÉSERVATION PASSAGER</strong>
 						</div>
-						<div class="meta-item">
+						<div class="meta-item flex-item">
 							<span class="section-micro-label label-reservation">Référence Système</span>
-							<strong class="text-highlight">RVS-2026-8943</strong>
+							<strong class="text-highlight" id="doc-ref-text">RVS-2026-8943</strong>
 						</div>
 					</div>
-					<div class="field-group mb-20 core-info-grid">
-						<div class="field">
-							<span class="section-micro-label">Bénéficiaire / Voyageur</span>
-							<p class="actor-name">Mputu Antoinette</p>
-							<span class="actor-sub-text">+243 897 112 233</span>
-						</div>
-						<div class="field">
-							<span class="section-micro-label">Logistique Associée</span>
-							<p class="actor-name">Kinshasa → Kenge</p>
-							<span class="actor-sub-text">Bus 01 | Siège 14 (Standard)</span>
+
+					{# BLOC A : CAS DU PASSAGER #}
+					<div id="fragment-reservation-view">
+						<div class="field-group mb-20 core-info-grid flex-row-gap">
+							<div class="field flex-item">
+								<span class="section-micro-label">Bénéficiaire / Voyageur</span>
+								<p class="actor-name">Mputu Antoinette</p>
+								<span class="actor-sub-text">+243 897 112 233</span>
+							</div>
+							<div class="field flex-item">
+								<span class="section-micro-label">Logistique Associée</span>
+								<p class="actor-name">Kinshasa → Kenge</p>
+								<span class="actor-sub-text">Bus 01 | Siège 14 (Standard)</span>
+							</div>
 						</div>
 					</div>
+
+					{# BLOC B : CAS DU COLIS #}
+					<div id="fragment-shipment-view">
+						<div class="field-group mb-20 core-info-grid flex-row-gap">
+							<div class="field flex-item">
+								<span class="section-micro-label">Expéditeur</span>
+								<p class="actor-name">Mputu Antoinette</p>
+								<span class="actor-sub-text">+243 897 112 233</span>
+							</div>
+							<div class="field flex-item">
+								<span class="section-micro-label">Destinataire</span>
+								<p class="actor-name">Francois Hollande</p>
+								<span class="actor-sub-text">+243 811 556 990</span>
+							</div>
+						</div>
+						<div class="field-group mb-20 core-info-grid flex-row-gap">
+							<div class="field flex-item">
+								<span class="section-micro-label">Origine</span>
+								<p class="actor-name">Kinshasa</p>
+							</div>
+							<div class="field flex-item">
+								<span class="section-micro-label">Destination</span>
+								<p class="actor-name">Kenge</p>
+							</div>
+						</div>
+					</div>
+
 				</div>
 			</div>
 
-			{# DROITE : LE BLOCK COMPTOIR DE PERCEPTION #}
-			<aside class="summary">
-				<div class="card summary-sticky-card">
-					<h2>Perception de la Taxe</h2>
-					<div class="payment-method-selectors mb-20">
-						<label class="section-micro-label">MODE DE RÈGLEMENT EFFECTIF</label>
-						<div class="payment-grid-buttons">
-							<label class="pay-method-item">
-								<input type="radio" name="pay_mode" checked>
-								<span class="custom-box">
-									<i class="fa-solid fa-money-bill-wave"></i>
-									Espèces</span>
-							</label>
-							<label class="pay-method-item">
-								<input type="radio" name="pay_mode">
-								<span class="custom-box">
-									<i class="fa-solid fa-mobile-screen"></i>
-									M-Money</span>
-							</label>
-						</div>
-					</div>
-					<div class="field mb-15">
-						<label class="section-micro-label">Devise de Réception</label>
-						<select required>
-							<option>CDF (Franc Congolais)</option>
-							<option>USD (Dollar Américain)</option>
-						</select>
-					</div>
-					<div class="field mb-20">
-						<label class="section-micro-label">Référence Transaction Mobile Money</label>
-						<input type="text" placeholder="Ex: TxID-98342" autocomplete="off">
-					</div>
-					<hr class="summary-divider mb-15">
-					<div class="total">Net Encaissé :
-						<strong>45 000 CDF</strong>
-					</div>
-					<button type="submit" class="btn btn-full mt-20 py-12">
-						<i class="fa-solid fa-print"></i>
-						Valider & Imprimer le Titre
-					</button>
-				</div>
-			</aside>
 
 		</div>
+
 	</div>
+
+	<script>
+		/**
+ * Mydigitrans SaaS - Module Espace Caissier
+ * Logique de calcul des remises et aiguillage dynamique Billet / Colis
+ */
+document.addEventListener('DOMContentLoaded', () => { // 1. Récupération des éléments du DOM
+const searchForm = document.getElementById('voucher-search-form');
+const voucherInput = document.getElementById('voucher-input');
+const paymentContainer = document.getElementById('cashier-payment-container');
+
+// Éléments d'aiguillage des fragments (Droite)
+const docNatureText = document.getElementById('doc-nature-text');
+const docRefText = document.getElementById('doc-ref-text');
+const fragmentReservation = document.getElementById('fragment-reservation-view');
+const fragmentShipment = document.getElementById('fragment-shipment-view');
+
+// Éléments du calculateur financier (Gauche)
+const baseAmountDisplay = document.getElementById('base-amount-display');
+const usdAmountDisplay = document.getElementById('usd-amount-display');
+const discountInput = document.getElementById('discount-input');
+const discountType = document.getElementById('discount-type');
+const finalAmountDisplay = document.getElementById('final-amount-display');
+
+// Prix de base initial mémorisé (Sera réécrit dynamiquement au submit)
+let baseValue = 45000;
+
+// Masquage initial de la grille à deux colonnes et du fragment colis par sécurité
+if (paymentContainer) 
+paymentContainer.style.display = 'none';
+
+if (fragmentShipment) 
+fragmentShipment.style.display = 'none';
+
+
+// 2. INTERCEPTION DE LA RECHERCHE (AIGUILLAGE DU RENDU STATIQUE)
+if (searchForm) {
+searchForm.addEventListener('submit', (e) => {
+e.preventDefault();
+const query = voucherInput.value.trim().toLowerCase();
+
+// Rendre le conteneur principal visible
+paymentContainer.style.display = 'grid';
+
+if (query.includes('colis') || query.includes('col')) { // CAS DU FRET / COLIS
+docNatureText.innerText = "BON D'EXPÉDITION COLIS (FRET)";
+docRefText.innerText = "COL-2026-0402";
+fragmentReservation.style.display = 'none';
+fragmentShipment.style.display = 'block';
+
+// Mutation des prix par défaut pour le colis de test
+baseValue = 18000;
+baseAmountDisplay.value = "18 000 CDF";
+usdAmountDisplay.value = "6.20 USD";
+} else { // CAS DU PASSAGER / BILLET (Par défaut)
+docNatureText.innerText = "BON DE RÉSERVATION PASSAGER";
+docRefText.innerText = "RVS-2026-8943";
+fragmentReservation.style.display = 'block';
+fragmentShipment.style.display = 'none';
+
+// Mutation des prix par défaut pour le billet de test
+baseValue = 45000;
+baseAmountDisplay.value = "45 000 CDF";
+usdAmountDisplay.value = "15.50 USD";
+}
+
+// Remise à zéro de l'input remise lors d'une nouvelle recherche pour éviter les bugs
+discountInput.value = '';
+recalculateTotal();
+});
+}
+
+// 3. LOGIQUE DU CALCULATEUR INTERACTIF DE REMISE (DISCOUNT)
+function recalculateTotal() {
+if (! discountInput || ! finalAmountDisplay) 
+return;
+
+
+let discount = parseFloat(discountInput.value) || 0;
+let finalValue = baseValue;
+
+// Élimination des valeurs négatives accidentelles
+if (discount < 0) {
+discount = 0;
+discountInput.value = 0;
+}
+
+if (discountType.value === 'percent') { // Sécurité : Une remise en pourcentage ne peut pas dépasser 100%
+if (discount > 100) {
+discount = 100;
+discountInput.value = 100;
+}
+finalValue = baseValue - (baseValue * (discount / 100));
+} else { // Sécurité : Une remise en valeur fixe ne peut pas dépasser le prix brut du billet
+if (discount > baseValue) {
+discount = baseValue;
+discountInput.value = baseValue;
+}
+finalValue = baseValue - discount;
+}
+
+// Formatage lisible pour l'agent guichetier (Ex: 45 000 CDF)
+finalAmountDisplay.value = new Intl.NumberFormat('fr-FR').format(finalValue) + " CDF";
+}
+
+// Écouteurs d'événements pour mettre à jour le Net à Payer en temps réel
+if (discountInput) 
+discountInput.addEventListener('input', recalculateTotal);
+
+if (discountType) 
+discountType.addEventListener('change', recalculateTotal);
+
+});
+	</script>
+
+
 {% endblock %}

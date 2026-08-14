@@ -1,99 +1,138 @@
 {# templates/admin/agency/cashier/expense.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
 {% block body %}
 	<div
-		class="admin-cashier-expense-scope container">
+		class="admin-cashier-dashboard-scope container">
 
-		{# --- EN-TÊTE --- #}
+		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header mb-25">
-			<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" title="Retour au tableau de bord">
-				<i class="fa-solid fa-arrow-left"></i>
-			</a>
-			<div class="title">
-				<h2>Enregistrement de Décaissement / Dépense</h2>
-				<p>Déclarez une sortie de fonds physique du coffre pour les charges d'exploitation de la gare.</p>
+			<div class="header-main-info" style="display: flex; align-items: center; gap: 1.2rem;">
+				<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" style="border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; background: rgba(75, 85, 99, 0.08); color: #0c326d; text-decoration: none;" title="Retour au tableau de bord">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h2>
+						<i class="fa-solid fa-money-bill-transfer"></i>
+						Bons de Décaissement à Payer
+					</h2>
+					<p>Consultez et payez les dépenses opérationnelles validées et ordonnées par votre gérant de succursale.</p>
+				</div>
 			</div>
 		</header>
 
-		{# --- FORMULAIRE DE SORTIE --- #}
-		<form action="#" method="POST" class="reservation-form">
-			<div
-				class="reservation-container">
-
-				{# GAUCHE : MOTIF ET JUSTIFICATIFS DE LA SORTIE #}
-				<div class="layout-main-panel">
-					<div class="card">
-						<h2>
-							<i class="fa-solid fa-file-invoice"></i>
-							Nature & Motif de la Dépense</h2>
-
-						<div class="field-group mb-20">
-							<div class="field">
-								<label>Motif de la sortie de fonds</label>
-								<input type="text" placeholder="Ex: Achat Gasoil Bus 01, Collation Équipage..." required autocomplete="off">
-							</div>
-						</div>
-
-						<div class="field-group mb-20">
-							<div class="field">
-								<label>Bénéficiaire des fonds (Nom / Entité)</label>
-								<input type="text" placeholder="Ex: Station Total Gare, Chauffeur Jean..." required autocomplete="off">
-							</div>
-							<div class="field">
-								<label>Numéro de Pièce Justificative / Facture</label>
-								<input type="text" placeholder="Ex: FAC-ENGEN-4590" required autocomplete="off">
-							</div>
-						</div>
-
-						<div class="field-group">
-							<div class="field">
-								<label>Voyage Associé (Optionnel)</label>
-								<select>
-									<option value="">-- Non rattaché à un départ --</option>
-									<option value="1">TRP-2026-0042 (Kinshasa → Kikwit)</option>
-									<option value="2">TRP-2026-0043 (Kinshasa → Matadi)</option>
-								</select>
-							</div>
-						</div>
-					</div>
+		{# --- CARTES DES FLUX DISPONIBLES EN DIRECT --- #}
+		<div class="stats-overview-grid mb-25">
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-file-signature"></i>
 				</div>
-
-				{# DROITE : LE COMPTAGE DES FONDS SORTIS #}
-				<aside class="summary">
-					<div class="card summary-sticky-card">
-						<h2>Comptabilité Sortie</h2>
-
-						<div class="field mb-15">
-							<label class="section-micro-label">Devise Décaissée</label>
-							<select required>
-								<option value="CDF">CDF (Franc Congolais)</option>
-								<option value="USD">USD (Dollar Américain)</option>
-							</select>
-						</div>
-
-						<div class="field mb-20">
-							<label class="section-micro-label">Montant exact à décaisser</label>
-							<input type="number" min="500" placeholder="Saisir le montant..." required>
-						</div>
-
-						<hr class="summary-divider mb-15">
-
-						<div class="reservation-notice-zone">
-							<p class="notice-title">
-								<i class="fa-solid fa-triangle-exclamation"></i>
-								Responsabilité Caisse</p>
-							<p class="notice-text">Toute sortie de fonds non appuyée par une pièce comptable valide créera un écart lors du contrôle de clôture de fin de journée.</p>
-						</div>
-
-						<button type="submit" class="btn btn-full mt-20 py-12">
-							<i class="fa-solid fa-money-bill-transfer"></i>
-							Valider le Décaissement
-						</button>
-					</div>
-				</aside>
-
+				<div class="stat-details">
+					<span class="stat-label">Bons en attente</span>
+					<strong class="stat-value text-primary">2 En attente</strong>
+				</div>
 			</div>
-		</form>
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-wallet"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Espèces Dispo (CDF)</span>
+					<strong class="stat-value text-success">1 425 000 CDF</strong>
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-dollar-sign"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Espèces Dispo (USD)</span>
+					<strong class="stat-value text-success" style="color: #1684c5;">450 USD</strong>
+				</div>
+			</div>
+		</div>
+
+		{# --- LISTE DES BONS DE DÉCAISSEMENT EN ATTENTE (DATATABLE) --- #}
+		<div class="card monitoring-table-card">
+			<h2>
+				<i class="fa-solid fa-clock-rotate-left"></i>
+				Ordres de décaissement autorisés par le gérant
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Réf & Date d'Ordre</th>
+						<th>Autorisé Par</th>
+						<th>Bénéficiaire / Motif</th>
+						<th>Montant Demandé</th>
+						<th>Statut</th>
+						<th class="text-right">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{# Ligne 1 : Une dépense de carburant approuvée #}
+					<tr>
+						<td>
+							<strong>EXP-2026-0401</strong>
+							<span class="sub-meta-text">Aujourd'hui, 08h30</span>
+						</td>
+						<td>
+							<strong>Alphonse Kalonji</strong>
+							<span class="sub-meta-text">Gérant de Succursale</span>
+						</td>
+						<td>
+							<strong>Chauffeur : Jean Mukendi</strong>
+							<span class="sub-meta-text">Achat Carburant Bus #01 (Station Engen Limete)</span>
+						</td>
+						<td>
+							<strong class="text-danger-mode" style="color: #d94516;">250.00 $</strong>
+						</td>
+						<td>
+							<span class="cash-badge" style="background-color: rgba(239, 110, 23, 0.1); color: #ef6e17;">PENDING (Approuvé)</span>
+						</td>
+						<td class="text-right table-action-buttons">
+							<button class="table-action-trigger view btn-disburse-trigger" style="background-color: #d94516; color: #fff; width: auto; padding-inline: 12px; font-weight: 700; gap: 5px; border: none; cursor: pointer;" onclick="if(confirm('Confimer la sortie physique de 250.00 $ de votre tiroir-caisse ?')) alert('Décaissement validé ! Le bon passe au statut PAID.');">
+								<i class="fa-solid fa-money-bill-wave"></i>
+								Décaisser le cash
+							</button>
+						</td>
+					</tr>
+
+					{# Ligne 2 : Des fournitures de bureau approuvées #}
+					<tr>
+						<td>
+							<strong>EXP-2026-0402</strong>
+							<span class="sub-meta-text">Aujourd'hui, 10h12</span>
+						</td>
+						<td>
+							<strong>Alphonse Kalonji</strong>
+							<span class="sub-meta-text">Gérant de Succursale</span>
+						</td>
+						<td>
+							<strong>Secrétariat de Gare</strong>
+							<span class="sub-meta-text">Achat rames de papiers et encre pour tickets</span>
+						</td>
+						<td>
+							<strong class="text-danger-mode" style="color: #d94516;">60 000 CDF</strong>
+						</td>
+						<td>
+							<span class="cash-badge" style="background-color: rgba(239, 110, 23, 0.1); color: #ef6e17;">PENDING (Approuvé)</span>
+						</td>
+						<td class="text-right table-action-buttons">
+							<button class="table-action-trigger view btn-disburse-trigger" style="background-color: #d94516; color: #fff; width: auto; padding-inline: 12px; font-weight: 700; gap: 5px; border: none; cursor: pointer;" onclick="if(confirm('Confimer la sortie physique de 60 000 CDF de votre tiroir-caisse ?')) alert('Décaissement validé ! Le bon passe au statut PAID.');">
+								<i class="fa-solid fa-money-bill-wave"></i>
+								Décaisser le cash
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
 	</div>
 {% endblock %}

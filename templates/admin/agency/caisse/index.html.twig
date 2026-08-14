@@ -1,0 +1,98 @@
+{# templates/admin/agency/cashier/open.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-cashier-session-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-25">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-lock-open"></i>
+					Ouverture de Session Journalière
+				</h2>
+				<p>Initialisez votre tiroir-caisse en déclarant les espèces physiques disponibles pour démarrer les encaissements.</p>
+			</div>
+		</header>
+
+		{# --- SÉCURITÉ DEUX COLONNES --- #}
+		<div
+			class="session-init-container">
+
+			{# GAUCHE : FORMULAIRE D'OUVERTURE #}
+			<div class="card">
+				<h2>
+					<i class="fa-solid fa-calculator"></i>
+					Déclaration du fond de roulement</h2>
+				<form action="#" method="POST" onsubmit="event.preventDefault(); alert('Session ouverte avec succès ! Redirection vers le tableau de bord caisse.');">
+
+					<div class="field mb-15">
+						<label class="session-micro-label">Assignation du Terminal Physique</label>
+						<select class="input-session-field" required>
+							<option value="1">Guichet Principal 01 (Terminal Billetterie Transit)</option>
+							<option value="2">Guichet Secondaire 02 (Terminal Fret & Colis)</option>
+						</select>
+					</div>
+
+					{# Double déclaration des fonds (Multi-devise MCD exigé) #}
+					<div class="field-group mb-15 flex-gap-15">
+						<div class="field flex-full">
+							<label class="session-micro-label">Fonds d'ouverture en CDF *</label>
+							<input type="number" name="opening_cdf" class="input-session-field" placeholder="Ex: 50000" min="0" required>
+							<span class="sub-meta-text">Espèces physiques en Francs Congolais (Monnaie)</span>
+						</div>
+						<div class="field flex-full">
+							<label class="session-micro-label">Fonds d'ouverture en USD *</label>
+							<input type="number" name="opening_usd" class="input-session-field" placeholder="Ex: 20" min="0" required>
+							<span class="sub-meta-text">Espèces physiques en Dollars (Monnaie)</span>
+						</div>
+					</div>
+
+					<div class="field mb-15">
+						<label class="session-micro-label">Note d'ouverture / État du matériel</label>
+						<textarea class="input-session-field text-area-fixed" placeholder="Ex: Clavier fonctionnel, rouleau d'imprimante thermique chargé à 50%..."></textarea>
+					</div>
+
+					<div class="block-action-wrapper">
+						<button type="submit" class="btn-submit-open">
+							<i class="fa-solid fa-key"></i>
+							Unclocker le Guichet & Ouvrir la Session
+						</button>
+					</div>
+				</form>
+			</div>
+
+			{# DROITE : CONTEXTE ET RÈGLES D'AUDIT COMPTABLE #}
+			<aside class="summary">
+				<div class="card summary-sticky-card alert-session-box">
+					<h2>
+						<i class="fa-solid fa-shield-halved"></i>
+						Protocole de Sécurité</h2>
+
+					<div class="meta-item mb-15">
+						<span class="session-micro-label">Opérateur Connecté</span>
+						<strong class="text-dark">Jean Mukendi</strong>
+						<span class="sub-meta-text">Rôle : Caissier Guichetier Approuvé</span>
+					</div>
+
+					<div class="meta-item mb-15">
+						<span class="session-micro-label">Succursale active</span>
+						<strong>Kinshasa Centre — Gare Centrale</strong>
+					</div>
+
+					<hr class="summary-divider mb-15">
+
+					<div class="meta-item">
+						<span class="sub-meta-text">
+							<i class="fa-solid fa-circle-info"></i>
+							Règle d'isolation (Multi-tenant)</span>
+						<span class="sub-meta-text">L'ouverture de session verrouille ce guichet sous votre identité. Aucun autre agent ne pourra l'utiliser tant que vous n'aurez pas soumis votre clôture comptable en fin de journée.</span>
+					</div>
+				</div>
+			</aside>
+
+		</div>
+
+	</div>
+{% endblock %}
