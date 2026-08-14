@@ -95,5 +95,13 @@ class CashierController extends AbstractController
         ]);
     } //session_closing
 
+    #[Route('/admin/agency/cash-register/session/{id}/closing/validation', name: 'admin_agency_cashier_session_closing_validation')]
+    public function session_closing_validation(Request $request): Response
+    {
+        return $this->render('admin/agency/cashier/session_closing_validation.html.twig', [
+            'page' => 'cashier',
+        ]);
+    } //session_closing_validation
+
 
 }

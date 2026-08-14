@@ -1,0 +1,108 @@
+{# templates/admin/agency/cashier/validate.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div class="admin-agency-finance-show-scope container">
+
+		<header class="header my-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_cashier_index') }}" class="agency-back-action" title="Retour à la liste des sessions">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Supervision</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-gray text-size-13 text-highlight">Approbation de la Clôture
+						</span>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<div class="layout-main-card">
+			<div
+				class="card-inner-box">
+
+				{# BANNIÈRE : EXPOSITION DE L'ÉCART APPLICABLE AU CHAMP 'difference' #}
+				<div class="finance-hero-banner mb-25">
+					<div class="hero-amount-zone">
+						<span class="audit-label">Écart de caisse calculé (difference)</span>
+						<h1 class="hero-main-amount text-danger">- 15.00 USD</h1>
+						<span class="sub-meta-text">Contrevaleur en monnaie locale : 0 CDF (Équilibré)</span>
+					</div>
+
+					<div class="hero-status-zone">
+						<span class="audit-label">Statut actuel en BDD (status)</span>
+						<span class="badge-status-confirmed" style="background-color: rgba(239, 110, 23, 0.1); color: #ef6e17;">closed</span>
+					</div>
+				</div>
+
+				<hr
+				class="finance-divider mb-25">
+
+				{# EXPOSITION DES VALEURS CONTRADICTOIRES #}
+				<h3 class="box-title mb-15">
+					<i class="fa-solid fa-scale-balanced"></i>
+					Vérification des montants avant archivage
+				</h3>
+
+				<div class="audit-details-grid mb-25">
+					<div class="audit-item">
+						<span class="audit-label">Caissier sortant</span>
+						<p class="audit-value">Jean Mukendi</p>
+					</div>
+
+					<div class="audit-item">
+						<span class="audit-label">Solde attendu calculé (expectedBalance)</span>
+						<p class="audit-value">450.00 USD</p>
+					</div>
+
+					<div class="audit-item">
+						<span class="audit-label">Solde physique déclaré (closingBalance)</span>
+						<p class="audit-value text-danger">435.00 USD</p>
+					</div>
+
+					<div class="audit-item">
+						<span class="audit-label">Date de fermeture (closedAt)</span>
+						<p class="audit-value">Aujourd'hui à 18:00</p>
+					</div>
+				</div>
+
+				{# RAPPORT INTÉGRAL DU CAISSIER #}
+				<div class="audit-description-box mb-25">
+					<span class="audit-label">Note explicitative du caissier</span>
+					<div class="description-text-container">
+						"Erreur constatée sur le rendu de monnaie du passager de 09h42. J'ai confondu un billet de 10$ avec un ancien billet de 25$."
+					</div>
+				</div>
+
+				<hr
+				class="finance-divider mb-20">
+
+				{# LE FORMULAIRE DE TRANSITION D'ÉTAT VERS L'ÉTAT 'validated' #}
+				<form action="#" method="POST" onsubmit="event.preventDefault(); alert('Figeage en BDD : status = validated, confirmedBy = Gérant, difference = -15.00');">
+
+					<div class="field mb-25">
+						<label class="admin-bus-layout-add-label">Observations d'inventaire du Gérant (Enregistré dans le champ description/note) *</label>
+						<textarea class="admin-bus-layout-add-input text-area-fixed" style="height: 70px;" required placeholder="Saisissez vos conclusions (Ex: Écart toléré pour cette fois / Erreur confirmée par le gérant...)"></textarea>
+					</div>
+
+					<div
+						class="finance-actions-footer">
+						{# Remplacement du bouton ugly/inutile par un vrai bouton d'annulation de l'action #}
+						<a href="{{ path('admin_agency_cashier_index') }}" class="btn btn-dark text-size-13">
+							Annuler et quitter
+						</a>
+						<button type="submit" class="btn btn-success text-size-13">
+							<i class="fa-solid fa-signature"></i>
+							Valider et figer l'écart en BDD
+						</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

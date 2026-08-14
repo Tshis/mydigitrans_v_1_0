@@ -1,0 +1,177 @@
+{# templates/admin/agency/cashier/show_journal.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-agency-cashier-journal-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE (Fil d'Ariane simple et épuré) --- #}
+		<header class="header my-25">
+			<a href="{{ path('admin_agency_cashier_dashboard_branch') }}" class="agency-back-action" title="Retour au tableau de bord manager">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Supervision</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-gray text-size-13 text-highlight">Journal de Caisse en Direct
+					</span>
+				</div>
+			</div>
+		</header>
+
+		{# --- CARTE MAÎTRESSE UNIQUE --- #}
+		<div class="layout-main-card">
+			<div
+				class="card-inner-box">
+
+				{# 1. BANNIÈRE LIVE : SOLDE DU TIROIR MIS À JOUR À CHAQUE SECONDE #}
+				<div class="finance-hero-banner mb-25">
+					<div class="hero-amount-zone">
+						<span class="audit-label">Fonds physiques en direct dans le tiroir</span>
+						<h1 class="hero-main-amount text-success">2 450 000 CDF</h1>
+						<span class="sub-meta-text">Fonds USD complémentaires :
+							<strong>450.00 USD</strong>
+						</span>
+					</div>
+
+					<div class="hero-status-zone">
+						<span class="audit-label">État du guichet</span>
+						<span class="badge-status-live">
+							<span class="live-dot"></span>
+							open (Ventes en cours)</span>
+					</div>
+				</div>
+
+				<hr
+				class="finance-divider mb-25">
+
+				{# 2. MÉTADONNÉES DE LA SESSION EN COURS d'AUDIT #}
+				<h3 class="box-title mb-15">
+					<i class="fa-solid fa-cash-register"></i>
+					Informations sur la Session Active
+				</h3>
+
+				<div class="audit-details-grid mb-25">
+					<div class="audit-item">
+						<span class="audit-label">Caissier surveillé</span>
+						<p class="audit-value">Mputu Antoinette (ID: #MDT-89)</p>
+					</div>
+
+					<div class="audit-item">
+						<span class="audit-label">N° Session (CashSession)</span>
+						<p class="audit-value monospace-code">CS-2026-0712</p>
+					</div>
+
+					<div class="audit-item">
+						<span class="audit-label">Heure d'ouverture</span>
+						<p class="audit-value">Aujourd'hui à 07h30</p>
+					</div>
+
+					<div class="audit-item">
+						<span class="audit-label">Dotation initiale (Fonds roulement)</span>
+						<p class="audit-value">50 000 CDF / 0.00 USD</p>
+					</div>
+				</div>
+
+				<hr
+				class="finance-divider mb-25">
+
+				{# 3. HISTORIQUE DES LIGNES COMPTABLES (FinancialOperation) #}
+				<h3 class="box-title mb-15">
+					<i class="fa-solid fa-list-ol"></i>
+					Grand Livre des Mouvements (FinancialOperation)
+				</h3>
+
+				<div class="table-responsive-wrapper">
+					<table class="table table-scrollable table-striped js-datatable">
+						<thead>
+							<tr>
+								<th>Heure / Réf Op</th>
+								<th>Flux</th>
+								<th>Nature / Libellé du mouvement</th>
+								<th>Mode</th>
+								<th>Montant CDF</th>
+								<th>Montant USD</th>
+							</tr>
+						</thead>
+						<tbody>
+							{# Ligne 1 : Vente de billet en espèces #}
+							<tr>
+								<td>
+									<strong>09h42</strong>
+									<span class="sub-meta-text">FLX-9834</span>
+								</td>
+								<td>
+									<span class="cash-badge badge-entry">IN</span>
+								</td>
+								<td>
+									<strong>Billet Passager : Mputu Antoinette</strong>
+									<span class="sub-meta-text">Réservation #RVS-2026-8943 • Kinshasa → Kenge</span>
+								</td>
+								<td>
+									<strong>Espèces</strong>
+								</td>
+								<td class="text-success-mode">
+									<strong>+ 45 000 FC</strong>
+								</td>
+								<td class="text-mute-mode">-</td>
+							</tr>
+
+							{# Ligne 2 : Décaissement approuvé pour du carburant #}
+							<tr>
+								<td>
+									<strong>11h15</strong>
+									<span class="sub-meta-text">FLX-9835</span>
+								</td>
+								<td>
+									<span class="cash-badge badge-exit">OUT</span>
+								</td>
+								<td>
+									<strong>Carburant Bus 01 (Marcopolo)</strong>
+									<span class="sub-meta-text">Décaissement validé par le gérant • Station Engen #44</span>
+								</td>
+								<td>
+									<strong>Espèces</strong>
+								</td>
+								<td class="text-mute-mode">-</td>
+								<td class="text-danger-mode">
+									<strong>- 30.00 $</strong>
+								</td>
+							</tr>
+
+							{# Ligne 3 : Vente de billet payée en USD cash #}
+							<tr>
+								<td>
+									<strong>14h22</strong>
+									<span class="sub-meta-text">FLX-9839</span>
+								</td>
+								<td>
+									<span class="cash-badge badge-entry">IN</span>
+								</td>
+								<td>
+									<strong>Billet Passager : Ilunga Christian</strong>
+									<span class="sub-meta-text">Réservation #RVS-2026-8949 • Kinshasa → Kikwit</span>
+								</td>
+								<td>
+									<strong>Espèces</strong>
+								</td>
+								<td class="text-mute-mode">-</td>
+								<td class="text-success-mode">
+									<strong>+ 20.00 $</strong>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

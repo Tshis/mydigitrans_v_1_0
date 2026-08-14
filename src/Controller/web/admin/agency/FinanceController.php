@@ -45,6 +45,14 @@ class FinanceController extends AbstractController
         ]);
     } //payment_log
 
+    #[Route('/admin/agency/finance/cashier/journal/{code}', name: 'admin_agency_finance_journal')]
+    public function journal_caissier(Request $request): Response
+    {
+        return $this->render('admin/agency/finance/journal_caissier.html.twig', [
+            'page' => 'paiement',
+        ]);
+    } //journal
+
 
 
 }
