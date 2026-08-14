@@ -15,11 +15,25 @@ class CashierController extends AbstractController
     {
         $session = "open";
 
-        if ($session === "close") {
+        if ($session === "await") {
             return $this->redirectToRoute('admin_agency_cashier_session_open');
         }
+
+        if ($session === "close") {
+            return $this->redirectToRoute('admin_agency_cashier_awaiting_init');
+        }
+
         return $this->redirectToRoute('admin_agency_cashier_dashboard');
     } //index
+
+    #[Route('/admin/agency/cash-register/await/init', name: 'admin_agency_cashier_awaiting_init')]
+    public function awaiting_init(Request $request): Response
+    {
+
+        return $this->render('admin/agency/cashier/awaiting_init.html.twig', [
+            'page' => 'cashier',
+        ]);
+    } //awaiting_init
 
 
     #[Route('/admin/agency/cash-register/open-session', name: 'admin_agency_cashier_session_open')]
@@ -102,6 +116,14 @@ class CashierController extends AbstractController
             'page' => 'cashier',
         ]);
     } //session_closing_validation
+
+    #[Route('/admin/agency/cash-register/session/{id}/initialization', name: 'admin_agency_cashier_session_init')]
+    public function session_init(Request $request): Response
+    {
+        return $this->render('admin/agency/cashier/session_init.html.twig', [
+            'page' => 'cashier',
+        ]);
+    } //session_init
 
 
 }

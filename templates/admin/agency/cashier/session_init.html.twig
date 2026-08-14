@@ -1,0 +1,112 @@
+{# templates/admin/agency/cashier/init_session.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-cashier-session-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE (Fidèle à votre modèle manager) --- #}
+		<header class="header mb-25">
+			<a href="{{ path('admin_agency_cashier_dashboard_branch') }}" class="agency-back-action" title="Retour au tableau de bord succursale">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Supervision des caisses</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-gray text-size-13 text-highlight">Allocation de la Dotation Matinale (Top-Down)</span>
+				</div>
+			</div>
+		</header>
+
+		{# --- STRUCTURE DEUX COLONNES --- #}
+		<div
+			class="session-init-container">
+
+			{# GAUCHE : LE FORMULAIRE DE CRÉATION DE LA DOTATION #}
+			<div class="card">
+				<h2>
+					<i class="fa-solid fa-money-bill-transfer"></i>
+					Préparation de l'enveloppe de fonds</h2>
+				<form
+					action="#" method="POST" onsubmit="event.preventDefault(); alert('Dotation injectée avec succès en BDD. Session au statut pending_open.');">
+
+					{# Sélection du guichet physique lié à la succursale du manager #}
+					<div class="field mb-15">
+						<label class="session-micro-label">Guichet physique de destination *</label>
+						<select class="input-session-field" required>
+							<option value="1">Guichet Principal 01 — Terminal Billetterie</option>
+							<option value="2">Guichet Principal 02 — Terminal Fret & Colis</option>
+						</select>
+					</div>
+
+					{# Sélection du caissier de garde ce matin #}
+					<div class="field mb-15">
+						<label class="session-micro-label">Guichetier / Caissier assigné *</label>
+						<select class="input-session-field" required>
+							<option value="89">Mputu Antoinette (Agent Certifié)</option>
+							<option value="90">Ilunga Christian (Agent Certifié)</option>
+						</select>
+					</div>
+
+					{# Saisie de la dotation (Peut être nulle comme convenu) #}
+					<div class="field-group mb-15 flex-gap-15">
+						<div class="field flex-full">
+							<label class="session-micro-label">Dotation en Francs Congolais (CDF)</label>
+							<input type="number" name="initial_cdf" class="input-session-field" placeholder="Ex: 50000 (Laissez 0 si aucune)" min="0" value="50000">
+							<span class="sub-meta-text">Monnaie physique remise en coupures FC.</span>
+						</div>
+						<div class="field flex-full">
+							<label class="session-micro-label">Dotation en Dollars (USD)</label>
+							<input type="number" name="initial_usd" class="input-session-field" placeholder="Ex: 20 (Laissez 0 si aucune)" min="0" value="0">
+							<span class="sub-meta-text">Monnaie physique remise en billets USD.</span>
+						</div>
+					</div>
+
+					<div class="field mb-15">
+						<label class="session-micro-label">Consignes de service / Notes pour le guichetier</label>
+						<textarea class="input-session-field text-area-fixed" placeholder="Ex: Prioriser le rendu de monnaie en petites coupures de 500 CDF reçues de la banque..."></textarea>
+					</div>
+
+					<div class="block-action-wrapper">
+						<button type="submit" class="btn-submit-open btn-manager-init">
+							<i class="fa-solid fa-paper-plane"></i>
+							Allouer les fonds & Envoyer au guichet
+						</button>
+					</div>
+				</form>
+			</div>
+
+			{# DROITE : PROFIL SÉCURITÉ DU MANAGER CONNECTÉ #}
+			<aside class="summary">
+				<div class="card summary-sticky-card alert-session-box alert-manager-box">
+					<h2>
+						<i class="fa-solid fa-user-shield"></i>
+						Signature Manager</h2>
+
+					<div class="meta-item mb-15">
+						<span class="session-micro-label">Manager émetteur</span>
+						<strong class="text-dark">Samy Badibanga</strong>
+						<span class="sub-meta-text">Rôle : Gérant de Succursale</span>
+					</div>
+
+					<div class="meta-item mb-15">
+						<span class="session-micro-label">Gare d'exploitation</span>
+						<strong>Kinshasa Centre — Gare Centrale</strong>
+					</div>
+
+					<hr class="summary-divider mb-15">
+
+					<div class="meta-item">
+						<span class="sub-meta-text">
+							<i class="fa-solid fa-shield-halved"></i>
+							Impact sur le MCD</span>
+						<span class="sub-meta-text">Cette action initialise l'ouverture d'une session de caisse. Le caissier verra ces chiffres s'afficher dès sa connexion pour confirmation physique.</span>
+					</div>
+				</div>
+			</aside>
+
+		</div>
+
+	</div>
+{% endblock %}

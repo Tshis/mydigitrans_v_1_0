@@ -1,0 +1,54 @@
+{# templates/admin/agency/cashier/waiting_init.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-cashier-waiting-scope container">
+
+		{# --- BOÎTE DE BLOCAGE ET D'ATTENTE CENTRALE --- #}
+		<div class="waiting-card-wrapper">
+			<div
+				class="card waiting-inner-card">
+
+				{# Icône animée ou mise en avant visuelle #}
+				<div class="lock-icon-animation">
+					<i class="fa-solid fa-user-lock"></i>
+				</div>
+
+				<h1 class="waiting-title">Guichet en attente d'initialisation</h1>
+
+				<p class="waiting-description">
+					Votre session de caisse n'a pas encore été préparée par la direction ce matin. 
+															Le gérant de la succursale doit allouer votre dotation initiale de monnaie avant que vous ne puissiez prendre votre service.
+				</p>
+
+				{# Zone de rappel du profil connecté pour rassurer l'agent #}
+				<div class="agent-context-badge">
+					<div class="context-item">
+						<span class="micro-label">Agent détecté</span>
+						<strong>Mputu Antoinette</strong>
+					</div>
+					<div class="context-divider"></div>
+					<div class="context-item">
+						<span class="micro-label">Poste d'affectation</span>
+						<strong>Guichet Principal 01 (Kinshasa)</strong>
+					</div>
+				</div>
+
+				{# Actions de secours ou rafraîchissement #}
+				<div class="waiting-actions-zone">
+					<a href="{{path('admin_agency_cashier_index')}}" class="btn btn-primary btn-refresh-status">
+						<i class="fa-solid fa-rotate"></i>
+						Vérifier si le gérant a validé
+					</a>
+					<span class="sub-alert-text">
+						<i class="fa-solid fa-circle-info"></i>
+						Si le gérant vous a remis une enveloppe physique, demandez-le de valider l'envoi depuis son tableau de bord.
+					</span>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

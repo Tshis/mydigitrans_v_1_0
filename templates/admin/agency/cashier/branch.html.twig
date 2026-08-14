@@ -78,7 +78,6 @@
 				<tr>
 					<th>Guichetier (Operator)</th>
 					<th>N° Session Caisse</th>
-					<th>Heure Ouverture</th>
 					<th>État Session</th>
 					<th>Encaissements (CDF)</th>
 					<th>Encaissements (USD)</th>
@@ -97,16 +96,46 @@
 					<td>
 						<span class="session-code-text">CS-2026-0712</span>
 					</td>
-					<td>07h30</td>
 					<td>
-						<span class="session-badge active-status">OUVERTE</span>
+						<span class="session-badge active-status">
+							OUVERTE
+							<p class="text-gray">07h00</p>
+						</span>
+
 					</td>
 					<td>2 450 000 CDF</td>
 					<td>450 USD</td>
 					<td class="text-right table-action-buttons">
-						<a href="{{ path('admin_agency_cashier_session_closing_validation', {'id': 2}) }}"
-							class="table-action-trigger view"
-							title="Ouvrir l'inventaire contradictoire et signer la décharge">
+
+						<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}"
+							class="table-action-trigger view" title="Auditer le journal en direct (Live)">
+							<i class="fa-solid fa-chart-line"></i>
+						</a>
+					</td>
+				</tr>
+
+				{# Caissier 2 : Session CLÔTURÉE -> Intégration directe du bouton d'initialisation #}
+				<tr>
+					<td>
+						<strong>Ilunga Christian</strong>
+						<span class="sub-meta-text">Guichet Fret & Colis</span>
+					</td>
+					<td>
+						<span class="session-code-text">CS-2026-0711</span>
+					</td>
+					<td>
+						<span class="session-badge closed-status">
+							CLÔTURÉE
+							<p class="text-gray">06h00</p>
+						</span>
+					</td>
+					<td>1 600 000 CDF</td>
+					<td>500 USD</td>
+					<td class="text-right table-action-buttons">
+						{# LE BOUTON CLÉ EST ICI : Il remplace l'icône de l'œil pour les caisses fermées #}
+
+						<a href="{{ path('admin_agency_cashier_session_init', {'id': 2}) }}"
+							class="table-action-trigger view" title="Initialiser l'ouverture d'une session">
 							<i class="fa-solid fa-key"></i>
 						</a>
 						<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}"
@@ -116,7 +145,7 @@
 					</td>
 				</tr>
 
-				{# Caissier 2 : Session CLÔTURÉE -> Intégration directe du bouton d'arbitrage #}
+				{# Caissier 3 : Session En Attente -> Intégration directe du bouton d'arbitrage #}
 				<tr>
 					<td>
 						<strong>Ilunga Christian</strong>
@@ -125,9 +154,11 @@
 					<td>
 						<span class="session-code-text">CS-2026-0711</span>
 					</td>
-					<td>06h00</td>
 					<td>
-						<span class="session-badge closed-status">CLÔTURÉE</span>
+						<span class="session-badge await-status bage badge-primary">
+							A CLOTURER
+							<p class="text-gray">06h00</p>
+						</span>
 					</td>
 					<td>1 600 000 CDF</td>
 					<td>500 USD</td>
