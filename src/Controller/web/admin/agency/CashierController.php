@@ -11,11 +11,30 @@ class CashierController extends AbstractController
 {
 
     #[Route('/admin/agency/cash-register', name: 'admin_agency_cashier_index')]
-    #[Route('/admin/agency/cash-register', name: 'admin_agency_cashier_dashboard')]
+    public function index(Request $request): Response
+    {
+        $session = "open";
+
+        if ($session === "close") {
+            return $this->redirectToRoute('admin_agency_cashier_session_open');
+        }
+        return $this->redirectToRoute('admin_agency_cashier_dashboard');
+    } //index
+
+
+    #[Route('/admin/agency/cash-register/open-session', name: 'admin_agency_cashier_session_open')]
+    public function session_opening(Request $request): Response
+    {
+        //return $this->render('admin/agency/cashier/dashboard.html.twig', [
+        return $this->render('admin/agency/cashier/session_open.html.twig', [
+            'page' => 'cashier',
+        ]);
+    } //session_opening
+
+    #[Route('/admin/agency/cash-register/dashboard', name: 'admin_agency_cashier_dashboard')]
     public function dashboard(Request $request): Response
     {
         return $this->render('admin/agency/cashier/dashboard.html.twig', [
-            //return $this->render('admin/agency/caisse/index.html.twig', [
             'page' => 'cashier',
         ]);
     } //dashboard
