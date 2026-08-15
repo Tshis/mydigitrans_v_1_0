@@ -26,6 +26,15 @@ class CashierController extends AbstractController
         return $this->redirectToRoute('admin_agency_cashier_dashboard');
     } //index
 
+    #[Route('/admin/agency/cash-register/create', name: 'admin_agency_cashier_add')]
+    public function add(Request $request): Response
+    {
+
+        return $this->render('admin/agency/cashier/add.html.twig', [
+            'page' => 'cashier',
+        ]);
+    } //add
+
     #[Route('/admin/agency/cash-register/await/init', name: 'admin_agency_cashier_awaiting_init')]
     public function awaiting_init(Request $request): Response
     {

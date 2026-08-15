@@ -1,0 +1,122 @@
+{# templates/admin/agency/cashier/create_register.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/admin/cashier_register_add.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div class="admin-booking-creation-scope container">
+
+		<header class="header mb-25">
+			<a href="{{ path('admin_agency_cashier_dashboard_branch') }}" class="agency-back-action" title="Retour à la supervision des caisses">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<h2>Déclaration d'un Nouveau Guichet de caisse</h2>
+				<p>Réseau d'Agences :
+					<strong class="text-primary">Mydigitrans Transit</strong>
+				</p>
+			</div>
+		</header>
+
+		<form action="#" method="POST" class="reservation-form" id="dynamic-register-form">
+			<div
+				class="reservation-container">
+
+				{# PANNEAU PRINCIPAL (GAUCHE) #}
+				<div
+					class="layout-main-panel">
+
+					{# Section 1 : Identité technique du terminal #}
+					<div class="card mb-20">
+						<h2>Fiche technique d'immatriculation [MCD 19]</h2>
+						<div class="field-group">
+							<div class="field">
+								<label>Nom / Libellé du Guichet *</label>
+								<input type="text" name="register_name" id="register-name-input" placeholder="Ex : Guichet Principal 03, Caisse Fret..." required autocomplete="off">
+							</div>
+							<div class="field">
+								<label>Code d'identification Unique *</label>
+								<input type="text" name="register_code" id="register-code-input" class="text-uppercase" placeholder="Ex : CSH-KIN-03" required autocomplete="off">
+							</div>
+						</div>
+					</div>
+
+					{# Section 2 : Affectation administrative sécurisée #}
+					<div class="card">
+						<h2>Affectation administrative</h2>
+						<div class="field-group">
+							<div class="field">
+								<label>Succursale d'immatriculation</label>
+								{% if is_granted('ROLE_SUPER_ADMIN') %}
+									<select name="branch_id" id="register-branch-select" required>
+										<option value="1" data-branch-name="Kinshasa Centre">Kinshasa Centre (Gare Centrale)</option>
+										<option value="2" data-branch-name="Succursale Goma">Succursale Goma (Port National)</option>
+										<option value="3" data-branch-name="Succursale Matadi">Succursale Matadi (Ville Haute)</option>
+									</select>
+								{% else %}
+									<input type="text" class="input-readonly" id="register-branch-static" value="Kinshasa Centre" data-branch-name="Kinshasa Centre" readonly>
+									<input type="hidden" name="branch_id" value="1">
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{# COLONNE DE CONTEXTE ET DE SÉCURITÉ STICKY (DROITE) #}
+				<aside class="summary">
+					<div class="card mb-20">
+						<h2>Hardware & Périphériques</h2>
+						<div class="field-group">
+							<div class="field">
+								<label>Note d'inventaire matériel (Optionnel)</label>
+								<textarea name="hardware_note" class="text-area-hardware" placeholder="Ex : PC HP ProDesk, Imprimante thermique Epson..."></textarea>
+							</div>
+						</div>
+					</div>
+
+					<div class="card summary-sticky-card">
+						<h2>Bon d'Activation Guichet</h2>
+						<div class="reservation-notice-zone mb-20">
+							<p class="notice-title">
+								<i class="fa-solid fa-circle-nodes"></i>
+								Isolation Logique
+							</p>
+							<p class="notice-text">Ce terminal collectera les flux financiers de manière étanche sous le compte de la succursale.</p>
+						</div>
+
+						<hr class="summary-divider mb-15">
+
+						<ul class="billing-details-list">
+							<li>
+								<strong>Libellé :</strong>
+								<span id="summary-register-name">Non défini</span>
+							</li>
+							<li>
+								<strong>Code technique :</strong>
+								<span id="summary-register-code" class="font-code-preview">-</span>
+							</li>
+							<li>
+								<strong>Affectation :</strong>
+								<span id="summary-register-branch">Kinshasa Centre</span>
+							</li>
+						</ul>
+
+						<div class="total">
+							Statut initial :
+							<strong id="summary-total-price" class="text-status-inactive">INACTIF</strong>
+						</div>
+
+						<button type="submit" class="btn btn-primary btn-full mt-20 py-12 btn-submit-activation">
+							<i class="fa-solid fa-circle-check"></i>
+							Activer & Déployer le Guichet
+						</button>
+					</div>
+				</aside>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}
