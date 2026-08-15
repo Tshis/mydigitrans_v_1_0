@@ -1,0 +1,202 @@
+{# templates/admin/agency/cashier/index_global.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-agency-cashier-dashboard-global-scope container">
+
+		{# --- EN-TÊTE DE NIVEAU DIRECTION GÉNÉRALE --- #}
+		<header class="header my-20">
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-shield-halved"></i>
+					Console d'Audit Globale des Caisses
+				</h2>
+				<p>Direction Générale : Supervision inter-succursales, consolidation des flux et monitoring des écarts du réseau.</p>
+			</div>
+			<div class="admin-bus-layout-add-action-zone">
+				<a href="{{ path('admin_agency_cashier_add') }}" class="btn btn-success text-size-12">
+					<i class="fa-solid fa-plus"></i>
+					Immatriculer un guichet réseau
+				</a>
+			</div>
+		</header>
+
+		{# --- CARTES STATISTIQUES CONSOLIDÉES À L'ÉCHELLE DU PAYS --- #}
+		<div class="stats-overview-grid mb-25">
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-network-wired"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Succursales Actives</span>
+					<strong class="stat-value">5 Villes</strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-vault"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Encaissements Réseau (Ce jour)</span>
+					<strong class="stat-value text-success">6 420 000 FC</strong>
+					<span class="sub-meta-text">+ 2,850.00 USD</span>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--danger">
+					<i class="fa-solid fa-triangle-exclamation"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Écarts non résolus</span>
+					<strong class="stat-value text-danger">3 Anomalies</strong>
+				</div>
+			</div>
+		</div>
+
+		{# --- ZONE DE FILTRES DIRECTIONNELS --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="#">
+				<div
+					class="field-group">
+					{# Filtre Majeur : Succursale géographique #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Filtrer par Succursale Réseau *</label>
+						<select name="filter_branch" class="admin-bus-layout-add-select">
+							<option value="">-- Toutes les succursales du réseau --</option>
+							<option value="1">Kinshasa Centre (Gare Centrale)</option>
+							<option value="2">Goma (Port National)</option>
+							<option value="3">Matadi (Ville Haute)</option>
+							<option value="4">Lubumbashi (Station Centre)</option>
+						</select>
+					</div>
+
+					{# Filtre : Statut comptable de session #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">État de Session (status) *</label>
+						<select name="filter_status" class="admin-bus-layout-add-select">
+							<option value="">-- Tous les états --</option>
+							<option value="open">open (En cours de vente)</option>
+							<option value="closed">closed (Fermée, en attente d'arbitrage)</option>
+							<option value="validated">validated (Validée et déchargée)</option>
+						</select>
+					</div>
+
+					{# Filtre : Recherche Multi-critères #}
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Recherche libre</label>
+						<input type="text" name="search_query" class="admin-bus-layout-add-input" placeholder="Code caisse, nom d'agent...">
+					</div>
+				</div>
+				<div class="field-button-right mt-10">
+					<button type="submit" class="btn btn-dark">
+						<i class="fa-solid fa-chart-pie"></i>
+						Générer le rapport filtré
+					</button>
+				</div>
+			</form>
+		</div>
+
+		{# --- REGISTRE CONSOLIDÉ DES FLUX DE SESSIONS (MCD 19) --- #}
+		<div class="layout-main-card">
+			<div class="card-inner-box table-responsive-wrapper">
+				<table class="table table-scrollable table-striped js-datatable">
+					<thead>
+						<tr>
+							<th>Succursale</th>
+							<th>Terminal (Register)</th>
+							<th>Caissier</th>
+							<th>Solde Attendu</th>
+							<th>Statut BDD</th>
+							<th class="text-right">Actions de Contrôle</th>
+						</tr>
+					</thead>
+					<tbody>
+						{# Ligne 1 : Caisse de Kinshasa validée par son gérant local #}
+						<tr>
+							<td>
+								<strong>Kinshasa Centre</strong>
+							</td>
+							<td>
+								<strong>Billetterie Principal 01</strong>
+								<span class="sub-meta-text">ID: CSH-KIN-01</span>
+							</td>
+							<td>Jean Mukendi</td>
+							<td>
+								<span class="text-success-mode">1 470 000 FC</span>
+								<span class="sub-meta-text">450.00 USD</span>
+							</td>
+							<td>
+								<span class="badge-status-validated">validated</span>
+							</td>
+							<td class="text-right actions">
+								<a href="{{ path('admin_agency_finance_journal', {'code': 1}) }}" class="table-action-btn bg-mute" title="Inspecter le grand livre des opérations [MCD 29]">
+									<i class="fa-solid fa-eye"></i>
+									View Journal
+								</a>
+							</td>
+						</tr>
+
+						{# Ligne 2 : Caisse de Matadi fermée avec litige en cours d'arbitrage #}
+						<tr>
+							<td>
+								<strong class="branch-highlight-text">Matadi Ville Haute</strong>
+							</td>
+							<td>
+								<strong>Guichet Unique Transit</strong>
+								<span class="sub-meta-text">ID: CSH-MAT-01</span>
+							</td>
+							<td>Kabila Alphonse</td>
+							<td>
+								<span class="text-danger-mode">820 000 FC</span>
+								<span class="sub-meta-text font-bold text-danger-mode">Écart : -45 000 FC</span>
+							</td>
+							<td>
+								<span class="badge-status-closed">closed</span>
+							</td>
+							<td class="text-right actions">
+								<a href="{{ path('admin_agency_cashier_session_closing_validation', {'code': 3}) }}" class="btn-gavel-arbitrate" title="Super-arbitrage de l'écart financier">
+									<i class="fa-solid fa-shield"></i>
+									Arbitrer l'Écart
+								</a>
+							</td>
+						</tr>
+
+						{# Ligne 3 : Caisse de Goma ouverte en direct #}
+						<tr>
+							<td>
+								<strong>Goma Port National</strong>
+							</td>
+							<td>
+								<strong>Caisse Cargo & Colis</strong>
+								<span class="sub-meta-text">ID: CSH-GOM-02</span>
+							</td>
+							<td>Nzuzi Marie-Jeanne</td>
+							<td>
+								<span>240 000 FC</span>
+								<span class="sub-meta-text">180.00 USD Live</span>
+							</td>
+							<td>
+								<span class="badge-status-open">open</span>
+							</td>
+							<td class="text-right actions">
+								<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-btn bg-mute" title="Auditer les transactions en temps réel">
+									<i class="fa-solid fa-chart-line"></i>
+									Monitor Live
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

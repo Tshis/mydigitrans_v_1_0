@@ -94,13 +94,13 @@ class CashierController extends AbstractController
         ]);
     } //show_expense
 
-    #[Route('/admin/agency/cash-register/dashboard/general', name: 'admin_agency_cashier_dashboard_general')]
-    public function general(Request $request): Response
+    #[Route('/admin/agency/cash-register/dashboard/global', name: 'admin_agency_cashier_dashboard_global')]
+    public function global(Request $request): Response
     {
-        return $this->render('admin/agency/cashier/general.html.twig', [
+        return $this->render('admin/agency/cashier/global.html.twig', [
             'page' => 'cashier',
         ]);
-    } //general
+    } //global
 
     #[Route('/admin/agency/cash-register/dashboard/branch', name: 'admin_agency_cashier_dashboard_branch')]
     public function branch(Request $request): Response
@@ -118,7 +118,7 @@ class CashierController extends AbstractController
         ]);
     } //session_closing
 
-    #[Route('/admin/agency/cash-register/session/{id}/closing/validation', name: 'admin_agency_cashier_session_closing_validation')]
+    #[Route('/admin/agency/cash-register/session/{code}/closing/validation', name: 'admin_agency_cashier_session_closing_validation')]
     public function session_closing_validation(Request $request): Response
     {
         return $this->render('admin/agency/cashier/session_closing_validation.html.twig', [
@@ -126,7 +126,7 @@ class CashierController extends AbstractController
         ]);
     } //session_closing_validation
 
-    #[Route('/admin/agency/cash-register/session/{id}/initialization', name: 'admin_agency_cashier_session_init')]
+    #[Route('/admin/agency/cash-register/session/{code}/initialization', name: 'admin_agency_cashier_session_init')]
     public function session_init(Request $request): Response
     {
         return $this->render('admin/agency/cashier/session_init.html.twig', [

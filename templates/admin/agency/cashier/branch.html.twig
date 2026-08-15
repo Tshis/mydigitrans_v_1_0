@@ -132,7 +132,7 @@
 							class="text-right table-action-buttons">
 							{# LE BOUTON CLÉ EST ICI : Il remplace l'icône de l'œil pour les caisses fermées #}
 
-							<a href="{{ path('admin_agency_cashier_session_init', {'id': 2}) }}" class="table-action-trigger view" title="Initialiser l'ouverture d'une session">
+							<a href="{{ path('admin_agency_cashier_session_init', {'code': 2}) }}" class="table-action-trigger view" title="Initialiser l'ouverture d'une session">
 								<i class="fa-solid fa-key"></i>
 							</a>
 							<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-trigger view" title="Auditer le journal en direct (Live)">
@@ -161,7 +161,7 @@
 						<td
 							class="text-right table-action-buttons">
 							{# LE BOUTON CLÉ EST ICI : Il remplace l'icône de l'œil pour les caisses fermées #}
-							<a href="{{ path('admin_agency_cashier_session_closing_validation', {'id': 2}) }}" class="table-action-trigger view" title="Ouvrir l'inventaire contradictoire et signer la décharge">
+							<a href="{{ path('admin_agency_cashier_session_closing_validation', {'code': 2}) }}" class="table-action-trigger view" title="Ouvrir l'inventaire contradictoire et signer la décharge">
 								<i class="fa-solid fa-gavel"></i>
 							</a>
 							<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-trigger view" title="Auditer le journal en direct (Live)">
