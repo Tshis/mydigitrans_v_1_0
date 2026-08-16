@@ -1,15 +1,27 @@
 @use '../../abstract/variables' as *;
 
-//==================
-//===DASHBOARD=====
-//---------------------------------------
+// ====================================================
+// === MODULE FINANCES : DASHBOARD OPÉRA CAISSIER =====
+// ====================================================
 .admin-cashier-dashboard-scope {
-    padding-block: 2rem;
     width: 100%;
 
+    // --- COHÉRENCE MAQUETTE ---
     .mb-25 { margin-bottom: 1.6rem; }
-    .sub-meta-text { display: block; font-size: 11px; color: $gray; margin-top: 2px; }
+    .mb-15 { margin-bottom: 1rem; }
     .text-right { text-align: right !important; }
+    .font-bold { font-weight: 700; }
+    
+    .text-success-mode { color: $success; }
+    .text-danger-mode { color: $danger; }
+
+    .sub-meta-text {
+        display: block;
+        font-size: 11px;
+        color: $gray;
+        margin-top: 2px;
+        font-weight: 500;
+    }
 
     .header {
         display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; padding-block: 1rem;
@@ -51,34 +63,71 @@
         }
     }
 
-    .card {
-        background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
-        h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; color: $dark; margin-bottom: 1.25rem; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; i { color: $primary; } }
+    // Stack des dépenses empilées dans la carte
+    .expenses-currency-stack {
+        display: flex;
+        flex-direction: column;
+        .stat-value { font-size: 1.2rem; line-height: 1.2; }
     }
 
-    .monitoring-table-card {
-        .cash-badge {
-            display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
-            &.badge-entry { background-color: rgba($success, 0.08); color: $success; }
-            &.badge-exit { background-color: rgba($danger, 0.08); color: $danger; }
-        }
-        .text-success-mode { color: $success; }
-        .text-danger-mode { color: $danger; }
+    // --- BADGES COMPACTS FLUX (IN / OUT) ---
+    .cash-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 800;
+        display: inline-block;
+        text-align: center;
+        width: 38px;
+        letter-spacing: 0.5px;
+
+        &.badge-entry { background-color: rgba($success, 0.1); color: $success; }
+        &.badge-exit { background-color: rgba($danger, 0.1); color: $danger; }
     }
 
+    // --- BOUTONS ACTIONS CELLULE (ZÉRO DÉCALAGE / BORDURES RESTAURÉES) ---
     .text-right.table-action-buttons {
-        display: table-cell !important; vertical-align: middle !important; text-align: right !important; white-space: nowrap !important;
-        .table-action-trigger { display: inline-flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: rgba($gray, 0.08); color: $dark; font-size: 13px; float: none !important; transition: all 0.2s; &.view:hover { background-color: $dark !important; color: $white !important; } }
+        display: table-cell !important;
+        vertical-align: middle !important;
+        text-align: right !important;
+        white-space: nowrap !important;
+        float: none !important;
+        border-bottom: 1px solid rgba($mute, 0.5) !important;
+
+        .table-action-trigger {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            margin-left: 6px;
+
+            &.view {
+                background-color: rgba($mute, 0.4);
+                color: $dark;
+                &:hover { background-color: $dark !important; color: $white !important; }
+            }
+        }
     }
 }
 
+// --- RENDU SECURE EN DARK MODE ---
 .dark {
     .admin-cashier-dashboard-scope {
-        background-color: $dm-bg-main;
-        .header .title h2 { color: $white; }
-        .stats-overview-grid .stat-card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); .stat-label { color: $mute; } .stat-value { color: $white; } }
-        .monitoring-table-card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } .cash-badge.badge-entry { background-color: rgba($success, 0.15); } .cash-badge.badge-exit { background-color: rgba($danger, 0.15); } td, strong { color: $white; } }
-        .text-right.table-action-buttons .table-action-trigger { background: rgba($white, 0.05); color: $mute; &.view:hover { background-color: $white !important; color: $dark !important; } }
+        .text-right.table-action-buttons {
+            border-bottom-color: rgba($mute, 0.15) !important;
+            .table-action-trigger.view {
+                background-color: rgba($white, 0.08);
+                color: $white;
+                &:hover { background-color: rgba($white, 0.15) !important; }
+            }
+        }
+        .expenses-currency-stack .stat-value { color: lighten($danger, 5%); }
     }
 }
 

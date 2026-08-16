@@ -15,7 +15,8 @@
 			<div class="title">
 				<h2>
 					<i class="fa-solid fa-vault"></i>
-					Tableau de Bord de la Caisse</h2>
+					Tableau de Bord de la Caisse
+				</h2>
 				<p>Suivi des soldes physiques en direct, enregistrement des flux et contrôle de session.</p>
 			</div>
 			<div class="border-actions-group">
@@ -25,84 +26,90 @@
 				</a>
 				<a href="{{ path('admin_agency_cashier_expense') }}" class="btn btn-action-caisse btn-primary-caisse">
 					<i class="fa-solid fa-money-bill-transfer"></i>
-					Bons de decaissement (2)
+					Bons de décaissement (2)
 				</a>
 				<a href="{{ path('admin_agency_cashier_session_closing') }}" class="btn btn-action-caisse btn-danger-caisse">
 					<i class="fa-solid fa-lock"></i>
-					Cloturer la session
+					Clôturer la session
 				</a>
 			</div>
 		</header>
 
-		{# --- LES SOLDES DU COFFRE-FORT (PAR DEVISE) --- #}
-		<div class="stats-overview-grid mb-25">
-			<div class="stat-card">
-				<div class="stat-icon stat-icon--success">
-					<i class="fa-solid fa-money-bill-wave"></i>
+		{# --- LES SOLDES DU TIROIR-CAISSE DYNAMIQUE (PAR DEVISE ACTIVE) --- #}
+		<div
+			class="stats-overview-grid mb-25">
+			{# Boucle dynamique sur les soldes réels présents dans le tiroir #}
+			{% for balance in vault_balances %}
+				<div class="stat-card">
+					<div class="stat-icon {% if balance.code == 'CDF' %}stat-icon--success{% else %}stat-icon--primary{% endif %}">
+						<i class="fa-solid fa-money-bill-wave"></i>
+					</div>
+					<div class="stat-details">
+						<span class="stat-label">Solde Tiroir
+							{{ balance.code }}</span>
+						<strong class="stat-value {% if balance.code == 'CDF' %}text-success{% else %}text-primary{% endif %}">
+							{{ balance.amount }}
+							{{ balance.code }}
+						</strong>
+					</div>
 				</div>
-				<div class="stat-details">
-					<span class="stat-label">Solde Coffre CDF</span>
-					<strong class="stat-value text-success">1 425 000 CDF</strong>
-				</div>
-			</div>
-			<div class="stat-card">
-				<div class="stat-icon stat-icon--primary">
-					<i class="fa-solid fa-dollar-sign"></i>
-				</div>
-				<div class="stat-details">
-					<span class="stat-label">Solde Coffre USD</span>
-					<strong class="stat-value text-primary">450 USD</strong>
-				</div>
-			</div>
+			{% endfor %}
+
+			{# Carte consolidée des dépenses de la journée multi-devises #}
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--danger">
 					<i class="fa-solid fa-arrow-trend-down"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">Total Dépenses (Sorties)</span>
-					<strong class="stat-value text-danger">85 000 CDF</strong>
+					<span class="stat-label">Total Sorties (Ce jour)</span>
+					<div class="expenses-currency-stack">
+						{% for expense in daily_expenses %}
+							<strong class="stat-value text-danger">{{ expense.amount }}
+								{{ expense.code }}</strong>
+						{% else %}
+							<strong class="stat-value text-muted">0.00</strong>
+						{% endfor %}
+					</div>
 				</div>
 			</div>
 		</div>
 
-		{# --- GRAND LIVRE DES FLUX JOURNALIERS (COMPOSANT GLOBAL) --- #}
+		{# --- GRAND LIVRE DES FLUX JOURNALIERS UNIFIÉ (FinancialOperation) --- #}
 		<div class="card monitoring-table-card">
 			<h2>
 				<i class="fa-solid fa-list-ol"></i>
-				Grand Livre des Flux du Jour</h2>
+				Grand Livre des Flux du Jour
+			</h2>
 			<table class="table table-scrollable table-striped js-datatable">
 				<thead>
 					<tr>
 						<th>Heure & Réf</th>
-						<th>Type Opération</th>
+						<th>Direction</th>
 						<th>Libellé / Motif</th>
-						<th>Mode</th>
-						<th>Flux Entrant</th>
-						<th>Flux Sortant</th>
+						<th>Mode de Règlement</th>
+						<th class="text-right">Montant & Devise</th>
 						<th class="text-right">Action</th>
 					</tr>
 				</thead>
 				<tbody>
+					{# Ligne 1 : Flux Entrant #}
 					<tr>
 						<td>
 							<strong>09h42</strong>
 							<span class="sub-meta-text">FLX-9834</span>
 						</td>
 						<td>
-							<span class="cash-badge badge-entry">ENCAISSEMENT</span>
+							<span class="cash-badge badge-entry">IN</span>
 						</td>
 						<td>
 							<strong>Billet Passager : Mputu Antoinette</strong>
-							<span class="sub-meta-text">Réf: RVS-2026-8943</span>
+							<span class="sub-meta-text">Réf: RVS-2026-8943 • Kinshasa → Kenge</span>
 						</td>
 						<td>
 							<span class="text-success-mode font-weight-700">Espèces</span>
 						</td>
-						<td>
-							<strong class="text-success-mode">+45 000 CDF</strong>
-						</td>
-						<td>
-							<span class="text-muted">-</span>
+						<td class="text-right text-success-mode font-bold">
+							+45 000 CDF
 						</td>
 						<td class="text-right table-action-buttons">
 							<a href="{{ path('admin_agency_cashier_show_payment') }}" class="table-action-trigger view" title="Voir le reçu">
@@ -110,13 +117,15 @@
 							</a>
 						</td>
 					</tr>
+
+					{# Ligne 2 : Flux Sortant #}
 					<tr>
 						<td>
 							<strong>11h15</strong>
 							<span class="sub-meta-text">FLX-9835</span>
 						</td>
 						<td>
-							<span class="cash-badge badge-exit">DECAISSEMENT</span>
+							<span class="cash-badge badge-exit">OUT</span>
 						</td>
 						<td>
 							<strong>Carburant Bus 01 (Marcopolo)</strong>
@@ -125,11 +134,8 @@
 						<td>
 							<span class="text-danger-mode font-weight-700">Espèces</span>
 						</td>
-						<td>
-							<span class="text-muted">-</span>
-						</td>
-						<td>
-							<strong class="text-danger-mode">-60 000 CDF</strong>
+						<td class="text-right text-danger-mode font-bold">
+							-60 000 CDF
 						</td>
 						<td class="text-right table-action-buttons">
 							<a href="{{ path('admin_agency_cashier_show_expense') }}" class="table-action-trigger view" title="Voir la pièce justificative">
@@ -142,5 +148,4 @@
 		</div>
 
 	</div>
-
 {% endblock %}

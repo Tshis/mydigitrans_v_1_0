@@ -74,8 +74,42 @@ class CashierController extends AbstractController
     #[Route('/admin/agency/cash-register/dashboard', name: 'admin_agency_cashier_dashboard')]
     public function dashboard(Request $request): Response
     {
+
+
+        // 1. Simulation des fonds réels actuellement présents dans le tiroir physique
+        $vaultBalances = [
+            [
+                'code'   => 'CDF',
+                'amount' => '1 425 000',
+            ],
+            [
+                'code'   => 'USD',
+                'amount' => '450.00',
+            ],
+            [
+                'code'   => 'EUR',
+                'amount' => '120.00',
+            ],
+        ];
+
+        // 2. Simulation du cumul des fiches de décaissement (sorties de caisse approuvées)
+        $dailyExpenses = [
+            [
+                'code'   => 'CDF',
+                'amount' => '85 000',
+            ],
+            [
+                'code'   => 'USD',
+                'amount' => '30.00',
+            ],
+        ];
+
+
+
         return $this->render('admin/agency/cashier/dashboard.html.twig', [
             'page' => 'cashier',
+            'vault_balances' => $vaultBalances,
+            'daily_expenses' => $dailyExpenses,
         ]);
     } //dashboard
 
@@ -103,7 +137,7 @@ class CashierController extends AbstractController
         ]);
     } //show_payment
 
-    #[Route('/admin/agency/cash-register/expense/code-de-paiement', name: 'admin_agency_cashier_show_expense')]
+    #[Route('/admin/agency/cash-register/expense/code-de-decaissement', name: 'admin_agency_cashier_show_expense')]
     public function show_expense(Request $request): Response
     {
         return $this->render('admin/agency/cashier/show_expense.html.twig', [
