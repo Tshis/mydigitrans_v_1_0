@@ -111,9 +111,8 @@ class FinanceController extends AbstractController
     public function expense_add(Request $request): Response
     {
 
-
         // 1. Simulation du rôle de l'utilisateur connecté (True = SuperManager, False = Gérant de succursale)
-        $isNetworkManager = false;
+        $isNetworkManager = true;
 
         // Si l'utilisateur est gérant simple, on mémorise l'ID de sa succursale attitrée (ex: Kinshasa Centre)
         $userBranchId = 1;
@@ -129,6 +128,7 @@ class FinanceController extends AbstractController
         $activeCurrencies = [
             ['code' => 'USD', 'symbol' => '$'],
             ['code' => 'CDF', 'symbol' => 'FC'],
+            ['code' => 'EUR', 'symbol' => '£'],
         ];
 
         // 4. Liste des sessions de caisses de guichet physiques actives (Uniquement pour type = other & source = cash_register)
