@@ -36,6 +36,60 @@
             }
         }
     }
+    
+    // --- BADGES STATUTS ---
+    .cash-badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-block;
+
+        &.badge-impacted {
+            background-color: rgba($danger, 0.1);
+            color: $danger;
+        }
+
+        &.badge-pending {
+            background-color: rgba($primary, 0.1);
+            color: $primary;
+        }
+
+        &.badge-confirmed {
+            background-color: rgba($success, 0.1);
+            color: $success;
+        }
+    }
+
+     // --- BOUTONS ACTIONS CELLULE (ZÉRO DÉCALAGE / BORDURES RESTAURÉES) ---
+    .text-right.table-action-buttons {
+        display: table-cell !important;
+        vertical-align: middle !important;
+        text-align: right !important;
+        white-space: nowrap !important;
+        float: none !important;
+        border-bottom: 1px solid rgba($mute, 0.5) !important;
+
+        .table-action-trigger {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            margin-left: 6px;
+
+            &.view {
+                background-color: rgba($mute, 0.4);
+                color: $dark;
+                &:hover { background-color: $dark !important; color: $white !important; }
+            }
+        }
+    }
 }
 
 

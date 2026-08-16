@@ -39,8 +39,10 @@
 					<span class="stat-label">Recettes du jour</span>
 					<div class="currency-financial-stack">
 						{% for revenue in daily_revenues %}
-							<strong class="stat-value text-success">{{ revenue.amount }}
-								{{ revenue.code }}</strong>
+							<p>
+								<strong class="stat-value text-success">{{ revenue.amount }}
+									{{ revenue.code }}</strong>
+							</p>
 						{% else %}
 							<strong class="stat-value text-muted">0.00</strong>
 						{% endfor %}
@@ -57,8 +59,10 @@
 					<span class="stat-label">Dépenses du jour</span>
 					<div class="currency-financial-stack">
 						{% for expense in daily_expenses %}
-							<strong class="stat-value text-danger">{{ expense.amount }}
-								{{ expense.code }}</strong>
+							<p>
+								<strong class="stat-value text-danger">{{ expense.amount }}
+									{{ expense.code }}</strong>
+							</p>
 						{% else %}
 							<strong class="stat-value text-muted">0.00</strong>
 						{% endfor %}
@@ -75,8 +79,10 @@
 					<span class="stat-label">Solde Net Provisoire</span>
 					<div class="currency-financial-stack">
 						{% for net in daily_nets %}
-							<strong class="stat-value text-primary">{{ net.amount }}
-								{{ net.code }}</strong>
+							<p>
+								<strong class="stat-value text-primary">{{ net.amount }}
+									{{ net.code }}</strong>
+							</p>
 						{% else %}
 							<strong class="stat-value text-muted">0.00</strong>
 						{% endfor %}
