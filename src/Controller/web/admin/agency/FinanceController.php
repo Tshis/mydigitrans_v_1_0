@@ -110,8 +110,43 @@ class FinanceController extends AbstractController
     #[Route('/admin/agency/finance/expense/add', name: 'admin_agency_finance_expense_add')]
     public function expense_add(Request $request): Response
     {
+
+
+        // 1. Simulation du rôle de l'utilisateur connecté (True = SuperManager, False = Gérant de succursale)
+        $isNetworkManager = false;
+
+        // Si l'utilisateur est gérant simple, on mémorise l'ID de sa succursale attitrée (ex: Kinshasa Centre)
+        $userBranchId = 1;
+
+        // 2. Liste globale des succursales (Uniquement exploitée par le Network Manager)
+        $branches = [
+            ['id' => 1, 'name' => 'Kinshasa Centre (Siège)'],
+            ['id' => 2, 'name' => 'Succursale Goma'],
+            ['id' => 3, 'name' => 'Succursale Matadi'],
+        ];
+
+        // 3. Devises autorisées par le système
+        $activeCurrencies = [
+            ['code' => 'USD', 'symbol' => '$'],
+            ['code' => 'CDF', 'symbol' => 'FC'],
+        ];
+
+        // 4. Liste des sessions de caisses de guichet physiques actives (Uniquement pour type = other & source = cash_register)
+        $activeSessions = [
+            ['id' => 1, 'label' => 'Guichet Billetterie 1 (Jean M.)', 'balance' => '1 425 000 CDF'],
+            ['id' => 2, 'label' => 'Guichet Colis & Fret (Marie K.)', 'balance' => '450 USD'],
+        ];
+
+
+
+
         return $this->render('admin/agency/finance/expense_add.html.twig', [
             'page' => 'finances',
+            'is_network_manager' => $isNetworkManager,
+            'user_branch_id'     => $userBranchId,
+            'branches'           => $branches,
+            'active_currencies'  => $activeCurrencies,
+            'active_sessions'    => $activeSessions,
         ]);
     } //expense_add
 

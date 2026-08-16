@@ -1,0 +1,151 @@
+@use '../../abstract/variables' as *;
+
+// ====================================================
+// === MODULE FINANCES : COMPOSITIONS DES DÉPENSES =====
+// ====================================================
+.admin-finance-expense-add-scope {
+    width: 100%;
+    padding-block: 2rem;
+
+    .mb-25 { margin-bottom: 1.55rem; }
+    .mb-15 { margin-bottom: 1rem; }
+    .mt-15 { margin-top: 1rem; }
+    .font-bold { font-weight: 700; }
+
+    // --- EN-TÊTE ---
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+
+        .title {
+            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; margin: 0; i{color: $primary;} }
+            p { font-size: 1rem; color: $gray; margin: 4px 0 0 0; }
+        }
+    }
+
+    // --- CARD CONTAINER ---
+    .card {
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+    }
+
+    // --- GRILLE INTERNE DES FORMULAIRES ---
+    .field-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
+        width: 100%;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .admin-bus-layout-add-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: $gray;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-bus-layout-add-input,
+        .admin-bus-layout-add-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
+            font-size: 13px;
+            font-weight: 600;
+            color: $dark;
+            background: $white;
+            outline: none;
+            height: 42px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+
+            &:focus { border-color: $primary; }
+        }
+
+        .text-area-fixed {
+            height: 80px;
+            resize: vertical;
+            line-height: 1.4;
+        }
+
+        // Alerte de réduction des fonds de caisse
+        .sub-meta-text.danger-hint {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: $danger;
+            margin-top: 5px;
+        }
+    }
+
+    .field-button-right {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+        // --- GRILLE INTERNE DES FORMULAIRES RECTIFIÉE ---
+    .field-group {
+        display: flex;
+        align-items: flex-end; // Aligne parfaitement les bas d'inputs indépendamment du label
+        gap: 1.25rem;
+        width: 100%;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
+    .field {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        
+        // Permet au libellé de prendre deux fois plus de place si nécessaire
+        &.flex-double {
+            flex: 2;
+        }
+        
+        // Sécurité d'affichage si le wrapper est masqué par le JS
+        &[style*="display: none"] {
+            display: none !important;
+        }
+    }
+
+}
+
+// ====================================================
+// --- CONFORMITÉ COMPLETE DARK MODE ------------------
+// ====================================================
+.dark {
+    .admin-finance-expense-add-scope {
+        .header .title h2 { color: $white; }
+        
+        .card {
+            background: $dm-bg-surface;
+            border-color: rgba($mute, 0.25);
+        }
+
+        .field {
+            .admin-bus-layout-add-input,
+            .admin-bus-layout-add-select {
+                background: darken($dm-bg-surface, 4%);
+                border-color: rgba($mute, 0.2);
+                color: $white;
+            }
+        }
+    }
+}
