@@ -1,0 +1,118 @@
+{# templates/admin/agency/cashier/expense.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/cashier-expense.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-cashier-expense-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" title="Retour au tableau de bord">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h2>
+						<i class="fa-solid fa-money-bill-transfer"></i>
+						Bons de Décaissement à Payer
+					</h2>
+					<p>Consultez et payez les dépenses opérationnelles validées et ordonnées par votre gérant de succursale.</p>
+				</div>
+			</div>
+		</header>
+
+		{# --- CARTES DES FLUX DISPONIBLES EN DIRECT (DYNAMIQUE) --- #}
+		<div class="stats-overview-grid mb-25">
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--primary">
+					<i class="fa-solid fa-file-signature"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Bons en attente</span>
+					<strong class="stat-value text-primary">{{ pending_count }}
+						En attente</strong>
+				</div>
+			</div>
+
+			{# Boucle dynamique sur l'état réel des tiroirs monétaires [MCD 19] #}
+			{% for balance in vault_balances %}
+				<div class="stat-card">
+					<div class="stat-icon {% if balance.code == 'CDF' %}stat-icon--success{% else %}stat-icon--primary{% endif %}">
+						<i class="fa-solid fa-wallet"></i>
+					</div>
+					<div class="stat-details">
+						<span class="stat-label">Espèces Dispo ({{ balance.code }})</span>
+						<strong class="stat-value {% if balance.code == 'CDF' %}text-success{% else %}text-primary{% endif %}">
+							{{ balance.amount }}
+							{{ balance.code }}
+						</strong>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+
+		{# --- LISTE DES BONS DE DÉCAISSEMENT EN ATTENTE (DATATABLE) --- #}
+		<div class="card monitoring-table-card">
+			<h2>
+				<i class="fa-solid fa-clock-rotate-left"></i>
+				Ordres de décaissement autorisés par le gérant
+			</h2>
+			<div class="table-responsive-wrapper">
+				<table class="table table-scrollable table-striped js-datatable">
+					<thead>
+						<tr>
+							<th>Réf & Date d'Ordre</th>
+							<th>Autorisé Par</th>
+							<th>Bénéficiaire / Motif</th>
+							<th class="text-right">Montant Ordonné</th>
+							<th>Statut</th>
+							<th class="text-right">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{# Boucle sur les ordres de dépenses en attente d'exécution physique #}
+						{% for expense in pending_expenses %}
+							<tr>
+								<td>
+									<strong>{{ expense.reference }}</strong>
+									<span class="sub-meta-text">{{ expense.date_ordered }}</span>
+								</td>
+								<td>
+									<strong>{{ expense.authorizer }}</strong>
+									<span class="sub-meta-text">{{ expense.authorizer_role }}</span>
+								</td>
+								<td>
+									<strong>{{ expense.beneficiary }}</strong>
+									<span class="sub-meta-text">{{ expense.motif }}</span>
+								</td>
+								<td class="text-right font-bold text-danger-mode">
+									{{ expense.amount }}
+									{{ expense.currency }}
+								</td>
+								<td>
+									<span class="cash-badge badge-pending">{{ expense.status }}</span>
+								</td>
+								<td class="text-right table-action-buttons">
+									<button class="btn-disburse-trigger js-btn-disburse" data-ref="{{ expense.reference }}" data-amount="{{ expense.amount_raw }}" data-currency="{{ expense.currency }}">
+										<i class="fa-solid fa-money-bill-wave"></i>
+										Décaisser le cash
+									</button>
+								</td>
+							</tr>
+						{% else %}
+							<tr>
+								<td colspan="6" class="text-center text-muted">Aucun ordre de décaissement en attente de paiement.</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

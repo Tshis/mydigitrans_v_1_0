@@ -133,8 +133,47 @@ class CashierController extends AbstractController
     #[Route('/admin/agency/cash-register/expense', name: 'admin_agency_cashier_expense')]
     public function expense(Request $request): Response
     {
-        return $this->render('admin/agency/cashier/expense.html.twig', [
+
+        // 1. Solde en temps réel des tiroirs physiques de l'agent
+        $vaultBalances = [
+            ['code' => 'CDF', 'amount' => '1 425 000'],
+            ['code' => 'USD', 'amount' => '450.00'],
+        ];
+
+        // 2. Fiches de dépenses validées par la direction en attente d'exécution de cash
+        $pendingExpenses = [
+            [
+                'reference'       => 'EXP-2026-0401',
+                'date_ordered'    => 'Aujourd\'hui, 08h30',
+                'authorizer'      => 'Alphonse Kalonji',
+                'authorizer_role' => 'Gérant de Succursale',
+                'beneficiary'     => 'Chauffeur : Jean Mukendi',
+                'motif'           => 'Achat Carburant Bus #01 (Station Engen Limete)',
+                'amount'          => '250.00',
+                'amount_raw'      => '250',
+                'currency'        => 'USD',
+                'status'          => 'PENDING (Approuvé)'
+            ],
+            [
+                'reference'       => 'EXP-2026-0402',
+                'date_ordered'    => 'Aujourd\'hui, 10h12',
+                'authorizer'      => 'Alphonse Kalonji',
+                'authorizer_role' => 'Gérant de Succursale',
+                'beneficiary'     => 'Secrétariat de Gare',
+                'motif'           => 'Achat rames de papiers et encre pour tickets',
+                'amount'          => '60 000',
+                'amount_raw'      => '60000',
+                'currency'        => 'CDF',
+                'status'          => 'PENDING (Approuvé)'
+            ]
+        ];
+
+
+        return $this->render('admin/agency/caisse/expense.html.twig', [
             'page' => 'cashier',
+            'pending_count'    => count($pendingExpenses),
+            'vault_balances'   => $vaultBalances,
+            'pending_expenses' => $pendingExpenses,
         ]);
     } //expense
 

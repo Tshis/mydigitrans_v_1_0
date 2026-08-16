@@ -1,0 +1,5 @@
+document.addEventListener("DOMContentLoaded",()=>{document.querySelectorAll(".js-btn-disburse").forEach(e=>{e.addEventListener("click",function(){var t=this.getAttribute("data-ref"),r=this.getAttribute("data-amount"),n=this.getAttribute("data-currency");if(confirm(`Confirmer l'ordonnancement de la dépense ${t} pour un montant théorique de : ${r} ${n} ?`)){t=prompt(`Devise de décaissement physique ? (Laissez vide pour valider en ${n})`,n);if(null!==t){t=t.trim().toUpperCase()||n;let e=r;if(t!==n){var i=prompt(`Quel montant exact en ${t} sortez-vous physiquement du tiroir ?`);if(!i)return void alert("Opération annulée. Le montant réel est requis pour les décaissements croisés.");e=i}alert(`Décaissement validé pour le grand livre comptable Mydigitrans !
+
+`+`• Ordre : ${r} ${n}
+`+`• Sortie physique coffre : ${e} ${t}
+`+"• Statut du bon : PAID (Clôturé)"),location.reload()}}})})});
