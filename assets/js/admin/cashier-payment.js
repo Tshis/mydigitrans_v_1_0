@@ -35,12 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (query.includes('colis') || query.includes('col')) { 
                 docNatureText.innerText = "BON D'EXPÉDITION COLIS (FRET)";
-                docRefText.innerText = "COL-2026-0402";
+                docRefText.innerText = "SHP-2026-0402";
                 baseValue = 25.00;
                 currentCurrencyCode = 'USD';
             } else { 
                 docNatureText.innerText = "BON DE RÉSERVATION PASSAGER";
-                docRefText.innerText = "RVS-2026-8943";
+                docRefText.innerText = "RSV-2026-8943";
                 baseValue = 45000;
                 currentCurrencyCode = 'CDF';
             }
