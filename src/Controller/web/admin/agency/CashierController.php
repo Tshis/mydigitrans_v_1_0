@@ -169,7 +169,7 @@ class CashierController extends AbstractController
         ];
 
 
-        return $this->render('admin/agency/caisse/expense.html.twig', [
+        return $this->render('admin/agency/cashier/expense.html.twig', [
             'page' => 'cashier',
             'pending_count'    => count($pendingExpenses),
             'vault_balances'   => $vaultBalances,
