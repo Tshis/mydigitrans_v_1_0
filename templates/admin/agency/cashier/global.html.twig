@@ -35,7 +35,7 @@
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">Succursales Actives</span>
-					<strong class="stat-value">5 Villes</strong>
+					<strong class="stat-value">5 Gares</strong>
 				</div>
 			</div>
 
@@ -44,9 +44,13 @@
 					<i class="fa-solid fa-vault"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">Encaissements Réseau (Ce jour)</span>
-					<strong class="stat-value text-success">6 420 000 FC</strong>
-					<span class="sub-meta-text">+ 2,850.00 USD</span>
+					<span class="stat-label">Solde du Réseau (Ce jour)</span>
+					{# Pile de devises globale consolidée issue de CashSessionBalance #}
+					<div class="stats-currency-stack">
+						<strong class="stat-value text-success">6 420 000 CDF</strong>
+						<span class="sub-meta-text">+ 2 850.00 USD</span>
+						<span class="sub-meta-text">+ 1 150.00 EUR</span>
+					</div>
 				</div>
 			</div>
 
@@ -64,9 +68,7 @@
 		{# --- ZONE DE FILTRES DIRECTIONNELS --- #}
 		<div class="trip-filters-card mb-20">
 			<form action="#">
-				<div
-					class="field-group">
-					{# Filtre Majeur : Succursale géographique #}
+				<div class="field-group">
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Filtrer par Succursale Réseau *</label>
 						<select name="filter_branch" class="admin-bus-layout-add-select">
@@ -78,7 +80,6 @@
 						</select>
 					</div>
 
-					{# Filtre : Statut comptable de session #}
 					<div class="field">
 						<label class="admin-bus-layout-add-label">État de Session (status) *</label>
 						<select name="filter_status" class="admin-bus-layout-add-select">
@@ -89,7 +90,6 @@
 						</select>
 					</div>
 
-					{# Filtre : Recherche Multi-critères #}
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Recherche libre</label>
 						<input type="text" name="search_query" class="admin-bus-layout-add-input" placeholder="Code caisse, nom d'agent...">
@@ -104,22 +104,22 @@
 			</form>
 		</div>
 
-		{# --- REGISTRE CONSOLIDÉ DES FLUX DE SESSIONS (MCD 19) --- #}
-		<div class="layout-main-card">
+		{# --- REGISTRE CONSOLIDÉ DES FLUX DE SESSIONS (MCD 19 / Pivot Balance) --- #}
+		<div class="layout-main-card mb-20">
 			<div class="card-inner-box table-responsive-wrapper">
 				<table class="table table-scrollable table-striped js-datatable">
 					<thead>
 						<tr>
 							<th>Succursale</th>
-							<th>Terminal (Register)</th>
+							<th>Guichet de caisse</th>
 							<th>Caissier</th>
-							<th>Solde Attendu</th>
-							<th>Statut BDD</th>
-							<th class="text-right">Actions de Contrôle</th>
+							<th>Bilan des Encaissements par Devise</th>
+							<th>Statut</th>
+							<th class="text-right">Actions</th>
 						</tr>
 					</thead>
 					<tbody>
-						{# Ligne 1 : Caisse de Kinshasa validée par son gérant local #}
+						{# Ligne 1 : Kinshasa avec 2 devises #}
 						<tr>
 							<td>
 								<strong>Kinshasa Centre</strong>
@@ -130,8 +130,18 @@
 							</td>
 							<td>Jean Mukendi</td>
 							<td>
-								<span class="text-success-mode">1 470 000 FC</span>
-								<span class="sub-meta-text">450.00 USD</span>
+								<div class="table-balances-stack">
+									<div class="balance-item">
+										<span class="cur-code">CDF:</span>
+										1 470 000 FC
+										<span class="gap-indicator text-success-mode">(Écart: 0)</span>
+									</div>
+									<div class="balance-item">
+										<span class="cur-code">USD:</span>
+										450.00 $
+										<span class="gap-indicator text-success-mode">(Écart: 0)</span>
+									</div>
+								</div>
 							</td>
 							<td>
 								<span class="badge-status-validated">validated</span>
@@ -139,12 +149,11 @@
 							<td class="text-right actions">
 								<a href="{{ path('admin_agency_finance_journal', {'code': 1}) }}" class="table-action-btn bg-mute" title="Inspecter le grand livre des opérations [MCD 29]">
 									<i class="fa-solid fa-eye"></i>
-									View Journal
 								</a>
 							</td>
 						</tr>
 
-						{# Ligne 2 : Caisse de Matadi fermée avec litige en cours d'arbitrage #}
+						{# Ligne 2 : Matadi avec un écart constaté en USD #}
 						<tr>
 							<td>
 								<strong class="branch-highlight-text">Matadi Ville Haute</strong>
@@ -155,21 +164,30 @@
 							</td>
 							<td>Kabila Alphonse</td>
 							<td>
-								<span class="text-danger-mode">820 000 FC</span>
-								<span class="sub-meta-text font-bold text-danger-mode">Écart : -45 000 FC</span>
+								<div class="table-balances-stack">
+									<div class="balance-item">
+										<span class="cur-code">CDF:</span>
+										820 000 FC
+										<span class="gap-indicator text-success-mode">(Écart: 0)</span>
+									</div>
+									<div class="balance-item">
+										<span class="cur-code">USD:</span>
+										500.00 $
+										<span class="gap-indicator text-danger-mode font-bold">(Écart: -45.00 $)</span>
+									</div>
+								</div>
 							</td>
 							<td>
 								<span class="badge-status-closed">closed</span>
 							</td>
 							<td class="text-right actions">
 								<a href="{{ path('admin_agency_cashier_session_closing_validation', {'code': 3}) }}" class="btn-gavel-arbitrate" title="Super-arbitrage de l'écart financier">
-									<i class="fa-solid fa-shield"></i>
-									Arbitrer l'Écart
+									<i class="fa-solid fa-gavel"></i>
 								</a>
 							</td>
 						</tr>
 
-						{# Ligne 3 : Caisse de Goma ouverte en direct #}
+						{# Ligne 3 : Goma avec 3 devises actives #}
 						<tr>
 							<td>
 								<strong>Goma Port National</strong>
@@ -180,8 +198,23 @@
 							</td>
 							<td>Nzuzi Marie-Jeanne</td>
 							<td>
-								<span>240 000 FC</span>
-								<span class="sub-meta-text">180.00 USD Live</span>
+								<div class="table-balances-stack">
+									<div class="balance-item">
+										<span class="cur-code">CDF:</span>
+										240 000 FC
+										<span class="gap-indicator text-success-mode">(Écart: 0)</span>
+									</div>
+									<div class="balance-item">
+										<span class="cur-code">USD:</span>
+										180.00 $
+										<span class="gap-indicator text-success-mode">(Écart: 0)</span>
+									</div>
+									<div class="balance-item">
+										<span class="cur-code">EUR:</span>
+										90.00 €
+										<span class="gap-indicator text-success-mode">(Écart: 0)</span>
+									</div>
+								</div>
 							</td>
 							<td>
 								<span class="badge-status-open">open</span>
@@ -189,7 +222,6 @@
 							<td class="text-right actions">
 								<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-btn bg-mute" title="Auditer les transactions en temps réel">
 									<i class="fa-solid fa-chart-line"></i>
-									Monitor Live
 								</a>
 							</td>
 						</tr>

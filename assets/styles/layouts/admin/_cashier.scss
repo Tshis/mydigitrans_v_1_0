@@ -88,6 +88,24 @@
 .admin-agency-cashier-dashboard-global-scope {
     width: 100%;
 
+    // --- UTILITIES ---
+    .my-20 { margin-block: 1.25rem; }
+    .mb-25 { margin-bottom: 1.55rem; }
+    .mb-20 { margin-bottom: 1.25rem; }
+    .mt-10 { margin-top: 0.75rem; }
+    .font-bold { font-weight: 700; }
+    
+    .text-success-mode { color: $success; }
+    .text-danger-mode { color: $danger; }
+
+    .sub-meta-text {
+        display: block;
+        font-size: 11px;
+        color: $gray;
+        margin-top: 2px;
+        font-weight: 500;
+    }
+
     .header {
         display: flex !important; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; padding-block: 1rem;
         .title {
@@ -132,43 +150,55 @@
         background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.25rem 1.5rem;
     }
 
-    // --- UTILITIES NATIVES ---
-    .mb-20 { margin-bottom: 1.25rem; }
-    .mt-10 { margin-top: 0.75rem; }
-    .text-right { text-align: right !important; }
-    .font-bold { font-weight: 700; }
-    
-    .text-success-mode { color: $success; font-weight: 600; }
-    .text-danger-mode { color: $danger; font-weight: 600; }
-
-    .sub-meta-text {
-        display: block;
-        font-size: 11px;
-        color: $gray;
-        margin-top: 2px;
-        font-weight: 500;
-    }
-
-    // --- CARTE CONTENEUR PRINCIPALE ---
+    // --- CARTE DE SUPERVISION MAÎTRESSE ---
     .layout-main-card {
         background: $white;
         border: 1px solid $mute;
         border-radius: $radius-card;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
         width: 100%;
-        margin-top: 1rem;
 
-        .card-inner-box {
-            padding: 1.5rem;
+        .card-inner-box { padding: 1.5rem; }
+    }
+
+    .branch-highlight-text { color: $primary; }
+
+    .stats-currency-stack {
+        display: flex;
+        flex-direction: column;
+        margin-top: 4px;
+        .stat-value { line-height: 1.2; }
+    }
+
+    // --- GRILLE COMPACTE MULTI-DEVISES (CELLULE TABLEAU) ---
+    .table-balances-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .balance-item {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: $dark;
+            display: flex;
+            align-items: center;
+
+            .cur-code {
+                font-family: monospace;
+                font-weight: 700;
+                color: $gray;
+                width: 38px;
+                display: inline-block;
+            }
+
+            .gap-indicator {
+                font-size: 11px;
+                margin-left: 8px;
+            }
         }
     }
 
-    // --- TEXTES EN METRIC SPECIFIQUE ---
-    .branch-highlight-text {
-        color: $primary;
-    }
-
-    // --- BADGES DE STATUT ---
+    // --- STATUTS DES SESSIONS ---
     .badge-status-open {
         background-color: rgba($success, 0.1);
         color: $success;
@@ -202,56 +232,96 @@
         display: inline-block;
     }
 
-    // --- STRUCTURE DES BOUTONS DE LIGNE ---
-    .actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-        align-items: center;
+   
 
+    // --- BOUTONS D'ACTIONS DE CONTRÔLE SUR TABLEAU (ZÉRO DÉCALAGE / FORMAT CELL) ---
+    .text-right.actions {
+        display: table-cell !important; 
+        vertical-align: middle !important; 
+        text-align: right !important; 
+        white-space: nowrap !important;
+        float: none !important;
+
+        // Bouton classique de consultation
         .table-action-btn {
-            padding: 6px 12px;
-            border-radius: $radius-input;
-            font-size: 11.5px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid transparent;
+            display: inline-flex !important; 
+            align-items: center; 
+            justify-content: center; 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 6px; 
+            text-decoration: none; 
+            font-size: 13px; 
             transition: all 0.2s ease;
+            border: 1px solid transparent;
+            margin-left: 6px;
+
+            // Masque le texte inutile pour n'avoir que l'icône dans le carré stable
+            font-size: 0 !important;
+            i { font-size: 13px; }
 
             &.bg-mute {
                 background-color: rgba($mute, 0.4);
                 color: $dark;
-                
-                &:hover {
-                    background-color: rgba($mute, 0.7);
-                }
+                &:hover { background-color: $dark !important; color: $white !important; }
             }
         }
 
-        // Bouton de super-arbitrage de la direction
+        // Bouton marteau/arbitrage exclusif
         .btn-gavel-arbitrate {
-            background-color: rgba($danger, 0.08) !important;
-            color: $danger !important;
-            border: 1px solid rgba($danger, 0.3);
-            font-weight: 700;
-            padding: 6px 12px;
-            border-radius: $radius-input;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-            font-size: 11.5px;
+            display: inline-flex !important; 
+            align-items: center; 
+            justify-content: center; 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 6px; 
+            text-decoration: none; 
+            font-size: 0 !important; // Masque le texte "Arbitrer l'écart" pour rester en format icône
             transition: all 0.2s ease;
+            border: 1px solid rgba($danger, 0.2);
+            background-color: rgba($danger, 0.1);
+            color: $danger;
+            margin-left: 6px;
+
+            i { font-size: 13px; }
             
             &:hover {
-                background-color: $danger;
+                background-color: $danger !important;
                 color: $white !important;
                 border-color: $danger;
-                transform: translateY(-1px);
-                box-shadow: 0 4px 6px rgba($danger, 0.15);
+            }
+        }
+    }
+
+}
+
+// --- SECURE DARK MODE ---
+.dark {
+    .admin-agency-cashier-dashboard-global-scope {
+        .layout-main-card { background: $dm-bg-surface; border-color: rgba($mute, 0.15); }
+        .table-balances-stack .balance-item {
+            color: $white;
+            .cur-code { color: $mute; }
+        }
+
+        .trip-filters-card{
+            background: $dm-bg;
+        }
+        
+        .badge-status-open { background-color: rgba($success, 0.18); color: lighten($success, 10%); }
+        .badge-status-closed { background-color: rgba($danger, 0.18); color: lighten($danger, 10%); }
+        .badge-status-validated { background-color: rgba($white, 0.06); color: $mute; }
+
+        .actions {
+            .table-action-btn.bg-mute {
+                background-color: rgba($white, 0.08);
+                color: $dark;
+                &:hover { background-color: rgba($white, 0.15); }
+            }
+            .btn-gavel-arbitrate {
+                background-color: rgba($danger, 0.15) !important;
+                border-color: rgba($danger, 0.4);
+                &:hover { background-color: $danger; color: $white !important; }
             }
         }
     }
@@ -631,55 +701,7 @@
 //==================
 //===GENERAL CAISSE DASHBOARD=====
 //---------------------------------------
-.admin-dashboard-general-scope {
-    padding-block: 2rem;
-    width: 100%;
 
-    .mb-25 { margin-bottom: 1.6rem; }
-    .text-right { text-align: right !important; }
-
-    .header {
-        padding-block: 1rem;
-        .title {
-            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; display: flex; align-items: center; gap: 10px; i { color: $primary; } }
-            p { font-size: 13px; color: $gray; margin-top: 4px; }
-        }
-    }
-
-    .stats-overview-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; width: 100%;
-        .stat-card {
-            background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1.2rem;
-            .stat-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; &--primary { background: rgba($primary, 0.1); color: $primary; } &--success { background: rgba($success, 0.1); color: $success; } }
-            .stat-details { display: flex; flex-direction: column; gap: 2px; .stat-label { font-size: 11px; color: $gray; font-weight: 700; text-transform: uppercase; } .stat-value { font-size: 1.4rem; font-weight: 800; color: $dark; line-height: 1.2; } }
-        }
-    }
-
-    .card {
-        background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
-        h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; color: $dark; margin-bottom: 1.25rem; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; i { color: $primary; } }
-    }
-
-    .monitoring-table-card {
-        .manager-name { color: $gray; font-weight: 600; }
-        .text-dark { color: $dark; font-weight: 700; }
-    }
-
-    .text-right.table-action-buttons {
-        display: table-cell !important; vertical-align: middle !important; text-align: right !important; white-space: nowrap !important;
-        .table-action-trigger { display: inline-flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: rgba($gray, 0.08); color: $dark; font-size: 13px; float: none !important; transition: all 0.2s; &.view:hover { background-color: $dark !important; color: $white !important; } }
-    }
-}
-
-.dark {
-    .admin-dashboard-general-scope {
-        background-color: $dm-bg-main;
-        .header .title h2 { color: $white; }
-        .stats-overview-grid .stat-card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); .stat-label { color: $mute; } .stat-value { color: $white; } }
-        .monitoring-table-card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } .manager-name { color: $mute; } td, .text-dark { color: $white !important; } }
-        .text-right.table-action-buttons .table-action-trigger { background: rgba($white, 0.05); color: $mute; &.view:hover { background-color: $white !important; color: $dark !important; } }
-    }
-}
 
 //==================
 //===BRANCH CAISSE DASHBOARD=====
