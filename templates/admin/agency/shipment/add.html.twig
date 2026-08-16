@@ -7,154 +7,196 @@
 {% endblock %}
 
 {% block body %}
-	<div class="admin-shipment-creation-scope container">
+	<div
+		class="admin-shipment-creation-scope container">
 
+		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header mb-25">
 			<a href="{{ path('admin_agency_shipment_index') }}" class="agency-back-action" title="Retour au registre">
 				<i class="fa-solid fa-arrow-left"></i>
 			</a>
 			<div class="title">
 				<h2>Enregistrement de Fret & Colis (Shipment)</h2>
-				<p>Pesez la marchandise, sélectionnez le type de tarification et émettez le Bon de chargement.</p>
+				<p>Enregistrez et tarifez la marchandise selon les règles d'encaissement du réseau.</p>
 			</div>
 		</header>
 
-		{# --- FORMULAIRE CONNECTÉ AUX DONNÉES DU CONTROLEUR --- #}
-		<form action="#" method="POST" class="reservation-form" id="dynamic-shipment-form" data-weight-pricing="{{ weight_matrix|json_encode }}" data-unit-pricing="{{ unit_fares|json_encode }}" data-nature-pricing="{{ nature_surcharges|json_encode }}" data-currency-code="{{ currency_code }}">
+		{# --- FORMULAIRE CONNECTÉ AUX CHAMPS DU MCD --- #}
+		<form action="#" method="POST" class="reservation-form" id="dynamic-shipment-form" data-price-per-kg="{{ price_per_kg }}" data-system-currency="{{ system_currency }}">
 
-			<div class="reservation-container">
+			<div
+				class="reservation-container">
 
+				{# PANNEAU PRINCIPAL (GAUCHE) #}
 				<div
 					class="layout-main-panel">
 
-					{# Section 1 : Itinéraire #}
+					{# Section 1 : Itinéraire Logistique (Agences & Arrêts) #}
 					<div class="card mb-20">
-						<h2>Logistique & Expédition</h2>
-						<div class="field-group">
+						<h2>
+							<i class="fa-solid fa-route"></i>
+							Logistique, Agences & Arrêts</h2>
+						<div class="field-group mb-15">
 							<div class="field">
-								<label>Origine</label>
-								<select name="departure_agency_id" id="departure-agency" required>
-									<option value="1">Kinshasa (Gare Centrale)</option>
+								<label class="admin-bus-layout-add-label">Succursale de départ *</label>
+								<select name="departureAgencyBranch" class="admin-bus-layout-add-select" required>
+									<option value="{{ current_branch.id }}">{{ current_branch.name }}</option>
 								</select>
 							</div>
 							<div class="field">
-								<label>Destination</label>
-								<select name="arrival_agency_id" id="arrival-agency" required>
-									<option value="3">Kikwit (Terminus)</option>
-									<option value="2">Kenge (Arrêt Principal)</option>
+								<label class="admin-bus-layout-add-label">Succursale d'arrivée *</label>
+								<select name="arrivalAgencyBranch" class="admin-bus-layout-add-select" required>
+									{% for branch in branches %}
+										<option value="{{ branch.id }}">{{ branch.name }}</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+
+						<div class="field-group">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Arrêt de départ *</label>
+								<select name="departureStop" class="admin-bus-layout-add-select" required>
+									<option value="1">Kinshasa Gare Centrale (Km 0)</option>
+								</select>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Arrêt de retrait *</label>
+								<select name="arrivalStop" class="admin-bus-layout-add-select" required>
+									<option value="2">Kenge Centre</option>
+									<option value="3">Kikwit Terminus</option>
 								</select>
 							</div>
 						</div>
 					</div>
 
-					{# Section 2 : Les Acteurs #}
+					{# Section 2 : Les Acteurs (Expéditeur / Destinataire) #}
 					<div class="card mb-20">
-						<h2>Acteurs du Fret</h2>
-						<div class="field-group mb-20">
+						<h2>
+							<i class="fa-solid fa-id-card"></i>
+							Acteurs du Fret</h2>
+						<div class="field-group mb-15">
 							<div class="field">
-								<label>Nom de l'Expéditeur</label>
-								<input type="text" name="sender_name" placeholder="Ex : Mbala Jean" required autocomplete="off">
+								<label class="admin-bus-layout-add-label">Nom de l'Expéditeur *</label>
+								<input type="text" name="sender_name" class="admin-bus-layout-add-input" placeholder="Ex : Mbala Jean" required autocomplete="off">
 							</div>
 							<div class="field">
-								<label>Téléphone Expéditeur</label>
-								<input type="tel" name="sender_phone" placeholder="Ex : +243..." required autocomplete="off">
+								<label class="admin-bus-layout-add-label">Téléphone Expéditeur *</label>
+								<input type="tel" name="sender_phone" class="admin-bus-layout-add-input" placeholder="Ex : +243..." required autocomplete="off">
 							</div>
 						</div>
+
 						<hr class="summary-divider mb-15">
+
 						<div class="field-group">
 							<div class="field">
-								<label>Nom du Destinataire</label>
-								<input type="text" name="receiver_name" placeholder="Ex : Toko Dieudonné" required autocomplete="off">
+								<label class="admin-bus-layout-add-label">Nom du Destinataire *</label>
+								<input type="text" name="receiver_name" class="admin-bus-layout-add-input" placeholder="Ex : Toko Dieudonné" required autocomplete="off">
 							</div>
 							<div class="field">
-								<label>Téléphone Destinataire</label>
-								<input type="tel" name="receiver_phone" placeholder="Ex : +243..." required autocomplete="off">
+								<label class="admin-bus-layout-add-label">Téléphone Destinataire *</label>
+								<input type="tel" name="receiver_phone" class="admin-bus-layout-add-input" placeholder="Ex : +243..." required autocomplete="off">
 							</div>
 						</div>
 					</div>
 
-					{# Section 3 : Marchandise & Tarification MCD #}
+					{# Section 3 : Marchandise & Tarification (MCD Strict) #}
 					<div class="card">
-						<h2>Nature & Caractéristiques de la marchandise</h2>
-						<div class="field mb-20">
-							<label>Description du contenu</label>
-							<input type="text" name="package_description" placeholder="Ex : Pièces de rechange, sac de vêtements" required autocomplete="off">
+						<h2>
+							<i class="fa-solid fa-boxes-stacked"></i>
+							Caractéristiques & Nature Logistique</h2>
+
+						<div class="field mb-15">
+							<label class="admin-bus-layout-add-label">Description / Nature du contenu *</label>
+							<input type="text" name="description" class="admin-bus-layout-add-input" placeholder="Ex : Pièces de rechange, sac de vêtements, Moto..." required autocomplete="off">
 						</div>
 
-						<div class="field-group mb-20">
+						<div class="field-group mb-15">
 							<div class="field">
-								<label>Nature Logistique</label>
-								<select name="package_nature" id="package-nature" required>
-									<option value="standard">Standard (Cartons ordinaires)</option>
-									<option value="fragile">Fragile / Électronique</option>
-									<option value="perishable">Périssable / Vivres de Kinshasa</option>
+								<label class="admin-bus-layout-add-label">Nature Marchandise *</label>
+								<select name="nature" id="package-nature" class="admin-bus-layout-add-select" required>
+									<option value="Standard">Standard (Cartons ordinaires)</option>
+									<option value="Fragile">Fragile / Électronique</option>
+									<option value="Perishable">Périssable / Vivres de Kinshasa</option>
 								</select>
 							</div>
 							<div class="field">
-								<label>Mode de Facturation</label>
-								<select name="billing_type" id="billing-type" required>
+								<label class="admin-bus-layout-add-label">Mode de Facturation (billing_type) *</label>
+								<select name="billing_type" id="billing-type" class="admin-bus-layout-add-select" required>
 									<option value="weight">Facturation au Poids (Par Kg)</option>
 									<option value="unit">Facturation Forfaitaire (Par Pièce)</option>
 								</select>
 							</div>
 						</div>
 
+						{# BLOCS DE SAISIE COMPTABLES VARIABLES #}
 						<div
 							class="field-group">
-							{# Bloc dynamique Poids #}
+							{# Mode Poids : Actif par défaut #}
 							<div class="field" id="weight-input-block">
-								<label>Poids du colis (En Kg)</label>
-								<input type="number" name="package_weight" id="package-weight" min="1" max="500" placeholder="Ex : 25">
+								<label class="admin-bus-layout-add-label">Poids du colis (En Kg) *</label>
+								<div class="input-unit-wrapper">
+									<input type="number" name="weight" id="package-weight" min="1" max="1000" class="admin-bus-layout-add-input" placeholder="Ex : 25">
+									<span class="unit-badge">Kg</span>
+								</div>
 							</div>
-							{# Bloc dynamique Forfait #}
-							<div class="field is-hidden" id="unit-input-block">
-								<label>Gabarit / Type de Pièce</label>
-								<select name="package_unit_type" id="package-unit-type">
-									<option value="box_small">Petit colis / Paquet</option>
-									<option value="box_large">Gros carton / Sac de foufou</option>
-									<option value="tv_plasma">Écran TV / Matériel Électronique</option>
-									<option value="motorbike">Moto / Engin roulant</option>
-								</select>
+
+							{# Mode Pièce : Saisie manuelle du prix et de la devise #}
+							<div class="field-group is-hidden flex-double" id="unit-manual-block">
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Fixer le prix unitaire manuel *</label>
+									<input type="number" name="price_manual" id="price-manual-input" step="0.01" min="0.01" class="admin-bus-layout-add-input" placeholder="0.00">
+								</div>
+								<div class="field flex-narrow">
+									<label class="admin-bus-layout-add-label">Devise *</label>
+									<select name="currency_manual" id="currency-manual-select" class="admin-bus-layout-add-select">
+										{% for curr in active_currencies %}
+											<option value="{{ curr.code }}">{{ curr.code }}</option>
+										{% endfor %}
+									</select>
+								</div>
 							</div>
 						</div>
 					</div>
 
 				</div>
 
-				{# COLONNE DROITE : LE BON DE FRET (ASIDE) #}
+				{# PANNEAU DROITE : LE BON DE FRET (ASIDE SYNC) #}
 				<aside class="summary">
 					<div class="card summary-sticky-card">
-						<h2>Bon de Fret & Colis</h2>
+						<h2>Ticket d'enregistrement</h2>
 
-						<div class="reservation-notice-zone mb-20" style="background-color: rgba(22, 163, 74, 0.05); border-left-color: #1684c5;">
-							<p class="notice-title" style="color: #1684c5;">
+						<div class="reservation-notice-zone mb-20">
+							<p class="notice-title">
 								<i class="fa-solid fa-boxes-packing"></i>
-								Enregistrement Fret</p>
-							<p class="notice-text">Ce reçu temporaire atteste du dépôt du colis. La taxe devra être acquittée en caisse centrale avant l'embarquement dans le bus.</p>
+								Statut initial : Pending
+							</p>
+							<p class="notice-text">Le colis est enregistré avec le statut
+								<strong>Pending</strong>. Le
+									                            paiement devra être acquitté au guichet pour validation du chargement.</p>
 						</div>
 
 						<hr class="summary-divider mb-15">
 
 						<ul class="billing-details-list">
 							<li>
-								<strong>Mode Calcul :</strong>
-								<span id="summary-billing-mode">Au Kg</span>
+								<span class="billing-item-label">Type Facturation :</span>
+								<strong id="summary-billing-mode">Au Kg</strong>
 							</li>
 							<li>
-								<strong>Nature Fret :</strong>
-								<span id="summary-nature">Standard</span>
+								<span class="billing-item-label">Tarif unitaire :</span>
+								<strong id="summary-unit-fare">0.00</strong>
 							</li>
 						</ul>
 
-						<div class="total">
-							Fret estimé :
-							<strong id="summary-total-price">0
-								{{ currency_code }}</strong>
+						<div class="total-fret-box mt-15">
+							<span class="total-label">Prix Total :</span>
+							<strong id="summary-total-price" class="total-amount-display">0.00 USD</strong>
 						</div>
 
-						<button class="btn btn-primary btn-full mt-20 py-12">
+						<button type="submit" class="btn btn-primary btn-full mt-20 py-12">
 							<i class="fa-solid fa-file-shield"></i>
-							Générer le Bon de Fret
+							Générer l'Expédition
 						</button>
 					</div>
 				</aside>

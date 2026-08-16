@@ -1,78 +1,78 @@
+/**
+ * Mydigitrans SaaS - Module Fret (Shipment)
+ * Gestion dynamique de la facturation au poids ou par pièce avec saisie manuelle
+ */
 document.addEventListener('DOMContentLoaded', () => {
-    const shipmentForm = document.getElementById('dynamic-shipment-form');
-    if (!shipmentForm) return;
+    const form = document.getElementById('dynamic-shipment-form');
+    if (!form) return;
 
-    // --- EXTRACTION DES MATRICES DE PRIX TWIG ---
-    const weightMatrix = JSON.parse(shipmentForm.getAttribute('data-weight-pricing'));
-    const unitMatrix = JSON.parse(shipmentForm.getAttribute('data-unit-pricing'));
-    const natureMatrix = JSON.parse(shipmentForm.getAttribute('data-nature-pricing'));
-    const currencyCode = shipmentForm.getAttribute('data-currency-code');
+    // Métadonnées système injectées par Twig
+    const pricePerKg = parseFloat(form.getAttribute('data-price-per-kg')) || 0;
+    const systemCurrency = form.getAttribute('data-system-currency') || 'USD';
 
-    const departureAgency = document.getElementById('departure-agency');
-    const arrivalAgency = document.getElementById('arrival-agency');
-    const packageNature = document.getElementById('package-nature');
-    const billingType = document.getElementById('billing-type');
-    
-    const weightInputBlock = document.getElementById('weight-input-block');
+    // Sélecteurs de formulaires
+    const billingTypeSelect = document.getElementById('billing-type');
+    const weightBlock = document.getElementById('weight-input-block');
     const weightInput = document.getElementById('package-weight');
     
-    const unitInputBlock = document.getElementById('unit-input-block');
-    const unitSelect = document.getElementById('package-unit-type');
+    // Blocs manuels par pièce
+    const unitManualBlock = document.getElementById('unit-manual-block');
+    const priceManualInput = document.getElementById('price-manual-input');
+    const currencyManualSelect = document.getElementById('currency-manual-select');
 
+    // Éléments du volet de récapitulatif latéral
     const summaryBillingMode = document.getElementById('summary-billing-mode');
-    const summaryNature = document.getElementById('summary-nature');
+    const summaryUnitFare = document.getElementById('summary-unit-fare');
     const summaryTotalPrice = document.getElementById('summary-total-price');
 
-    // --- INTERACTION 1 : BASCULE DYNAMIQUE (POIDS VS FORFAIT) ---
-    billingType.addEventListener('change', () => {
-        if (billingType.value === 'unit') {
-            weightInputBlock.classList.add('is-hidden');
-            unitInputBlock.classList.remove('is-hidden');
-            summaryBillingMode.textContent = "Forfaitaire";
-            weightInput.value = ""; // Réinitialise le poids
-        } else {
-            weightInputBlock.classList.remove('is-hidden');
-            unitInputBlock.classList.add('is-hidden');
-            summaryBillingMode.textContent = "Au Kg";
-        }
-        calculateFretPrice();
-    });
+    function calculateShipmentFare() {
+        const mode = billingTypeSelect.value;
+        let totalPrice = 0;
+        let currentCurrency = systemCurrency;
 
-    // --- INTERACTION 2 : CALCULATEUR MÉTIER ---
-    function calculateFretPrice() {
-        const start = departureAgency.value;
-        const end = arrivalAgency.value;
-        const nature = packageNature.value;
-        
-        let basePrice = 0;
+        if (mode === 'weight') {
+            // 1. Logique d'affichage et de validation au Poids
+            weightBlock.classList.remove('is-hidden');
+            unitManualBlock.classList.add('is-hidden');
+            
+            weightInput.required = true;
+            priceManualInput.required = false;
+            currencyManualSelect.required = false;
 
-        // Récupération de la surcharge de nature depuis Twig
-        const surplus = natureMatrix[nature] || 0;
-        summaryNature.textContent = packageNature.options[packageNature.selectedIndex].text;
+            summaryBillingMode.innerText = "Au Kg";
+            summaryUnitFare.innerText = `${pricePerKg.toFixed(2)} ${systemCurrency} / Kg`;
 
-        if (billingType.value === 'weight') {
-            // Mode A : Facturation au poids (Segment * Poids Kg)
             const weight = parseFloat(weightInput.value) || 0;
-            const segmentKey = `${start}-${end}`;
-            const pricePerKg = weightMatrix[segmentKey] || 0;
-            basePrice = weight * pricePerKg;
+            totalPrice = weight * pricePerKg;
         } else {
-            // Mode B : Facturation forfaitaire par type de colis
-            const unitType = unitSelect.value;
-            basePrice = unitMatrix[unitType] || 0;
+            // 2. Logique d'affichage et de validation manuelle par Pièce
+            weightBlock.classList.add('is-hidden');
+            unitManualBlock.classList.remove('is-hidden');
+            
+            weightInput.required = false;
+            priceManualInput.required = true;
+            currencyManualSelect.required = true;
+
+            summaryBillingMode.innerText = "Par Pièce (Forfait)";
+            
+            currentCurrency = currencyManualSelect.value;
+            const manualPrice = parseFloat(priceManualInput.value) || 0;
+            
+            summaryUnitFare.innerText = "Fixé manuellement";
+            totalPrice = manualPrice;
         }
 
-        // Somme finale brute
-        const finalFret = basePrice > 0 ? basePrice + surplus : 0;
-
-        // Rendu final dynamique
-        summaryTotalPrice.textContent = `${finalFret.toLocaleString()} ${currencyCode}`;
+        // Rendu formaté final
+        const formattedTotal = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalPrice);
+        summaryTotalPrice.innerText = `${formattedTotal} ${currentCurrency}`;
     }
 
-    // Association des écouteurs
-    departureAgency.addEventListener('change', calculateFretPrice);
-    arrivalAgency.addEventListener('change', calculateFretPrice);
-    packageNature.addEventListener('change', calculateFretPrice);
-    weightInput.addEventListener('input', calculateFretPrice);
-    unitSelect.addEventListener('change', calculateFretPrice);
+    // Attachement des écouteurs d'événements
+    billingTypeSelect.addEventListener('change', calculateShipmentFare);
+    weightInput.addEventListener('input', calculateShipmentFare);
+    priceManualInput.addEventListener('input', calculateShipmentFare);
+    currencyManualSelect.addEventListener('change', calculateShipmentFare);
+
+    // Lancement au chargement de la vue
+    calculateShipmentFare();
 });
