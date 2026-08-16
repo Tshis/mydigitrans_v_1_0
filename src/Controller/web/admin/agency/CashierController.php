@@ -116,8 +116,17 @@ class CashierController extends AbstractController
     #[Route('/admin/agency/cash-register/payment', name: 'admin_agency_cashier_payment')]
     public function payment(Request $request): Response
     {
+        // Simulation des caisses/devises actuellement actives pour cette succursale
+        $activeCurrencies = [
+            ['code' => 'CDF', 'name' => 'Franc Congolais'],
+            ['code' => 'USD', 'name' => 'Dollar Américain'],
+            ['code' => 'EUR', 'name' => 'Euro'],
+            ['code' => 'CFA', 'name' => 'Franc CFA'],
+        ];
+
         return $this->render('admin/agency/cashier/payment.html.twig', [
             'page' => 'cashier',
+            'active_currencies' => $activeCurrencies
         ]);
     } //payment
 

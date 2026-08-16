@@ -1,0 +1,158 @@
+{# templates/admin/agency/cashier/payment.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/cashier-payment.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-cashier-payment-scope container">
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
+		<header class="header mb-25">
+			<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" title="Retour au tableau de bord">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<h2>
+					<i class="fa-solid fa-cash-register"></i>
+					Guichet Unique d'Encaissement
+				</h2>
+				<p>Saisissez une référence pour charger le dossier, appliquer une remise et enregistrer le versement physique.</p>
+			</div>
+		</header>
+
+		{# --- BLOC DE RECHERCHE UNIFIÉ --- #}
+		<div class="card mb-25">
+			<h2>
+				<i class="fa-solid fa-magnifying-glass"></i>
+				Identification du Bon Client
+			</h2>
+			<form class="form-search-voucher-group" id="voucher-search-form">
+				<div class="field-item-flex">
+					<label class="section-micro-label">Référence du Bon</label>
+					<input type="text" id="voucher-input" class="input-search-voucher" placeholder="Ex: RVS-2026-8943 ou COL-2026-0402" required>
+				</div>
+				<button type="submit" class="btn btn-dark btn-search-submit">
+					<i class="fa-solid fa-arrow-right-to-bracket"></i>
+					Charger le dossier
+				</button>
+			</form>
+		</div>
+
+		{# --- ZONE DE TRAITEMENT DEUX COLONNES --- #}
+		<div
+			class="reservation-container" id="cashier-payment-container">
+
+			{# PANNEAU DE GAUCHE : CALCULATEUR & SAISIE ENCAISSEMENT CROISÉ #}
+			<div class="card">
+				<h2>
+					<i class="fa-solid fa-calculator"></i>
+					Règlement & Enregistrement des Espèces
+				</h2>
+				<form
+					action="#" method="POST" id="payment-processing-form" onsubmit="event.preventDefault(); alert('Paiement encaissé avec succès ! Flux enregistré.');">
+
+					{# 1. MONTANT INITIAL DU DOCUMENT --- #}
+					<div class="field mb-15">
+						<label class="section-micro-label">Montant initial du bon</label>
+						<div class="input-currency-wrapper">
+							<input type="text" id="base-amount-display" class="input-search-voucher text-amount-base" readonly value="45 000">
+							<span class="currency-badge-suffix id-doc-currency">CDF</span>
+						</div>
+					</div>
+
+					{# 2. ZONE DE REMISE (DISCOUNT) --- #}
+					<div class="field-group mb-15 discount-badge-container grid-two-columns">
+						<div class="field flex-full">
+							<label class="session-micro-label discount-label">Appliquer une remise</label>
+							<input type="number" id="discount-input" class="input-search-voucher" placeholder="0" min="0">
+						</div>
+						<div class="field flex-full">
+							<label class="session-micro-label discount-label">Type de remise</label>
+							<select id="discount-type" class="input-search-voucher">
+								<option value="percent">Pourcentage (%)</option>
+								<option value="value">Valeur Fixe (<span class="js-current-doc-currency">CDF</span>)</option>
+							</select>
+						</div>
+					</div>
+
+					{# 3. NET À ENCAISSER THÉORIQUE --- #}
+					<div class="field mb-20 text-success-highlight">
+						<label class="session-micro-label font-bold">Net attendu (Devise Facture)</label>
+						<div class="input-currency-wrapper">
+							<input type="text" id="final-amount-display" class="input-search-voucher text-amount-xl font-bold" readonly value="45 000">
+							<span class="currency-badge-suffix id-doc-currency font-bold">CDF</span>
+						</div>
+					</div>
+
+					<hr
+					class="summary-divider mb-20">
+
+					{# 4. PERCEPTION RÉELLE (FLEXIBILITÉ DU GUICHETIER POUR LE TIROIR PHYSQUE) --- #}
+					<div class="field-group mb-15 grid-two-columns execution-receipt-box">
+						<div class="field flex-full">
+							<label class="session-micro-label font-bold text-danger-mode">Montant réellement encaissé *</label>
+							<input type="number" name="captured_amount" id="captured-amount" class="input-search-voucher font-bold" placeholder="Saisir la somme reçue" step="0.01" required>
+							<span class="sub-meta-text">Inscrivez le montant exact remis par le client.</span>
+						</div>
+						<div class="field flex-full">
+							<label class="session-micro-label font-bold text-danger-mode">Devise physiquement reçue *</label>
+							<select name="captured_currency" id="captured-currency-select" class="input-search-voucher font-bold" required>
+								{% for currency in active_currencies %}
+									<option value="{{ currency.code }}">{{ currency.code }}
+										(Espèces
+										{{ currency.name }})</option>
+								{% endfor %}
+							</select>
+							<span class="sub-meta-text">Sélectionnez le compartiment du coffre impacté.</span>
+						</div>
+					</div>
+
+					<div class="field mb-15">
+						<label class="session-micro-label">Observation / Notes de transaction</label>
+						<textarea class="input-search-voucher text-area-fixed" id="discount-observation" placeholder="Ex: Billet de 45000 FC payé avec un billet de 20$, ou accord de remise..."></textarea>
+					</div>
+
+					<div class="text-right table-action-buttons block-action-wrapper">
+						<button type="submit" class="btn-submit-perceive">
+							<i class="fa-solid fa-print"></i>
+							Valider la perception & Émettre le titre
+						</button>
+					</div>
+				</form>
+			</div>
+
+			{# PANNEAU DE DROITE : DETAILS DU DOCUMENT (Stable) --- #}
+			<div class="layout-main-panel">
+				<div class="card cashier-document-card">
+					<h2>
+						<i class="fa-solid fa-file-invoice-dollar"></i>
+						Détails du Document</h2>
+					<div class="field-group mb-20 status-alert-box alert-reservation">
+						<div class="meta-item flex-item">
+							<span class="section-micro-label label-reservation">Nature du document</span>
+							<strong class="text-highlight" id="doc-nature-text">BON DE RÉSERVATION PASSAGER</strong>
+						</div>
+						<div class="meta-item flex-item">
+							<span class="section-micro-label label-reservation">Référence Système</span>
+							<strong class="text-highlight" id="doc-ref-text">RVS-2026-8943</strong>
+						</div>
+					</div>
+					<div id="fragment-reservation-view">
+						<div class="field-group mb-20 core-info-grid flex-row-gap">
+							<div class="field flex-item">
+								<span class="section-micro-label">Bénéficiaire / Voyageur</span>
+								<p class="actor-name">Mputu Antoinette</p>
+								<span class="actor-sub-text">+243 897 112 233</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}

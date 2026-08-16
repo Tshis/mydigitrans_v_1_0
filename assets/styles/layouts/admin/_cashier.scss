@@ -419,12 +419,25 @@
 //===PAYMENT=====
 //---------------------------------------
 .admin-cashier-payment-scope {
-    padding-block: 2rem;
-    width: 100%;
 
-    .mb-25 { margin-bottom: 1.6rem; }
-    .mb-20 { margin-bottom: 1.25rem; }
+    width: 100%;
+    padding-block: 2rem;
+
+    .mb-25 { margin-bottom: 1.55rem; }
     .mb-15 { margin-bottom: 1rem; }
+    .font-bold { font-weight: 700; }
+
+    .text-amount-base { font-size: 1.1rem !important; font-weight: 600; color: $dark; }
+    .text-amount-xl { font-size: 1.4rem !important; color: $success !important; background-color: rgba($success, 0.03) !important; }
+    // Amélioration de la typographie des notes d'aide
+    .sub-meta-text {
+        display: block;
+        font-size: 10px;
+        color: darken($success, 15%);
+        margin-top: 5px;
+        line-height: 1.5;
+        font-weight: 600;
+    }
 
     .header {
         display: flex; align-items: center; gap: 1rem; margin-bottom: 1.6rem;
@@ -435,6 +448,7 @@
         .title { h2 { font-size: 1.5rem; font-weight: 800; color: $dark; } p { font-size: 1rem; color: $gray; } }
     }
 
+
     .form-search-voucher-group {
         display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; width: 100%;
         label { font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; margin-bottom: 6px; display: block; }
@@ -442,6 +456,19 @@
         .btn-search-trigger { height: 40px; background-color: $dark; color: $white; border: none; padding-inline: 20px; font-weight: 700; font-size: 13px; border-radius: $radius-input; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
     }
 
+    .input-currency-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        .input-search-voucher { width: 100%; padding-right: 55px; height: 44px; font-weight: 700; }
+        .currency-badge-suffix {
+            position: absolute; right: 12px; background-color: rgba($mute, 0.5); color: $dark;
+            font-weight: 800; font-size: 11px; padding: 3px 6px; border-radius: 4px;
+        }
+    }
+
+    
     .reservation-container { display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start; width: 100%; @media (max-width: 992px) { grid-template-columns: 1fr; } }
 
     .card {
@@ -525,6 +552,26 @@
         }
     }
 
+    //Bloc dédié à la perception des fonds
+    // Encart spécifique pour l'encaissement physique libre
+    .execution-receipt-box {
+        background-color: rgba($gray, 0.08);
+        border: 1px solid $mute;
+        padding: 15px;
+        border-radius: $radius-input;
+        margin-top: 15px;
+
+        .field{
+            padding: .5rem;
+            border-radius: 6px;
+        }
+    }
+
+    .summary-divider {
+        border: 0;
+        border-top: 1px dashed rgba($mute, 0.8);
+    }
+
     // Zone text-area contrainte pour l'observation
     .text-area-fixed {
         height: 50px;
@@ -558,6 +605,8 @@
     }
 }
 
+
+
 .dark {
     .admin-cashier-payment-scope {
         background-color: $dm-bg-main;
@@ -565,9 +614,9 @@
         .header .title h2 { color: $white; }
         .form-search-voucher-group .input-search-voucher { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.2); color: $white; }
         .form-search-voucher-group .btn-search-trigger { background-color: $white; color: $dark; }
-        .reservation-form .card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: #fff; border-bottom-color: rgba($mute, 0.15); } .field input, .field select { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: #fff; } }
+        .reservation-form .card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } .field input, .field select { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: $white; } }
         .cashier-document-card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } .text-highlight, .actor-name { color: $white; } .section-micro-label:not(.label-reservation) { color: $mute; } .actor-sub-text { color: $mute; } .status-alert-box.alert-reservation { background-color: rgba($primary, 0.12); border-color: rgba($primary, 0.25); } }
-        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .total { background: rgba($white, 0.02); color: #fff; strong { color: $white; } } .payment-method-selectors .pay-method-item { .custom-box { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.2); color: #fff; } input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; } } }
+        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .total { background: rgba($white, 0.02); color: $white; strong { color: $white; } } .payment-method-selectors .pay-method-item { .custom-box { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.2); color: $white; } input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; } } }
     
         .discount-badge-container {
             background-color: rgba($primary, 0.1);
@@ -576,6 +625,9 @@
         .text-success-highlight .text-amount-xl {
             color: lighten($success, 10%);
         }
+
+        
+
     }
 }
 
@@ -635,7 +687,7 @@
         background-color: $dm-bg-main;
         .header .agency-back-action { background: $dm-bg-surface; border-color: rgba($mute, 0.2); color: $white; }
         .header .title h2 { color: $white; }
-        .reservation-form .card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: #fff; border-bottom-color: rgba($mute, 0.15); } .field input, .field select { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: #fff; } }
+        .reservation-form .card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } .field input, .field select { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: $white; } }
         .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .reservation-notice-zone { .notice-text { color: $mute; } } .btn-full { background: $white; color: $dark; } }
     }
 }
@@ -690,7 +742,7 @@
         .header .header-main-info .title h2 { color: $white; }
         .header .btn-action-caisse { background-color: $white; color: $dark; }
         .card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } .text-dark.text-main { color: $white; } .text-main.bold { color: $mute; } .section-micro-label { color: $mute; } }
-        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .billing-details-list li { color: $mute; .text-main.bold { color: $white; } } .total { background: rgba($white, 0.02); color: #fff; strong.text-success { color: $white; } } }
+        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .billing-details-list li { color: $mute; .text-main.bold { color: $white; } } .total { background: rgba($white, 0.02); color: $white; strong.text-success { color: $white; } } }
     }
 }
 
@@ -742,7 +794,7 @@
         .header .header-main-info .agency-back-action { background: $dm-bg-surface; border-color: rgba($mute, 0.2); color: $white; }
         .header .header-main-info .title h2 { color: $white; }
         .card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } .text-dark.bold { color: $white; } .section-micro-label { color: $mute; } }
-        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .billing-details-list li { color: $mute; .text-main.bold { color: $white; } } .total { background: rgba($white, 0.02); color: #fff; strong.text-danger-mode { color: $white; } } }
+        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .billing-details-list li { color: $mute; .text-main.bold { color: $white; } } .total { background: rgba($white, 0.02); color: $white; strong.text-danger-mode { color: $white; } } }
     }
 }
 
@@ -1106,12 +1158,12 @@
         .header .agency-back-action { background: $dm-bg-surface; border-color: rgba($mute, 0.2); color: $white; }
         .header .title h2 { color: $white; }
         .reservation-form .card {
-            background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: #fff; border-bottom-color: rgba($mute, 0.15); }
+            background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); }
             .field label, .section-micro-label { color: $mute; }
-            .field input { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: #fff; }
+            .field input { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: $white; }
             .theoretical-value { &.text-success-color { color: $success; } &.text-primary-color { color: $primary; } }
         }
-        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .reservation-notice-zone .notice-text { color: $mute; } .btn-full { background: #fff; color: $dark; } }
+        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .reservation-notice-zone .notice-text { color: $mute; } .btn-full { background: $white; color: $dark; } }
     }
 }
 
@@ -1798,7 +1850,7 @@
         letter-spacing: 0.5px;
         margin-bottom: 6px;
         
-        &.text-highlight { color: #0c326d; }
+        &.text-highlight { color: $dark; }
     }
 
     .sub-meta-text {
@@ -1854,7 +1906,7 @@
             margin: 6px 0;
             font-size: 13.5px;
             font-weight: 700;
-            color: #0c326d;
+            color: $dark;
             display: flex;
             flex-direction: column;
             gap: 4px;
