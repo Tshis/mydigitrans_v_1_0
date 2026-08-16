@@ -244,3 +244,130 @@
         }
     }
 }
+
+
+
+
+//===========SHOW==========
+// ====================================================
+// === MODULE FINANCES : FICHE D'AUDIT DU GRAND LIVRE =
+// ====================================================
+.admin-agency-finance-show-scope {
+    width: 100%;
+    padding-block: 2rem;
+
+    .mb-25 { margin-bottom: 1.55rem; }
+    .mb-20 { margin-bottom: 1.25rem; }
+    .mb-15 { margin-bottom: 1rem; }
+    .text-size-13 { font-size: 13px; }
+
+    // --- EN-TÊTE ET FIL D'ARIANE ---
+    .header {
+        display: flex;
+        align-items: center;
+
+        .agency-back-action {
+            border-radius: 50%; width: 40px; height: 40px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: rgba($gray, 0.08); color: $primary; text-decoration: none;
+            margin-right: 15px; transition: transform 0.2s;
+            &:hover { transform: scale(1.05); }
+        }
+
+        .sub-header-flex {
+            display: flex; align-items: center; gap: 8px;
+            .arrow-divider { color: $mute; }
+            .text-highlight { font-weight: 700; color: $dark; }
+        }
+    }
+
+    // --- MAIN CARD ---
+    .layout-main-card.card {
+        background: $white; border: 1px solid $mute;
+        border-radius: $radius-card; padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+    }
+
+    // --- BANNIÈRE D'AFFICHAGE DU FLUX ---
+    .finance-hero-banner {
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 1.5rem;
+
+        .hero-main-amount {
+            font-size: 2.2rem; font-weight: 900; margin: 0 0 6px 0;
+            &.text-success { color: $success; }
+            &.text-danger { color: $danger; }
+        }
+
+        .sub-meta-text { font-size: 12px; color: $gray; font-weight: 600; }
+    }
+
+    .finance-divider { border: 0; border-top: 1px dashed $mute; }
+    .box-title { font-size: 14px; font-weight: 800; text-transform: uppercase; color: $dark; i { color: $primary; margin-right: 6px; } }
+
+    // --- GRILLE COMPTABLE D'AUDIT ---
+    .audit-details-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+
+        .audit-item {
+            display: flex; flex-direction: column; gap: 4px;
+            border-bottom: 1px solid rgba($mute, 0.4); padding-bottom: 8px;
+        }
+    }
+
+    .audit-label { font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; letter-spacing: 0.5px; }
+    .audit-value { font-size: 13.5px; font-weight: 700; color: $dark; margin: 0; }
+
+    .audit-description-box {
+        background-color: rgba($gray, 0.02); border: 1px solid $mute;
+        padding: 15px; border-radius: $radius-input;
+        .description-text-container { font-size: 13px; color: $dark; font-weight: 600; line-height: 1.5; margin-top: 6px; }
+    }
+
+    .finance-actions-footer { display: flex; gap: 12px; justify-content: flex-end; }
+
+    // ====================================================
+    // --- STYLISATION DE LA FENÊTRE MODALE DE REMBOURSEMENT
+    // ====================================================
+    .modal-wrapper {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba($dark, 0.5); display: flex; align-items: center;
+        justify-content: center; z-index: 1050;
+
+        .modal-card-content {
+            background: $white; border-radius: $radius-card; width: 480px;
+            max-width: 90%; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .modal-card-title { font-size: 16px; font-weight: 800; color: $dark; margin-top: 0; display: flex; align-items: center; gap: 8px; i { color: $success; } }
+        
+        .admin-bus-layout-add-input, .admin-bus-layout-add-select {
+            width: 100%; padding: 10px 12px; border: 1px solid $mute; border-radius: $radius-input;
+            font-size: 13px; font-weight: 600; color: $dark; background: $white; outline: none; height: 40px; box-sizing: border-box;
+            &:focus { border-color: $primary; }
+        }
+        
+        .text-area-fixed { height: 60px; resize: none; }
+        .modal-actions-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px; }
+    }
+}
+
+// --- SECURE DARK MODE STANDARDS ---
+.dark {
+    .admin-agency-finance-show-scope {
+        .header .sub-header-flex .text-highlight { color: $white; }
+        .layout-main-card.card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); }
+        .box-title { color: $white; }
+        .audit-details-grid .audit-item { border-bottom-color: rgba($mute, 0.1); }
+        .audit-value { color: $white; }
+        .audit-description-box { background-color: rgba($white, 0.02); border-color: rgba($mute, 0.15); .description-text-container { color: $white; } }
+        
+        .modal-wrapper {
+            background-color: rgba(0, 0, 0, 0.7);
+            .modal-card-content { background: $dm-bg-surface; border: 1px solid rgba($mute, 0.2); h3 { color: $white; } p { color: $gray; } }
+            .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.15); color: $white; }
+        }
+    }
+}
+

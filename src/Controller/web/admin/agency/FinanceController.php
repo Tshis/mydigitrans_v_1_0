@@ -99,11 +99,52 @@ class FinanceController extends AbstractController
 
 
     #[Route('/admin/agency/finance/show/{id}/{type}', name: 'admin_agency_finance_show')]
-    public function show(Request $request): Response
+    public function show(Request $request, int $id, string $type): Response
     {
+
+        if ($type === 'payment') {
+            $operation = [
+                'id' => $id,
+                'type' => 'payment',
+                'reference' => '8942',
+                'amount' => '130 500',
+                'amount_raw' => '130500',
+                'currency' => 'FC',
+                'date' => '13/08/2026',
+                'time' => '10:41',
+                'label' => 'Vente de Billet (Clientèle Transit - Guichet Unique)',
+                'branch_name' => 'Kinshasa Centre — Gare Centrale Principale',
+                'actor' => 'Jean Kabamba (+243 812 345 678)',
+                'funding_source' => 'Compte Mobile Money Principal (M-Pesa)',
+                'created_by' => 'Client Authentifié (Portail Web public)',
+                'confirmed_by' => 'API Webhook Vodacom RDC',
+                'description' => 'Préservation de place pour le voyage Kinshasa -> Kikwit. Le siège n°12 a été réservé et bloqué avec succès pour ce passager.'
+            ];
+        } else {
+            $operation = [
+                'id' => $id,
+                'type' => 'expense',
+                'reference' => '0401',
+                'amount' => '250.00',
+                'amount_raw' => '250',
+                'currency' => 'USD',
+                'date' => '13/08/2026',
+                'time' => '08:30',
+                'label' => 'Achat Carburant Bus #01 (Exploitation Ligne Interurbaine)',
+                'branch_name' => 'Kinshasa Centre — Gare Centrale Principale',
+                'actor' => 'Chauffeur : Jean Mukendi (Flotte #01)',
+                'funding_source' => 'Caisse Principale de Guichet - Tiroir 1',
+                'created_by' => 'Manager : Alphonse Kalonji',
+                'confirmed_by' => 'Guichetier principal (Session physique active)',
+                'description' => 'Facture de carburant émise par la Station Engen Limete (Reçu physique agrafé N°ENG-9923). Index kilométrique au départ : 142 500 km.'
+            ];
+        }
+
+
         return $this->render('admin/agency/finance/show.html.twig', [
             'page' => 'finances',
-            'type' => 'payment'
+            'type' => $type,
+            'operation' => $operation
         ]);
     } //show
 
@@ -150,15 +191,6 @@ class FinanceController extends AbstractController
         ]);
     } //expense_add
 
-    #[Route('/admin/agency/fare/add', name: 'admin_agency_fare_add')]
-    public function payment_log(Request $request): Response
-    {
-
-
-        return $this->render('admin/agency/finance/payment_log.html.twig', [
-            'page' => 'paiement',
-        ]);
-    } //payment_log
 
     #[Route('/admin/agency/finance/cashier/journal/{code}', name: 'admin_agency_finance_journal')]
     public function journal_caissier(Request $request): Response
