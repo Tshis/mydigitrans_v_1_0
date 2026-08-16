@@ -931,6 +931,28 @@
         }
     }
 
+    .input-currency-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .input-session-field {
+            padding-right: 60px; // Laisse de la place pour le badge de devise à droite
+        }
+
+        .currency-badge-suffix {
+            position: absolute;
+            right: 12px;
+            background-color: rgba($mute, 0.4);
+            color: $dark;
+            font-weight: 700;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none; // L'utilisateur clique à travers le badge
+        }
+    }
+
     .text-area-fixed {
         height: 75px;
         resize: none;

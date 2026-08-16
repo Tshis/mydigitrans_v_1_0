@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Polyfill\Intl\Icu\Currencies;
 
 class CashierController extends AbstractController
 {
@@ -129,8 +130,10 @@ class CashierController extends AbstractController
     #[Route('/admin/agency/cash-register/session/{code}/initialization', name: 'admin_agency_cashier_session_init')]
     public function session_init(Request $request): Response
     {
+        $currencies = ['CDF', 'USD', 'EUR'];
         return $this->render('admin/agency/cashier/session_init.html.twig', [
             'page' => 'cashier',
+            'active_currencies' => $currencies
         ]);
     } //session_init
 

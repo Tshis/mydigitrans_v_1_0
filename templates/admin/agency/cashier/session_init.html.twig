@@ -49,19 +49,26 @@
 						</select>
 					</div>
 
-					{# Saisie de la dotation (Peut être nulle comme convenu) #}
-					<div class="field-group mb-15 flex-gap-15">
-						<div class="field flex-full">
-							<label class="session-micro-label">Dotation en Francs Congolais (CDF)</label>
-							<input type="number" name="initial_cdf" class="input-session-field" placeholder="Ex: 50000 (Laissez 0 si aucune)" min="0" value="50000">
-							<span class="sub-meta-text">Monnaie physique remise en coupures FC.</span>
-						</div>
-						<div class="field flex-full">
-							<label class="session-micro-label">Dotation en Dollars (USD)</label>
-							<input type="number" name="initial_usd" class="input-session-field" placeholder="Ex: 20 (Laissez 0 si aucune)" min="0" value="0">
-							<span class="sub-meta-text">Monnaie physique remise en billets USD.</span>
-						</div>
+
+					<div class="field-group-dynamic">
+						{# La boucle magique : Génère les champs uniquement pour les devises actives de l'agence #}
+						{# En contrôleur Symfony : $currencies = ['CDF', 'USD', 'EUR'] #}
+							{% for currency in active_currencies %}
+								<div class="field mb-15"> <label class="session-micro-label">Dotation initiale en
+									<strong>{{ currency }}</strong>
+								</label>
+								<div class="input-currency-wrapper">
+									<input type="number" name="amounts[{{ currency }}]" class="input-session-field" placeholder="0.00" min="0" step="0.01" value="0">
+									<span class="currency-badge-suffix">{{ currency }}</span>
+								</div>
+								<span class="sub-meta-text">Saisissez le montant physique transféré pour la devise
+									{{ currency }}.</span>
+							</div>
+						{% else %}
+							<p class="alert-text">Aucune devise configurée pour cette succursale. Contactez l'administrateur.</p>
+						{% endfor %}
 					</div>
+
 
 					<div class="field mb-15">
 						<label class="session-micro-label">Consignes de service / Notes pour le guichetier</label>
