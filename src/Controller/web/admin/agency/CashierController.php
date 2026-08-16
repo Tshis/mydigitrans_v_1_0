@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Polyfill\Intl\Icu\Currencies;
 
 class CashierController extends AbstractController
 {
@@ -122,8 +121,33 @@ class CashierController extends AbstractController
     #[Route('/admin/agency/cash-register/session/{code}/closing/validation', name: 'admin_agency_cashier_session_closing_validation')]
     public function session_closing_validation(Request $request): Response
     {
+        // Simulation statique des lignes de la table CashSessionBalance liées à cette session
+        $sessionBalances = [
+            [
+                'currency'  => 'CDF',
+                'closingBalanceExpected'  => '1 450 000',
+                'closingBalanceDeclared'  => '1 450 000',
+                'closingBalanceDifference'       => '0',
+            ],
+            [
+                'currency'  => 'USD',
+                'closingBalanceExpected'  => '450.00',
+                'closingBalanceDeclared'  => '435.00',
+                'closingBalanceDifference' => '-15.00', // Écart négatif (Manquant de caisse)
+            ],
+            [
+                'currency'  => 'EUR',
+                'closingBalanceExpected'  => '120.00',
+                'closingBalanceDeclared'  => '125.00',
+                'closingBalanceDifference'       => '+5',
+            ],
+        ];
+
+
+
         return $this->render('admin/agency/cashier/session_closing_validation.html.twig', [
             'page' => 'cashier',
+            'session_balances' => $sessionBalances
         ]);
     } //session_closing_validation
 

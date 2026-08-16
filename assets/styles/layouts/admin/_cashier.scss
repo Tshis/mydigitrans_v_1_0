@@ -846,6 +846,135 @@
 }
 
 
+
+//=============================================
+//===========SESSION CLOSING VALIDATION=========
+//================================================
+.admin-agency-cashier-index-scope, .admin-booking-creation-scope {
+    
+    // --- DESIGN DES LIGNES COMPACTES SUR L'INDEX ---
+    .dynamic-balances-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .balance-row-item {
+            font-size: 13px;
+            color: $dark;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+
+            .currency-label {
+                font-family: monospace;
+                font-weight: 700;
+                color: $gray;
+                width: 40px;
+            }
+        }
+    }
+
+    // --- GRILLE D'ARBITRAGE PAR BLOC DE DEVISE ---
+    .dynamic-discrepancy-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        .currency-discrepancy-block {
+            background-color: rgba($mute, 0.15);
+            border: 1px solid rgba($mute, 0.4);
+            border-radius: 8px;
+            padding: 1.25rem;
+
+            .block-header {
+                border-bottom: 1px solid rgba($mute, 0.4);
+                padding-bottom: 8px;
+                margin-bottom: 12px;
+
+                h3 {
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: $gray;
+                    margin: 0;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    
+                    strong { color: $success; font-size: 16px; }
+                }//h3
+            }
+
+            .field{
+                padding: .8rem .35rem;
+                border-radius: 6px;
+                background: rgba($color: $mute, $alpha: .5);
+
+            }
+        }
+    }
+
+    // Textarea spécifique pour l'arbitrage
+    .text-area-arbitrage {
+        width: 100%;
+        height: 90px;
+        padding: 12px;
+        border: 1px solid rgba($mute, 0.7);
+        border-radius: $radius-input;
+        font-size: 13.5px;
+        resize: none;
+        outline: none;
+        box-sizing: border-box;
+        line-height: 1.5;
+        
+        &:focus { border-color: $primary; }
+    }
+
+    // Coloration spécifique de l'input cible caissier
+    .text-highlight-input {
+        color: $primary !important;
+    }
+
+    .btn-sign:hover{
+        border: 1px solid $primary !important;
+    }
+
+}
+
+// --- RENDU SÉCURISÉ DARK MODE ---
+.dark {
+    .admin-agency-cashier-index-scope, .admin-booking-creation-scope {
+        .dynamic-balances-stack .balance-row-item {
+            color: $white;
+        }
+        
+        .dynamic-discrepancy-grid .currency-discrepancy-block {
+            background-color: rgba($dm-bg-main, 0.4);
+            border-color: rgba($mute, 0.1);
+            
+            .block-header h3 {
+                color: $mute;
+                strong { color: $white; }
+            }
+
+             .field{
+                background: $dm-bg;
+
+            }
+        }
+
+        .text-area-arbitrage {
+            background-color: $dm-bg-main;
+            color: $white;
+            border-color: rgba($dm-border, 0.5);
+        }
+
+         .btn-sign:hover{
+            border: 1px solid $success !important;
+            color: $success !important;
+        }
+    }
+}
+
+
 // ===============================================
 // ===INITIALISATION SESSION ===
 // ===============================================
