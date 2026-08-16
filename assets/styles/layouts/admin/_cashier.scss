@@ -685,38 +685,78 @@
 //===BRANCH CAISSE DASHBOARD=====
 //---------------------------------------
 .admin-dashboard-branch-scope {
-    padding-block: 2rem; width: 100%;
+    width: 100%;
+    padding-block: 2rem;
+
+    // --- CLASSES UTILITAIRES ---
     .mb-25 { margin-bottom: 1.6rem; }
-    
-    .sub-meta-text {
-        display: block; font-size: 11px; color: $gray; margin-top: 2px;
-    }
+    .mb-20 { margin-bottom: 1.25rem; }
+    .sub-meta-text { display: block; font-size: 11px; color: $gray; margin-top: 2px; }
 
-    /* .header {
-        display: flex; align-items: center; gap: 1.2rem; padding-block: 1rem;
-        .agency-back-action { background: $white; border: 1px solid $mute; width: 3.25rem; height: 3.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: $dark; text-decoration: none; transition: all 0.3s; &:hover { background: rgba($primary, 0.05); color: $primary; transform: translateX(-0.5rem); } }
-        .title { h2 { font-size: 1.5rem; font-weight: 800; color: $dark; } p { font-size: 13px; color: $gray; margin-top: 4px; } }
-    } */
-
+    // --- EN-TÊTE CONFIGURABLE ---
     .header {
-        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; padding-block: 1rem;
-        .main-info{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        padding-block: 1rem;
+
+        .main-info {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
+
         .title {
-            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; display: flex; align-items: center; gap: 10px; i { color: $primary; } }
+            h2 { 
+                font-size: 1.5rem; 
+                font-weight: 800; 
+                color: $dark; 
+                display: flex; 
+                align-items: center; 
+                gap: 10px; 
+                i { color: $primary; } 
+            }
             p { font-size: 13px; color: $gray; margin-top: 4px; }
         }
+
         .agency-back-action {
-            background: $white !important; border: 1px solid $mute; width: 3.25rem; height: 3.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: $dark; text-decoration: none; transition: all .3s;
-            &:hover { transform: translateX(-.5rem); background: rgba($primary, 0.04); color: $primary; }
+            background: $white !important;
+            border: 1px solid $mute;
+            width: 3.25rem;
+            height: 3.25rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $dark;
+            text-decoration: none;
+            transition: all 0.3s ease;
+
+            &:hover { 
+                transform: translateX(-0.5rem); 
+                background: rgba($primary, 0.04); 
+                color: $primary; 
+            }
         }
+
         .border-actions-group {
-            display: flex; gap: 10px; flex-wrap: wrap;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+
             .btn-action-caisse {
-                padding: 10px 16px; font-size: 13px; font-weight: 700; border-radius: $radius-input; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s;
+                padding: 10px 16px;
+                font-size: 13px;
+                font-weight: 700;
+                border-radius: $radius-input;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: opacity 0.2s;
+
                 &:hover { opacity: 0.9; }
                 &.btn-success-caisse { background-color: $success; color: $white; }
                 &.btn-danger-caisse { background-color: $danger; color: $white; }
@@ -725,59 +765,218 @@
         }
     }
 
+    // --- GRILLE STATISTIQUE ---
     .stats-overview-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        width: 100%;
+
         .stat-card {
-            background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1.2rem;
+            background: $white;
+            border: 1px solid $mute;
+            border-radius: $radius-card;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+
             .stat-icon {
-                width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+
                 &--primary { background: rgba($primary, 0.1); color: $primary; }
                 &--success { background: rgba($success, 0.1); color: $success; }
                 &--danger  { background: rgba($danger, 0.1); color: $danger; }
             }
+
             .stat-details {
-                display: flex; flex-direction: column; gap: 2px;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+
                 .stat-label { font-size: 11px; color: $gray; font-weight: 700; text-transform: uppercase; }
-                .stat-value { font-size: 1.4rem; font-weight: 800; line-height: 1.2; &.text-success { color: $success; } &.text-primary { color: $primary; } &.text-danger { color: $danger; } }
+                .stat-value { 
+                    font-size: 1.4rem; 
+                    font-weight: 800; 
+                    line-height: 1.2; 
+                    &.text-success { color: $success; } 
+                    &.text-primary { color: $primary; } 
+                    &.text-danger { color: $danger; } 
+                }
+            }
+        }
+
+        .stats-currency-stack {
+            display: flex;
+            flex-direction: column;
+            margin-top: 4px;
+            .stat-value { line-height: 1.2; }
+        }
+    }
+
+    // --- TABLEAU DE SUPERVISION DES TRANSACTIONS ---
+    .monitoring-table-card {
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+
+        h2 { 
+            font-size: 14px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: $dark; 
+            margin-bottom: 1.25rem; 
+            border-bottom: 1px solid rgba($mute, 0.5); 
+            padding-bottom: 8px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            i { color: $primary; } 
+        }
+
+        .session-code-text { font-weight: 700; color: $dark; }
+    }
+
+    // Métadonnées temporelles sous le badge
+    .status-time-meta {
+        font-size: 10px;
+        color: inherit;
+        opacity: 0.7;
+        margin: 2px 0 0 0;
+        font-weight: 500;
+    }
+
+    // Gestion unifiée des Badges de Session
+    .session-badge {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        line-height: 1;
+        text-transform: uppercase;
+
+        &.active-status { background-color: rgba($success, 0.08); color: $success; }
+        &.closed-status { background-color: rgba($gray, 0.12); color: darken($gray, 15%); }
+        &.await-status { background-color: rgba($primary, 0.1); color: $primary; }
+    }
+
+    // Grille des devises
+    .table-balances-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .balance-item {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: $dark;
+            display: flex;
+            align-items: center;
+
+            .cur-code {
+                font-family: monospace;
+                font-weight: 700;
+                color: $gray;
+                width: 38px;
+                display: inline-block;
             }
         }
     }
 
-    .monitoring-table-card {
-        background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
-        h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; color: $dark; margin-bottom: 1.25rem; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; i { color: $primary; } }
-        .session-code-text { font-weight: 700; color: $dark; }
-        
-        .session-badge {
-            display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase;
-            &.active-status { background-color: rgba($success, 0.12); color: $success; }
-            &.closed-status { background-color: rgba($gray, 0.15); color: $dark; }
-        }
-    }
-
+    // --- BOUTONS D'ACTIONS DE CONTRÔLE SUR TABLEAU (ZÉRO DÉCALAGE) ---
     .text-right.table-action-buttons {
         display: table-cell !important; vertical-align: middle !important; text-align: right !important; white-space: nowrap !important;
         .table-action-trigger {
-            display: inline-flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: rgba($gray, 0.08); color: $dark; font-size: 13px; float: none !important; transition: all 0.2s;
-            &.view:hover { background-color: $dark !important; color: $white !important; }
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+
+            &.view {
+                background-color: rgba($mute, 0.4);
+                color: $dark;
+                &:hover { background-color: $dark; color: $white;}
+            }
+
+            &.init {
+                background-color: rgba($success, 0.1);
+                color: $success;
+                border-color: rgba($success, 0.2);
+                &:hover { background-color: $success; color: $white; }
+            }
+
+            &.arbitrate {
+                background-color: rgba($primary, 0.1);
+                color: $primary;
+                border-color: rgba($primary, 0.2);
+                &:hover { background-color: $primary; color: $white; }
+            }
+        }
+    }
+
+
+}
+
+// --- SECURE INLINE DARK MODE ---
+.dark {
+    .admin-dashboard-branch-scope {
+        .header {
+            .title h2 { color: $white; }
+            .agency-back-action { background-color: $dm-bg-surface !important; border-color: rgba($mute, 0.15); color: $white; }
+        }
+
+        .stats-overview-grid .stat-card {
+            background: $dm-bg-surface;
+            border-color: rgba($mute, 0.15);
+            .stat-details .stat-value { color: $white; }
+        }
+
+        .monitoring-table-card {
+            background: $dm-bg-surface;
+            border-color: rgba($mute, 0.15);
+            h2, .session-code-text { color: $white; }
+        }
+
+        .table-balances-stack .balance-item {
+            color: $white;
+            .cur-code { color: $mute; }
+        }
+
+        .session-badge {
+            &.active-status { background-color: rgba($success, 0.15); }
+            &.closed-status { background-color: rgba($white, 0.06); color: $mute; }
+            &.await-status { background-color: rgba($primary, 0.15); }
+        }
+
+        .table-action-buttons, .text-right.table-action-buttons {
+            .table-action-trigger.view {
+                background-color: rgba($white, 0.08);
+                color: $white;
+                &:hover { background-color: rgba($white, .6); color: $dark; }
+            }
         }
     }
 }
 
-.dark {
-    .admin-dashboard-branch-scope {
-        background-color: $dm-bg-main;
-        .header .title h2 { color: $white; }
-        .header .agency-back-action { background: $dm-bg-surface; border-color: rgba($mute, 0.2); color: $white; }
-        .monitoring-table-card {
-            background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); }
-            .session-badge.closed-status { background-color: rgba($white, 0.1); color: $mute; }
-            .session-code-text { color: $white; }
-            td, strong { color: $white; }
-        }
-        .text-right.table-action-buttons .table-action-trigger { background: rgba($white, 0.05); color: $mute; &.view:hover { background-color: $white !important; color: $dark !important; } }
-    }
-}
 
 
 

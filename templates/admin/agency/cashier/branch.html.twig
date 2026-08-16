@@ -2,13 +2,12 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-	<div class="admin-dashboard-branch-scope container">
+	<div
+		class="admin-dashboard-branch-scope container">
 
 		{# --- EN-TÊTE DE LA PAGE DE LA SUCCURSALE --- #}
-
-
-		{# --- EN-TÊTE DE LA PAGE (Fidèle à votre modèle de voyage) --- #}
-			<header class="header mb-20"> <div class="main-info">
+		<header class="header mb-20">
+			<div class="main-info">
 				<a href="#" class="agency-back-action" title="Retour à la supervision générale">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
@@ -17,20 +16,18 @@
 						<i class="fa-solid fa-cash-register"></i>
 						Gestion des Caisses & Sessions
 					</h2>
-					<p>
-						Suivi des sessions actives et des guichetiers.
-					</p>
+					<p>Suivi des sessions actives et des guichetiers de la succursale.</p>
 				</div>
 			</div>
 			<div class="admin-bus-layout-add-action-zone">
-				<a href="{{path('admin_agency_cashier_add')}}" class="btn btn-success text-size-12" onclick="alert('Action statique : Configuration d\'un nouveau guichet de caisse');">
+				<a href="{{ path('admin_agency_cashier_add') }}" class="btn btn-success text-size-12">
 					<i class="fa-solid fa-plus"></i>
 					Nouveau guichet de caisse
 				</a>
 			</div>
 		</header>
 
-		{# --- CARTES DE STATISTIQUES COMPTABLES --- #}
+		{# --- CARTES DE STATISTIQUES COMPTABLES MULTI-DEVISES --- #}
 		<div class="stats-overview-grid mb-20">
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--success">
@@ -47,9 +44,13 @@
 					<i class="fa-solid fa-vault"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">Total Espèces Estimé</span>
-					<strong class="stat-value text-success">1 875 000 FC</strong>
-					<span class="sub-meta-text">+ 450.00 USD</span>
+					<span class="stat-label">Fonds Estimés en Caisse</span>
+					{# Pile de devises de la succursale locale #}
+					<div class="stats-currency-stack">
+						<strong class="stat-value text-success">1 875 000 CDF</strong>
+						<span class="sub-meta-text">+ 450.00 USD</span>
+						<span class="sub-meta-text">+ 120.00 EUR</span>
+					</div>
 				</div>
 			</div>
 
@@ -77,15 +78,12 @@
 						<th>Guichetier (Operator)</th>
 						<th>N° Session Caisse</th>
 						<th>État Session</th>
-						<th>Encaissements (CDF)</th>
-						<th>Encaissements (USD)</th>
-						<th class="text-right">Action</th>
+						<th>Bilan des Encaissements par Devise</th>
+						<th class="text-right">Actions</th>
 					</tr>
 				</thead>
-
-
 				<tbody>
-					{# Caissier 1 : Session ouverte active (Ligne inchangée) #}
+					{# Caissier 1 : Session ouverte active #}
 					<tr>
 						<td>
 							<strong>Mputu Antoinette</strong>
@@ -97,21 +95,28 @@
 						<td>
 							<span class="session-badge active-status">
 								OUVERTE
-								<p class="text-gray">07h00</p>
+								<p class="status-time-meta">07h00</p>
 							</span>
-
 						</td>
-						<td>2 450 000 CDF</td>
-						<td>450 USD</td>
+						<td>
+							{# Pile dynamique issue de la table CashSessionBalance #}
+							<div class="table-balances-stack">
+								<div class="balance-item">
+									<span class="cur-code">CDF:</span>
+									2 450 000 FC</div>
+								<div class="balance-item">
+									<span class="cur-code">USD:</span>
+									450.00 $</div>
+							</div>
+						</td>
 						<td class="text-right table-action-buttons">
-
 							<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-trigger view" title="Auditer le journal en direct (Live)">
 								<i class="fa-solid fa-chart-line"></i>
 							</a>
 						</td>
 					</tr>
 
-					{# Caissier 2 : Session CLÔTURÉE -> Intégration directe du bouton d'initialisation #}
+					{# Caissier 2 : Session CLÔTURÉE (Prête pour une ré-initialisation / ré-ouverture) #}
 					<tr>
 						<td>
 							<strong>Ilunga Christian</strong>
@@ -123,25 +128,33 @@
 						<td>
 							<span class="session-badge closed-status">
 								CLÔTURÉE
-								<p class="text-gray">06h00</p>
+								<p class="status-time-meta">06h00</p>
 							</span>
 						</td>
-						<td>1 600 000 CDF</td>
-						<td>500 USD</td>
-						<td
-							class="text-right table-action-buttons">
-							{# LE BOUTON CLÉ EST ICI : Il remplace l'icône de l'œil pour les caisses fermées #}
-
-							<a href="{{ path('admin_agency_cashier_session_init', {'code': 2}) }}" class="table-action-trigger view" title="Initialiser l'ouverture d'une session">
+						<td>
+							<div class="table-balances-stack">
+								<div class="balance-item">
+									<span class="cur-code">CDF:</span>
+									1 600 000 FC</div>
+								<div class="balance-item">
+									<span class="cur-code">USD:</span>
+									500.00 $</div>
+								<div class="balance-item">
+									<span class="cur-code">EUR:</span>
+									70.00 €</div>
+							</div>
+						</td>
+						<td class="text-right table-action-buttons">
+							<a href="{{ path('admin_agency_cashier_session_init', {'code': 2}) }}" class="table-action-trigger init" title="Initialiser l'ouverture d'une session (Top-Down)">
 								<i class="fa-solid fa-key"></i>
 							</a>
-							<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-trigger view" title="Auditer le journal en direct (Live)">
+							<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-trigger view" title="Voir l'historique comptable de ce journal">
 								<i class="fa-solid fa-chart-line"></i>
 							</a>
 						</td>
 					</tr>
 
-					{# Caissier 3 : Session En Attente -> Intégration directe du bouton d'arbitrage #}
+					{# Caissier 3 : Session En Attente de validation d'arbitrage #}
 					<tr>
 						<td>
 							<strong>Ilunga Christian</strong>
@@ -151,30 +164,33 @@
 							<span class="session-code-text">CS-2026-0711</span>
 						</td>
 						<td>
-							<span class="session-badge await-status bage badge-primary">
+							<span class="session-badge await-status">
 								A CLOTURER
-								<p class="text-gray">06h00</p>
+								<p class="status-time-meta">06h00</p>
 							</span>
 						</td>
-						<td>1 600 000 CDF</td>
-						<td>500 USD</td>
-						<td
-							class="text-right table-action-buttons">
-							{# LE BOUTON CLÉ EST ICI : Il remplace l'icône de l'œil pour les caisses fermées #}
-							<a href="{{ path('admin_agency_cashier_session_closing_validation', {'code': 2}) }}" class="table-action-trigger view" title="Ouvrir l'inventaire contradictoire et signer la décharge">
+						<td>
+							<div class="table-balances-stack">
+								<div class="balance-item">
+									<span class="cur-code">CDF:</span>
+									1 600 000 FC</div>
+								<div class="balance-item">
+									<span class="cur-code">USD:</span>
+									500.00 $</div>
+							</div>
+						</td>
+						<td class="text-right table-action-buttons">
+							<a href="{{ path('admin_agency_cashier_session_closing_validation', {'code': 2}) }}" class="table-action-trigger arbitrate" title="Ouvrir l'inventaire contradictoire et arbitrer les écarts">
 								<i class="fa-solid fa-gavel"></i>
 							</a>
-							<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-trigger view" title="Auditer le journal en direct (Live)">
+							<a href="{{ path('admin_agency_finance_journal', {'code': 2}) }}" class="table-action-trigger view" title="Auditer le journal des ventes de cette session">
 								<i class="fa-solid fa-chart-line"></i>
 							</a>
 						</td>
 					</tr>
 				</tbody>
-
 			</table>
 		</div>
 
 	</div>
-
-
 {% endblock %}
