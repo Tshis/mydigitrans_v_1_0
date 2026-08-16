@@ -48,9 +48,26 @@ class CashierController extends AbstractController
     #[Route('/admin/agency/cash-register/open-session', name: 'admin_agency_cashier_session_open')]
     public function session_opening(Request $request): Response
     {
+        // Simulation des montants alloués au terminal par le gérant
+        $activeCurrencies = [
+            [
+                'code' => 'CDF',
+                'expected_amount' => '50000',
+            ],
+            [
+                'code' => 'USD',
+                'expected_amount' => '100',
+            ],
+            [
+                'code' => 'EUR',
+                'expected_amount' => '0',
+            ],
+        ];
+
         //return $this->render('admin/agency/cashier/dashboard.html.twig', [
         return $this->render('admin/agency/cashier/session_open.html.twig', [
             'page' => 'cashier',
+            'active_currencies' => $activeCurrencies
         ]);
     } //session_opening
 

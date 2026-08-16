@@ -22,7 +22,7 @@
 		<div
 			class="session-init-container">
 
-			{# DROITE : PROFIL ET DOTATION DE LA SEMAINE (Saisie par le gérant en amont) #}
+			{# DROITE : PROFIL ET DOTATION DE LA SESSIONS (Configurée par le gérant en amont) #}
 			<aside class="summary">
 				<div class="card summary-sticky-card alert-session-box">
 					<h2>
@@ -41,48 +41,54 @@
 					<hr
 					class="summary-divider mb-15">
 
-					{# Zone de sécurité modifiée : Elle affiche la dotation enregistrée par le gérant #}
+					{# Zone de sécurité dynamique : Affiche les dotations attendues configurées dans la table pivot CashSessionBalance #}
 					<div class="meta-item prev-session-audit-box">
-						<span class="session-micro-label text-highlight">Dotation du matin (Par le Gérant)</span>
-						<p style="margin: 4px 0 0 0; font-size: 13px; font-weight: 700; color: #0c326d;">
-							•
-							<span id="expected-cdf-val">50 000</span>
-							CDF
-							<br>
-							•
-							<span id="expected-usd-val">0</span>
-							USD
-						</p>
-						<span class="sub-meta-text" style="font-style: italic; margin-top: 5px;">Le gérant déclare vous
-							                        avoir remis cette somme. Votre saisie à gauche doit y correspondre.</span>
+						<span class="session-micro-label text-highlight">Dotation attendue du matin (Par le Gérant)</span>
+						<ul class="dynamic-expected-balances-list">
+							{% for currency in active_currencies %}
+								<li>
+									•
+									<span class="js-expected-val" data-currency="{{ currency.code }}">{{ currency.expected_amount }}</span>
+									{{ currency.code }}
+								</li>
+							{% else %}
+								<li class="text-danger">Aucune dotation configurée pour ce matin.</li>
+							{% endfor %}
+						</ul>
+						<span class="sub-meta-text inline-notice-italic">Le gérant déclare vous avoir remis cette enveloppe. Votre saisie à gauche doit y correspondre.</span>
 					</div>
 				</div>
 			</aside>
 
-			{# GAUCHE : LE FORMULAIRE DE COMPTAGE DU TIROIR #}
+			{# GAUCHE : LE FORMULAIRE DE COMPTAGE DU TIROIR MULTI-DEVISES #}
 			<div class="card">
 				<h2>
 					<i class="fa-solid fa-calculator"></i>
 					Comptage des espèces reçues
 				</h2>
-				<form action="#" method="POST" id="session-open-form">
+				<form
+					action="#" method="POST" id="session-open-form">
 
-					<div class="field-group mb-15 flex-gap-15">
-						<div class="field flex-full">
-							<label class="session-micro-label">Espèces physiques comptées en CDF *</label>
-							<input type="number" name="opening_cdf" id="opening-cdf" class="input-session-field" placeholder="0" min="0" required>
-							<span class="sub-meta-text">Comptez les billets Francs Congolais remis par le gérant.</span>
-						</div>
-						<div class="field flex-full">
-							<label class="session-micro-label">Espèces physiques comptées en USD *</label>
-							<input type="number" name="opening_usd" id="opening-usd" class="input-session-field" placeholder="0" min="0" required>
-							<span class="sub-meta-text">Comptez les billets Dollars remis par le gérant.</span>
-						</div>
+					{# Boucle magique : Génère les champs uniquement pour les devises actives de l'agence #}
+					<div class="field-group mb-15 grid-dynamic-currencies">
+						{% for currency in active_currencies %}
+							<div class="field">
+								<label class="session-micro-label">Espèces physiques en
+									{{ currency.code }}
+									*</label>
+								<div class="input-currency-wrapper">
+									<input type="number" name="opening_balances[{{ currency.code }}]" class="input-session-field js-declared-input" data-currency="{{ currency.code }}" placeholder="0" min="0" step="0.01" required>
+									<span class="currency-badge-suffix">{{ currency.code }}</span>
+								</div>
+								<span class="sub-meta-text">Comptez les billets physiques reçus en
+									{{ currency.code }}.</span>
+							</div>
+						{% endfor %}
 					</div>
 
 					<div class="field mb-15">
 						<label class="session-micro-label">Observations / Notes d'ouverture</label>
-						<textarea class="input-session-field text-area-fixed" placeholder="Signalez si des coupures sont trop usées ou si l'enveloppe reçue ne correspond pas..."></textarea>
+						<textarea name="opening_note" class="input-session-field text-area-fixed" placeholder="Signalez si des coupures sont trop usées ou si l'enveloppe reçue ne correspond pas..."></textarea>
 					</div>
 
 					<div class="block-action-wrapper">
@@ -97,28 +103,45 @@
 
 	</div>
 
-
+	{# Intercepteur JS universel et décorrélé des devises figées #}
 	<script>
-
 		document.addEventListener('DOMContentLoaded', () => {
 const openForm = document.getElementById('session-open-form');
-const inputCdf = document.getElementById('opening-cdf');
-const inputUsd = document.getElementById('opening-usd');
-
-// Récupération des valeurs configurées par le gérant (à droite dans le Twig)
-const expectedCdf = parseFloat(document.getElementById('expected-cdf-val').innerText) || 0;
-const expectedUsd = parseFloat(document.getElementById('expected-usd-val').innerText) || 0;
 
 if (openForm) {
 openForm.addEventListener('submit', (e) => {
-const declaredCdf = parseFloat(inputCdf.value) || 0;
-const declaredUsd = parseFloat(inputUsd.value) || 0;
+let hasDiscrepancy = false;
+let logExpected = [];
+let logDeclared = [];
 
-// Alerte si le caissier ne valide pas la même somme que le gérant
-if (declaredCdf !== expectedCdf || declaredUsd !== expectedUsd) {
-e.preventDefault(); // Bloque la soumission automatique
+// 1. Parcourir toutes les valeurs attendues générées à droite
+const expectedElements = document.querySelectorAll('.js-expected-val');
 
-const message = `⚠️ LITIGE DE DOTATION INITIALE\n\n` + `Le gérant a enregistré une dotation de : ${expectedCdf} CDF / ${expectedUsd} USD.\n` + `Vous déclarez avoir reçu en main : ${declaredCdf} CDF / ${declaredUsd} USD.\n\n` + `Cette différence va bloquer l'ouverture automatique. Un arbitrage immédiat du gérant de succursale est requis pour valider ce guichet.`;
+expectedElements.forEach(el => {
+const currency = el.getAttribute('data-currency');
+const expectedAmt = parseFloat(el.innerText) || 0;
+
+// Trouver l'input de déclaration correspondant à gauche
+const inputEl = document.querySelector (`.js-declared-input[data-currency="${currency}"]`);
+const declaredAmt = inputEl ? (parseFloat(inputEl.value) || 0) : 0;
+
+logExpected.push(`${expectedAmt} ${currency}`);
+logDeclared.push(`${declaredAmt} ${currency}`);
+
+if (declaredAmt !== expectedAmt) {
+hasDiscrepancy = true;
+}
+});
+
+// 2. Si un écart est détecté sur au moins une devise, bloquer le formulaire et lancer l'alerte
+if (hasDiscrepancy) {
+e.preventDefault();
+
+const message = `⚠️ LITIGE DE DOTATION INITIALE DETECTÉ\n\n` + `Le gérant a enregistré en base : ${
+logExpected.join(' / ')
+}.\n` + `Vous déclarez avoir compté en main : ${
+logDeclared.join(' / ')
+}.\n\n` + `Cette différence empêche l'ouverture automatique sécurisée. Un arbitrage du gérant de succursale est requis immédiatement pour forcer ou corriger ce tiroir de caisse.`;
 
 alert(message);
 }

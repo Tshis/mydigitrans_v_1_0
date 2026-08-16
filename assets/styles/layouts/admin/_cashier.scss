@@ -1730,6 +1730,176 @@
 }
 
 
+// ====================================================
+// === MODULE FINANCES : COMPTAGE OUVERTURE CAISSE ===
+// ====================================================
+.admin-cashier-session-scope {
+    width: 100%;
+
+    // --- UTILITIES ---
+    .mb-25 { margin-bottom: 1.6rem; }
+    .mb-15 { margin-bottom: 1rem; }
+
+    .session-micro-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: $gray;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+        
+        &.text-highlight { color: #0c326d; }
+    }
+
+    .sub-meta-text {
+        display: block;
+        font-size: 11px;
+        color: lighten($gray, 10%);
+        margin-top: 4px;
+        line-height: 1.3;
+        
+        &.inline-notice-italic {
+            font-style: italic;
+            margin-top: 8px;
+            color: $gray;
+        }
+    }
+
+    // --- LAYOUT BI-PANNEAUX ---
+    .session-init-container {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+        width: 100%;
+
+        @media (max-width: 992px) {
+            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column-reverse; // Met la sidebar d'info sous le formulaire sur mobile
+        }
+    }
+
+    // --- SIDEBAR D'INFORMATION DE L'ENVELOPPE ---
+    aside.summary {
+        position: sticky;
+        top: 1.5rem;
+        width: 100%;
+
+        .alert-session-box {
+            background-color: $white;
+            border: 1px solid $mute;
+            border-radius: $radius-card;
+            padding: 1.5rem;
+        }
+
+        .summary-divider {
+            border: 0;
+            border-top: 1px dashed rgba($mute, 0.8);
+        }
+
+        .dynamic-expected-balances-list {
+            list-style: none;
+            padding: 0;
+            margin: 6px 0;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #0c326d;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+    }
+
+    // --- COMPOSANTS DE FORMULAIRE ---
+    .grid-dynamic-currencies {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .input-currency-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        .input-session-field {
+            width: 100%;
+            padding-right: 55px; // Laisse la place pour le badge
+        }
+
+        .currency-badge-suffix {
+            position: absolute;
+            right: 12px;
+            background-color: rgba($mute, 0.4);
+            color: $dark;
+            font-weight: 700;
+            font-size: 11px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+    }
+
+    .text-area-fixed {
+        height: 80px;
+        resize: none;
+        line-height: 1.4;
+    }
+
+    // --- BOUTON DE CONFIRMATION DE DOTATION ---
+    .block-action-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+        
+        .btn-submit-open {
+            background-color: $primary;
+            color: $white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border-radius: $radius-input;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background-color: darken($primary, 5%);
+                box-shadow: 0 4px 10px rgba($primary, 0.2);
+            }
+        }
+    }
+}
+
+// ====================================================
+// --- CONFORMITÉ COMPLÈTE DARK MODE ------------------
+// ====================================================
+.dark {
+    .admin-cashier-session-scope {
+        aside.summary .alert-session-box {
+            background-color: $dm-bg-surface;
+            border-color: rgba($mute, 0.15);
+            
+            .text-dark { color: $white; }
+            .dynamic-expected-balances-list { color: lighten($primary, 15%); }
+            .session-micro-label.text-highlight { color: $mute; }
+        }
+
+        .input-currency-wrapper .currency-badge-suffix {
+            background-color: rgba($white, 0.08);
+            color: $white;
+        }
+    }
+}
+
+
 
 
 
