@@ -1,71 +1,45 @@
 @use '../../abstract/variables' as *;
 
 // ====================================================
-// === MODULE CAISSE : AUDIT LIVE JOURNAL COMPTABLE ===
+// === MODULE FINANCES : JOURNAL DE CAISSE EN DIRECT ==
 // ====================================================
 .admin-agency-cashier-journal-scope {
     width: 100%;
 
-    // --- UTILITIES NATIVES ---
+    // --- RÈGLES UTILITAIRES DE POSITIONNEMENT ---
+    .my-25 { margin-block: 1.6rem; }
     .mb-25 { margin-bottom: 1.6rem; }
     .mb-15 { margin-bottom: 1rem; }
-    .text-gray { color: $gray; }
-    .text-size-13 { font-size: 13px; }
-    .text-highlight { font-weight: 700; color: $primary; }
-    .text-success-mode { color: $success; font-weight: 700; }
-    .text-danger-mode { color: $danger; font-weight: 700; }
-    .text-mute-mode { color: rgba($gray, 0.4); }
+    .text-right { text-align: right !important; }
+    .font-bold { font-weight: 700; }
+    
+    .text-success-mode { color: $success; }
+    .text-danger-mode { color: $danger; }
 
-    .arrow-divider { font-size: 11px; color: $mute; margin-inline: 4px; }
-    .sub-meta-text { display: block; font-size: 11px; color: $gray; margin-top: 2px; }
-    .monospace-code { font-family: monospace; font-size: 13.5px; font-weight: 700; }
-
-    .header{
+     .header{
         display: flex;
         align-items: center;
         gap: 1rem;
 
     }
 
-    // --- CARTE UNIQUE ENTOURANT L'INTERFACE ---
+    .sub-meta-text {
+        display: block;
+        font-size: 11px;
+        color: $gray;
+        margin-top: 3px;
+        font-weight: 500;
+    }
+
+    // --- CARTE DE COMPOSITE DU GRAND LIVRE ---
     .layout-main-card {
         background: $white;
         border: 1px solid $mute;
         border-radius: $radius-card;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
         width: 100%;
-        margin-top: 1rem;
-    }
 
-    .card-inner-box { padding: 2rem; }
-
-    .box-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: $dark;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        border-bottom: 1px solid rgba($mute, 0.5);
-        padding-bottom: 8px;
-        i { color: $primary; }
-    }
-
-    // --- HERO BANNER LIVE ---
-    .finance-hero-banner {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-
-        .hero-main-amount {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin: 4px 0 0 0;
-            line-height: 1;
-            color: $success;
-        }
+        .card-inner-box { padding: 1.75rem; }
     }
 
     .finance-divider {
@@ -73,125 +47,191 @@
         border-top: 1px solid rgba($mute, 0.5);
     }
 
-    // --- BADGE LIVE UNIQUE (CLIGNOTANT EN CSS VERT) ---
-    .badge-status-live {
-        background-color: rgba($success, 0.12);
-        color: $success;
-        padding: 8px 14px;
-        border-radius: 6px;
-        font-size: 12px;
+    .box-title {
+        font-size: 13.5px;
         font-weight: 700;
-        display: inline-flex;
+        text-transform: uppercase;
+        color: $dark;
+        display: flex;
         align-items: center;
         gap: 8px;
-        text-transform: uppercase;
-
-        .close-dot {
-            width: 8px;
-            height: 8px;
-            background-color: $success;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse-live 1.8s infinite ease-in-out;
-        }
+        i { color: $primary; }
     }
 
-    // Animation du point clignotant
-    @keyframes pulse-live {
-        0% { transform: scale(0.9); opacity: 0.6; }
-        50% { transform: scale(1.2); opacity: 1; }
-        100% { transform: scale(0.9); opacity: 0.6; }
-    }
-
-    // --- BADGE Close UNIQUE (CLIGNOTANT EN CSS Rouge) ---
-    .badge-status-close {
-        background-color: rgba($danger, 0.12);
-        color: $danger;
-        padding: 8px 14px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-transform: uppercase;
-
-        .close-dot {
-            width: 8px;
-            height: 8px;
-            background-color: $danger;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse-close 1.8s infinite ease-in-out;
-        }
-    }
-
-    // Animation du point clignotant
-    @keyframes pulse-close {
-        0% { transform: scale(0.9); opacity: 0.6; }
-        50% { transform: scale(1.2); opacity: 1; }
-        100% { transform: scale(0.9); opacity: 0.6; }
-    }
-
-    // --- GRILLE DES LABELS INFOS ---
-    .audit-details-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    // --- BANNIÈRE FINANCIÈRE LIVE ---
+    .finance-hero-banner {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        background-color: rgba($mute, 0.2);
+        border: 1px solid rgba($mute, 0.5);
+        padding: 1.5rem;
+        border-radius: $radius-card;
         gap: 1.5rem;
-        width: 100%;
+        flex-wrap: wrap;
 
-        .audit-item {
+        .audit-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: $gray;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        // Grille adaptative multi-devises
+        .live-currency-grid {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            gap: 2rem;
+            flex-wrap: wrap;
 
-            .audit-value {
-                font-size: 13.5px;
-                font-weight: 600;
-                color: $dark;
-                margin: 0;
-                line-height: 1.4;
+            .live-currency-item {
+                display: flex;
+                align-items: baseline;
+                gap: 6px;
+
+                .hero-main-amount {
+                    font-size: 1.8rem;
+                    font-weight: 800;
+                    letter-spacing: -0.5px;
+                    margin: 0;
+                    line-height: 1.1;
+                }
+
+                .currency-tag {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: $gray;
+                }
+            }
+        }
+
+        // Zone d'état d'activité du tiroir
+        .hero-status-zone {
+            text-align: right;
+            
+            @media (max-width: 576px) { text-align: left; }
+        }
+
+        .badge-status-live {
+            background-color: rgba($success, 0.08);
+            color: $success;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+
+            .live-dot {
+                width: 7px;
+                height: 7px;
+                background-color: $success;
+                border-radius: 50%;
+                display: inline-block;
+                animation: livePulse 1.8s infinite ease-in-out;
             }
         }
     }
 
-    .audit-label {
-        font-size: 11px;
-        font-weight: 700;
-        color: $gray;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    // --- GRILLE DES MÉTADONNÉES DE SESSION ---
+    .audit-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+
+        .audit-item {
+            .audit-label {
+                font-size: 11px;
+                font-weight: 700;
+                color: lighten($gray, 5%);
+                text-transform: uppercase;
+                margin-bottom: 4px;
+                display: block;
+            }
+
+            .audit-value {
+                font-size: 13.5px;
+                font-weight: 700;
+                color: $dark;
+                margin: 0;
+
+                &.monospace-code {
+                    font-family: monospace;
+                    letter-spacing: 0.3px;
+                }
+            }
+
+            .initial-balances-inline {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+                margin-top: 4px;
+
+                .balance-tag {
+                    background-color: rgba($mute, 0.4);
+                    color: $dark;
+                    font-size: 11.5px;
+                    font-weight: 600;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                }
+            }
+        }
     }
 
-    // --- BADGES IN / OUT DU TABLEAU ---
+    // --- BADGES DE FLUX DE TRÉSORERIE (IN / OUT) ---
     .cash-badge {
-        display: inline-block;
         padding: 4px 8px;
         border-radius: 4px;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 800;
+        display: inline-block;
         text-align: center;
+        width: 32px;
 
-        &.badge-entry {
-            background-color: rgba($success, 0.1);
-            color: $success;
-        }
-
-        &.badge-exit {
-            background-color: rgba($danger, 0.1);
-            color: $danger;
-        }
+        &.badge-entry { background-color: rgba($success, 0.1); color: $success; }
+        &.badge-exit { background-color: rgba($danger, 0.1); color: $danger; }
     }
 }
 
-// --- SUPPORT EN SÉCURITÉ DU DARK MODE ---
+// --- ANIMATION CLIGNOTANTE DU BOUTON LIVE ---
+@keyframes livePulse {
+    0% { transform: scale(0.95); opacity: 0.5; }
+    50% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.5; }
+}
+
+// --- SUPPORT COMPLET POUR LE DARK MODE ---
 .dark {
     .admin-agency-cashier-journal-scope {
-        .layout-main-card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); }
-        .finance-divider { border-top-color: rgba($mute, 0.15); }
-        .box-title { color: $white; border-bottom-color: rgba($mute, 0.15); }
-        .audit-details-grid .audit-item .audit-value { color: $white; }
-        .table-responsive-wrapper table tbody tr td { color: $white; strong { color: $white; } }
-        .text-mute-mode { color: rgba($mute, 0.2); }
+        .layout-main-card { background: $dm-bg-surface; border-color: rgba($mute, 0.15); }
+        .finance-divider { border-top-color: rgba($mute, 0.1); }
+        .box-title { color: $white; }
+
+        .finance-hero-banner {
+            background-color: rgba($dm-bg-main, 0.4);
+            border-color: rgba($mute, 0.1);
+            
+            .live-currency-grid .live-currency-item .currency-tag { color: $mute; }
+            .badge-status-live { background-color: rgba($success, 0.15); }
+        }
+
+        .audit-details-grid .audit-item {
+            .audit-value { color: $white; }
+            .initial-balances-inline .balance-tag { background-color: rgba($white, 0.06); color: $mute; }
+        }
+
+        .table-responsive-wrapper table tbody tr td {
+            color: $white;
+            strong { color: $white; }
+            .sub-meta-text { color: $mute; }
+        }
+
+        .text-danger-mode{color: $danger !important;}
     }
 }
+
