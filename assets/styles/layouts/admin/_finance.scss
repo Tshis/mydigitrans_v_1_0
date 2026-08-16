@@ -1,43 +1,16 @@
 @use '../../abstract/variables' as *;
 
 // ====================================================
-// === MODULE FINANCES : CONSOLE DE SUPERVISION FLUX ==
+// === MODULE FINANCES : COMPOSITIONS DES DÉPENSES =====
 // ====================================================
-.admin-finance-global-scope {
+.admin-finance-expense-add-scope {
     width: 100%;
+    padding-block: 2rem;
 
-    // --- COHÉRENCE CORE ---
     .mb-25 { margin-bottom: 1.55rem; }
-    .mb-20 { margin-bottom: 1.25rem; }
+    .mb-15 { margin-bottom: 1rem; }
     .mt-15 { margin-top: 1rem; }
     .font-bold { font-weight: 700; }
-    .text-right { text-align: right !important; }
-
-    .stats-overview-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; width: 100%;
-        .stat-card {
-            background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1.2rem;
-            .stat-icon {
-                width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-                &--primary { background: rgba($primary, 0.1); color: $primary; }
-                &--success { background: rgba($success, 0.1); color: $success; }
-                &--danger  { background: rgba($danger, 0.1); color: $danger; }
-            }
-            .stat-details {
-                display: flex; flex-direction: column; gap: 2px;
-                .stat-label { font-size: 11px; color: $gray; font-weight: 700; text-transform: uppercase; }
-                .stat-value { font-size: 1.4rem; font-weight: 800; line-height: 1.2; &.text-success { color: $success; } &.text-primary { color: $primary; } &.text-danger { color: $danger; } }
-            }
-        }
-    }
-
-    .sub-meta-text {
-        display: block;
-        font-size: 11px;
-        color: $gray;
-        margin-top: 2px;
-        font-weight: 500;
-    }
 
     // --- EN-TÊTE ---
     .header {
@@ -46,153 +19,132 @@
         align-items: center;
         gap: 1.5rem;
         flex-wrap: wrap;
-        margin-top: 2rem;
 
         .title {
-            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; margin: 0; }
+            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; margin: 0; i{color: $primary;} }
             p { font-size: 1rem; color: $gray; margin: 4px 0 0 0; }
         }
     }
 
-    // --- EMPILAGE DES DEVISES ACTIVES (STATS) ---
-    .currency-financial-stack {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        
-        .stat-value {
-            font-size: 1.25rem;
-            line-height: 1.2;
-            &.text-success { color: $success; }
-            &.text-danger { color: $danger; }
-            &.text-primary { color: $primary; }
-        }
-    }
-
-    // --- FORMULAIRE DE FILTRE CHASSÉ ---
-    .trip-filters-card {
-        .field-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-            width: 100%;
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-
-            .admin-bus-layout-add-label {
-                font-size: 11px;
-                font-weight: 700;
-                color: $gray;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .admin-bus-layout-add-input,
-            .admin-bus-layout-add-select {
-                width: 100%;
-                padding: 10px 12px;
-                border: 1px solid $mute;
-                border-radius: $radius-input;
-                font-size: 13px;
-                font-weight: 600;
-                color: $dark;
-                background: $white;
-                outline: none;
-                height: 40px;
-                box-sizing: border-box;
-                transition: border-color 0.2s;
-
-                &:focus { border-color: $primary; }
-            }
-        }
-
-        .field-button-right {
-            display: flex;
-            justify-content: flex-end;
-        }
-    }
-
-    // --- COMPOSANT TABLEAU ET BADGES DE DIRECTION ---
-    .monitoring-table-card {
+    // --- CARD CONTAINER ---
+    .card {
         background: $white;
         border: 1px solid $mute;
         border-radius: $radius-card;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
     }
 
-    .cash-badge {
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 10.5px;
-        font-weight: 700;
-        display: inline-block;
-
-        &.badge-confirmed { background-color: rgba($success, 0.1); color: $success; }
-        &.badge-impacted { background-color: rgba($danger, 0.1); color: $danger; }
+    // --- GRILLE INTERNE DES FORMULAIRES ---
+    .field-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
+        width: 100%;
     }
 
-    // --- ACTIONS DE TABLEAU DÉCORRÉLÉES ---
-    .text-right.table-action-buttons {
-        display: table-cell !important;
-        vertical-align: middle !important;
-        text-align: right !important;
-        white-space: nowrap !important;
-        float: none !important;
-        border-bottom: 1px solid rgba($mute, 0.5) !important;
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
 
-        .table-action-trigger {
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            text-decoration: none;
+        .admin-bus-layout-add-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: $gray;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-bus-layout-add-input,
+        .admin-bus-layout-add-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
             font-size: 13px;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
+            font-weight: 600;
+            color: $dark;
+            background: $white;
+            outline: none;
+            height: 42px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
 
-            &.view {
-                background-color: rgba($mute, 0.4);
-                color: $dark;
-                &:hover { background-color: $dark !important; color: $white !important; }
-            }
+            &:focus { border-color: $primary; }
+        }
+
+        .text-area-fixed {
+            height: 80px;
+            resize: vertical;
+            line-height: 1.4;
+        }
+
+        // Alerte de réduction des fonds de caisse
+        .sub-meta-text.danger-hint {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: $danger;
+            margin-top: 5px;
         }
     }
+
+    .field-button-right {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+        // --- GRILLE INTERNE DES FORMULAIRES RECTIFIÉE ---
+    .field-group {
+        display: flex;
+        align-items: flex-end; // Aligne parfaitement les bas d'inputs indépendamment du label
+        gap: 1.25rem;
+        width: 100%;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+
+    .field {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        
+        // Permet au libellé de prendre deux fois plus de place si nécessaire
+        &.flex-double {
+            flex: 2;
+        }
+        
+        // Sécurité d'affichage si le wrapper est masqué par le JS
+        &[style*="display: none"] {
+            display: none !important;
+        }
+    }
+
 }
 
 // ====================================================
 // --- CONFORMITÉ COMPLETE DARK MODE ------------------
 // ====================================================
 .dark {
-    .admin-finance-global-scope {
+    .admin-finance-expense-add-scope {
         .header .title h2 { color: $white; }
         
-        .trip-filters-card .field {
+        .card {
+            background: $dm-bg-surface;
+            border-color: rgba($mute, 0.25);
+        }
+
+        .field {
             .admin-bus-layout-add-input,
             .admin-bus-layout-add-select {
                 background: darken($dm-bg-surface, 4%);
                 border-color: rgba($mute, 0.2);
                 color: $white;
-            }
-        }
-
-        .monitoring-table-card {
-            background: $dm-bg-surface;
-            border-color: rgba($mute, 0.25);
-        }
-
-        .text-right.table-action-buttons {
-            border-bottom-color: rgba($mute, 0.15) !important;
-            .table-action-trigger.view {
-                background-color: rgba($white, 0.08);
-                color: $white;
-                &:hover { background-color: rgba($white, 0.15) !important; }
             }
         }
     }
