@@ -8,81 +8,108 @@
 
 {% block body %}
 	<div
-		class="admin-trip-wrapper container">
+		class="admin-finance-global-scope container">
 
 		{# --- EN-TÊTE DE LA PAGE --- #}
-		<header class="header mb-20">
+		<header class="header mb-25">
 			<div class="title">
 				<h2>
 					<i class="fa-solid fa-hand-holding-dollar"></i>
-					Gestion des Finances & Flux
+					Gestion des Finances & Flux Multi-devises
 				</h2>
-				<p>Suivi en temps réel des recettes d'agences et enregistrement des dépenses opérationnelles.</p>
+				<p>Suivi en temps réel des recettes d'agences et enregistrement des dépenses opérationnelles par devise.</p>
 			</div>
 			<div class="admin-bus-layout-add-action-zone">
-				<a href="{{path('admin_agency_finance_expense_add')}}" class="btn btn-success text-size-12">
+				<a href="{{ path('admin_agency_finance_expense_add') }}" class="btn btn-success text-size-12">
 					<i class="fa-solid fa-plus"></i>
 					Enregistrer une dépense
 				</a>
 			</div>
 		</header>
 
-		{# --- CARTES DE STATISTIQUES --- #}
-		<div class="stats-overview-grid">
+		{# --- CARTES DE STATISTIQUES CONSOLIDÉES MULTI-DEVISES --- #}
+		<div
+			class="stats-overview-grid mb-25">
+			{# CARTE 1 : pile des recettes du jour #}
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--success">
 					<i class="fa-solid fa-arrow-trend-up"></i>
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">Recettes du jour</span>
-					<strong class="stat-value text-success">1 450.00 $</strong>
+					<div class="currency-financial-stack">
+						{% for revenue in daily_revenues %}
+							<strong class="stat-value text-success">{{ revenue.amount }}
+								{{ revenue.code }}</strong>
+						{% else %}
+							<strong class="stat-value text-muted">0.00</strong>
+						{% endfor %}
+					</div>
 				</div>
 			</div>
 
+			{# CARTE 2 : pile des dépenses du jour #}
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--danger">
 					<i class="fa-solid fa-arrow-trend-down"></i>
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">Dépenses du jour</span>
-					<strong class="stat-value text-danger">320.00 $</strong>
+					<div class="currency-financial-stack">
+						{% for expense in daily_expenses %}
+							<strong class="stat-value text-danger">{{ expense.amount }}
+								{{ expense.code }}</strong>
+						{% else %}
+							<strong class="stat-value text-muted">0.00</strong>
+						{% endfor %}
+					</div>
 				</div>
 			</div>
 
+			{# CARTE 3 : pile des soldes nets #}
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--primary">
 					<i class="fa-solid fa-scale-balanced"></i>
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">Solde Net Provisoire</span>
-					<strong class="stat-value text-primary">1 130.00 $</strong>
+					<div class="currency-financial-stack">
+						{% for net in daily_nets %}
+							<strong class="stat-value text-primary">{{ net.amount }}
+								{{ net.code }}</strong>
+						{% else %}
+							<strong class="stat-value text-muted">0.00</strong>
+						{% endfor %}
+					</div>
 				</div>
 			</div>
 		</div>
 
-		{# --- ZONE DE RECHERCHE ET DE FILTRE AVANCÉ (3 CHAMPS) --- #}
-		<div class="trip-filters-card mb-20">
-			<form action="">
+		{# --- ZONE DE RECHERCHE ET DE FILTRE AVANCÉ --- #}
+		<div class="card trip-filters-card mb-20">
+			<form action="" method="GET">
 				<div
 					class="field-group">
-					{# Champ 1 : Date exacte #}
+					{# Filtre 1 : Date exacte #}
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Rechercher par date exacte</label>
-						<input type="date" name="filter_date" class="admin-bus-layout-add-input">
+						<input type="date" name="filter_date" class="admin-bus-layout-add-input" value="">
 					</div>
 
-					{# Champ 2 : Succursales / Branches (MCD Table 4) #}
+					{# Filtre 2 : Succursales / Branches #}
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Filtrer par Succursale</label>
 						<select name="filter_branch" class="admin-bus-layout-add-select">
 							<option value="">-- Toutes les succursales --</option>
-							<option value="1">Kinshasa Centre (Guichet 1)</option>
-							<option value="2">Succursale Goma</option>
-							<option value="3">Succursale Matadi</option>
+							{% for branch in branches %}
+								<option value="{{ branch.id }}">
+									{{ branch.name }}
+								</option>
+							{% endfor %}
 						</select>
 					</div>
 
-					{# Champ 3 : Type de flux financier #}
+					{# Filtre 3 : Type de flux financier #}
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Filtrer par type de flux</label>
 						<select name="filter_type" class="admin-bus-layout-add-select">
@@ -92,7 +119,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="field-button-right mt-10">
+				<div class="field-button-right mt-15">
 					<button type="submit" class="btn btn-dark">
 						<i class="fa-solid fa-magnifying-glass"></i>
 						Filtrer les flux...
@@ -101,75 +128,62 @@
 			</form>
 		</div>
 
-		{# --- TABLEAU DES DONNÉES DATATABLE AVEC SCROLL RESPONSIVE --- #}
-		<div class="table-responsive-wrapper">
-			<table class="table table-scrollable table-striped js-datatable">
-				<thead>
-					<tr>
-						<th>Date & Référence</th>
-						<th>Opération / Libellé</th>
-						<th>Mode / Provenance</th>
-						<th>Montant</th>
-						<th>Statut / Caisse</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{# Ligne Statique 1 : Un paiement entrant (MCD Table 20) #}
-					<tr>
-						<td>
-							<strong>13/08/2026</strong>
-							<span class="sub-meta-text">À 10h14 • PAY-8942</span>
-						</td>
-						<td>
-							<strong>Billet de Voyage (Jean Kabamba)</strong>
-							<span class="sub-meta-text">Réservation #RES-3904</span>
-						</td>
-						<td>
-							<strong>Mobile Money</strong>
-							<span class="sub-meta-text">M-Pesa (+243 812...)</span>
-						</td>
-						<td>
-							<strong class="text-success">+ 45.00 $</strong>
-						</td>
-						<td>
-							<span class="badge badge-warning-status" style="background-color: rgba(22, 132, 197, 0.1); color: #1684c5;">Confirmé</span>
-						</td>
-						<td class="actions">
-							<a href="{{ path('admin_agency_finance_show', {'id': 1, 'type': 'payment'}) }}" class="table-action-btn bg-mute" title="Détails du paiement">
-								<i class="fa-solid fa-eye"></i>
-							</a>
-						</td>
-					</tr>
-
-					{# Ligne Statique 2 : Une dépense sortante (MCD Table 28) #}
-					<tr>
-						<td>
-							<strong>13/08/2026</strong>
-							<span class="sub-meta-text">À 08h30 • EXP-0401</span>
-						</td>
-						<td>
-							<strong>Achat Carburant Bus #01</strong>
-							<span class="sub-meta-text">Frais d'exploitation de ligne</span>
-						</td>
-						<td>
-							<strong>Espèces (Cash)</strong>
-							<span class="sub-meta-text">Kinshasa Centre</span>
-						</td>
-						<td>
-							<strong class="text-danger">- 250.00 $</strong>
-						</td>
-						<td>
-							<span class="badge badge-warning-status" style="background-color: rgba(217, 69, 22, 0.1); color: #d94516;">Caisse Impactée</span>
-						</td>
-						<td class="actions">
-							<a href="{{ path('admin_agency_finance_show', {'id': 401, 'type': 'expense'}) }}" class="table-action-btn bg-mute" title="Détails de la dépense">
-								<i class="fa-solid fa-eye"></i>
-							</a>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+		{# --- TABLEAU DES FLUX FINANCIERS DU GRAND LIVRE --- #}
+		<div class="card monitoring-table-card">
+			<div class="table-responsive-wrapper">
+				<table class="table table-scrollable table-striped js-datatable">
+					<thead>
+						<tr>
+							<th>Date & Référence</th>
+							<th>Opération / Libellé</th>
+							<th>Mode / Provenance</th>
+							<th class="text-right">Montant & Devise</th>
+							<th>Statut / Caisse</th>
+							<th class="text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for operation in financial_operations %}
+							<tr>
+								<td>
+									<strong>{{ operation.date }}</strong>
+									<span class="sub-meta-text">{{ operation.time }}
+										•
+										{{ operation.reference }}</span>
+								</td>
+								<td>
+									<strong>{{ operation.label }}</strong>
+									<span class="sub-meta-text">{{ operation.sub_label }}</span>
+								</td>
+								<td>
+									<strong>{{ operation.mode }}</strong>
+									<span class="sub-meta-text">{{ operation.origin }}</span>
+								</td>
+								<td class="text-right font-bold {% if operation.type == 'payment' %}text-success{% else %}text-danger{% endif %}">
+									{% if operation.type == 'payment' %}+{% else %}-
+									{% endif %}
+									{{ operation.amount }}
+									{{ operation.currency }}
+								</td>
+								<td>
+									<span class="cash-badge {% if operation.type == 'payment' %}badge-confirmed{% else %}badge-impacted{% endif %}">
+										{{ operation.status }}
+									</span>
+								</td>
+								<td class="text-right table-action-buttons">
+									<a href="{{ path('admin_agency_finance_show', {'id': operation.id, 'type': operation.type}) }}" class="table-action-trigger view" title="Voir les détails">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								</td>
+							</tr>
+						{% else %}
+							<tr>
+								<td colspan="6" class="text-center text-muted py-15">Aucun flux financier enregistré pour les critères sélectionnés.</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
 		</div>
 
 	</div>

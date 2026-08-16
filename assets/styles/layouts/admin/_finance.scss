@@ -1,211 +1,199 @@
 @use '../../abstract/variables' as *;
 
-.admin-agency-finance-show-scope {
+// ====================================================
+// === MODULE FINANCES : CONSOLE DE SUPERVISION FLUX ==
+// ====================================================
+.admin-finance-global-scope {
     width: 100%;
 
-    .header-main-info{
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }//header-main-info
-
-    // --- UTILITIES NATIVES REPRISES ---
-    .mb-25 { margin-bottom: 1.6rem; }
+    // --- COHÉRENCE CORE ---
+    .mb-25 { margin-bottom: 1.55rem; }
     .mb-20 { margin-bottom: 1.25rem; }
-    .mb-15 { margin-bottom: 1rem; }
-    .text-gray { color: $gray; }
-    .text-size-13 { font-size: 13px; }
-    .text-highlight { font-weight: 700; color: $primary; }
-    .arrow-divider { font-size: 11px; color: $mute; margin-inline: 4px; }
-    .sub-meta-text { display: block; font-size: 11px; color: $gray; margin-top: 4px; }
+    .mt-15 { margin-top: 1rem; }
+    .font-bold { font-weight: 700; }
+    .text-right { text-align: right !important; }
 
-    // --- CARTE MAÎTRESSE PRINCIPALE ---
-    .layout-main-card {
-        background: $white;
-        border: 1px solid $mute;
-        border-radius: $radius-card;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
-        width: 100%;
-        margin-top: 1rem;
-    }
-
-    .card-inner-box {
-        padding: 2rem;
-    }
-
-    .box-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: $dark;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        i { color: $primary; }
-    }
-
-    // --- HERO SECTION DE LA CARTE ---
-    .finance-hero-banner {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-
-        .hero-main-amount {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin: 4px 0 0 0;
-            line-height: 1;
-            &.text-success { color: $success; }
-            &.text-danger { color: $danger; }
-        }
-    }
-
-    .finance-divider {
-        border: 0;
-        border-top: 1px solid rgba($mute, 0.5);
-    }
-
-    // --- BADGES DE STATUT ---
-    .badge-status-confirmed {
-        background-color: rgba($success, 0.12);
-        color: $success;
-        padding: 8px 14px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        &.status-exit {
-            background-color: rgba($danger, 0.1);
-            color: $danger;
-        }
-    }
-
-    .font-color-entry { color: $success; }
-    .font-color-exit { color: $danger; }
-
-    // --- GRILLE COMPTABLE D'AUDIT ---
-    .audit-details-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
-        width: 100%;
-
-        .audit-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-
-            .audit-value {
-                font-size: 13px;
-                font-weight: 600;
-                color: $dark;
-                margin: 0;
-                line-height: 1.4;
+    .stats-overview-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; width: 100%;
+        .stat-card {
+            background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1.2rem;
+            .stat-icon {
+                width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+                &--primary { background: rgba($primary, 0.1); color: $primary; }
+                &--success { background: rgba($success, 0.1); color: $success; }
+                &--danger  { background: rgba($danger, 0.1); color: $danger; }
+            }
+            .stat-details {
+                display: flex; flex-direction: column; gap: 2px;
+                .stat-label { font-size: 11px; color: $gray; font-weight: 700; text-transform: uppercase; }
+                .stat-value { font-size: 1.4rem; font-weight: 800; line-height: 1.2; &.text-success { color: $success; } &.text-primary { color: $primary; } &.text-danger { color: $danger; } }
             }
         }
     }
 
-    .audit-label {
+    .sub-meta-text {
+        display: block;
         font-size: 11px;
-        font-weight: 700;
         color: $gray;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        margin-top: 2px;
+        font-weight: 500;
     }
 
-    // --- DESCRIPTION D'AUDIT ---
-    .audit-description-box {
+    // --- EN-TÊTE ---
+    .header {
         display: flex;
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
 
-        .description-text-container {
-            background-color: rgba($mute, 0.15);
-            border-left: 4px solid $primary;
-            padding: 1.25rem;
-            border-radius: 0 $radius-input $radius-input 0;
-            font-size: 13px;
-            color: lighten($black, 15%);
-            line-height: 1.5;
-            font-weight: 500;
+        .title {
+            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; margin: 0; }
+            p { font-size: 1rem; color: $gray; margin: 4px 0 0 0; }
         }
     }
 
-    // --- CORRECTION DU BLOC BOUTONS DU FOOTER (FINI LES BOUTONS UGLY) ---
-    .finance-actions-footer {
+    // --- EMPILAGE DES DEVISES ACTIVES (STATS) ---
+    .currency-financial-stack {
         display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-        align-items: center;
-        flex-wrap: wrap;
-        margin-top: 0;
-
-       
+        flex-direction: column;
+        gap: 2px;
+        
+        .stat-value {
+            font-size: 1.25rem;
+            line-height: 1.2;
+            &.text-success { color: $success; }
+            &.text-danger { color: $danger; }
+            &.text-primary { color: $primary; }
+        }
     }
 
-    // --- STRUCTURE DE LA MODALE MODERNE ---
-    .modal-wrapper {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba($black, 0.6);
-        z-index: 9999;
-        justify-content: center; align-items: center;
-        padding: 1rem;
+    // --- FORMULAIRE DE FILTRE CHASSÉ ---
+    .trip-filters-card {
+        .field-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .admin-bus-layout-add-label {
+                font-size: 11px;
+                font-weight: 700;
+                color: $gray;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .admin-bus-layout-add-input,
+            .admin-bus-layout-add-select {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid $mute;
+                border-radius: $radius-input;
+                font-size: 13px;
+                font-weight: 600;
+                color: $dark;
+                background: $white;
+                outline: none;
+                height: 40px;
+                box-sizing: border-box;
+                transition: border-color 0.2s;
+
+                &:focus { border-color: $primary; }
+            }
+        }
+
+        .field-button-right {
+            display: flex;
+            justify-content: flex-end;
+        }
     }
 
-    .modal-card-content {
-        width: 100%;
-        max-width: 500px;
-        padding: 2rem;
+    // --- COMPOSANT TABLEAU ET BADGES DE DIRECTION ---
+    .monitoring-table-card {
         background: $white;
-        box-shadow: 0 10px 25px rgba($black, 0.15);
+        border: 1px solid $mute;
         border-radius: $radius-card;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
     }
 
-    .modal-card-title {
-        font-size: 1.2rem;
+    .cash-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 10.5px;
         font-weight: 700;
-        color: $dark;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        i { color: $danger; }
+        display: inline-block;
+
+        &.badge-confirmed { background-color: rgba($success, 0.1); color: $success; }
+        &.badge-impacted { background-color: rgba($danger, 0.1); color: $danger; }
     }
 
-    .text-area-fixed {
-        height: 60px;
-        resize: none;
-    }
+    // --- ACTIONS DE TABLEAU DÉCORRÉLÉES ---
+    .text-right.table-action-buttons {
+        display: table-cell !important;
+        vertical-align: middle !important;
+        text-align: right !important;
+        white-space: nowrap !important;
+        float: none !important;
+        border-bottom: 1px solid rgba($mute, 0.5) !important;
 
-    .modal-actions-footer {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-        margin-top: 1.5rem;
+        .table-action-trigger {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
 
-       
+            &.view {
+                background-color: rgba($mute, 0.4);
+                color: $dark;
+                &:hover { background-color: $dark !important; color: $white !important; }
+            }
+        }
     }
 }
 
-// --- SUPPORT DARK MODE ---
+// ====================================================
+// --- CONFORMITÉ COMPLETE DARK MODE ------------------
+// ====================================================
 .dark {
-    .admin-agency-finance-show-scope {
-        .layout-main-card { background: $dm-bg-surface; border-color: rgba($mute, 0.2); }
-        .finance-divider { border-top-color: rgba($mute, 0.15); }
-        .box-title { color: $white; }
-        .audit-details-grid .audit-item .audit-value { color: $white; }
-        .audit-description-box .description-text-container { background-color: rgba($dm-bg-main, 0.4); color: $dm-text-mute; }
-        .modal-card-content {
-            background: $dm-bg-surface;
-            border: 1px solid rgba($mute, 0.2);
-            .modal-card-title { color: $white; }
+    .admin-finance-global-scope {
+        .header .title h2 { color: $white; }
+        
+        .trip-filters-card .field {
+            .admin-bus-layout-add-input,
+            .admin-bus-layout-add-select {
+                background: darken($dm-bg-surface, 4%);
+                border-color: rgba($mute, 0.2);
+                color: $white;
+            }
         }
-        .finance-actions-footer .btn-dark {
-            background-color: $white;
-            color: $dark;
+
+        .monitoring-table-card {
+            background: $dm-bg-surface;
+            border-color: rgba($mute, 0.25);
+        }
+
+        .text-right.table-action-buttons {
+            border-bottom-color: rgba($mute, 0.15) !important;
+            .table-action-trigger.view {
+                background-color: rgba($white, 0.08);
+                color: $white;
+                &:hover { background-color: rgba($white, 0.15) !important; }
+            }
         }
     }
 }
