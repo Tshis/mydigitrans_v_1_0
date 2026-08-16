@@ -1253,65 +1253,243 @@
 //==================
 //===SESSION CLOSING=====
 //---------------------------------------
+
+// ====================================================
+// === MODULE FINANCES : ARRÊT DE CAISSE ET CLÔTURE ===
+// ====================================================
 .admin-cashier-session-closing-scope {
-    padding-block: 2rem; width: 100%;
+    width: 100%;
+    padding-block: 2rem;
+
+    // --- COHÉRENCE MAQUETTE ---
     .mb-25 { margin-bottom: 1.6rem; }
     .mb-20 { margin-bottom: 1.25rem; }
     .mb-15 { margin-bottom: 1rem; }
-    
-    .sub-meta-text { display: block; font-size: 11px; color: $gray; margin-top: 2px; }
+    .font-bold { font-weight: 700; }
 
+    .section-micro-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: $gray;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    // --- HEADER ---
     .header {
-        display: flex; align-items: center; gap: 1rem; margin-bottom: 1.6rem;
-        .agency-back-action { background: $white; border: 1px solid $mute; width: 3.25rem; height: 3.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: $dark; text-decoration: none; transition: all .3s; &:hover { transform: translateX(-.5rem); background: rgba($primary, 0.04); color: $primary; } }
-        .title { h2 { font-size: 1.5rem; font-weight: 800; color: $dark; } p { font-size: 13px; color: $gray; } }
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+
+        .agency-back-action {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba($white, 0.8);
+            color: $dark;
+            text-decoration: none;
+            transition: transform 0.2s;
+            border: 1px solid $mute;
+
+            &:hover { transform: scale(1.05); }
+        }
+
+        .title {
+            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; margin: 0; }
+            p { font-size: 1rem; color: $gray; margin: 4px 0 0 0; }
+        }
     }
 
+    // --- MISE EN PAGE DEUX PANNEAUX ---
     .reservation-container {
-        display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; align-items: start; width: 100%;
-        @media (max-width: 992px) { grid-template-columns: 1fr; }
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 1.5rem;
+        align-items: start;
+        width: 100%;
+
+        @media (max-width: 992px) {
+            grid-template-columns: 1fr;
+        }
     }
 
+    .grid-dynamic-closing {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+        width: 100%;
+    }
+
+    // --- COMPOSANTS DE CARTES ---
     .card {
-        background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005); box-sizing: border-box;
-        h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; color: $dark; margin-bottom: 1.25rem; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .theoretical-value { font-size: 1.5rem; font-weight: 900; margin: 4px 0 0 0; &.text-success-color { color: $success; } &.text-primary-color { color: $primary; } }
-        .section-micro-label { display: block; font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; }
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: $radius-card;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+
+        h2 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: $dark;
+            margin: 0 0 1.25rem 0;
+            border-bottom: 1px solid rgba($mute, 0.5);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            i { color: $primary; }
+        }
     }
 
-    .field-group {
-        display: flex; gap: 1.25rem; width: 100%;
-        @media (max-width: 576px) { flex-direction: column; gap: 1rem; }
-        .field { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-    }
-
+    // --- MONTANTS THÉORIQUES RECALCULÉS ---
     .field {
-        label { font-size: 9px; font-weight: 700; color: $gray; text-transform: uppercase;  }
-        input { width: 100%; padding: 10px 12px; border: 1px solid $mute; border-radius: $radius-input; font-size: 11px; font-weight: 600; color: $dark; background: $white; outline: none; height: 40px; box-sizing: border-box; transition: border-color 0.2s; &:focus { border-color: $primary; } }
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        label {
+            font-size: 11px;
+            font-weight: 700;
+            color: $gray;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid $mute;
+            border-radius: $radius-input;
+            font-size: 13px;
+            font-weight: 600;
+            color: $dark;
+            background: $white;
+            outline: none;
+            height: 40px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+
+            &:focus { border-color: $primary; }
+        }
+
+        .theoretical-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 4px 0;
+
+            &.text-success-color { color: $success; }
+            &.text-primary-color { color: $primary; }
+        }
+
+        .sub-meta-text {
+            font-size: 11px;
+            color: lighten($gray, 10%);
+        }
     }
 
+    // --- INPUT AVEC DEVISE ---
+    .input-currency-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        input { padding-right: 55px !important; }
+
+        .currency-badge-suffix {
+            position: absolute;
+            right: 12px;
+            background-color: rgba($mute, 0.5);
+            color: $dark;
+            font-weight: 800;
+            font-size: 11px;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+    }
+
+    .text-area-fixed { height: 65px; resize: none; line-height: 1.4; padding: 10px; border-radius: $radius-input; border: 1px solid $mute; font-size: 13px; }
+
+    // --- ENCART D'AVERTISSEMENT DROITE ---
     .summary {
         .summary-sticky-card { position: sticky; top: 20px; }
-        .summary-divider { border: none; border-top: 1px dashed $mute; margin-bottom: 1rem; }
-        .reservation-notice-zone { border-left: 3px solid $primary; padding: 12px; border-radius: 4px; .notice-title { font-size: 11px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 6px; } .notice-text { font-size: 12px; color: $gray; margin-top: 4px; line-height: 1.4; } }
-        .btn-full { width: 100%; height: 44px; color: $white; border: none; border-radius: $radius-input; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; &:hover { opacity: 0.9; } }
+        .summary-divider { border: none; border-top: 1px dashed $mute; margin-block: 1rem; }
+
+        .reservation-notice-zone {
+            border-left: 4px solid $primary;
+            background-color: rgba($primary, 0.04);
+            padding: 12px;
+            border-radius: 0 $radius-input $radius-input 0;
+
+            .notice-title {
+                font-weight: 700;
+                color: $primary;
+                font-size: 12px;
+                margin: 0 0 4px 0;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .notice-text { font-size: 11px; color: $gray; margin: 0; line-height: 1.4; }
+        }
+
+        .btn-submit-closing {
+            width: 100%;
+            height: 44px;
+            background-color: $dark;
+            color: $white;
+            border: none;
+            border-radius: $radius-input;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+
+            &:hover { opacity: 0.95; }
+        }
     }
 }
 
+// ====================================================
+// --- CONFORMITÉ COMPLETE DARK MODE ------------------
+// ====================================================
 .dark {
     .admin-cashier-session-closing-scope {
-        background-color: $dm-bg-main;
-        .header .agency-back-action { background: $dm-bg-surface; border-color: rgba($mute, 0.2); color: $white; }
-        .header .title h2 { color: $white; }
-        .reservation-form .card {
-            background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); }
-            .field label, .section-micro-label { color: $mute; }
-            .field input { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: $white; }
-            .theoretical-value { &.text-success-color { color: $success; } &.text-primary-color { color: $primary; } }
+        .header {
+            .agency-back-action { background: rgba($white, 0.1); color: $white; }
+            .title h2 { color: $white; }
         }
-        .summary { .summary-divider { border-top-color: rgba($mute, 0.15); } .reservation-notice-zone .notice-text { color: $mute; } .btn-full { background: $white; color: $dark; } }
+
+        .card {
+            background: $dm-bg-surface;
+            border-color: rgba($mute, 0.25);
+            h2 { color: $white; border-bottom-color: rgba($mute, 0.15); }
+        }
+
+        .field {
+            input, textarea { background: darken($dm-bg-surface, 6%); border-color: rgba($mute, 0.2); color: $white; }
+            .theoretical-value.text-primary-color { color: lighten($primary, 15%); }
+        }
+
+        .input-currency-wrapper .currency-badge-suffix { background-color: rgba($white, 0.1); color: $white; }
+        .summary .reservation-notice-zone { background-color: rgba(239, 110, 23, 0.08); }
     }
 }
+
+
 
 
 

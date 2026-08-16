@@ -212,8 +212,31 @@ class CashierController extends AbstractController
     #[Route('/admin/agency/cash-register/session/closing', name: 'admin_agency_cashier_session_closing')]
     public function session_closing(Request $request): Response
     {
+
+        // Simulation des soldes cumulés calculés par le système pour la session active [MCD 19]
+        $vaultBalances = [
+            [
+                'code'   => 'CDF',
+                'name'   => 'Franc Congolais',
+                'amount' => '625 000',
+            ],
+            [
+                'code'   => 'USD',
+                'name'   => 'Dollar Américain',
+                'amount' => '120.00',
+            ],
+            [
+                'code'   => 'EUR',
+                'name'   => 'Euro',
+                'amount' => '0.00',
+            ],
+        ];
+
+
+
         return $this->render('admin/agency/cashier/session_close.html.twig', [
             'page' => 'cashier',
+            'vault_balances' => $vaultBalances,
         ]);
     } //session_closing
 
