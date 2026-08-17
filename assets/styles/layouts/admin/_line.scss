@@ -99,188 +99,165 @@
 
 
 //====LINE ADD======
-.admin-agency-lines-add-scope{
-   
-    padding-inline: 8%;
+.admin-route-creation-scope {
+    width: 100%;
     padding-block: 2rem;
 
-    .header{
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 2rem;
-        max-width: 600px;
-        margin: auto;
-    }//header
-    
-    .text{
-        h2{font-size: 1.8rem;}
-        p{font-size: 1rem; color: $gray;}
-        margin-bottom: 2.5rem;
-    }//text
+    // --- GRILLE EN-TETE (FIXÉE) ---
+    .main-route-header-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        align-items: flex-end;
+    }
 
-    .form-line-add-container{
-        display: block;
-        background: $white;
-        box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
-        padding: 2rem;
-        max-width: 600px;
-        margin: auto;
-        border-radius: 1rem;
+    .header {
+        display: flex; align-items: center; gap: 1.2rem;
+        .agency-back-action {
+            border-radius: 50%; width: 40px; height: 40px;
+            border: 1px solid $mute;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: rgba($white, 0.08); color: $dark; text-decoration: none;
+            transition: transform 0.2s;
+            &:hover { transform: scale(1.05); }
+        }
+        .title {
+            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; margin: 0; }
+            p { font-size: 1rem; color: $gray; margin: 4px 0 0 0; }
+        }
+    }
 
-        //===from gimini====
-        // À imbriquer ou chaîner avec vos styles de formulaires .form-line-add-container
-        .border-top-dashed {
-            border-top: 1px dashed $mute;
-            padding-top: 1.5rem;
+    .route-create-container{
+        display: grid;
+        grid-template-columns: 1fr 340px; // Définit strictement les deux colonnes
+        gap: 1.5rem;
+        align-items: start;
+        width: 100%;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr; // On empile sur tablette/mobile
+        }
+    }
+
+    .card {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card;
+        padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+        box-sizing: border-box;
+        
+        h2 {
+            font-size: 13.5px; font-weight: 700; text-transform: uppercase; color: $dark;
+            margin: 0 0 1.25rem 0; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 8px; 
+            display: flex; align-items: center; gap: 8px;
+            i { color: $primary; }
+        }
+    }
+
+    .field {
+        display: flex; flex-direction: column; gap: 6px;
+        label { font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; }
+        input, select {
+            width: 100%; height: 40px; padding: 10px; border: 1px solid $mute;
+            border-radius: $radius-input; font-weight: 600; background: $white;
+            &:focus { border-color: $primary; outline: none; }
+        }
+    }
+
+    .title {
+        display: block !important; // Force le titre à prendre sa ligne
+        width: 100%;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: $dark;
+        margin-bottom: 1.25rem;
+        border-bottom: 1px solid rgba($mute, 0.5);
+        padding-bottom: 8px;
+        i { color: $primary; margin-right: 8px; }
+    }
+
+    // --- TIMELINE DYNAMIQUE ---
+    .route-stops-timeline-container {
+        position: relative; padding-left: 80px;
+        &::before {
+            content: ''; position: absolute; left: 32px; top: 0; bottom: 0;
+            width: 2px; background: rgba($primary, 0.2);
+        }
+    }
+
+    .stop-node-row {
+        position: relative; margin-bottom: 2rem;
+        
+        .stop-badge-marker {
+            position: absolute; left: -48px; top: 0;
+            width: 44px; height: 24px; border-radius: 12px; font-size: 10px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            &.start { background: $dark; color: $white; }
+            &.end { background: $success; color: $white; }
+            &.intermediate { background: $white; border: 2px solid $primary; color: $dark; }
         }
 
-        .stops-manager-section {
-            .stops-manager-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                
-                .btn-add-stop-trigger {
-                    background: rgba($primary, 0.1);
-                    color: $primary;
-                    border: none;
-                    padding: 6px 12px;
-                    border-radius: 4px;
-                    font-size: 0.8rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    transition: all 0.2s ease;
-                    
-                    &:hover {
-                        background: $primary;
-                        color: $white;
-                    }
-                }
-            }
+        .stop-fields-stack {
+            display: flex; flex-direction: column; gap: 1rem;
+            background: rgba($gray, 0.03); padding: 1.25rem;
+            border-radius: $radius-input; border: 1px solid $mute;
 
-            .stops-dynamic-list {
-                display: flex;
-                flex-direction: column;
-                gap: 0.8rem;
-                position: relative;
-                padding-left: 10px;
-
-                // Ligne verticale décorative rappelant un tracé d'itinéraire
-                &::before {
-                    content: '';
-                    position: absolute;
-                    left: 24px;
-                    top: 20px;
-                    bottom: 20px;
-                    width: 2px;
-                    background: dashed $mute;
-                    z-index: 1;
-                }
-
-                .stop-row-card {
-                    background: $white;
-                    border: 1px solid $mute;
-                    border-radius: 6px;
-                    padding: 0.8rem 1rem;
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    position: relative;
-                    z-index: 2;
-
-                    &--first { border-left: 3px solid $primary; background: #fafafa; }
-                    &--last { border-left: 3px solid $success; background: #fafafa; }
-
-                    .stop-order-indicator {
-                        width: 28px;
-                        height: 28px;
-                        border-radius: 50%;
-                        background: $dark;
-                        color: $white;
-                        font-weight: bold;
-                        font-size: 0.85rem;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-
-                    .stop-fields-grid {
-            flex: 1;
-            display: flex;
-            flex-wrap: wrap; // Permet de passer proprement à la ligne sur mobile si l'écran est trop petit
-            gap: 1rem;
-            
-            .field {
-                flex: 1;
-                min-width: 130px; // Empêche le champ de devenir trop minuscule
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-                
-                label {
-                    color: $gray;
-                    font-weight: 600;
-                    white-space: nowrap; // Évite que le texte du label se coupe en deux
-                }
-            }
-                    }
-
-
-                    .input-unit-wrapper {
-                        position: relative;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        
-                        input { padding-right: 40px; width: 100%; }
-                        
-                        .unit-label {
-                            position: absolute;
-                            right: 12px;
-                            font-size: 0.75rem;
-                            color: $gray;
-                            font-weight: bold;
-                        }
-                    }
-
-                    .stop-row-action {
-                        width: 30px;
-                        display: flex;
-                        justify-content: center;
-                        
-                        .action-btn-delete {
-                            background: none;
-                            border: none;
-                            color: $danger;
-                            cursor: pointer;
-                            font-size: 1rem;
-                            opacity: 0.7;
-                            transition: opacity 0.2s;
-                            
-                            &:hover { opacity: 1; }
-                        }
-                    }
-                }
+            .field-row {
+                display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+                align-items: flex-end;
+                // Si bouton de suppression présent
+                &:has(.btn-remove-row) { grid-template-columns: 1fr 1fr 40px; }
             }
         }
+    }
 
-        .field-group--actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 1.5rem;
+    // BOUTON AJOUTER SUR LA LIGNE
+    .stop-action-row-on-timeline {
+        position: relative; margin-bottom: 2rem; display: flex; align-items: center;
+        .btn-add-on-timeline {
+            background: $white; border: 2px dashed $primary; color: $primary;
+            padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 12px;
+            cursor: pointer; transition: all 0.2s;
+            &:hover { background: $primary; color: $white; transform: scale(1.05); }
         }
+    }
+
+    .btn-remove-row {
+        height: 40px; border: none; background: rgba($danger, 0.1); color: $danger;
+        border-radius: 6px; cursor: pointer; &:hover { background: $danger; color: $white; }
+    }
+
+    .summary {
+        .summary-sticky-card { position: sticky; top: 20px; }
+        .reservation-notice-zone {
+            border-left: 4px solid $primary; background-color: rgba($primary, 0.03);
+            padding: 12px; border-radius: 0 $radius-input $radius-input 0;
+            .notice-title { font-weight: 700; color: $primary; font-size: 12px; margin: 0 0 4px 0; display: flex; align-items: center; gap: 6px; }
+            .notice-text { font-size: 11px; color: $gray; margin: 0; line-height: 1.4; }
+        }
+        .btn-full { width: 100%; height: 44px; font-weight: 700; font-size: 13.5px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    }
+    .summary-divider { border: none; border-top: 1px dashed $mute; margin-block: 1rem; }
+}
 
 
-
-    }//form-line-add-container
-
-}//.admin-agency-lines-add-scope
-
+// --- DARK MODE CONFIGURATION ---
+.dark {
+    .admin-route-creation-scope {
+        .header .agency-back-action { background: rgba($white, 0.1); color: $white; }
+        .header .title h2 { color: $white; }
+        .card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } }
+        .field .admin-bus-layout-add-input, .field .admin-bus-layout-add-select { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.2); color: $white; &[readonly] { background-color: rgba(0, 0, 0, 0.2); color: $gray; } }
+        .input-unit-wrapper .unit-badge { background-color: rgba($white, 0.1); color: $white; }
+        .summary .reservation-notice-zone { background-color: rgba($white, 0.02); }
+        
+        .stop-node-row {
+            .stop-id-indicator { color: rgba($white, 0.5); background-color: rgba($white, 0.05); }
+            .stop-grid-fields { background: rgba(0, 0, 0, 0.15); border-color: rgba($mute, 0.15); }
+            .stop-badge-marker.intermediate { background-color: $dm-bg-surface; color: $white; border-color: lighten($primary, 10%); }
+        }
+        .route-stops-timeline-container::before { background-color: rgba($white, 0.1); }
+    }
+}
 
 //===LINE SHOW===
 .admin-agency-line-show-scope {

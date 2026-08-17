@@ -1,48 +1,60 @@
-/**
- * Mydigitrans SaaS - Module Exploitation
- * Gestion des RouteStops géographiques libres avec recalcul du stopOrder en direct
- */
 document.addEventListener('DOMContentLoaded', () => {
-    const btnAddStop = document.getElementById('js-add-stop-row');
-    const container = document.getElementById('stops-dynamic-container');
-    const terminusRow = document.getElementById('js-terminus-row');
+    const btnAdd = document.getElementById('js-add-stop-row');
+    const wrapper = document.getElementById('js-stops-wrapper');
     const template = document.getElementById('stop-row-template');
+    
+    // runningIndex sert uniquement pour les noms des champs (stops[0], stops[1]...)
+    // On ne le décrémente jamais pour éviter les doublons de clés côté serveur.
+    let runningIndex = wrapper.querySelectorAll('.stop-node-row').length;
 
-    let runningIndex = 1;
-
-    function reindexStopOrders() {
-        const allRows = container.querySelectorAll('.stop-node-row');
-        
-        allRows.forEach((row, idx) => {
-            const orderValue = idx + 1;
-            
-            const indicator = row.querySelector('.stop-id-indicator');
-            if (indicator) indicator.innerText = `#${orderValue}`;
-
-            const hiddenOrderInput = row.querySelector('input[name*="[stopOrder]"]');
-            if (hiddenOrderInput) hiddenOrderInput.value = orderValue;
-            
-            row.setAttribute('data-stop-order', orderValue);
+    /**
+     * Fonction pour mettre à jour l'affichage visuel des numéros (#1, #2, #3...)
+     */
+    function updateVisualIndexes() {
+        const allStops = wrapper.querySelectorAll('.stop-node-row');
+        allStops.forEach((stop, i) => {
+            // L'index visuel commence à 2 car le Départ fixe est le #1
+            const visualNumber = i + 1; 
+            const indicator = stop.querySelector('.stop-id-indicator');
+            if (indicator) {
+                indicator.textContent = `#${visualNumber}`;
+            }
         });
+
+        // Mise à jour du numéro du Terminus (il doit toujours être le dernier)
+        const terminusIndicator = document.querySelector('#js-terminus-row .stop-id-indicator');
+        if (terminusIndicator) {
+            terminusIndicator.textContent = `#${allStops.length + 2}`;
+        }
     }
 
-    if (btnAddStop && container && terminusRow && template) {
-        btnAddStop.addEventListener('click', () => {
-            let htmlContent = template.innerHTML;
-            htmlContent = htmlContent.replace(/__INDEX__/g, runningIndex);
-            runningIndex++;
-
+    if (btnAdd) {
+        btnAdd.addEventListener('click', () => {
+            // 1. Préparer le contenu avec l'index technique unique
+            let content = template.innerHTML
+                .replace(/__INDEX__/g, runningIndex);
+            
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
+            tempDiv.innerHTML = content.trim();
             const newRow = tempDiv.firstElementChild;
 
-            container.insertBefore(newRow, terminusRow);
-            reindexStopOrders();
+            // 2. Ajouter au wrapper
+            wrapper.appendChild(newRow);
+            runningIndex++;
 
-            newRow.querySelector('.js-remove-row').addEventListener('click', () => {
+            // 3. Re-numéroter visuellement
+            updateVisualIndexes();
+
+            // 4. Événement de suppression
+            newRow.querySelector('.js-remove-row').addEventListener('click', (e) => {
+                e.preventDefault();
                 newRow.remove();
-                reindexStopOrders();
+                // 5. Re-numéroter après suppression pour boucher les trous
+                updateVisualIndexes();
             });
         });
     }
+
+    // Initialisation pour les éléments existants au chargement
+    updateVisualIndexes();
 });
