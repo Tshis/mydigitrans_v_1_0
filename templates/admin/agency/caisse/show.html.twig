@@ -1,0 +1,240 @@
+{# templates/admin/agency/route/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/admin/line_fare.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-route-show-scope container">
+    {# --- EN-TÊTE --- #}
+    <header class="header mb-25">
+        <div class="header-main-info">
+            <a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Itinéraires</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-gray text-size-13 text-highlight">Fiche Technique Ligne</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="" class="btn btn-primary text-size-12">
+                <i class="fa-solid fa-pen-to-square"></i> Modifier l'axe
+            </a>
+        </div>
+    </header>
+
+    <div class="reservation-container">
+        {# COLONNE GAUCHE : DÉTAILS ET TIMELINE #}
+        <div class="layout-main-panel">
+
+            {# CARD 1 : RÉSUMÉ DE LA ROUTE (MCD 11) #}
+            <div class="card mb-20">
+                <h2 class="card-title-fix"><i class="fa-solid fa-circle-info"></i> Identité de la Route</h2>
+                <div class="route-info-banner">
+                    <div class="main-details">
+                        <h1>{{ route.name }}</h1>
+                        <span class="route-code-badge">{{ route.code }}</span>
+                    </div>
+                    <div class="route-meta-grid">
+                        <div class="meta-item">
+                            <span class="label">Distance Totale</span>
+                            <strong>{{ route.distance }} Km</strong>
+                        </div>
+                        <div class="meta-item">
+                            <span class="label">Durée Estimée</span>
+                            <strong>{{ route.duration }}</strong>
+                        </div>
+                        <div class="meta-item">
+                            <span class="label">Prix Fret / Kg</span>
+                            <strong class="text-success">{{ route.pricePerKg|number_format(0, '.', ' ') }} {{
+                                route.currency }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section Tarification par Tronçons (Segments) #}
+            <div class="card mb-20">
+                <div class="card-header-action-row mb-15">
+                    <h2 class="card-title-fix"><i class="fa-solid fa-layer-group"></i> Matrice des Tarifs par Segment
+                    </h2>
+                    <button type="button" class="btn btn-success text-size-11" id="js-open-fare-modal">
+                        <i class="fa-solid fa-plus-circle"></i> Configurer un nouveau tarif
+                    </button>
+                </div>
+
+                <div class="table-responsive-wrapper">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Segment (De ➔ À)</th>
+                                <th>Catégorie</th>
+                                <th class="text-right">Tarif Billet</th>
+                                <th class="text-right">Fret / Kg</th>
+                                <th>Validité</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fare in route.fares %}
+                            <tr>
+                                <td>
+                                    <strong>{{ fare.departureCity }} ➔ {{ fare.arrivalCity }}</strong>
+                                </td>
+                                <td><span class="fare-badge-inline {{ fare.type|lower }}">{{ fare.type }}</span></td>
+                                <td class="text-right font-bold">{{ fare.amount|number_format(0, '.', ' ') }} {{
+                                    fare.currency }}</td>
+                                <td class="text-right">{{ fare.pricePerKg }} {{ fare.currency }}</td>
+                                <td class="text-size-11">Du {{ fare.validFrom|date('d/m/y') }}</td>
+                                <td class="text-right actions">
+                                    <a href="#" class="table-action-btn bg-mute" title="Modifier ce tarif"><i
+                                            class="fa-solid fa-pen"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+            {# CARD 2 : TRACÉ DÉTAILLÉ DES ARRÊTS (MCD 12) #}
+            <div class="card mb-20">
+                <h2 class="card-title-fix"><i class="fa-solid fa-map-location-dot"></i> Itinéraire & Escales</h2>
+                <div class="route-timeline-display">
+
+                    {% for stop in route.stops %}
+                    <div class="timeline-stop-item">
+                        <div class="timeline-visual">
+                            <div
+                                class="marker {% if loop.first %}start{% elseif loop.last %}end{% else %}intermediate{% endif %}">
+                                {% if loop.first %}<i class="fa-solid fa-bus"></i>{% elseif loop.last %}<i
+                                    class="fa-solid fa-flag-checkered"></i>{% else %}{{ stop.stopOrder }}{% endif %}
+                            </div>
+                            {% if not loop.last %}<div class="connector"></div>{% endif %}
+                        </div>
+                        <div class="timeline-content">
+                            <div class="stop-header">
+                                <h3>{{ stop.city }} <small>({{ stop.country }})</small></h3>
+                                <span class="stop-km">+ {{ stop.distanceFromDeparture }} Km</span>
+                            </div>
+                            <div class="stop-details">
+                                <span><i class="fa-solid fa-clock"></i> Arrivée estimée à <strong>T + {{
+                                        stop.durationFromDeparture }}</strong></span>
+                                {% if stop.isActive %}
+                                <span class="badge-status-active">Gare Active</span>
+                                {% else %}
+                                <span class="badge-status-inactive">Arrêt Suspendu</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+
+        {# COLONNE DROITE : STATUT ET AUDIT #}
+        <aside class="summary">
+            <div class="card summary-sticky-card">
+                <h2 class="card-title-fix">Exploitation</h2>
+
+                <div class="audit-stack">
+                    <div class="audit-line">
+                        <span class="label">Statut :</span>
+                        {% if route.isAvailable %}
+                        <span class="badge-status-confirmed">Opérationnelle</span>
+                        {% else %}
+                        <span class="badge-status-pending">En Maintenance</span>
+                        {% endif %}
+                    </div>
+                    <div class="audit-line">
+                        <span class="label">Délai Expiration :</span>
+                        <strong>{{ route.reservationExpirationDelay ?? '120' }} minutes</strong>
+                    </div>
+                </div>
+
+                <hr class="summary-divider">
+
+                <div class="audit-stack small">
+                    <div class="audit-line">
+                        <span>Créé le :</span>
+                        <span>{{ route.createdAt|date('d/m/Y') }}</span>
+                    </div>
+                    <div class="audit-line">
+                        <span>Par :</span>
+                        <span>{{ route.createdBy }}</span>
+                    </div>
+                </div>
+
+                <div class="notice-box mt-20">
+                    <p><i class="fa-solid fa-lightbulb"></i> <strong>Note :</strong> Cette configuration définit les
+                        options de billetterie pour les voyageurs souhaitant descendre en cours de route.</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    {# ... Reste de la page show ... #}
+
+    <div id="fare-modal" class="modal-wrapper">
+        <div class="modal-content card">
+            <h2 class="card-title-fix"><i class="fa-solid fa-tag"></i> Configurer un nouveau tarif</h2>
+
+            <form action="#" method="POST">
+                <div class="field-group mb-20">
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Départ (Origine)</label>
+                        <select name="departure" class="admin-bus-layout-add-select">
+                            {% for stop in route.stops %}
+                            <option value="{{ stop.id }}">{{ stop.city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Arrivée (Destination)</label>
+                        <select name="arrival" class="admin-bus-layout-add-select">
+                            {% for stop in route.stops %}
+                            <option value="{{ stop.id }}">{{ stop.city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field-group mb-20">
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Catégorie</label>
+                        <select name="type" class="admin-bus-layout-add-select">
+                            <option value="Standard">Standard</option>
+                            <option value="VIP">VIP</option>
+                            <option value="Promo">Promo</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Prix ({{ route.currency }})</label>
+                        <input type="number" name="amount" class="admin-bus-layout-add-input" required>
+                    </div>
+                </div>
+
+                <div class="header-actions" style="justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" id="js-close-fare-modal" class="btn btn-dark">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer le tarif</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+{% endblock %}
