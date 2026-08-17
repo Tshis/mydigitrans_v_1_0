@@ -1,0 +1,232 @@
+{# templates/admin/agency/route/new.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/admin/route_add.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-route-creation-scope container">
+
+    {# --- EN-TÊTE DE LA PAGE --- #}
+    <header class="header mb-25">
+        <a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour au registre">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="title">
+            <h2>Configuration d'un Itinéraire Multi-devises [MCD 11-12]</h2>
+            <p>Définissez l'axe principal, la devise de référence logistique et la séquence des arrêts géographiques.
+            </p>
+        </div>
+    </header>
+
+    {# --- FORMULAIRE D'AXE ROUTIER COMPLET --- #}
+    <form action="#" method="POST" id="route-creation-form" class="reservation-form">
+        <div class="reservation-container">
+
+            {# PANNEAU PRINCIPAL (GAUCHE) #}
+            <div class="layout-main-panel">
+
+                {# Section 1 : Route (11. Route) #}
+                <div class="card mb-20">
+                    <h2><i class="fa-solid fa-map-location-dot"></i> Itinéraire & Axe Principal</h2>
+                    <div class="field-group">
+                        <div class="field flex-double">
+                            <label class="admin-bus-layout-add-label">Nom Commercial de la Ligne *</label>
+                            <input type="text" name="name" id="route-name-input" class="admin-bus-layout-add-input"
+                                placeholder="Ex : Kinshasa - Muanda" required autocomplete="off">
+                        </div>
+
+                    </div>
+                </div>
+
+                {# Section 2 : ROUTESTOPS DYNAMIQUES EN GRID (12. RouteStop) #}
+                <div class="card mb-20">
+                    <div class="card-header-action-row mb-15">
+                        <h2><i class="fa-solid fa-list-ol"></i> Points d'Arrêts & Escales Routières (RouteStops)</h2>
+                        <button type="button" class="btn btn-success text-size-11" id="js-add-stop-row">
+                            <i class="fa-solid fa-plus"></i> Ajouter une escale
+                        </button>
+                    </div>
+
+                    <div class="route-stops-timeline-container" id="stops-dynamic-container">
+
+                        {# Nœud 1 : Départ Initial (Forcé stopOrder: 1, Km: 0) #}
+                        <div class="stop-node-row core-node" data-stop-order="1">
+                            <div class="stop-id-indicator">#1</div>
+                            <div class="stop-badge-marker start">Départ</div>
+                            <input type="hidden" name="stops[stopOrder]" value="1">
+
+                            <div class="stop-grid-fields">
+                                <div class="field">
+                                    <label class="admin-bus-layout-add-label">Ville d'Origine (city) *</label>
+                                    <input type="text" name="stops[city]" value="Kinshasa"
+                                        class="admin-bus-layout-add-input" required autocomplete="off">
+                                </div>
+                                <div class="field">
+                                    <label class="admin-bus-layout-add-label">Pays (country) *</label>
+                                    <input type="text" name="stops[country]" value="RDC"
+                                        class="admin-bus-layout-add-input" required autocomplete="off">
+                                </div>
+                                <div class="field">
+                                    <label class="admin-bus-layout-add-label">Distance *</label>
+                                    <div class="input-unit-wrapper">
+                                        <input type="number" name="stops[distanceFromDeparture]" value="0"
+                                            class="admin-bus-layout-add-input" readonly>
+                                        <span class="unit-badge">Km 0</span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="admin-bus-layout-add-label">Durée *</label>
+                                    <input type="text" name="stops[durationFromDeparture]" value="0h00"
+                                        class="admin-bus-layout-add-input" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Emplacement d'injection des RouteStops intermédiaires via le Script JS #}
+
+                        {# Nœud Final : Terminus Dynamique #}
+                        <div class="stop-node-row core-node last" id="js-terminus-row" data-stop-order="2">
+                            <div class="stop-id-indicator" id="js-terminus-order-text">#2</div>
+                            <div class="stop-badge-marker end">Fin</div>
+                            <input type="hidden" name="stops[terminus][stopOrder]" id="js-terminus-order-input"
+                                value="2">
+
+                            <div class="stop-grid-fields">
+                                <div class="field">
+                                    <label class="admin-bus-layout-add-label">Ville de Destination (city) *</label>
+                                    <input type="text" name="stops[terminus][city]" class="admin-bus-layout-add-input"
+                                        placeholder="Ex : Muanda" required autocomplete="off">
+                                </div>
+                                <div class="field">
+                                    <label class="admin-bus-layout-add-label">Pays (country) *</label>
+                                    <input type="text" name="stops[terminus][country]" value="RDC"
+                                        class="admin-bus-layout-add-input" required autocomplete="off">
+                                </div>
+                                <div class="field">
+                                    <label class="admin-bus-layout-add-label">Distance (km) *</label>
+                                    <div class="input-unit-wrapper">
+                                        <input type="number" name="stops[terminus][distanceFromDeparture]" min="1"
+                                            class="admin-bus-layout-add-input" placeholder="650" required>
+                                        <span class="unit-badge">Km</span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="admin-bus-layout-add-label">Durée Totale *</label>
+                                    <input type="text" name="stops[terminus][durationFromDeparture]"
+                                        class="admin-bus-layout-add-input" placeholder="11h00" required
+                                        autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {# Section 3 : RECONVERSION MULTI-DEVISES DU PRIX AU KILO #}
+                <div class="card">
+                    <h2><i class="fa-solid fa-hand-holding-dollar"></i> Règles Métier & Tarification Multi-devises</h2>
+                    <div class="field-group mb-15">
+                        <div class="field flex-double">
+                            <label class="admin-bus-layout-add-label">Valeur du Fret par Kilo (Price_per_kg) *</label>
+                            <input type="number" name="price_per_kg" min="0" step="0.01"
+                                class="admin-bus-layout-add-input" placeholder="Ex: 500 ou 1.50" required>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Devise de Facturation du Fret *</label>
+                            <select name="route_currency" id="js-route-currency-selector"
+                                class="admin-bus-layout-add-select" required>
+                                {% for curr in active_currencies %}
+                                <option value="{{ curr.code }}">{{ curr.code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Délai d'expiration des Réservations (Minutes)</label>
+                        <div class="input-unit-wrapper">
+                            <input type="number" name="reservation_expiration_delay" min="5" max="1440"
+                                class="admin-bus-layout-add-input" placeholder="Ex : 120 (Par défaut : 2 heures)">
+                            <span class="unit-badge">Min</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {# PANNEAU DROITE (ASIDE RESUMÉ) #}
+            <aside class="summary">
+                <div class="card summary-sticky-card">
+                    <h2>Publication</h2>
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Disponibilité (isAvailable)</label>
+                        <select name="isAvailable" class="admin-bus-layout-add-select" required>
+                            <option value="1">Actif / En Ligne</option>
+                            <option value="0">Inactif / Suspendu</option>
+                        </select>
+                    </div>
+
+                    <hr class="summary-divider mb-15">
+
+                    <div class="reservation-notice-zone mb-20">
+                        <p class="notice-title">
+                            <i class="fa-solid fa-calculator"></i>
+                            Calculateur Fret Unifié
+                        </p>
+                        <p class="notice-text">
+                            Le prix par kilo configuré à gauche s'appliquera automatiquement dans la devise choisie pour
+                            toutes les expéditions associées à ce trajet.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full py-12">
+                        <i class="fa-solid fa-map-pin"></i> Enregistrer l'Itinéraire
+                    </button>
+                </div>
+            </aside>
+
+        </div>
+    </form>
+</div>
+
+{# MODÈLE TEMPLATE POUR L'INJECTION D'ARRÊTS INTERMÉDIAIRES #}
+<template id="stop-row-template">
+    <div class="stop-node-row intermediate-node">
+        <div class="stop-id-indicator">#__ORDER__</div>
+        <div class="stop-badge-marker intermediate">Arrêt</div>
+        <input type="hidden" name="stops[__INDEX__][stopOrder]" value="__ORDER__">
+
+        <div class="stop-grid-fields has-delete-action">
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Ville d'Escale (city) *</label>
+                <input type="text" name="stops[__INDEX__][city]" class="admin-bus-layout-add-input"
+                    placeholder="Ex : Mbanza-Ngungu" required autocomplete="off">
+            </div>
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Pays (country) *</label>
+                <input type="text" name="stops[__INDEX__][country]" value="RDC" class="admin-bus-layout-add-input"
+                    required autocomplete="off">
+            </div>
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Distance (Km) *</label>
+                <div class="input-unit-wrapper">
+                    <input type="number" name="stops[__INDEX__][distanceFromDeparture]" min="1"
+                        class="admin-bus-layout-add-input" placeholder="150" required>
+                    <span class="unit-badge">Km</span>
+                </div>
+            </div>
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Durée *</label>
+                <input type="text" name="stops[__INDEX__][durationFromDeparture]" class="admin-bus-layout-add-input"
+                    placeholder="2h15" required autocomplete="off">
+            </div>
+            <button type="button" class="btn-remove-stop-node js-remove-row" title="Retirer cet arrêt">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </div>
+    </div>
+</template>
+{% endblock %}

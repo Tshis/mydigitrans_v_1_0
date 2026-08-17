@@ -18,8 +18,8 @@ class LineController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/line/add', name: 'admin_agency_line_add')]
-    public function add(Request $request): Response
+    #[Route('/admin/agency/route/add', name: 'admin_agency_line_add_ggg')]
+    public function new(Request $request): Response
     {
         // 1. Création du formulaire à la volée (sans entité)
         $form = $this->createFormBuilder()
@@ -43,7 +43,25 @@ class LineController extends AbstractController
             'page' => 'line',
             'form' => $form->createView(),
         ]);
+    } //bew
+
+    // src/Controller/Admin/RouteController.php
+
+    #[Route('/admin/agency/line/add', name: 'admin_agency_line_add')]
+    public function add(): Response
+    {
+        // Devises autorisées pour le calcul de fret sur le réseau Mydigitrans
+        $activeCurrencies = [
+            ['code' => 'CDF'],
+            ['code' => 'USD'],
+        ];
+
+        return $this->render('admin/agency/caisse/add.html.twig', [
+            'page' => 'line',
+            'active_currencies' => $activeCurrencies,
+        ]);
     } //add
+
 
     #[Route('/admin/agency/line/{slug}/details', name: 'admin_agency_line_show')]
     public function show(): Response

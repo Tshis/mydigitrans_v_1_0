@@ -1,0 +1,200 @@
+@use '../../abstract/variables' as *;
+
+// ====================================================
+// === MODULE EXPLOITATION : CONFIGURATION DES ROUTES =
+// ====================================================
+.admin-route-creation-scope {
+    width: 100%;
+    padding-block: 2rem;
+    overflow-x: hidden; // Élimine tout scroll parasite global
+
+    // --- UTILITIES CORE ---
+    .mb-25 { margin-bottom: 1.55rem; }
+    .mb-20 { margin-bottom: 1.25rem; }
+    .mb-15 { margin-bottom: 1rem; }
+    .mt-15 { margin-top: 1rem; }
+    
+    .flex-double { flex: 2 !important; }
+
+    .card-header-action-row {
+        display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+        h2 { border-bottom: none !important; padding-bottom: 0 !important; margin: 0 !important; }
+    }
+
+    // --- EN-TÊTE ---
+    .header {
+        display: flex; align-items: center; gap: 1.2rem;
+        .agency-back-action {
+            border-radius: 50%; width: 40px; height: 40px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: rgba($gray, 0.08); color: #0c326d; text-decoration: none;
+            transition: transform 0.2s;
+            &:hover { transform: scale(1.05); }
+        }
+        .title {
+            h2 { font-size: 1.5rem; font-weight: 800; color: $dark; margin: 0; }
+            p { font-size: 1rem; color: $gray; margin: 4px 0 0 0; }
+        }
+    }
+
+    // --- STRUCTRE DES PANNEAUX PRINCIPAUX ---
+    .reservation-container {
+        display: grid; 
+        grid-template-columns: 1fr 360px; 
+        gap: 1.5rem;
+        align-items: start; 
+        width: 100%;
+        box-sizing: border-box;
+        
+        @media (max-width: 1200px) { grid-template-columns: 1fr; }
+    }
+
+    .layout-main-panel {
+        width: 100%;
+        min-width: 0; // Empêche l'éclatement de la grille en Flexbox/Grid parent
+    }
+
+    .card {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card;
+        padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+        box-sizing: border-box;
+        
+        h2 {
+            font-size: 13.5px; font-weight: 700; text-transform: uppercase; color: $dark;
+            margin: 0 0 1.25rem 0; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 8px; 
+            display: flex; align-items: center; gap: 8px;
+            i { color: $primary; }
+        }
+    }
+
+    .field-group {
+        display: flex; gap: 1.25rem; width: 100%; align-items: flex-end;
+        box-sizing: border-box;
+        @media (max-width: 768px) { flex-direction: column; align-items: stretch; }
+    }
+
+    .field {
+        flex: 1; display: flex; flex-direction: column; gap: 6px;
+        box-sizing: border-box;
+        
+        .admin-bus-layout-add-label { 
+            font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        
+        .admin-bus-layout-add-input, .admin-bus-layout-add-select {
+            width: 100%; padding: 10px 12px; border: 1px solid $mute; border-radius: $radius-input;
+            font-size: 13px; font-weight: 600; color: $dark; background: $white; outline: none;
+            height: 40px; box-sizing: border-box; transition: border-color 0.2s;
+            &:focus { border-color: $primary; }
+            &[readonly] { background-color: rgba($mute, 0.3); color: lighten($dark, 15%); cursor: not-allowed; }
+        }
+    }
+
+    .input-unit-wrapper {
+        position: relative; display: flex; align-items: center; width: 100%;
+        box-sizing: border-box;
+        input { padding-right: 45px !important; }
+        .unit-badge {
+            position: absolute; right: 12px; font-weight: 800; font-size: 11px;
+            color: $dark; background-color: rgba($mute, 0.5); padding: 3px 6px; border-radius: 4px;
+        }
+    }
+
+    // ====================================================
+    // --- TIMELINE CONTENANT LES BLOCS D'ARRÊTS ----------
+    // ====================================================
+    .route-stops-timeline-container {
+        position: relative; display: flex; flex-direction: column; gap: 1.25rem;
+        padding-left: 95px; margin-block: 1rem; box-sizing: border-box;
+
+        &::before {
+            content: ''; position: absolute; left: 22px; top: 15px; bottom: 15px;
+            width: 3px; background-color: rgba($primary, 0.2); z-index: 1;
+        }
+    }
+
+    .stop-node-row {
+        position: relative; width: 100%; box-sizing: border-box;
+        
+        .stop-id-indicator {
+            position: absolute; left: -95px; top: 50%; transform: translateY(-50%);
+            font-size: 12px; font-weight: 900; color: rgba($dark, 0.4);
+            background-color: rgba($gray, 0.05); padding: 4px 6px; border-radius: 4px;
+        }
+
+        .stop-badge-marker {
+            position: absolute; left: -50px; top: 50%; transform: translateY(-50%);
+            width: 44px; height: 24px; border-radius: 12px; font-size: 10px; font-weight: 800;
+            display: inline-flex; align-items: center; justify-content: center;
+            text-transform: uppercase; z-index: 2;
+
+            &.start { background-color: #0c326d; color: $white; }
+            &.intermediate { background-color: $white; color: $dark; border: 2px solid $primary; }
+            &.end { background-color: $success; color: $white; }
+        }
+
+        // ALIGNEMENT ABSOLU : Grille géométrique fixe alignée par le bas sans décalage
+        .stop-grid-fields {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr 1fr 1fr; // Quatre colonnes égales et proportionnelles
+            gap: 1rem;
+            align-items: flex-end; // Aligne tous les bas d'inputs de façon chirurgicale
+            background: rgba($gray, 0.02);
+            border: 1px solid $mute;
+            padding: 12px;
+            border-radius: $radius-input;
+            box-sizing: border-box;
+
+            // Ajustement si présence du bouton de suppression (Noeuds intermédiaires)
+            &.has-delete-action {
+                grid-template-columns: 1.8fr 1fr 1fr 1fr 40px;
+            }
+
+            @media (max-width: 992px) {
+                grid-template-columns: 1fr !important; // S'adapte sur tablette et mobile
+                gap: 0.75rem;
+            }
+        }
+
+        .btn-remove-stop-node {
+            background: rgba($danger, 0.08); color: $danger; border: none;
+            width: 100%; height: 40px; border-radius: $radius-input; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s; box-sizing: border-box;
+            
+            &:hover { background-color: $danger; color: $white; }
+        }
+    }
+
+    // --- ENCART DROITE ---
+    .summary {
+        .summary-sticky-card { position: sticky; top: 20px; }
+        .reservation-notice-zone {
+            border-left: 4px solid $primary; background-color: rgba($primary, 0.03);
+            padding: 12px; border-radius: 0 $radius-input $radius-input 0;
+            .notice-title { font-weight: 700; color: $primary; font-size: 12px; margin: 0 0 4px 0; display: flex; align-items: center; gap: 6px; }
+            .notice-text { font-size: 11px; color: $gray; margin: 0; line-height: 1.4; }
+        }
+        .btn-full { width: 100%; height: 44px; font-weight: 700; font-size: 13.5px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    }
+    .summary-divider { border: none; border-top: 1px dashed $mute; margin-block: 1rem; }
+}
+
+// --- DARK MODE CONFIGURATION ---
+.dark {
+    .admin-route-creation-scope {
+        .header .agency-back-action { background: rgba($white, 0.1); color: $white; }
+        .header .title h2 { color: $white; }
+        .card { background: $dm-bg-surface; border-color: rgba($mute, 0.25); h2 { color: $white; border-bottom-color: rgba($mute, 0.15); } }
+        .field .admin-bus-layout-add-input, .field .admin-bus-layout-add-select { background: darken($dm-bg-surface, 4%); border-color: rgba($mute, 0.2); color: $white; &[readonly] { background-color: rgba(0, 0, 0, 0.2); color: $gray; } }
+        .input-unit-wrapper .unit-badge { background-color: rgba($white, 0.1); color: $white; }
+        .summary .reservation-notice-zone { background-color: rgba($white, 0.02); }
+        
+        .stop-node-row {
+            .stop-id-indicator { color: rgba($white, 0.5); background-color: rgba($white, 0.05); }
+            .stop-grid-fields { background: rgba(0, 0, 0, 0.15); border-color: rgba($mute, 0.15); }
+            .stop-badge-marker.intermediate { background-color: $dm-bg-surface; color: $white; border-color: lighten($primary, 10%); }
+        }
+        .route-stops-timeline-container::before { background-color: rgba($white, 0.1); }
+    }
+}
