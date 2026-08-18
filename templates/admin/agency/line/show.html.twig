@@ -1,179 +1,217 @@
 {# templates/admin/agency/route/show.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+
 {% block body %}
-	<div
-		class="admin-agency-line-show-scope container">
+<div class="admin-route-show-scope container">
+	{# --- EN-TÊTE --- #}
+	<header class="header mb-25">
+		<div class="header-main-info">
+			<a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray">Itinéraires</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-gray text-highlight">Fiche Technique Ligne</span>
+				</div>
+			</div>
+		</div>
+		<div class="header-actions">
+			<a href="" class="btn btn-danger text-size-12">
+				<i class="fa-solid fa-ban"></i>
+				suspendre la ligne
+			</a>
+		</div>
+	</header>
 
-		{# --- EN-TÊTE DE NAVIGATION --- #}
-		<header class="header mb-25">
-			<div class="text">
-				<a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
-					<i class="fa-solid fa-arrow-left"></i>
-				</a>
-				<div class="title">
-					<h2>{{ route_name|default('Kinshasa - Kikwit via Kenge') }}</h2>
-					<div class="mt-5 d-flex align-center gap-10">
-						<span class="badge badge-success px-5 py-2 text-white text-size-11 border-radius-5">Opérationnelle</span>
-						<span class="text-gray text-size-13">Axe routier principal</span>
+	<div class="admin-route-show-container">
+		{# COLONNE GAUCHE : DÉTAILS ET TIMELINE #}
+		<div class="layout-main-panel">
+
+			{# CARD 1 : RÉSUMÉ DE LA ROUTE (MCD 11) #}
+			<div class="card mb-20">
+				<h2 class="card-title-fix">
+					<i class="fa-solid fa-circle-info"></i>
+					Identité de la Route
+				</h2>
+				<div class="route-info-banner">
+					<div class="main-details">
+						<h1>{{ route.name }}</h1>
+						<span class="route-code-badge">{{ route.code }}</span>
+					</div>
+					<div class="route-meta-grid">
+						<div class="meta-item">
+							<span class="label">Distance Totale</span>
+							<strong>{{ route.distance }}
+								Km</strong>
+						</div>
+						<div class="meta-item">
+							<span class="label">Durée Estimée</span>
+							<strong>{{ route.duration }}</strong>
+						</div>
+						<div class="meta-item">
+							<span class="label">Prix Fret / Kg</span>
+							<strong class="text-success">{{ route.pricePerKg|number_format(0, '.', ' ') }}
+								{{
+								route.currency }}</strong>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			{# Actions de sécurité : Suspendre au lieu de modifier l'itinéraire #}
-			<div class="admin-action-zone">
-				<button type="button" class="btn btn-danger text-size-12" onclick="confirmSuspension()">
-					<i class="fa-solid fa-ban"></i>
-					Suspendre la ligne (Archiver)
-				</button>
-			</div>
-		</header>
-
-		{# --- GRILLE PRINCIPALE (DASHBOARD DE LA LIGNE) --- #}
-		<div
-			class="show-grid-container">
-
-			{# --- COLONNE GAUCHE (1/3) : LA FRISE CHRONOLOGIQUE DES ARRÊTS --- #}
-			<div class="col-span-1">
-				<div class="card">
-
-					<div class="card-header mb-15">
-						<h3>
-							<i class="fa-solid fa-map-marked-alt text-primary"></i>
-							Itinéraire & Escales
-						</h3>
-						<p class="text-gray text-size-12 mt-5">Ordre de passage physique des véhicules.</p>
-					</div>
-
-					<div
-						class="route-timeline-vertical">
-
-						{# ARRÊT 1 : DÉPART #}
-						<div class="timeline-step timeline-step--start">
-							<div class="step-marker">1</div>
-							<div class="step-content">
-								<strong class="text-dark">Kinshasa</strong>
-								<span class="text-gray text-size-12 d-block">Point d'origine (RDC)</span>
-								<span class="badge badge-ligh distance mt-5">0 Km · Terminus de départ</span>
-							</div>
-						</div>
-
-						{# ARRÊT 2 : ESCALE #}
-						<div class="timeline-step">
-							<div class="step-marker">2</div>
-							<div class="step-content">
-								<strong class="text-dark">Kenge</strong>
-								<span class="text-gray text-size-12 d-block">Ville Escale (RDC)</span>
-								<span class="badge badge-primary-ligh distance mt-5">+ 260 Km (depuis le départ)</span>
-							</div>
-						</div>
-
-						{# ARRÊT 3 : TERMINUS #}
-						<div class="timeline-step timeline-step--end">
-							<div class="step-marker">3</div>
-							<div class="step-content">
-								<strong class="text-dark">Kikwit</strong>
-								<span class="text-gray text-size-12 d-block">Terminus d'arrivée (RDC)</span>
-								<span class="badge badge-success-ligh distance mt-5">520 Km au total</span>
-							</div>
-						</div>
-
-					</div>
+			{# Section Tarification par Tronçons (Segments) #}
+			<div class="card mb-20">
+				<div class="card-header-action-row mb-15">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-layer-group"></i>
+						Matrice des Tarifs par Segment
+					</h2>
+					<button type="button" class="btn btn-success text-size-11" id="js-open-fare-modal">
+						<i class="fa-solid fa-plus-circle"></i>
+						Configurer un nouveau tarif
+					</button>
 				</div>
-			</div>
 
-			{# --- COLONNE DROITE (2/3) : TARIFS SEGMENTÉS ET STATISTIQUES --- #}
-			<div
-				class="col-span-2">
-				{# BLOC B : LA GRILLE TARIFAIRE CONFIGURÉE (MCD TABLE 17. FARE) #}
-				<div class="card">
-					<div class="card-header d-flex justify-between align-center mb-15">
-						<div>
-							<h3>
-								<i class="fa-solid fa-tags text-success"></i>
-								Grille Tarifaire par Segment
-							</h3>
-							<p class="text-gray text-size-12 mt-5">Prix appliqués selon la gare de montée et de descente du
-																                            passager.</p>
-						</div>
-						<a href="{{path('admin_agency_line_fare_add',{'slug':'kinshasa-matadi-direct'})}}" class="btn btn-primary text-size-11">
-							<i class="fa-solid fa-plus"></i>
-							Ajuster les tarifs
-						</a>
-					</div>
-
-					<table class="table table-stripped">
+				<div class="table-responsive-wrapper">
+					<table class="table table-striped">
 						<thead>
 							<tr>
-								<th>Gare de Montée (Départ)</th>
-								<th>Gare de Descente (Arrivée)</th>
-								<th>Type de Siège</th>
-								<th class="text-right">Tarif Actuel</th>
+								<th>Segment (De ➔ À)</th>
+								<th class="text-right">Tarif Billet</th>
+								<th class="text-right">Fret / Kg</th>
+								<th>Validité</th>
 							</tr>
 						</thead>
 						<tbody>
+							{% for fare in route.fares %}
 							<tr>
 								<td>
-									<strong>Kinshasa</strong>
-									(Arrêt 1)
+									<strong>{{ fare.departureCity }}
+										➔
+										{{ fare.arrivalCity }}</strong>
 								</td>
-								<td>
-									<strong>Kenge</strong>
-									(Arrêt 2)
-								</td>
-								<td>
-									<span class="text-gray">Standard</span>
-								</td>
-								<td class="text-right">
-									<strong>15 000 CDF</strong>
-								</td>
+								<td class="text-right font-bold">{{ fare.amount|number_format(0, '.', ' ') }}
+									{{
+									fare.currency }}</td>
+								<td class="text-right">{{ fare.pricePerKg }}
+									{{ fare.currency }}</td>
+								<td class="text-size-11">Du
+									{{ fare.validFrom|date('d/m/y') }}</td>
+
 							</tr>
-							<tr>
-								<td>
-									<strong>Kinshasa</strong>
-									(Arrêt 1)
-								</td>
-								<td>
-									<strong>Kikwit</strong>
-									(Arrêt 3)
-								</td>
-								<td>
-									<span class="text-gray">Standard</span>
-								</td>
-								<td class="text-right">
-									<strong class="text-primary">40 000 CDF</strong>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<strong>Kenge</strong>
-									(Arrêt 2)
-								</td>
-								<td>
-									<strong>Kikwit</strong>
-									(Arrêt 3)
-								</td>
-								<td>
-									<span class="text-gray">Standard</span>
-								</td>
-								<td class="text-right">
-									<strong>25 000 CDF</strong>
-								</td>
-							</tr>
+							{% endfor %}
 						</tbody>
 					</table>
 				</div>
+			</div>
 
+
+			{# CARD 2 : TRACÉ DÉTAILLÉ DES ARRÊTS (MCD 12) #}
+			<div class="card mb-20">
+				<h2 class="card-title-fix">
+					<i class="fa-solid fa-map-location-dot"></i>
+					Itinéraire & Escales
+				</h2>
+				<div class="route-timeline-display">
+
+					{% for stop in route.stops %}
+					<div class="timeline-stop-item">
+						<div class="timeline-visual">
+							<div
+								class="marker {% if loop.first %}start{% elseif loop.last %}end{% else %}intermediate{% endif %}">
+								{% if loop.first %}
+								<i class="fa-solid fa-bus"></i>
+								{% elseif loop.last %}
+								<i class="fa-solid fa-flag-checkered"></i>
+								{% else %}
+								{{ stop.stopOrder }}
+								{% endif %}
+							</div>
+							{% if not loop.last %}
+							<div class="connector"></div>
+							{% endif %}
+						</div>
+						<div class="timeline-content">
+							<div class="stop-header">
+								<h3>{{ stop.city }}
+									<small>({{ stop.country }})</small>
+								</h3>
+								<span class="stop-km">+
+									{{ stop.distanceFromDeparture }}
+									Km</span>
+							</div>
+							<div class="stop-details">
+								<span>
+									<i class="fa-solid fa-clock"></i>
+									Arrivée estimée à
+									<strong>T +
+										{{
+										stop.durationFromDeparture }}</strong>
+								</span>
+								{% if stop.isActive %}
+								<span class="badge-status-active">Gare Active</span>
+								{% else %}
+								<span class="badge-status-inactive">Arrêt Suspendu</span>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+
+				</div>
 			</div>
 		</div>
 
+		{# COLONNE DROITE : STATUT ET AUDIT #}
+		<aside class="summary">
+			<div class="card summary-sticky-card">
+				<h2 class="card-title-fix">Exploitation</h2>
+
+				<div class="audit-stack">
+					<div class="audit-line">
+						<span class="label">Statut :</span>
+						{% if route.isAvailable %}
+						<span class="badge-status-confirmed">Opérationnelle</span>
+						{% else %}
+						<span class="badge-status-pending">En Maintenance</span>
+						{% endif %}
+					</div>
+					<div class="audit-line">
+						<span class="label">Délai Expiration :</span>
+						<strong>{{ route.reservationExpirationDelay ?? '120' }}
+							minutes</strong>
+					</div>
+				</div>
+
+				<hr class="summary-divider">
+
+				<div class="audit-stack small">
+					<div class="audit-line">
+						<span>Créé le :</span>
+						<span>{{ route.createdAt|date('d/m/Y') }}</span>
+					</div>
+					<div class="audit-line">
+						<span>Par :</span>
+						<span>{{ route.createdBy }}</span>
+					</div>
+				</div>
+
+				<div class="notice-box mt-20">
+					<p>
+						<i class="fa-solid fa-lightbulb"></i>
+						<strong>Note :</strong>
+						Cette configuration définit les
+						options de billetterie pour les voyageurs souhaitant descendre en cours de route.
+					</p>
+				</div>
+			</div>
+		</aside>
 	</div>
 
-	<script>
-		function confirmSuspension() {
-if (confirm("Attention : Suspendre cette ligne empêchera toute nouvelle planification de voyage sur cet itinéraire. Les voyages déjà programmés et l'historique financier resteront intacts. Voulez-vous continuer ?")) { // Logique de redirection ou soumission de formulaire pour passer isAvailable à false
-alert("Ligne suspendue avec succès.");
-}
-}
-	</script>
+
+</div>
+
+
 {% endblock %}

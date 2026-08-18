@@ -280,26 +280,7 @@
         }
     }
 
-    .show-grid-container{
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-        align-content: center;
-
-        .col-span-1{
-            .card-header{
-                h3{font-size: 1.8rem;}  
-            }//card-header
-
-            .timeline-step{
-                strong{font-size: 1.5rem;}
-                .d-block{display: inline-block;}
-                .distance{font-size: 1rem;}
-            }//timeline-step
-
-        }//col-span-1
-
-    }//.show-grid-container
+    
 
     // --- FRISE CHRONOLOGIQUE VERTICALE ---
     .route-timeline-vertical {
