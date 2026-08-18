@@ -19,18 +19,26 @@
 			</div>
 		</div>
 		<div class="header-actions">
+			{% if route.isAvailable %}
 			<a href="" class="btn btn-danger text-size-12">
 				<i class="fa-solid fa-ban"></i>
-				suspendre la ligne
+				Suspendre la ligne
 			</a>
+			{% else %}
+			<a href="" class="btn btn-success text-size-12">
+				<i class="fa-regular fa-circle-check"></i>
+				Activer la ligne
+			</a>
+			{% endif %}
+
 		</div>
 	</header>
 
-	<div class="admin-route-show-container">
+	<div class="route-show-container">
 		{# COLONNE GAUCHE : DÉTAILS ET TIMELINE #}
 		<div class="layout-main-panel">
 
-			{# CARD 1 : RÉSUMÉ DE LA ROUTE (MCD 11) #}
+			{# CARD 1 : RÉSUMÉ DE LA ROUTE #}
 			<div class="card mb-20">
 				<h2 class="card-title-fix">
 					<i class="fa-solid fa-circle-info"></i>
@@ -39,7 +47,19 @@
 				<div class="route-info-banner">
 					<div class="main-details">
 						<h1>{{ route.name }}</h1>
-						<span class="route-code-badge">{{ route.code }}</span>
+						{% if route.isAvailable %}
+						<span class="route-code-badge available">
+							<i class="fa-regular fa-circle-check"></i>
+							Operationnelle
+						</span>
+						{% else %}
+						<span class="route-code-badge unavailable">
+							<i class="fa-solid fa-ban"></i>
+							Suspendu
+						</span>
+
+						{% endif %}
+
 					</div>
 					<div class="route-meta-grid">
 						<div class="meta-item">
@@ -53,7 +73,8 @@
 						</div>
 						<div class="meta-item">
 							<span class="label">Prix Fret / Kg</span>
-							<strong class="text-success">{{ route.pricePerKg|number_format(0, '.', ' ') }}
+							<strong class="text-success text-size-13">{{ route.pricePerKg|number_format(0, '.', ' ')
+								}}
 								{{
 								route.currency }}</strong>
 						</div>
@@ -61,17 +82,20 @@
 				</div>
 			</div>
 
-			{# Section Tarification par Tronçons (Segments) #}
+			{# CARD 2 : Section Tarification par Tronçons (Segments) #}
 			<div class="card mb-20">
 				<div class="card-header-action-row mb-15">
 					<h2 class="card-title-fix">
 						<i class="fa-solid fa-layer-group"></i>
 						Matrice des Tarifs par Segment
 					</h2>
-					<button type="button" class="btn btn-success text-size-11" id="js-open-fare-modal">
-						<i class="fa-solid fa-plus-circle"></i>
-						Configurer un nouveau tarif
-					</button>
+					<div class="add-line-fare-btn-box">
+						<a href="{{path('admin_agency_line_fare_add',{'slug':route.slug})}}"
+							class="btn btn-success text-size-12">
+							<i class="fa-solid fa-plus-circle"></i>
+							Configurer un nouveau tarif
+						</a>
+					</div>
 				</div>
 
 				<div class="table-responsive-wrapper">
@@ -82,6 +106,7 @@
 								<th class="text-right">Tarif Billet</th>
 								<th class="text-right">Fret / Kg</th>
 								<th>Validité</th>
+								<th>Fin</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -99,6 +124,7 @@
 									{{ fare.currency }}</td>
 								<td class="text-size-11">Du
 									{{ fare.validFrom|date('d/m/y') }}</td>
+								<td>Indéfini</td>
 
 							</tr>
 							{% endfor %}
@@ -108,7 +134,7 @@
 			</div>
 
 
-			{# CARD 2 : TRACÉ DÉTAILLÉ DES ARRÊTS (MCD 12) #}
+			{# CARD 3 : TRACÉ DÉTAILLÉ DES ARRÊTS (MCD 12) #}
 			<div class="card mb-20">
 				<h2 class="card-title-fix">
 					<i class="fa-solid fa-map-location-dot"></i>
@@ -173,16 +199,31 @@
 					<div class="audit-line">
 						<span class="label">Statut :</span>
 						{% if route.isAvailable %}
-						<span class="badge-status-confirmed">Opérationnelle</span>
+						<span class="text-success text-weight-800">
+							<i class="fa-regular fa-circle-check"></i>
+							Operationnelle
+						</span>
 						{% else %}
-						<span class="badge-status-pending">En Maintenance</span>
+						<span class="text-danger text-weight-800">
+							<i class="fa-solid fa-ban"></i>
+							Suspendu
+						</span>
 						{% endif %}
 					</div>
 					<div class="audit-line">
-						<span class="label">Délai Expiration :</span>
+						<span class="label">Délai Expiration Reservation:</span>
 						<strong>{{ route.reservationExpirationDelay ?? '120' }}
 							minutes</strong>
 					</div>
+					{% if not route.isAvailable %}
+					<div class="audit-line">
+						<span class="label">Suspendu depuis le :</span>
+						<strong>
+							{{ route.lastUpdatAt ? route.lastUpdatAt|date('d/m/Y') ~ ' à '~route.lastUpdatAt|date('H:i')
+							: 'Indéfini' }}
+						</strong>
+					</div>
+					{% endif %}
 				</div>
 
 				<hr class="summary-divider">

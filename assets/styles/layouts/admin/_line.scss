@@ -259,191 +259,173 @@
 }
 
 //===LINE SHOW===
-.admin-agency-line-show-scope {
+.admin-route-show-scope {
     padding-block: 2rem;
 
+    @media (max-width: 380px) {
+            padding: 2% !important;
+        }
+
+    // --- EN-TÊTE ET FIL D'ARIANE ---
     .header {
         display: flex;
+        align-items: center;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
         flex-wrap: wrap;
-        gap: 2rem;
+        gap: 1rem;
 
-        .text{
+        .header-main-info{
             display: flex;
+            gap: .5rem;
             align-items: center;
-            gap: 2rem;
 
-            h2{font-size: 1.8rem;}
-            span{font-size: .85rem;}
-        }
-    }
-
-    
-
-    // --- FRISE CHRONOLOGIQUE VERTICALE ---
-    .route-timeline-vertical {
-        position: relative;
-        padding-left: 35px;
-        margin-block: 1.5rem;
-        display: flex;
-        flex-direction: column;
-
-        // Ligne verticale d'arrière-plan parfaitement centrée sous les ronds
-        &::before {
-            content: '';
-            position: absolute;
-            left: 11px;
-            top: 5px;
-            bottom: 5px;
-            width: 2px;
-            background: $mute;
-            z-index: 1;
-        }
-
-        .timeline-step {
-            position: relative;
-            padding-bottom: 1.5rem;
-            z-index: 2;
-
-            &:last-child {
-                padding-bottom: 0;
-            }
-
-            // Le cercle contenant le numéro
-            .step-marker {
-                position: absolute;
-                left: -35px;
-                top: 4px;
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                background: $white;
-                border: 2px solid $gray;
-                color: $gray;
-                font-weight: 700;
-                font-size: 0.75rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 3;
-                box-shadow: 0 0 0 4px $white;
-            }
-
-            // La boîte de contenu stylisée en carte légère
-            .step-content {
-                background: transparent;
+            .agency-back-action {
+                border-radius: 50%; width: 40px; height: 40px;
+                display: inline-flex; align-items: center; justify-content: center;
+                background: rgba($white, 0.08); color: $primary; text-decoration: none;
+                margin-right: 15px; transition: transform 0.2s;
                 border: 1px solid $mute;
-                border-radius: $radius-card;
-                padding: 1rem;
-                
-                &:hover {
-                    border-color: $primary;
-                }
+                &:hover { transform: scale(1.05); }
             }
 
-            // --- COLORATIONS AVEC VOS VARIABLES ---
-            &--start {
-                .step-marker { 
-                    border-color: $primary; 
-                    color: $primary; 
-                    background: $white; 
-                }
-                .step-content { 
-                    border-left: 3px solid $primary; 
-                }
+            .sub-header-flex {
+                display: flex; align-items: center; gap: 5px;
+                .arrow-divider { color: $mute; }
+                .text-highlight { font-weight: 700; color: $dark; }
             }
+        }//header-main-info
 
-            &--end {
-                .step-marker { 
-                    border-color: $success; 
-                    color: $success; 
-                    background: $white; 
-                }
-                .step-content { 
-                    border-left: 3px solid $success; 
-                }
+
+    }
+    
+   .route-show-container{
+        display: grid;
+        grid-template-columns: 1fr 340px; // Définit strictement les deux colonnes
+        gap: 1.5rem;
+        align-items: start;
+        width: 100%;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr; // On empile sur tablette/mobile
+        }
+
+        
+    }
+
+    //Card
+    .card {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card;
+        padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+        box-sizing: border-box;
+        
+        h2 {
+            font-size: 13.5px; font-weight: 700; text-transform: uppercase; color: $dark;
+            margin: 0 0 1.25rem 0; border-bottom: 1px solid rgba($mute, 0.5); padding-bottom: 8px; 
+            display: flex; align-items: center; gap: 8px;
+            i { color: $primary; }
+        }
+    }
+
+    // --- BANNER INFO ---
+    .route-info-banner {
+        .main-details {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 1.5rem; justify-content: space-between;
+            h1 { font-size: 1.8rem; font-weight: 900; color: $dark; margin: 0; }
+            .route-code-badge {  
+                color: $white; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 1.2rem; 
+                &.available{background: $success}
+                &.unavailable{background: $danger}
+            }
+        }
+        .route-meta-grid {
+           display: flex;
+           gap: 1rem;
+           align-items: center;
+           justify-content: space-around;
+           margin-top: 2rem;
+
+            .meta-item {
+                display: flex; flex-direction: column; gap: 4px;
+                .label { font-size: 11px; font-weight: 700; color: $gray; text-transform: uppercase; }
+                strong { font-size: 1.2rem; color: $dark; }
             }
         }
     }
 
-    // --- COMPOSANT DE PETITES ICÔNES DE STATISTIQUES ---
-    .stat-icon-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
+    //FARE CARD
+    .card-header-action-row{
+        .add-line-fare-btn-box{
+            display: flex;
+           justify-content: end ;
+        }
+    }
+
+    // --- TIMELINE DESIGN ---
+    .route-timeline-display {
+        padding: 1rem 0;
+        .timeline-stop-item {
+            display: flex; gap: 20px;
+            .timeline-visual {
+                display: flex; flex-direction: column; align-items: center; width: 44px;
+                .marker {
+                    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                    font-size: 12px; font-weight: 800; z-index: 2;
+                    &.start { background: $dark; color: $white; }
+                    &.end { background: $success; color: $white; }
+                    &.intermediate { background: $white; border: 2px solid $primary; color: $primary; }
+                }
+                .connector { width: 3px; flex-grow: 1; background: rgba($primary, 0.15); margin-block: 4px; }
+            }
+            .timeline-content {
+                padding-bottom: 2rem; flex-grow: 1;
+                .stop-header {
+                    display: flex; justify-content: space-between; align-items: baseline;
+                    h3 { font-size: 1.2rem; font-weight: 800; color: $dark; margin: 0; small { color: $gray; font-weight: 500; } }
+                    .stop-km { font-weight: 800; color: $primary; font-family: monospace; }
+                }
+                .stop-details {
+                    display: flex; gap: 20px; margin-top: 8px; font-size: 13px; color: $gray;
+                    .badge-status-active { color: $success; font-weight: 700; }
+                }
+            }
+            &:last-child .timeline-content { padding-bottom: 0; }
+        }
+    }
+
+    // --- ASIDE AUDIT ---
+    .audit-stack {
+        display: flex; flex-direction: column; gap: 12px;
+        .audit-line { 
+            display: flex; justify-content: space-between; font-size: 13px;
+            .label { color: $gray; font-weight: 600; }
+        }
+        &.small { font-size: 11px; color: $gray; border-top: 1px solid rgba($mute, 0.5); padding-top: 15px; }
+    }
+
+    .notice-box {
+        background: rgba($primary, 0.05); 
+        padding: 12px; 
+        border-radius: 8px; font-size: 12px; 
+        color: darken($primary, 15%);
+        line-height: 1.4;
+    }
+
+}
+
+// DARK MODE
+.dark .admin-route-show-scope {
+    .route-info-banner .main-details h1, 
+    .route-meta-grid .meta-item strong { color: $white; }
+    .timeline-content .stop-header h3 { color: darken($white,25%) !important; letter-spacing: 1px; }
+    .timeline-visual .marker.intermediate { background: $dm-bg; }
+
+    .route-meta-grid{
+        .meta-item,span.label{color: $mute;}
         
-        &.bg-primary-light { background: rgba($primary, 0.1); color: $primary; }
-        &.bg-success-light { background: rgba($success, 0.1); color: $success; }
-        &.bg-warning-light { background: rgba($primary, 0.15); color: $primary; } // Utilisation de primary pour l'alerte à défaut de $warning
-    }
-}//.admin-agency-line-show-scope 
-
-
-
-// --- ADAPTATION AU MODE SOMBRE (DARK MODE) ---
-.dark {
-    .stat-card {
-        background: $dm-bg !important;
-        border-color: rgba($mute, 0.25) !important;
-
-        .stat-details {
-            .stat-label {
-                color: $mute !important;
-            }
-            .stat-value {
-                color: $white !important;
-            }
-        }//stat-details
-
-        // Amélioration du contraste des icônes en mode sombre
-        .stat-icon {
-            &--primary {
-                background: rgba($primary, 0.15) !important;
-                color: lighten($primary, 10%) !important;
-            }
-            &--success {
-                background: rgba($success, 0.15) !important;
-                color: lighten($success, 15%) !important;
-            }
-            &--danger {
-                background: rgba($danger, 0.15) !important;
-                color: lighten($danger, 15%) !important;
-            }
-        }//.stat-icon
-    }//start-card
-
-    .text{
-        h2{color: $success !important;}
-        p{color: $mute;}
     }
 
-    .form-line-add-container{
-        background: $dm-bg;
-        border: 1px solid $mute;
-
+    .card-title-fix{ 
+        color: $success; 
     }
-
-    .admin-agency-line-show-scope  {
-
-        .show-grid-container{
-            
-            .col-span-1{
-                .timeline-step{
-                    strong{color: $success !important;}
-                    .d-block{display: inline-block;}
-                    .distance{font-size: 1rem;}
-                }//timeline-step
-
-            }//col-span-1
-
-        }//.show-grid-container
-
-       color: $mute;
-    }
-}//dark
+}

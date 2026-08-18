@@ -33,8 +33,6 @@ class LineController extends AbstractController
     } //add
 
 
-
-
     #[Route('/admin/agency/line/{slug}/details', name: 'admin_agency_line_show')]
     public function show(string $slug): Response
     {
@@ -48,10 +46,11 @@ class LineController extends AbstractController
             'duration' => '11h30',
             'pricePerKg' => 500,
             'currency' => 'CDF',
-            'isAvailable' => true,
+            'isAvailable' => false,
             'reservationExpirationDelay' => 120,
             'createdAt' => new \DateTime('2026-01-15'),
             'createdBy' => 'Daniel Lukonu',
+            'lastUpdatAt' => null,
             'stops' => [
                 [
                     'id' => 101, // ID ajouté pour l'option 1
@@ -78,7 +77,7 @@ class LineController extends AbstractController
                     'country' => 'RDC',
                     'distanceFromDeparture' => 350,
                     'durationFromDeparture' => '6h00',
-                    'isActive' => true
+                    'isActive' => false
                 ],
                 [
                     'id' => 104, // ID ajouté
@@ -130,5 +129,5 @@ class LineController extends AbstractController
             'page' => 'line',
             'route' => $route
         ]);
-    }
+    } //show
 }
