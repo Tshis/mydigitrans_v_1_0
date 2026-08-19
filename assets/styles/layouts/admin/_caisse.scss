@@ -1,5 +1,116 @@
 @use '../../abstract/variables' as *;
 
+.admin-fare-matrix-scope {
+    padding-block: 2rem;
 
+    .header-sticky {
+        position: sticky; top: 0; z-index: 1000;
+        background: rgba($white, 0.95); backdrop-filter: blur(8px);
+        padding-block: 1rem; border-bottom: 1px solid $mute;
+        margin-left: -15px; margin-right: -15px; padding-inline: 15px;
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+    }
 
+    // --- HEADER ---
+    .header {
+        margin-top: 2rem;
 
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+        align-items: center;
+        flex-wrap: wrap;
+
+        @media (max-width:768px) {
+
+             justify-content: space-around;
+        }
+
+        .header-main-info {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+
+            h1{
+                font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0;
+            }
+            
+            .agency-back-action {
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: $white;
+                color: $dark;
+                text-decoration: none;
+                transition: transform 0.2s;
+                border: 1px solid $mute ;
+    
+                &:hover { transform: scale(1.05); }
+            }//agency-back-action
+
+        }//header-main-info
+
+    }//header
+
+    .route-selector-card {
+        background: linear-gradient(to right, $white, rgba($primary, 0.03));
+        border-left: 5px solid $primary;
+        .selector-content { 
+            display: flex; 
+            align-items: center; 
+            flex-wrap: wrap;
+            gap: 20px; 
+            padding: 1.25rem; 
+        }
+    }
+
+    .direct-route-card {
+        border-top: 4px solid $primary;
+        .card-header-simple {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 1rem; border-bottom: 1px solid rgba($mute, 0.5);
+            h2 { font-size: 15px; font-weight: 800; margin: 0; }
+        }
+        .direct-pricing-row { display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; }
+        .segment-display {
+            display: flex; align-items: center; gap: 15px;
+            .city { font-size: 1.4rem; font-weight: 900; color: $dark; }
+            .separator { color: $primary; font-size: 1.2rem; }
+            .dist-badge { background: rgba($primary, 0.1); color: $primary; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 12px; }
+        }
+        .pricing-fields { display: flex; gap: 1.5rem; }
+    }
+
+    .table-matrix {
+        width: 100%; border-collapse: collapse;
+        th { background: rgba($gray, 0.03); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; text-align: left; }
+        td { padding: 10px 15px; vertical-align: middle; border-bottom: 1px solid rgba($mute, 0.5); }
+        .segment-path { 
+            display: flex; align-items: center; gap: 10px; font-weight: 800; 
+            i { color: $mute; font-size: 10px; }
+            .from { color: $primary; }
+        }
+    }
+
+    .matrix-input {
+        width: 100%; height: 38px; padding: 8px 12px; border: 1px solid $mute; border-radius: 6px;
+        font-weight: 700; color: $dark; background: $white;
+        &:focus { border-color: $primary; outline: none; box-shadow: 0 0 0 3px rgba($primary, 0.1); }
+        &.main-price { height: 46px; font-size: 1.2rem; border-width: 2px; width: 180px; }
+    }
+
+    .matrix-select.mini { width: 90px; height: 32px; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+}
+
+.dark .admin-fare-matrix-scope {
+    .header-sticky { background: rgba($dm-bg, 0.95); 
+        border-bottom-color:1px solid rgba($mute, 0.4) !important; 
+        h1{ color: $mute;         }
+        .sub-header-flex{color: $white !important;}
+    }
+    .direct-route-card .segment-display .city, .table-matrix .segment-path { color: $white; }
+    .matrix-input { background: $dm-bg-main; color: $white; border-color: rgba($mute, 0.2); }
+}

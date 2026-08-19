@@ -1,0 +1,138 @@
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/admin/fare_line_add.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-fare-matrix-scope container">
+    {# --- HEADER STICKY --- #}
+    <header class="header header-sticky mb-25">
+        <div class="header-main-info">
+            <a href="{{ path('admin_agency_line_show', {'slug': route.slug}) }}" class="agency-back-action">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">MyDigitrans Console</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-gray text-size-13 text-highlight">Pilotage Tarifaire</span>
+                </div>
+                <h1 class="mt-5">Matrice de Tarification</h1>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button type="submit" form="bulk-fare-form" class="btn btn-success btn-lg-save">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Enregistrer les tarifs
+            </button>
+        </div>
+    </header>
+
+    {# --- SÉLECTEUR DE ROUTE MAÎTRE --- #}
+    <div class="card route-selector-card mb-20">
+        <div class="selector-content">
+            <label class="admin-bus-layout-add-label"><i class="fa-solid fa-map-location-dot"></i> Itinéraire à
+                configurer :</label>
+            <select id="js-master-route-picker" class="admin-bus-layout-add-select select-primary-focus">
+                {% for r in all_routes %}
+                <option value="{{ r.id }}" {% if r.id==route.id %}selected{% endif %}>
+                    {{ r.code }} : {{ r.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <form id="bulk-fare-form" action="#" method="POST">
+        <div id="js-matrix-content-loader">
+
+            {# --- CARTE TRAJET DIRECT --- #}
+            <div class="card direct-route-card mb-25">
+                <div class="card-header-simple">
+                    <h2 class="text-primary"><i class="fa-solid fa-star"></i> Trajet Direct (Terminus à Terminus)</h2>
+                    <div class="currency-selector-inline">
+                        <label>Devise :</label>
+                        <select name="matrix_currency" class="matrix-select mini">
+                            {% for curr in active_currencies %}
+                            <option value="{{ curr.code }}" {% if route.currency==curr.code %}selected{% endif %}>{{
+                                curr.code }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="direct-pricing-row">
+                    <div class="segment-display">
+                        <span class="city">{{ route.start_city }}</span>
+                        <i class="fa-solid fa-arrow-right-long separator"></i>
+                        <span class="city">{{ route.end_city }}</span>
+                        <span class="dist-badge">{{ route.distance }} Km</span>
+                    </div>
+                    <div class="pricing-fields">
+                        <div class="field">
+                            <label>Prix Billet Direct</label>
+                            <input type="number" name="direct_amount" class="matrix-input main-price"
+                                value="{{ route.direct_amount }}" step="0.01">
+                        </div>
+                        <div class="field">
+                            <label>Prix Fret / Kg</label>
+                            <input type="number" name="direct_fret" class="matrix-input main-price"
+                                value="{{ route.price_per_kg }}" step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# --- TABLEAU DES TRONÇONS --- #}
+            <div class="card matrix-card">
+                <div class="matrix-toolbar">
+                    <h3><i class="fa-solid fa-route"></i> Découpage des Tronçons</h3>
+                    <span class="text-gray text-size-12">Configurez les tarifs pour les arrêts intermédiaires.</span>
+                </div>
+
+                <div class="table-responsive-wrapper">
+                    <table class="table table-matrix">
+                        <thead>
+                            <tr>
+                                <th>Tronçon (Origine ➔ Destination)</th>
+                                <th>Distance</th>
+                                <th>Prix du Billet</th>
+                                <th>Prix Fret / Kg</th>
+                                <th class="text-center">Actif</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for segment in segments %}
+                            <tr class="matrix-row">
+                                <td class="segment-info">
+                                    <div class="segment-path">
+                                        <span class="from">{{ segment.from_city|default(route.start_city) }}</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                        <span class="to">{{ segment.to_city }}</span>
+                                    </div>
+                                    <input type="hidden" name="fares[{{ loop.index }}][to_id]"
+                                        value="{{ segment.to_id }}">
+                                </td>
+                                <td class="text-muted">{{ segment.distance }} Km</td>
+                                <td>
+                                    <input type="number" name="fares[{{ loop.index }}][amount]" class="matrix-input"
+                                        value="{{ segment.current_amount }}" step="0.01">
+                                </td>
+                                <td>
+                                    <input type="number" name="fares[{{ loop.index }}][price_per_kg]"
+                                        class="matrix-input" value="{{ segment.current_fret }}" step="0.01">
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" name="fares[{{ loop.index }}][is_active]" checked>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
