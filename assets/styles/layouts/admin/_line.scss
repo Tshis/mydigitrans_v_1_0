@@ -94,9 +94,31 @@
         }//stat-card 
 
     }//stats-overview-grid
+
+    .table-action-trigger {
+            display: inline-flex !important; 
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: rgba($gray, 0.25);
+            color: $dark;
+            font-size: 13px;
+            margin-left: 6px; 
+            float: none !important;
+            transition: all 0.2s;
+
+            &.view:hover      { background: rgba($primary, 0.12); color: $primary; }
+            &.print:hover     { background: rgba($dark, 0.12); color: $dark; }
+            &.validate:hover  { background: rgba($success, 0.12); color: $success; }
+        }
     
 }//admin-lines-wrapper
 
+.dark{
+    .table-action-trigger{color: $mute;}
+}
 
 //====LINE ADD======
 .admin-route-creation-scope {
