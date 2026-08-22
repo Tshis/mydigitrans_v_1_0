@@ -4,7 +4,7 @@
     padding-block: 2rem;
 
     .header-sticky {
-        position: sticky; top: 0; z-index: 1000;
+        position: sticky; top: 56px; z-index: 1000;
         background: rgba($white, 0.95); backdrop-filter: blur(8px);
         padding-block: 1rem; border-bottom: 1px solid $mute;
         margin-left: -15px; margin-right: -15px; padding-inline: 15px;
@@ -64,6 +64,24 @@
             flex-wrap: wrap;
             gap: 20px; 
             padding: 1.25rem; 
+
+
+            .admin-bus-layout-add-select{
+                 width: 100%;
+                    padding: 8px 12px;
+                    border: 1px solid $mute;
+                    border-radius: $radius-input;
+                    font-size: 13px;
+                    font-weight: 600;
+                    background: $white;
+                    color: $dark;
+                    outline: none;
+                    height: 38px;
+                    box-sizing: border-box;
+                    transition: border-color 0.2s;
+
+                    &:focus { border-color: $primary; }
+            }
         }
     }
 
@@ -74,14 +92,19 @@
             padding-bottom: 1rem; border-bottom: 1px solid rgba($mute, 0.5);
             h2 { font-size: 15px; font-weight: 800; margin: 0; }
         }
-        .direct-pricing-row { display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; }
+        .direct-pricing-row {
+         display: flex; justify-content: 
+         space-between; align-items: center; 
+         padding-top: 1.5rem; 
+         flex-wrap: wrap;
+        }
         .segment-display {
             display: flex; align-items: center; gap: 15px;
             .city { font-size: 1.4rem; font-weight: 900; color: $dark; }
             .separator { color: $primary; font-size: 1.2rem; }
             .dist-badge { background: rgba($primary, 0.1); color: $primary; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 12px; }
         }
-        .pricing-fields { display: flex; gap: 1.5rem; }
+        .pricing-fields { display: flex; gap: 1.5rem; flex-wrap: wrap;}
     }
 
     .table-matrix {
@@ -103,6 +126,18 @@
     }
 
     .matrix-select.mini { width: 90px; height: 32px; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+
+    .matrix-card {
+        margin-bottom: 2.5  rem;
+        border: 1px solid $mute;
+        h3 {
+            font-size: 13.5px; font-weight: 700; text-transform: uppercase; color: $dark; 
+            display: flex; align-items: center; gap: 8px; 
+            i { color: $primary; }
+        }
+    }
+
+
 }
 
 .dark .admin-fare-matrix-scope {
@@ -113,4 +148,9 @@
     }
     .direct-route-card .segment-display .city, .table-matrix .segment-path { color: $white; }
     .matrix-input { background: $dm-bg-main; color: $white; border-color: rgba($mute, 0.2); }
+
+    .matrix-card{
+        h3{color: $white;}
+    }
+    
 }
