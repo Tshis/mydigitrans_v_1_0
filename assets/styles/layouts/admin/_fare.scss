@@ -1,0 +1,175 @@
+@use '../../abstract/variables' as *;
+
+.admin-fare-matrix-scope {
+    padding-block: 2rem;
+
+    // --- HEADER STICKY ---
+    .header-sticky {
+        position: sticky; top: 56px; z-index: 1000;
+        background: rgba($white, 0.95); backdrop-filter: blur(10px);
+        padding-block: 1rem; border-bottom: 1px solid $mute;
+        margin-inline: -15px; padding-inline: 15px;
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+        
+        .header-main-info {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+
+            .agency-back-action {
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: $white;
+                color: $dark;
+                text-decoration: none;
+                transition: transform 0.2s;
+                border: 1px solid $mute ;
+
+                &:hover { transform: scale(1.05); }
+            }
+
+            
+        }
+
+        @media(max-width:650px){flex-wrap: wrap; justify-content: space-around;}
+    }
+
+    // --- ZONE DE CONTRÔLE SUPÉRIEURE ---
+    .matrix-top-control-grid {
+        display: grid; grid-template-columns: 350px 1fr; gap: 1.5rem;
+        @media (max-width: 1100px) { grid-template-columns: 1fr; }
+
+        .control-card {
+            padding: 1.5rem; display: flex; align-items: flex-end; gap: 1.5rem;
+            border-left: 5px solid $primary;
+            align-items: center;
+            
+            &.success-accent { border-left-color: $success; }
+        }
+
+       .direct-pricing-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            width: 100%; /* Force la ligne à prendre toute la largeur disponibles */  
+            .currency-field { flex: 0 0 100px; }        
+        }
+
+         // --- LIGNE DE PRIX DIRECTE (L'élément que tu voulais fixer) ---
+        .direct-pricing-row {
+            display: flex;
+            gap: 1.25rem;
+            flex-wrap: wrap; // Permet de passer à la ligne sur mobile
+            align-items: flex-end; // Aligne les inputs sur la même ligne de base
+            width: 100%;
+
+            .field {
+                flex: 1 1 200px; // S'étire (1), rétrécit (1) et base de 150px
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+
+                label {
+                    font-size: 11px;
+                    font-weight: 800;
+                    color: $gray;
+                    text-transform: uppercase;
+                    white-space: nowrap; // Empêche le label de forcer une hauteur différente
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                // Cas particulier pour la devise pour qu'elle ne soit pas trop large
+                &.currency-field {
+                    flex: 0 0 110px; 
+                }
+            }
+        }
+
+
+        .field {
+            display: flex; flex-direction: column; gap: 8px; flex: 1;
+            label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; $white-space: nowrap; }
+        }
+    }
+
+    // --- TABLEAU DES TRONÇONS ---
+    .matrix-table-wrapper {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card; overflow: hidden;
+        
+        .matrix-toolbar {
+            padding: 1.25rem 1.5rem; background: rgba($gray, 0.02); border-bottom: 1px solid $mute;
+            h3 { 
+                font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin: 0; 
+                i{color: $primary;}
+            }
+        }
+    }
+
+    .responsive-scroll-container {
+        width: 100%; overflow-x: auto; // Scroll seulement si nécessaire
+        
+        .table-fare-matrix {
+            width: 100%; border-collapse: collapse; min-width: 850px; padding: 2rem; // Protection responsive
+            
+            th { background: rgba($gray, 0.04); font-size: 11px; text-transform: uppercase; color: $gray; padding: 15px; text-align: left; }
+            td { padding: 12px 15px; vertical-align: middle; border-bottom: 1px solid rgba($mute, 0.5); }
+        }
+    }
+
+    // --- INPUTS & VISUELS ---
+    .segment-path {
+        display: flex; align-items: center; gap: 12px; font-weight: 800;
+        i { color: $primary; font-size: 10px; }
+        .city { font-size: 13px; color: $dark; }
+    }
+
+    .matrix-input {
+        width: 100%; height: 40px; padding: 8px 12px; border: 1px solid $mute; border-radius: 8px;
+        font-weight: 700; color: $dark; background: $white; transition: all 0.2s;
+        &:focus { border-color: $primary; outline: none; box-shadow: 0 0 0 3px rgba($primary, 0.1); }
+        &.main-price { border-width: 2px; }
+    }
+
+    // Switch style iOS pour l'activation
+    .switch-ios {
+        position: relative; display: inline-block; width: 40px; height: 22px;
+        input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: $mute; transition: .4s; border-radius: 34px;
+            &:before { content: ""; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: $white; transition: .4s; border-radius: 50%; }
+        }
+        input:checked + .slider { background-color: $success; }
+        input:checked + .slider:before { transform: translateX(18px); }
+    }
+}
+
+// --- DARK MODE ---
+.dark .admin-fare-matrix-scope {
+    .header-sticky { 
+        background: rgba($dm-bg, 0.95); border-bottom-color: rgba($mute, 0.2); 
+        .agency-back-action{background: darken($color: $white, $amount: 25%);}
+
+        h1{
+              color: $success !important;
+        }
+    
+    }
+
+    .matrix-table-wrapper { background: $dm-bg; border-color: rgba($mute, 0.1); }
+    .matrix-toolbar { background: rgba(0,0,0,0.2); border-bottom-color: rgba($mute, 0.1); h3{color: $success;} }
+    .segment-path .city { color: $white; }
+    .matrix-row .dist-cell { color: $success; }
+    .matrix-input { background: $dm-bg-main; color: $white; border-color: rgba($mute, 0.2); }
+    .control-card { background: $dm-bg; }
+}

@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         routePicker.addEventListener('change', (e) => {
             const routeId = e.target.value;
             // On redirige vers la page de la route sélectionnée
-            window.location.href = `/admin/agency/line/${routeId}/fare-matrix`;
+            window.location.href = `/admin/agency/line/${routeId}/fare/add`;
         });
     }
 

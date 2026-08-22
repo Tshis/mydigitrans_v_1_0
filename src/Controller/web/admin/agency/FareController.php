@@ -85,7 +85,7 @@ class FareController extends AbstractController
             ],
         ];
 
-        return $this->render('admin/agency/caisse/add.html.twig', [
+        return $this->render('admin/agency/fare/add.html.twig', [
             'page' => 'fare',
             'slug' => $slug,
             'route' => $route,
