@@ -638,8 +638,6 @@
 
 }
 
-
-
 // --- INTEGRATION DARK MODE POUR LA PAGE SPECIFIQUE ---
 .dark {
 
@@ -726,4 +724,129 @@
         p { color: $mute; }
         .empty-icon { color: $white; background: $danger;}
     }
+}
+
+
+
+//===============================================
+//ADD TRIP ============
+//==========================================
+.admin-agency-trip-add-scope {
+    padding-block: 2rem;
+
+    // --- LE HEADER STICKY (Respect de tes règles de navigation) ---
+    .header-sticky {
+        position: sticky; top: 56px; z-index: 1000;
+        background: rgba($white, 0.95); backdrop-filter: blur(10px);
+        padding-block: 1rem; border-bottom: 1px solid $mute;
+        margin-inline: -15px; padding-inline: 15px;
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+    }
+
+    // --- LE HEADER STANDARD ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+
+        @media (max-width: 768px) { justify-content: space-around; }
+
+        .header-main-info {
+            display: flex; align-items: center; gap: 1.2rem;
+            h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+            .agency-back-action {
+                border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+                background: $white; color: $dark; text-decoration: none; transition: transform 0.2s; border: 1px solid $mute;
+                &:hover { transform: scale(1.05); }
+            }
+        }
+    }
+
+    // --- CONTRÔLE DES CARTES ET TITRES ---
+    .control-card {
+        padding: 1.5rem; border-top: 4px solid $primary; background: $white;
+        &.success-accent { border-top-color: $success; border-left: none; } // Harmonisation des axes de couleur
+    }
+
+    .card-title-fix {
+        font-size: 14px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem;
+        display: flex; align-items: center; gap: 10px;
+    }
+
+    // --- ALIGNEMENT DES CHAMPS EN LIGNE (FLEX-END REQUIS POUR LABELS) ---
+    .direct-pricing-row {
+        display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; width: 100%;
+
+        .field {
+            flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px;
+
+            label {
+                font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0;
+            }
+        }
+    }
+
+    // --- ARCHITECTURE DU COMPOSANT INPUT/SELECT ---
+    .matrix-input, .matrix-select, .admin-bus-layout-add-select {
+        width: 100%; height: 40px; padding: 8px 12px; border: 1px solid $mute; border-radius: 8px;
+        font-weight: 700; color: $dark; background: $white; box-sizing: border-box; transition: all 0.2s;
+
+        &:focus { border-color: $primary; outline: none; box-shadow: 0 0 0 3px rgba($primary, 0.1); }
+    }
+
+    // --- COMPOSANT COMMUNICATION / SIDEBAR (Notice boxes) ---
+    .notice-box {
+        background: rgba($primary, 0.04); border-radius: 8px; padding: 12px 15px;
+        font-size: 12px; color: darken($primary, 15%); line-height: 1.5; border: 1px solid rgba($primary, 0.1);
+    }
+
+    // --- ARCHITECTURE DU CONTAINER BI-COLONNE ---
+    .agency-trip-add-form {
+        width: 100%;
+
+        .agency-trip-add-container {
+            display: flex;
+            gap: 1.5rem; // Espacement uniforme entre le bloc principal et la barre latérale
+            width: 100%;
+
+            // Gestion adaptative : passe sur une seule colonne sur tablette et mobile
+            @media (max-width: 992px) {
+                flex-direction: column;
+            }
+        }
+
+        // COLONNE GAUCHE : Zone principale des formulaires et des cartes
+        .layout-main-panel {
+            flex: 1; // Prend tout l'espace restant disponible à gauche
+            min-width: 0; // Sécurité anti-débordement Flexbox pour les tableaux imbriqués
+        }
+
+        // COLONNE DROITE : Barre latérale (Résumé, Actions secondaires, Totaux)
+        .summary {
+            flex: 0 0 360px; // Largeur fixe et stable de 360px sur grand écran
+            width: 360px;
+
+            @media (max-width: 992px) {
+                flex: 1 1 100%; // Prend toute la largeur sur mobile quand elle passe en dessous
+                width: 100%;
+            }
+
+            // Optionnel : Rend la carte de droite collante au défilement
+            .summary-sticky-card {
+                position: sticky;
+                top: 130px; // Se cale juste en dessous de ton header-sticky (56px + marges)
+                z-index: 10;
+            }
+        }
+    }
+
+}
+
+// --- CONFIGURATION DARK MODE UNIFIÉE ---
+.dark .admin-agency-trip-add-scope {
+    .header-sticky { background: rgba($dm-bg, 0.95); border-bottom-color: rgba($mute, 0.4); h1 { color: $mute; } .sub-header-flex { color: $white !important; } }
+    .header .header-main-info h1 { color: $white; }
+    .control-card { background: $dm-bg-surface; border-bottom: none; }
+    .card-title-fix { color: $white; }
+    .matrix-input, .matrix-select, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($mute, 0.2); }
+    .notice-box { background: rgba(0, 0, 0, 0.2); color: $mute; border-color: rgba($mute, 0.1); }
 }
