@@ -1,0 +1,86 @@
+@use '../../abstract/variables' as *;
+
+
+//=============
+//==INDEX======
+//==============
+.admin-agency-ticketing-index-scope {
+    padding-block: 2rem;
+
+     // --- HEADER REFINÉ ---
+    .header-refined {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        flex-wrap: wrap; gap: 2rem;
+        .breadcrumb-mini {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
+            i { font-size: 8px; margin-inline: 5px; }
+            strong { color: $primary; }
+        }
+        h1 { font-size: 2rem; font-weight: 900; color: $dark; margin: 0; }
+        .subtitle { color: $gray; font-size: 14px; margin-top: 5px; }
+    }   
+
+    // --- BOUTONS ---
+    .btn-refined {
+        padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; border: none; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;
+        &.btn-success-gradient {
+            background: linear-gradient(135deg, $success 0%, darken($success, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($success, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($success, 0.4); }
+        }
+        &.btn-primary-gradient {
+            background: linear-gradient(135deg, $primary 0%, darken($primary, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($primary, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($primary, 0.4); }
+        }
+        &.btn-full { width: 100%; justify-content: center; }
+    }
+
+    .ticketing-grid-layout {
+        display: flex; gap: 1.5rem; align-items: flex-start;
+        @media (max-width: 1100px) { flex-direction: column-reverse; }
+    }
+
+    .main-content-panel { flex: 1; min-width: 0; }
+    .sidebar-filters-panel { flex: 0 0 320px; }
+
+    // --- FILTRES SIDEBAR ---
+    .side-title { font-size: 14px; font-weight: 800; text-transform: uppercase; color: $dark; padding: 1.5rem; border-bottom: 1px solid rgba($mute, 0.5); margin: 0; }
+    // --- CARD ET TABLEAU ---
+
+    .card-refined {
+        background: $white; border-radius: 16px; border: 1px solid rgba($mute, 0.6);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); overflow: hidden;
+        margin: 2rem auto;
+    }
+
+    .ticket-ref { font-weight: 800; color: $primary; font-family: monospace; font-size: 14px; }
+    .route-badge { font-size: 11px; font-weight: 700; color: $gray; }
+
+    .badge-status {
+        padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800;
+        &.valid { background: rgba($success, 0.1); color: $success; }
+        &.used { background: rgba($primary, 0.1); color: $primary; }
+        &.cancelled { background: rgba($danger, 0.1); color: $danger; }
+        &.expired { background: rgba($gray, 0.1); color: $gray; }
+    }
+
+   // --- ACTIONS ---
+    .action-buttons-group {
+        display: flex; gap: 8px; justify-content: flex-end;
+        .action-link {
+            width: 34px; height: 34px; border-radius: 10px; border: 1px solid $mute; background: $white;
+            display: flex;align-items: center;justify-content: center;
+            color: $dark; cursor: pointer; transition: all 0.2s;
+            &:hover { background: $dark; color: $white; border-color: $dark; }
+            &.refund:hover { background: $danger; color: $white; border-color: $danger; }
+        }
+    }
+}
+
+.dark .admin-agency-ticketing-index-scope {
+    .header-main-info h1, .ticket-ref { color: $white; }
+    .card { background: $dm-bg-surface; border-color: rgba($mute, 0.1); }
+    .search-bar-mini { background: $dm-bg-main; border-color: rgba($mute, 0.2); input { background: transparent; color: $white; } }
+}

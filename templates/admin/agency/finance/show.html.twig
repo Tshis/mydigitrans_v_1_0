@@ -62,7 +62,7 @@
 				{# 2. BLOC DES PARAMÈTRES ET CARACTÉRISTIQUES MÉTIER #}
 				<h3 class="box-title mb-15">
 					<i class="fa-solid fa-file-invoice"></i>
-					Fiche d'Audit & Traçabilité [MCD 19]
+					Fiche d'Audit & Traçabilité
 				</h3>
 
 				<div class="audit-details-grid mb-25">
@@ -135,12 +135,12 @@
 						<i class="fa-solid fa-print"></i>
 						Imprimer le reçu d'audit
 					</button>
-					{% if operation.type == 'payment' %}
-						<button type="button" class="btn btn-success text-size-13" id="js-open-refund">
-							<i class="fa-solid fa-arrow-rotate-left"></i>
-							Émettre un remboursement
-						</button>
-					{% endif %}
+					{# {% if operation.type == 'payment' %}
+											<button type="button" class="btn btn-success text-size-13" id="js-open-refund">
+												<i class="fa-solid fa-arrow-rotate-left"></i>
+												Émettre un remboursement
+											</button>
+										{% endif %} #}
 				</div>
 
 			</div>
@@ -157,7 +157,7 @@
 					Vous vous apprêtez à annuler les effets financiers du paiement
 					<strong>#{{ operation.reference
                     }}</strong>.
-												                Cette action générera une écriture de sortie (Dépense) dans la devise native :
+																														                Cette action générera une écriture de sortie (Dépense) dans la devise native :
 					<strong>{{
                     operation.currency }}</strong>.
 				</p>
@@ -185,7 +185,7 @@
 
 					<div class="modal-actions-footer">
 						<button type="button" class="btn btn-dark" id="js-close-refund">Annuler</button>
-						<button type="submit" class="btn btn-success">Valider la rétrocession</button>
+						{# <button type="submit" class="btn btn-success">Valider la rétrocession</button> #}
 					</div>
 				</form>
 			</div>

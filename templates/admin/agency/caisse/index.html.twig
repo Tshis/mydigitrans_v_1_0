@@ -1,0 +1,117 @@
+{# templates/admin/agency/ticketing/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div class="admin-agency-ticketing-index-scope container">
+
+
+		<div
+			class="ticketing-layout-refined">
+			{# COLONNE GAUCHE : LISTE #}
+			<div class="main-panel">
+				<div class="card-refined">
+					<div class="table-toolbar">
+						<div class="search-wrapper-refined">
+							<i class="fa-solid fa-magnifying-glass"></i>
+							<input type="text" placeholder="Rechercher un passager, une réf...">
+						</div>
+						<div class="table-actions-mini">
+							<button class="btn-icon-only" title="Exporter Excel">
+								<i class="fa-solid fa-file-excel"></i>
+							</button>
+							<button class="btn-icon-only" title="Actualiser">
+								<i class="fa-solid fa-rotate"></i>
+							</button>
+						</div>
+					</div>
+
+					<div class="table-responsive">
+						<table class="table-refined">
+							<thead>
+								<tr>
+									<th>Référence</th>
+									<th>Passager</th>
+									<th>Détails Voyage</th>
+									<th>Siège</th>
+									<th class="text-center">Statut</th>
+									<th class="text-right">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for ticket in tickets %}
+									<tr>
+										<td>
+											<span class="ref-tag">#{{ ticket.reference }}</span>
+											<div class="date-meta">le
+												{{ ticket.createdAt|date('d M Y') }}</div>
+										</td>
+										<td>
+											<div class="passenger-cell">
+												<div class="avatar-mini">{{ ticket.passengerName|slice(0,1) }}</div>
+												<div class="info">
+													<span class="name">{{ ticket.passengerName }}</span>
+													<span class="phone">{{ ticket.passengerPhone }}</span>
+												</div>
+											</div>
+										</td>
+										<td>
+											<div class="trip-info-mini">
+												<span class="code">{{ ticket.tripCode }}</span>
+												<span class="route">Kinshasa
+													<i class="fa-solid fa-arrow-right"></i>
+													Kikwit</span>
+											</div>
+										</td>
+										<td>
+											<span class="seat-badge">N°
+												{{ ticket.seatNumber }}</span>
+										</td>
+										<td class="text-center">
+											<span class="status-pill {{ ticket.status }}">
+												{{ ticket.status|upper }}
+											</span>
+										</td>
+										<td class="text-right">
+											<div class="action-group-refined">
+												<button class="action-link print" title="Imprimer">
+													<i class="fa-solid fa-print"></i>
+												</button>
+												<button class="action-link refund" title="Rembourser">
+													<i class="fa-solid fa-rotate-left"></i>
+												</button>
+											</div>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			{# COLONNE DROITE : FILTRES #}
+			<aside class="sidebar-refined">
+				<div class="card-refined sticky-top">
+					<h3 class="side-title">
+						<i class="fa-solid fa-sliders"></i>
+						Filtrage</h3>
+					<div class="filter-form-refined">
+						<div class="form-group">
+							<label>Statut du billet</label>
+							<select class="input-refined">
+								<option value="valid">Valide</option>
+								<option value="used">Utilisé</option>
+								<option value="cancelled">Annulé</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Période</label>
+							<input type="date" class="input-refined">
+						</div>
+						<button class="btn-refined btn-dark-refined btn-full">Mettre à jour la vue</button>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</div>
+{% endblock %}
