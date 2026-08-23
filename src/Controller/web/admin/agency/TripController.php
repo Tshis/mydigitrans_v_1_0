@@ -13,29 +13,9 @@ class TripController extends AbstractController
     #[Route('/admin/agency/trips', name: 'admin_agency_trip_index')]
     public function index(Request $request): Response
     {
-        // Simulation de la liste des voyages pour l'affichage
-        $trips = [
-            [
-                'id' => 1,
-                'code' => 'KIN-KKW-260824',
-                'route_code' => 'KIN-KKW',
-                'route_name' => 'Kinshasa - Kikwit',
-                'bus_plate' => 'A-1234-BC',
-                'departure_date' => new \DateTime('2026-08-24'),
-                'departure_time' => '06:00',
-                'driver_name' => 'Jean-Pierre Makila',
-                'co_driver_name' => 'Patrice Nzuzi',
-                'status' => 'scheduled',
-                'seats_available' => 24, // Calculé depuis TripSeat (available)
-                'seats_blocked' => 2,     // Sièges en panne ou réservés VIP
-                'seats_total' => 30
-            ]
-        ];
-
 
         return $this->render('admin/agency/trip/index.html.twig', [
             'page' => 'trip',
-            'trips' => $trips
         ]);
     } //index
 

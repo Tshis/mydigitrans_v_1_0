@@ -1,3 +1,153 @@
 @use '../../abstract/variables' as *;
 
+.admin-agency-trip-index-scope {
+    padding-block: 2rem;
 
+    // --- LE HEADER STANDARD ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        @media (max-width: 768px) { justify-content: space-around; }
+
+        .header-main-info {
+            display: flex; align-items: center; gap: 1.2rem;
+            h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+        }
+    }
+
+    // --- L'ARCHITECTURE ET CONTAINER DEUX COLONNES PROPRE A CETTE PAGE ---
+    .trip-index-grid-layout {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        width: 100%;
+
+        @media (max-width: 1100px) {
+            flex-direction: column-reverse; // Met la barre de filtres au dessus ou en dessous sur mobile
+        }
+
+        .main-content-panel {
+            flex: 1;
+            min-width: 0; // Protège le tableau responsive du débordement
+            width: 100%;
+        }
+
+        .sidebar-filters-panel {
+            flex: 0 0 320px;
+            width: 320px;
+
+            @media (max-width: 1100px) {
+                flex: 1 1 100%;
+                width: 100%;
+            }
+
+            .sticky-filter-card {
+                position: sticky;
+                top: 130px;
+                z-index: 10;
+                background: $white;
+                padding: 1.5rem;
+                border-top: 4px solid $primary;
+            }
+        }
+    }
+
+    // --- MINI CARDS STATS ---
+    .stats-overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+
+        .stat-mini-card {
+            padding: 1.25rem; display: flex; align-items: center; gap: 15px; border-left: 4px solid $primary;
+            &.success-accent { border-left-color: $success; }
+            .icon-box { font-size: 1.5rem; color: $gray; }
+            .stat-info {
+                display: flex; flex-direction: column;
+                .label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: $gray; }
+                .value { font-size: 1.3rem; font-weight: 800; color: $dark; }
+            }
+        }
+    }
+
+    // --- GRILLE / TABLEAU RESPONSIVE ---
+    .matrix-card {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card; overflow: hidden;
+        
+        .matrix-toolbar {
+            padding: 1.25rem 1.5rem; background: rgba($gray, 0.02); border-bottom: 1px solid $mute;
+            h3 { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin: 0; display: flex; align-items: center; gap: 8px;}
+        }
+    }
+
+    .table-responsive-scroll {
+        width: 100%; overflow-x: auto;
+        
+        .table-trip-matrix {
+            width: 100%; border-collapse: collapse; min-width: 900px; // Forçage scroll sur mobile
+
+            th { background: rgba($gray, 0.04); font-size: 11px; text-transform: uppercase; color: $gray; padding: 15px; text-align: left; }
+            td { padding: 14px 15px; vertical-align: middle; border-bottom: 1px solid rgba($mute, 0.5); }
+        }
+    }
+
+    // --- STYLES DES CELLULES ET BADGES COMPLETES ---
+    .trip-main-cell {
+        .trip-code { font-size: 11px; font-weight: 800; color: $primary; background: rgba($primary, 0.05); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
+        .route-label strong { font-size: 14px; color: $dark; }
+    }
+
+    .crew-cell, .time-cell {
+        font-size: 13px; color: $dark; display: flex; flex-direction: column; gap: 4px;
+        i { width: 16px; color: $gray; }
+    }
+
+    .fill-cell {
+        .seats-counter { font-size: 15px; color: $dark; strong { color: $success; font-weight: 900; } }
+        small { font-size: 11px; }
+    }
+
+    // LISTE DES STATUTS CONFIGURÉS (MCD 13)
+    .badge-status {
+        padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; display: inline-block;
+        &.scheduled { background: rgba($primary, 0.1); color: $primary; }
+        &.boarding { background: rgba(230, 126, 34, 0.1); color: rgb(230, 126, 34); }
+        &.departed { background: rgba(155, 89, 182, 0.1); color: rgb(155, 89, 182); }
+        &.arrived { background: rgba($success, 0.1); color: $success; }
+        &.cancelled { background: rgba($danger, 0.1); color: $danger; }
+    }
+
+    .action-buttons-group {
+        display: flex; gap: 8px; justify-content: flex-end;
+        a {
+            width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid $mute; transition: all 0.2s;
+            &.btn-action-view { color: $primary; background: rgba($primary, 0.02); &:hover { background: $primary; color: white; } }
+            &.btn-action-edit { color: $dark; background: rgba($gray, 0.02); &:hover { background: $dark; color: white; } }
+        }
+    }
+
+    // --- FORMULAIRE DES FILTRES ---
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+    
+    .filter-field-group {
+        display: flex; flex-direction: column; gap: 15px;
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 0; }
+    }
+
+    .matrix-input, .matrix-select {
+        width: 100%; height: 38px; padding: 6px 12px; border: 1px solid $mute; border-radius: 6px; font-weight: 600; color: $dark; background: $white; box-sizing: border-box;
+        &:focus { border-color: $primary; outline: none; }
+    }
+    .filter-divider { border: 0; border-top: 1px solid rgba($mute, 0.5); margin-block: 10px; }
+}
+
+// --- DARK MODE AUTONOME ---
+.dark .admin-agency-trip-index-scope {
+    .header .header-main-info h1, .stats-overview-grid .stat-mini-card .stat-info .value, .card-title-fix, .matrix-toolbar h3, .trip-main-cell .route-label strong, .crew-cell, .time-cell, .fill-cell .seats-counter { color: white; }
+    .sticky-filter-card, .stat-mini-card, .matrix-card { background: $dm-bg-surface; border-color: rgba($mute, 0.1); }
+    .matrix-toolbar { background: rgba(0,0,0,0.2); border-bottom-color: rgba($mute, 0.1); }
+    .table-trip-matrix th { background: rgba($white, 0.02); }
+    .table-trip-matrix td { border-bottom-color: rgba($mute, 0.1); }
+    .matrix-input, .matrix-select { background: $dm-bg-main; color: white; border-color: rgba($mute, 0.2); }
+    .action-buttons-group a.btn-action-edit { color: $mute; }
+}
