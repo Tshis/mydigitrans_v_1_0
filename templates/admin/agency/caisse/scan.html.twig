@@ -3,13 +3,7 @@
 
 {% block javascripts %}
 {{ parent() }}
-
-{# --- 1. REMPLACEMENT PAR LE CDN LE PLUS STABLE ET SÉCURISÉ (cdnjs) --- #}
-<script src="https://cloudflare.com"
-    integrity="sha512-rYRh9VpSdfL33L4HshXW8w7zT0oA2O737AosvWvBfLid3009K/6dF+j/N8tizw97wWf/XpZ56KxlOwaNshO4XA=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
+<script src="/js/admin/html5qrCode.js" defer></script>
 <script src="/js/admin/ticket_scan.js" defer></script>
 {% endblock %}
 
