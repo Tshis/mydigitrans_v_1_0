@@ -80,7 +80,8 @@
 }
 
 .dark .admin-agency-ticketing-index-scope {
-    .header-main-info h1, .ticket-ref { color: $white; }
+    header h1, .ticket-ref, .route-badge  { color: $white; }
+    .card-refined{background: $dm-bg;}
     .card { background: $dm-bg-surface; border-color: rgba($mute, 0.1); }
     .search-bar-mini { background: $dm-bg-main; border-color: rgba($mute, 0.2); input { background: transparent; color: $white; } }
 }
