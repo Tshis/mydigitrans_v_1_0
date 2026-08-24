@@ -13,8 +13,49 @@ final class BusController extends AbstractController
     #[Route('/admin/agency/bus/list', name: 'admin_agency_bus_index')]
     public function index(): Response
     {
+
+        $fleet = [
+            [
+                'brand' => 'Mercedes-Benz',
+                'model' => 'Sprinter 316',
+                'type' => 'Minibus',
+                'plateNumber' => 'A-1234-BC',
+                'capacity' => 19,
+                'mileage' => 142050,
+                'docStatus' => 'up-to-date',
+                'status' => 'available',
+                'statusLabel' => 'Disponible'
+            ],
+            [
+                'brand' => 'Toyota',
+                'model' => 'Coaster',
+                'type' => 'Bus Interurbain',
+                'plateNumber' => 'A-5678-DE',
+                'capacity' => 30,
+                'mileage' => 89400,
+                'docStatus' => 'up-to-date',
+                'status' => 'on_road',
+                'statusLabel' => 'En Voyage'
+            ],
+            [
+                'brand' => 'Scania',
+                'model' => 'K410',
+                'type' => 'Autocar Grand Confort',
+                'plateNumber' => 'A-9012-FG',
+                'capacity' => 54,
+                'mileage' => 310200,
+                'docStatus' => 'expired',
+                'status' => 'broken',
+                'statusLabel' => 'En Panne'
+            ]
+        ];
+
+
+
+
         return $this->render('admin/agency/bus/index.html.twig', [
             'page' => 'bus',
+            'fleet' => $fleet
         ]);
     } //index
 

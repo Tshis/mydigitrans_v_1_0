@@ -1,322 +1,129 @@
 @use '../../abstract/variables' as *;
 
-// --- CONTENEUR GLOBAL Management---
-.agency-fleet-management-wrapper {
-  padding: 2.5rem;
-  font-family: system-ui, -apple-system, sans-serif;
+//==============================
+//=====INDEX ========
+//====================
+.admin-agency-fleet-index-scope {
+    padding-block: 2.5rem;
 
-  // --- HEADER DE LA PAGE ---
-  .agency-fleet-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-
-    .agency-fleet-main-title {
-      font-size: 2rem;
-      margin: 0;
-      font-weight: 700;
-      color: $dark;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      i { color: $success; }
+    // --- HEADER REFINÉ ---
+    .header-refined {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        flex-wrap: wrap; gap: 2rem;
+        .breadcrumb-mini {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
+            i { font-size: 8px; margin-inline: 5px; }
+            strong { color: $primary; }
+        }
+        h1 { font-size: 2rem; font-weight: 900; color: $dark; margin: 0; }
+        .subtitle { color: $gray; font-size: 14px; margin-top: 5px; }
     }
-
-    .agency-fleet-subtitle { margin: 4px 0 0 0; font-size: 0.95rem; color: $gray; }
-
-    .agency-btn-control {
-      padding: 10px 20px;
-      border-radius: $radius-input;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      
-      &.btn-add-bus {
-        background: $success;
-        color: $white;
-        &:hover { opacity: 0.9; }
-      }
-    }
-  }
-
-  // --- BARRE DE FILTRES ---
-  .agency-filter-card {
-    background: $white;
-    border: 1px solid $mute;
-    border-radius: $radius-card;
-    padding: 20px;
-    margin-bottom: 1.5rem;
-
-    .agency-filter-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      align-items: flex-end;
-
-      @media (min-width: 992px) {
-        grid-template-columns: 1fr 1fr 2fr; // Donne plus de place à la recherche
-      }
-    }
-
-    .agency-filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .agency-filter-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: $dark;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .agency-filter-select, .agency-filter-input {
-      padding: 10px 14px;
-      border: 1px solid $mute;
-      border-radius: $radius-input;
-      background: $white;
-      color: darken($gray, 20%);
-      font-size: 0.95rem;
-      outline: none;
-      width: 100%;
-      
-      &:focus { border-color: $success; }
-    }
-
-    .agency-search-input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-
-      i {
-        position: absolute;
-        left: 14px;
-        color: $gray;
-      }
-
-      .agency-filter-input {
-        padding-left: 38px;
-      }
-    }
-  }
-
-  // --- COMPTEUR ---
-  .agency-fleet-counter {
-    margin-bottom: 1rem;
-    p { margin: 0; font-size: 0.9rem; color: $gray; font-weight: 500; }
-    span { font-weight: 700; color: $dark; }
-  }
-
-  // --- COMPOSANT DE LA TABLE ---
-  .agency-fleet-card {
-    background: $white;
-    border: 1px solid $mute;
-    border-radius: $radius-card;
-    overflow: hidden;
     
-    }//agency-fleet-card
-
-// Style de la barre de pagination
-.agency-pagination-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  background: rgba($gray, 0.02);
-  border-top: 1px solid rgba($mute, 0.15);
-  flex-wrap: wrap;
-  gap: 1.5rem;
-
-  @media (max-width: 576px) {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .agency-pagination-per-page {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: $gray;
-
-    .agency-pagination-select {
-      padding: 6px 12px;
-      border: 1px solid $mute;
-      border-radius: $radius-input;
-      background: $white;
-      color: $dark;
-      outline: none;
-      cursor: pointer;
-      font-weight: 600;
-      &:focus { border-color: $success; }
-    }
-  }
-
-  .agency-pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .agency-pagination-btn {
-    padding: 8px 14px;
-    border: 1px solid $mute;
-    background: $white;
-    color: darken($gray, 20%);
-    border-radius: $radius-input;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s;
-
-    &:hover:not(:disabled) {
-      border-color: $success;
-      color: $success;
+     // --- BOUTONS ---
+    .btn-refined {
+        padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; border: none; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;
+        &.btn-success-gradient {
+            background: linear-gradient(135deg, $success 0%, darken($success, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($success, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($success, 0.4); }
+        }
+        &.btn-primary-gradient {
+            background: linear-gradient(135deg, $primary 0%, darken($primary, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($primary, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($primary, 0.4); }
+        }
+        &.btn-full { width: 100%; justify-content: center; }
     }
 
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-  }
-
-  .agency-page-numbers {
-    display: flex;
-    gap: 6px;
-
-    .page-num {
-      width: 34px;
-      height: 34px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid $mute;
-      border-radius: $radius-input;
-      background: $white;
-      color: $dark;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover:not(.active) { border-color: $success; color: $success; }
-
-      &.active {
-        background: $success;
-        border-color: $success;
-        color: $white;
-      }
-    }
-  }
-}//agency-pagination-footer
-
-  .responsive-fleet-table {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 0 24px 20px 24px;
-
-    &::-webkit-scrollbar { height: 6px; }
-    &::-webkit-scrollbar-track { background: rgba($mute, 0.05); }
-    &::-webkit-scrollbar-thumb { background: rgba($mute, 0.2); border-radius: 4px; }
-  }
-
-  .agency-fleet-table {
-    width: 100%;
-    border-collapse: collapse;
-
-    @media (max-width: 992px) { min-width: 850px; }
-
-    th, td {
-      padding: 16px 12px;
-      border-bottom: 1px solid rgba($mute, 0.12);
-      vertical-align: middle;
-      text-align: left;
+    // --- GRID DES STATS ---
+    .fleet-stats-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;
+        
+        .stat-card {
+            display: flex; align-items: center; gap: 18px; padding: 20px; background: $white;
+            border: 1px solid $mute;
+            border-radius: $radius-card;
+            .icon-wrap {
+                width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+            }
+            .info {
+                display: flex; flex-direction: column;
+                h3 { margin: 0; font-size: 1.6rem; font-weight: 900; color: $dark; }
+                span { font-size: 12px; color: $gray; font-weight: 600; }
+            }
+            &.total .icon-wrap { background: rgba($primary, 0.1); color: $primary; }
+            &.active .icon-wrap { background: rgba($success, 0.1); color: $success; }
+            &.maintenance .icon-wrap { background: rgba($primary, 0.1); color: $primary; }
+            &.alert .icon-wrap { background: rgba($danger, 0.1); color: $danger; }
+        }
     }
 
-    th {
-      font-size: 0.95rem;
-      color: $dark;
-      font-weight: 600;
-      background: rgba($gray, 0.01);
+    // --- CELLULE DU BUS ---
+    .bus-cell {
+        display: flex; align-items: center; gap: 14px;
+        .bus-avatar {
+            width: 40px; height: 40px; background: $white; border: 1px solid $mute; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; color: $gray; font-size: 16px;
+        }
+        .info {
+            display: flex; flex-direction: column; gap: 2px;
+            .model { font-size: 14px; font-weight: 700; color: $dark; }
+            .type-badge { font-size: 10px; font-weight: 800; color: $gray; text-transform: uppercase; }
+        }
     }
 
-    .text-center { text-align: center; }
-
-    .agency-fleet-row {
-      &:last-child td { border-bottom: none; }
-      &:hover { background: rgba($gray, 0.01); }
+    // --- PLAQUE D'IMMATRICULATION STYLE RDC ---
+    .plate-tag {
+        font-family: 'Monaco', monospace; background: $white; border: 2px solid $dark; color: $dark;
+        padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 13px; display: inline-block;
     }
 
-    // Métadonnées du bus
-    .agency-bus-meta {
-      strong { font-size: 1.1rem; color: $dark; display: block; }
-      p { margin: 2px 0 0 0; font-size: 0.85rem; color: $gray; }
+    .seat-count-badge {
+        font-size: 13px; font-weight: 700; color: $dark; i { color: $primary; margin-right: 4px; }
     }
 
-    // Badges de Succursales
-    .agency-branch-tag {
-      background: rgba($gray, 0.08);
-      color: darken($gray, 20%);
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      font-weight: 600;
+    // --- BADGES DE STATUS ---
+    .doc-status-pill {
+        padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;
+        &.up-to-date { background: rgba($success, 0.1); color: darken($success, 10%); }
+        &.expired { background: rgba($danger, 0.1); color: $danger; }
     }
 
-    // Statuts d'exploitation
-    .agency-status-badge {
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      display: inline-block;
-
-      &.status-available { background: rgba($success, 0.1); color: $success; }
-      &.status-on-route { background: rgba($success, 0.1); color: $success; }
-      &.status-loading { background: rgba($primary, 0.1); color: $primary; }
-      &.status-maintenance { background: rgba($danger, 0.1); color: $danger; }
+    .status-pill-fleet {
+        padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; display: inline-block;
+        &.available { background: rgba($color: $dark, $alpha: .2); color: $dark; }
+        &.on_road { background: rgba($color: $success, $alpha: .2); color: $success; }
+        &.broken { background: rgba($color: $danger, $alpha: .2); color: $danger; }
+        &.maintenance { background: rgba($color: $primary, $alpha: .2); color: $primary; }
     }
 
-    // Bouton d'action de la ligne
-    .agency-action-trigger {
-      color: $gray;
-      font-size: 1.2rem;
-      text-decoration: none;
-      padding: 6px;
-      border-radius: 4px;
-      transition: all 0.2s;
-      
-      &:hover {
-        background: rgba($gray, 0.08);
-        color: $success;
-      }
+
+    // --- ACTIONS ---
+    .action-group-refined {
+        display: flex; gap: 8px; justify-content: flex-end;
+        .action-link {
+            width: 34px; height: 34px; border-radius: 10px; border: 1px solid $mute; background: $white;
+            display: flex;align-items: center;justify-content: center;
+            color: $dark; cursor: pointer; transition: all 0.2s;
+            &:hover { background: $dark; color: $white; border-color: $dark; }
+            &.refund:hover { background: $danger; color: $white; border-color: $danger; }
+        }
     }
-  }
-
-  // Fallback si vide
-  .agency-table-fallback {
-    text-align: center;
-    padding: 40px 24px;
-    color: $gray;
-
-    i { font-size: 3rem; color: $mute; margin-bottom: 12px; }
-    p { margin: 0; font-size: 1.1rem; font-weight: 500; }
-  }
-
 }
-//agency-fleet-management-wrapper
+
+// --- DARK MODE ---
+.dark .admin-agency-fleet-index-scope {
+    .fleet-stats-grid .stat-card .info h3, .bus-cell .info .model, .seat-count-badge { color: $white; }
+    .bus-cell .bus-avatar { background: rgba($white, 0.05); border-color: rgba($white, 0.1); color: $mute; }
+    .plate-tag { background: $dm-bg-main; border-color: rgba($white, 0.2); color: $white; }
+    .status-pill-fleet {
+        &.available { background: rgba($dark, 0.2); color: $mute; }
+        &.on_road { background: rgba($success, 0.2); color: $success; }
+        &.broken { background: rgba($danger, 0.2); color: $danger; }
+        &.maintenance { background: rgba($primary, 0.2); color: $primary; }
+    }
+}
 
 
 // ================= PAGE D'AJOUT / CREATION BUS =================

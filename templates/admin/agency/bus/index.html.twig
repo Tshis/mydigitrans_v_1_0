@@ -1,229 +1,137 @@
+{# templates/admin/agency/fleet/index.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-	{{parent()}}
-	<script src="/js/admin/bus.js" defer></script>
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 {% block body %}
-
-	{# templates/agency/bus/index.html.twig #}
 	<div
-		class="agency-fleet-management-wrapper">
-
-		{# --- EN-TÊTE DE PAGE & ACTIONS --- #}
-		<header class="agency-fleet-header">
-			<div class="agency-fleet-title-block">
-				<h2 class="agency-fleet-main-title">
-					<i class="fa-solid fa-bus-simple"></i>
-					Gestion de la Flotte</h2>
-				<p class="agency-fleet-subtitle">Suivi en temps réel des véhicules et de leur déploiement opérationnel.</p>
+		class="admin-agency-fleet-index-scope container">
+		{# --- HEADER --- #}
+		<header class="header-refined mb-30">
+			<div class="header-left">
+				<div class="breadcrumb-mini">
+					<span>Logistique</span>
+					<i class="fa-solid fa-chevron-right"></i>
+					<strong>Flotte</strong>
+				</div>
+				<h1>Gestion de la Flotte</h1>
+				<p class="subtitle">Suivi technique, administratif et opérationnel de vos bus.</p>
 			</div>
-			<div class="agency-fleet-actions">
-				<a href="{{path('admin_agency_bus_add')}}" class="agency-btn-control btn-add-bus">
+			<div class="header-right">
+				<a href="{{path('admin_agency_bus_add')}}" class="btn-refined btn-primary-gradient">
 					<i class="fa-solid fa-plus"></i>
-					Ajouter un véhicule</a>
+					<span>Ajouter un véhicule</span>
+				</a>
 			</div>
 		</header>
 
-		{# --- ZONE DE FILTRES DYNAMIQUES --- #}
-		<section class="agency-filter-card">
-			<div
-				class="agency-filter-grid">
-
-				{# Filtre par Succursale #}
-				<div class="agency-filter-group">
-					<label for="filter-branch" class="agency-filter-label">Filtrer par Succursale</label>
-					<select id="filter-branch" class="agency-filter-select">
-						<option value="all">Toutes les succursales</option>
-						<option value="Limete">Limete (Kinshasa)</option>
-						<option value="Matadi">Matadi</option>
-						<option value="Boma">Boma</option>
-					</select>
+		{# --- STATS RAPIDES --- #}
+		<div class="fleet-stats-grid mb-25">
+			<div class="stat-card card-refined total">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-bus"></i>
 				</div>
-
-				{# Filtre par Statut #}
-				<div class="agency-filter-group">
-					<label for="filter-status" class="agency-filter-label">Filtrer par Statut</label>
-					<select id="filter-status" class="agency-filter-select">
-						<option value="all">Tous les statuts</option>
-						<option value="available">Disponible au garage</option>
-						<option value="on-route">En route</option>
-						<option value="loading">Au chargement</option>
-						<option value="maintenance">En maintenance</option>
-					</select>
+				<div class="info">
+					<h3>12</h3>
+					<span>Total Flotte</span>
 				</div>
-
-				{# Barre de Recherche #}
-				<div class="agency-filter-group search-group">
-					<label for="search-bus" class="agency-filter-label">Recherche rapide</label>
-					<div class="agency-search-input-wrapper">
-						<i class="fa-solid fa-magnifying-glass"></i>
-						<input type="text" id="search-bus" class="agency-filter-input" placeholder="Plaque, Chauffeur, Modèle...">
-					</div>
-				</div>
-
 			</div>
-		</section>
-
-		{# --- COMPTEUR DE VÉHICULES FILTRÉS --- #}
-		<div class="agency-fleet-counter">
-			<p>
-				<span id="visible-count">3</span>
-				véhicule(s) affiché(s) sur
-				<span id="total-count">3</span>
-				au total.</p>
+			<div class="stat-card card-refined active">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-circle-check"></i>
+				</div>
+				<div class="info">
+					<h3>8</h3>
+					<span>En Service</span>
+				</div>
+			</div>
+			<div class="stat-card card-refined maintenance">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-screwdriver-wrench"></i>
+				</div>
+				<div class="info">
+					<h3>2</h3>
+					<span>Au Garage</span>
+				</div>
+			</div>
+			<div class="stat-card card-refined alert">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-triangle-exclamation"></i>
+				</div>
+				<div class="info">
+					<h3>2</h3>
+					<span>Doc. Expirés</span>
+				</div>
+			</div>
 		</div>
 
-		{# --- MATRICE / TABLEAU DE LA FLOTTE --- #}
-		<div class="agency-fleet-card">
-			<div class="responsive-fleet-table">
-				<table class="agency-fleet-table" id="fleet-table-data">
-					<thead>
+		{# --- LISTE DE LA FLOTTE --- #}
+		<div class="table-responsive-wrappe">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Véhicule</th>
+						<th>Immatriculation</th>
+						<th>Capacité</th>
+						<th>Kilométrage</th>
+						<th class="text-center">État Administratif</th>
+						<th class="text-center">Statut Opérationnel</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for bus in fleet %}
 						<tr>
-							<th>Code & Modèle</th>
-							<th>Immatriculation</th>
-							<th>Succursale Actuelle</th>
-							<th>Chauffeur assigné</th>
-							<th class="text-center">Capacité</th>
-							<th>Statut opérationnel</th>
-							<th class="text-center">Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-
-						{# Véhicule 1 #}
-						<tr class="agency-fleet-row" data-branch="Limete" data-status="on-route">
 							<td>
-								<div class="agency-bus-meta">
-									<strong>BUS-012</strong>
-									<p>Mercedes-Benz Marcopolo</p>
+								<div class="bus-cell">
+
+									<div class="info">
+										<span class="model">{{ bus.brand }}
+											{{ bus.model }}</span>
+										<span class="type-badge">{{ bus.type }}</span>
+									</div>
 								</div>
 							</td>
-							<td class="searchable-field">5412AB/01 (Kinshasa)</td>
 							<td>
-								<span class="agency-branch-tag">Limete</span>
+								<span class="plate-tag">{{ bus.plateNumber }}</span>
 							</td>
-							<td class="searchable-field">Ilunga Dieudonné</td>
+							<td>
+								<span class="seat-count-badge">
+									<i class="fa-solid fa-chair"></i>
+									{{ bus.capacity }}
+									places</span>
+							</td>
+							<td>
+								<strong>{{ bus.mileage|number_format(0, ',', ' ') }}
+									km</strong>
+							</td>
 							<td class="text-center">
-								<strong>45</strong>
-								<small>places</small>
-							</td>
-							<td>
-								<span class="agency-status-badge status-on-route">En route</span>
+								<span class="doc-status-pill {{ bus.docStatus }}">
+									<i class="fa-solid {{ bus.docStatus == 'up-to-date' ? 'fa-shield-check' : 'fa-circle-exclamation' }}"></i>
+									{{ bus.docStatus == 'up-to-date' ? 'À jour' : 'Alerte' }}
+								</span>
 							</td>
 							<td class="text-center">
-								<a href="{{path('admin_agency_bus_show',{code:'bus-001'})}}" class="agency-action-trigger" data-tooltip="Fiche Technique">
-									<i class="fa-solid fa-eye"></i>
-								</a>
+								<span class="status-pill-fleet {{ bus.status }}">
+									{{ bus.statusLabel }}
+								</span>
 							</td>
-						</tr>
-
-						{# Véhicule 2 #}
-						<tr class="agency-fleet-row" data-branch="Matadi" data-status="loading">
-							<td>
-								<div class="agency-bus-meta">
-									<strong>BUS-045</strong>
-									<p>Toyota Coaster (VIP)</p>
+							<td class="text-right">
+								<div class="action-group-refined">
+									<a href="{{path('admin_agency_bus_show',{code:'bus-001'})}}" class="action-link edit" title="Fiche technique">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+									{# <a href="#" class="action-link config" title="Éditer"><i class="fa-solid fa-pen"></i></a>
+									                            #}
 								</div>
 							</td>
-							<td class="searchable-field">8943AC/02 (Kongo-Central)</td>
-							<td>
-								<span class="agency-branch-tag">Matadi</span>
-							</td>
-							<td class="searchable-field">Mvumbi Blaise</td>
-							<td class="text-center">
-								<strong>24</strong>
-								<small>places</small>
-							</td>
-							<td>
-								<span class="agency-status-badge status-loading">Au chargement</span>
-							</td>
-							<td class="text-center">
-								<a href="{{path('admin_agency_bus_show',{code:'bus-001'})}}" class="agency-action-trigger" data-tooltip="Fiche Technique">
-									<i class="fa-solid fa-eye"></i>
-								</a>
-							</td>
 						</tr>
-
-						{# Véhicule 3 #}
-						<tr class="agency-fleet-row" data-branch="Boma" data-status="maintenance">
-							<td>
-								<div class="agency-bus-meta">
-									<strong>BUS-009</strong>
-									<p>Scania Touring K410</p>
-								</div>
-							</td>
-							<td class="searchable-field">2376AA/02 (Kongo-Central)</td>
-							<td>
-								<span class="agency-branch-tag">Boma</span>
-							</td>
-							<td class="searchable-field">Nsimba Gabriel</td>
-							<td class="text-center">
-								<strong>55</strong>
-								<small>places</small>
-							</td>
-							<td>
-								<span class="agency-status-badge status-maintenance">En maintenance</span>
-							</td>
-							<td class="text-center">
-								<a href="{{path('admin_agency_bus_show',{code:'bus-001'})}}" class="agency-action-trigger" data-tooltip="Fiche Technique">
-									<i class="fa-solid fa-eye"></i>
-								</a>
-							</td>
-						</tr>
-
-					</tbody>
-				</table>
-
-				{# Message si aucun bus ne correspond #}
-				<div id="no-bus-fallback" class="agency-table-fallback" style="display: none;">
-					<i class="fa-solid fa-bus-simple"></i>
-					<p>Aucun bus ne correspond aux critères de recherche actuels.</p>
-				</div>
-
-			</div>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
-
-		{# --- NOUVEAU : BLOC DE PAGINATION & CONTRÔLE --- #}
-		<div class="agency-pagination-footer">
-			<div class="agency-pagination-per-page">
-				<label for="per-page-select">Afficher</label>
-				<select id="per-page-select" class="agency-pagination-select">
-					<option value="10" selected>10</option>
-					<option value="25">25</option>
-					<option value="50">50</option>
-				</select>
-				<span>bus par page</span>
-			</div>
-
-			<div class="agency-pagination-controls">
-				<button id="btn-prev-page" class="agency-pagination-btn" disabled>
-					<i class="fa-solid fa-chevron-left"></i>
-					Précédent
-				</button>
-
-				{# Ce conteneur va recevoir les numéros de page dynamiquement via le JS #}
-				<div id="page-numbers-container" class="agency-page-numbers"></div>
-
-				<button id="btn-next-page" class="agency-pagination-btn">
-					Suivant
-					<i class="fa-solid fa-chevron-right"></i>
-				</button>
-			</div>
-		</div>
-
-		{% if buses is defined and buses|length > 0 %}
-			{# --- ÉTAT VIDE (FALLBACK UX) --- #}
-			<div class="table-empty-state">
-				<i class="fa-solid fa-bus"></i>
-				<p>Aucun véhicule n'est actuellement enregistré dans la flotte.</p>
-			</div>
-		{% endif %}
-
-
 	</div>
-	<!--agency-fleet-management-wrapper-->
-
-
 {% endblock %}
