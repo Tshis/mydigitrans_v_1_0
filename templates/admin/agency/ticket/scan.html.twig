@@ -1,17 +1,115 @@
 {# templates/admin/agency/ticketing/scan.html.twig #}
-<div class="admin-ticketing-scan-scope">
-	<div class="scan-visual-feedback success" id="js-scan-result">
-		<i class="fa-solid fa-circle-check"></i>
-		<div class="pass-info">
-			<strong>Mputu Antoinette</strong>
-			<span>Siège N°14 | Destination : Kenge</span>
-		</div>
-		<div class="status-msg">TICKET VALIDÉ - BON VOYAGE</div>
-	</div>
+{% extends "admin/base.html.twig" %}
 
-	<div
-		class="scanner-camera-container">
-		<!-- Ici l'intégration du lecteur QR JS -->
-		<div class="qr-placeholder">Caméra en attente...</div>
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/admin/html5qrCode.js" defer></script>
+	<script src="/js/admin/ticket_scan.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div class="admin-agency-scan-scope container">
+		<header class="header-refined mb-25">
+			<div class="header-left">
+				<a href="{{ path('admin_agency_ticket_index') }}" class="back-circle">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title-meta">
+					<h1>Contrôle de Montée</h1>
+					<p>Scanner ou saisir la référence du billet</p>
+				</div>
+			</div>
+		</header>
+
+		<div class="scan-wrapper-grid">
+			<div
+				class="scan-interaction-panel">
+
+				{# --- NOUVEAU : BARRE DE SELECTION DEVICE --- #}
+				<div class="device-selector-bar mb-15">
+					<i class="fa-solid fa-camera"></i>
+					<select id="js-camera-selection" class="matrix-select mini">
+						<option value="">Initialisation des caméras...</option>
+					</select>
+				</div>
+
+				<div class="scanner-viewport card-refined">
+					<div id="reader"></div>
+					<div class="scan-overlay-ui">
+						<div class="corners">
+							<span class="c-tl"></span>
+							<span class="c-tr"></span>
+							<span class="c-bl"></span>
+							<span class="c-br"></span>
+						</div>
+						<div class="scan-bar"></div>
+					</div>
+				</div>
+
+				<div class="manual-entry-card card-refined mt-20">
+					<div class="manual-header">
+						<i class="fa-solid fa-keyboard"></i>
+						<span>Saisie Manuelle de secours</span>
+					</div>
+					<form id="js-manual-form" class="input-group-refined">
+						<input type="text" id="js-manual-ref" placeholder="Ex: 88942..." autocomplete="off">
+						<button type="submit" class="btn-check">
+							<i class="fa-solid fa-magnifying-glass"></i>
+						</button>
+					</form>
+				</div>
+			</div>
+
+			<aside class="scan-history-panel">
+				<div class="card-refined">
+					<h3 class="side-title">Dernières validations</h3>
+					<div id="js-scan-history-list" class="history-list">
+						<div class="empty-state">En attente de scan...</div>
+					</div>
+				</div>
+			</aside>
+		</div>
+
+		{# --- MODALE DE RESULTAT --- #}
+		<div id="js-scan-result-overlay" class="result-modal-wrapper hidden">
+			<div
+				class="result-content card-refined">
+
+				{# Indicateur visuel haut #}
+				<div
+					id="js-res-icon" class="res-icon">{# Injecté par JS : <i class="fa-solid fa-circle-check"></i> #}
+				</div>
+
+				<div class="res-info">
+					<h2 id="js-res-name" class="passenger-name">Chargement...</h2>
+
+					<div class="res-details-grid">
+						<div class="detail-item">
+							<span class="label">Siège</span>
+							<strong id="js-res-seat">--</strong>
+						</div>
+						<div class="detail-item">
+							<span class="label">Destination</span>
+							<strong id="js-res-dest">--</strong>
+						</div>
+						<div class="detail-item">
+							<span class="label">Voyage</span>
+							<strong id="js-res-trip">--</strong>
+						</div>
+					</div>
+
+					{# Badge de statut (Validé / Refusé) #}
+					<div id="js-res-msg" class="res-status-badge">---</div>
+				</div>
+
+				<div class="modal-footer-actions">
+					<button id="js-btn-close-res" class="btn-refined btn-primary-gradient btn-full">
+						<i class="fa-solid fa-arrow-right"></i>
+						Passager Suivant
+					</button>
+				</div>
+			</div>
+		</div>
+
 	</div>
-</div>
+{% endblock %}

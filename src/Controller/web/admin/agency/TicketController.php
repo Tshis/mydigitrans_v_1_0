@@ -55,7 +55,7 @@ class TicketController extends AbstractController
     public function scan(Request $request): Response
     {
 
-        return $this->render('admin/agency/caisse/scan.html.twig', [
+        return $this->render('admin/agency/ticket/scan.html.twig', [
             'page' => 'ticket',
         ]);
     } //scan
