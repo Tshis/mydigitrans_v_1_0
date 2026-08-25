@@ -42,10 +42,17 @@
 					</h3>
 					<form id="agency-bus-update-form" class="agency-bus-profile-form" method="POST" action="#">
 
-						<div class="field mb-20">
-							<label class="agency-bus-profile-form-label">Numéro de Plaque d'Immatriculation</label>
-							<input type="text" name="update_plate" class="agency-bus-profile-form-input"
-								value="5412AB/01" required>
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="agency-bus-profile-form-label">Plaque d'Immatriculation</label>
+								<input type="text" name="update_plate" class="agency-bus-profile-form-input"
+									value="5412AB/01" required>
+							</div>
+							<div class="field">
+								<label class="agency-bus-profile-form-label">Kilometrage (km parcourus)</label>
+								<input type="number" name="mileage" class="agency-bus-profile-form-input" value="72000"
+									required>
+							</div>
 						</div>
 
 						<div class="field mb-20">
