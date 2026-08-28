@@ -5,6 +5,7 @@
 {{ parent() }}
 <script src="/js/admin/bus_profil.js" defer></script>
 <script src="/js/seatmap.js" defer></script>
+<script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -104,6 +105,100 @@
 					</form>
 				</div>
 
+				{# COLONNE INFERIEURE : DÉCLASSEMENT (ZÔNE CRITIQUE) #}
+				<div class="agency-bus-profile-card agency-bus-profile-card--critical">
+					<h3 class="agency-bus-profile-card-title text-danger">
+						<i class="fa-solid fa-triangle-exclamation"></i> Zone de Danger
+					</h3>
+					<div class="agency-bus-maintenance-status-box border-dark">
+						<p>Le déclassement retire définitivement le bus du réseau actif. Utilisez cette option si le
+							véhicule est vendu, détruit ou jugé irréparable.</p>
+
+						<button type="button" id="btn-trigger-decommission"
+							class="btn btn-danger btn-full text-size-12">
+							<i class="fa-solid fa-trash-can"></i> Déclasser / Rendre inactif ce bus
+						</button>
+					</div>
+
+					{# Volet de confirmation du déclassement #}
+					<div id="decommission-action-panel" class="agency-bus-panic-panel panel-border-danger hidden">
+						<form action="">
+							<div class="field mb-20">
+								<label class="agency-bus-profile-form-label text-danger">Motif du déclassement
+									définitif</label>
+								<select id="decommission-reason-select" class="agency-bus-profile-form-select">
+									<option value="sold">Véhicule vendu / Cédé</option>
+									<option value="scrapped">Véhicule irréparable (Épave / Réforme)</option>
+									<option value="expired">Fin de contrat de leasing / Retrait</option>
+								</select>
+							</div>
+							<div class="agency-bus-panic-actions">
+								<button type="button" id="btn-cancel-decommission"
+									class="btn btn-dark text-size-12">Annuler</button>
+								<button type="button" id="btn-confirm-decommission"
+									class="btn btn-success text-size-12">Confirmer la
+									radiation</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				{# HISTORIQUE DES PANNES #}
+				<div class="table-responsive-wrapper my-20">
+					<h2 class="card-title-fix text-size-16 py-10">
+						<i class="fa-solid fa-screwdriver-wrench text-primary"></i>
+						Historique des Pannes & Interventions
+					</h2>
+					<table class="table table-scrollable table-striped js-datatable">
+						<thead>
+							<tr>
+								<th>Date panne</th>
+								<th>Details de la panne</th>
+								<th>Solutions</th>
+								<th>Status</th>
+								<th>Date solution</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for log in bus.maintenance_history %}
+							{# Ligne 1 : Vente de billet en CDF #}
+							<tr>
+								<td>
+									{{ log.reportedAt|date('d/m/Y') }}
+								</td>
+								<td>
+									<strong>{{ log.issue }}</strong>
+								</td>
+								<td>
+									{{ log.solution|default('En attente de diagnostic...') }}
+								</td>
+								<td>
+									<span class="pill-maintenance {{ log.status }}">
+										{{ log.status == 'in_progress' ? 'Panne' : 'Resolue' }}
+									</span>
+								</td>
+								<td class="text-right text-success-mode font-bold">
+									{{ log.resolvedAt ? log.resolvedAt|date('d/m/Y') : 'En attente...' }}
+								</td>
+							</tr>
+							{% else %}
+							<tr>
+								<td colspan="5" class="text-center text-gray italic padding-20">
+									Aucun incident technique signalé sur ce véhicule. Excellent état.
+								</td>
+							</tr>
+							{% endfor %}
+
+
+						</tbody>
+					</table>
+				</div>
+
+			</div>
+			<!--left-side-->
+
+			{# --- COULOIR DE TEST MULTI-MODÈLES --- #}
+			<div class="right-side seatmap-section">
 
 				{# COLONNE INFERIEURE : MAINTENANCE #}
 				<div class="agency-bus-profile-card">
@@ -174,56 +269,15 @@
 
 				</div>
 
-				{# COLONNE INFERIEURE : DÉCLASSEMENT (ZÔNE CRITIQUE) #}
-				<div class="agency-bus-profile-card agency-bus-profile-card--critical">
-					<h3 class="agency-bus-profile-card-title text-danger">
-						<i class="fa-solid fa-triangle-exclamation"></i> Zone de Danger
-					</h3>
-					<div class="agency-bus-maintenance-status-box border-dark">
-						<p>Le déclassement retire définitivement le bus du réseau actif. Utilisez cette option si le
-							véhicule est vendu, détruit ou jugé irréparable.</p>
+				<div class="seatmap-zone">
 
-						<button type="button" id="btn-trigger-decommission"
-							class="btn btn-danger btn-full text-size-12">
-							<i class="fa-solid fa-trash-can"></i> Déclasser / Rendre inactif ce bus
-						</button>
+					<div class="seatmap-section-header">
+						<h4 class="seatmap-section-title">{{ seatmap.name }}</h4>
 					</div>
 
-					{# Volet de confirmation du déclassement #}
-					<div id="decommission-action-panel" class="agency-bus-panic-panel panel-border-danger hidden">
-						<form action="">
-							<div class="field mb-20">
-								<label class="agency-bus-profile-form-label text-danger">Motif du déclassement
-									définitif</label>
-								<select id="decommission-reason-select" class="agency-bus-profile-form-select">
-									<option value="sold">Véhicule vendu / Cédé</option>
-									<option value="scrapped">Véhicule irréparable (Épave / Réforme)</option>
-									<option value="expired">Fin de contrat de leasing / Retrait</option>
-								</select>
-							</div>
-							<div class="agency-bus-panic-actions">
-								<button type="button" id="btn-cancel-decommission"
-									class="btn btn-dark text-size-12">Annuler</button>
-								<button type="button" id="btn-confirm-decommission"
-									class="btn btn-success text-size-12">Confirmer la
-									radiation</button>
-							</div>
-						</form>
-					</div>
+					{# Rendu dynamique des plans des bus en incluant le composant autonome #}
+					{{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
 				</div>
-
-
-			</div>
-			<!--left-side-->
-
-			{# --- COULOIR DE TEST MULTI-MODÈLES --- #}
-			<div class="right-side seatmap-section">
-				<div class="seatmap-section-header">
-					<h4 class="seatmap-section-title">{{ seatmap.name }}</h4>
-				</div>
-
-				{# Rendu dynamique des plans des bus en incluant le composant autonome #}
-				{{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
 
 			</div>
 			<!--right-side-->

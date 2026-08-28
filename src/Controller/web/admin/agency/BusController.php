@@ -90,10 +90,49 @@ final class BusController extends AbstractController
             throw $this->createNotFoundException('Bus layout introuvable');
         }
 
+        $bus = [
+            'id' => 1002,
+            'brand' => 'Toyota',
+            'model' => 'Coaster',
+            'plateNumber' => 'A-5678-DE',
+            'capacity' => 30,
+            'mileage' => 89400,
+            'vin' => 'JT153JA0004912',
+            'status' => 'maintenance',
+            'statusLabel' => 'Au Garage',
+            'currency' => 'CDF',
+
+            // Simulation de la table historique des incidents techniques
+            'maintenance_history' => [
+                [
+                    'id' => 4021,
+                    'reportedAt' => new \DateTime('2026-08-10'),
+                    'issue' => 'Surchauffe moteur sur la route de Matadi',
+                    'solution' => 'Remplacement du joint de culasse et purge du radiateur',
+                    'reportedBy' => 'Maitre Kabeya',
+                    'status' => 'resolved',
+                    'resolvedAt' => new \DateTime('2026-08-15'),
+                    'updatedBy' => 'Kalonji Beya',
+                ],
+                [
+                    'id' => 4156,
+                    'reportedAt' => new \DateTime('2026-08-25'),
+                    'issue' => 'Amortisseurs arrières usés (RN1)',
+                    'solution' => '',
+                    'status' => 'in_progress',
+                    'reportedBy' => 'Maitre Kabeya',
+                    'resolvedAt' => null,
+                    'updatedBy' => null,
+                ]
+            ]
+        ];
+
+
 
         return $this->render('admin/agency/bus/show.html.twig', [
             'page' => 'bus',
             'bus_code' => $code,
+            'bus' => $bus,
             'seatmap' => $busLayoutGridBuilder->build($busLayout),
         ]);
     } ////show()

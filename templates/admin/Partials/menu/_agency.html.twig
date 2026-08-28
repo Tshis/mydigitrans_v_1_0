@@ -73,6 +73,13 @@
 	<span class="text">Bus</span>
 </a>
 
+<a href="{{path('admin_agency_bus_index')}}" class="menu-link {{ page is same as('maintenance') ? 'active' : '' }}" data-tooltip="Flotte de Bus">
+	<span class="icon">
+		<i class="fa-solid fa-screwdriver-wrench"></i>
+	</span>
+	<span class="text">Maintenance & Pannes</span>
+</a>
+
 {# 4. RESSOURCES HUMAINES & STRUCTURE #}
 <a href="{{path('admin_agency_branch_index')}}" class="menu-link {{ page is same as('branch') ? 'active' : '' }}" data-tooltip="Succursales">
 	<span class="icon">

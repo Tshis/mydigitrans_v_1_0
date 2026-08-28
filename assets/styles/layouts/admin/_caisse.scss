@@ -1,0 +1,68 @@
+@use '../../abstract/variables' as *;
+
+.admin-agency-fleet-show-scope {
+    // ... (Vos styles précédents)
+
+    // --- TABLEAU DE MAINTENANCE ---
+    .table-responsive-scroll {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-maintenance-logs {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 750px; // Évite l'écrasement des colonnes en responsive
+        margin-top: 1rem;
+
+        th {
+            background: rgba($gray, 0.03);
+            font-size: 11px;
+            text-transform: uppercase;
+            color: $gray;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid $mute;
+        }
+
+        td {
+            padding: 14px 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba($mute, 0.5);
+            font-size: 13px;
+        }
+    }
+
+    .log-date { font-weight: 800; color: $dark; }
+    .log-code { font-family: monospace; font-size: 11px; color: $gray; }
+    .issue-text { color: $dark; }
+    .amount-cell { font-size: 14px; color: $dark; }
+
+    // --- PILLS DE STATUT DE PANNE ---
+    .pill-maintenance {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        display: inline-block;
+
+        &.resolved { background: #e6f4ea; color: #1e7e34; }     // Réparé
+        &.in_progress { background: #fef7e0; color: #b06000; }  // En cours à l'atelier
+        &.critical { background: #fce8e6; color: #c5221f; }     // Panne bloquante active
+    }
+}
+
+// DARK MODE
+.dark .admin-agency-fleet-show-scope {
+    .table-maintenance-logs th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); }
+    .table-maintenance-logs td { border-bottom-color: rgba($white, 0.05); }
+    .log-date, .issue-text, .amount-cell { color: white; }
+    
+    .pill-maintenance {
+        &.resolved { background: rgba(#1e7e34, 0.2); color: #81c995; }
+        &.in_progress { background: rgba(#b06000, 0.2); color: #fdd663; }
+        &.critical { background: rgba(#c5221f, 0.2); color: #f28b82; }
+    }
+}

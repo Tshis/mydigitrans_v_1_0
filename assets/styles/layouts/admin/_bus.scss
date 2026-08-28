@@ -885,6 +885,23 @@ color: $mute;
         }
     }
 
+    .pill-maintenance{
+        padding: 4px 8px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        border-radius: 6px;
+
+        &.resolved{
+            background: rgba($color: $success, $alpha: .20);
+            color: $success;
+        }
+
+        &.in_progress{
+            background: rgba($color: $danger, $alpha: .20);
+            color: $danger;
+        }
+    }
+
 }//agency-bus-profile-scope
 //=============== FIN PROFIL BUS =================
 
@@ -987,6 +1004,10 @@ color: $mute;
         }//agency-bus-view-shell
 
     }//agency-bus-add-container
+
+    .agency-bus-profile-scope{
+        .card-title-fix{color: $white;}
+    }
 
 }//dark
 
