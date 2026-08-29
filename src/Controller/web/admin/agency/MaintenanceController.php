@@ -4,6 +4,7 @@ namespace App\Controller\web\admin\agency;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -61,51 +62,36 @@ final class MaintenanceController extends AbstractController
     } //index
 
     #[Route('/admin/agency/maintenance/add', name: 'admin_agency_maintenance_add')]
-    public function add(): Response
+    public function add(Request $request): Response
     {
 
-        $fleet = [
-            [
-                'brand' => 'Mercedes-Benz',
-                'model' => 'Sprinter 316',
-                'type' => 'Minimaintenance',
-                'plateNumber' => 'A-1234-BC',
-                'capacity' => 19,
-                'mileage' => 142050,
-                'docStatus' => 'up-to-date',
-                'status' => 'available',
-                'statusLabel' => 'Disponible'
-            ],
-            [
-                'brand' => 'Toyota',
-                'model' => 'Coaster',
-                'type' => 'Bus Interurbain',
-                'plateNumber' => 'A-5678-DE',
-                'capacity' => 30,
-                'mileage' => 89400,
-                'docStatus' => 'up-to-date',
-                'status' => 'on_road',
-                'statusLabel' => 'En Voyage'
-            ],
-            [
-                'brand' => 'Scania',
-                'model' => 'K410',
-                'type' => 'Autocar Grand Confort',
-                'plateNumber' => 'A-9012-FG',
-                'capacity' => 54,
-                'mileage' => 310200,
-                'docStatus' => 'expired',
-                'status' => 'broken',
-                'statusLabel' => 'En Panne'
-            ]
+
+        // Simulation des véhicules de l'agence pour le select
+        $activeBuses = [
+            ['code' => 'bus-001', 'brand' => 'Mercedes-Benz', 'model' => 'Sprinter', 'plateNumber' => 'A-1234-BC'],
+            ['code' => 'bus-002', 'brand' => 'Toyota', 'model' => 'Coaster', 'plateNumber' => 'A-5678-DE'],
+            ['code' => 'bus-003', 'brand' => 'Scanya', 'model' => 'K410', 'plateNumber' => 'A-9012-FG'],
         ];
 
+        // Traitement de la soumission
+        if ($request->isMethod('POST')) {
+            $busCode = $request->request->get('bus_code');
+            $issue = $request->request->get('issue_description');
+
+            // Flash message simulant la mise en panne automatique
+            $this->addFlash('success', sprintf(
+                'Panne enregistrée avec succès pour le véhicule %s. Statut basculé en BROKEN.',
+                strtoupper($busCode)
+            ));
+
+            return $this->redirectToRoute('admin_agency_maintenance_index');
+        }
 
 
 
         return $this->render('admin/agency/maintenance/add.html.twig', [
             'page' => 'maintenance',
-            'fleet' => $fleet
+            'active_buses' => $activeBuses
         ]);
     } //add
 }
