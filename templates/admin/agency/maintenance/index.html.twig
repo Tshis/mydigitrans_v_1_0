@@ -2,151 +2,181 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script src="/js/datatable.js" defer></script>
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+<script src="/js/admin/maintenance.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-maintenance-index-scope container">
-		{# --- HEADER --- #}
-		<header class="header-refined mb-30">
-			<div class="header-left">
-				<div class="breadcrumb-mini">
-					<span>Logistique</span>
-					<i class="fa-solid fa-chevron-right"></i>
-					<strong>Atelier Central</strong>
-				</div>
-				<h1>Maintenance & Carnet de Pannes</h1>
-				<p class="subtitle">Suivi technique et opérationnel de vos bus.</p>
+<div class="admin-agency-maintenance-index-scope container">
+	{# --- HEADER --- #}
+	<header class="header-refined mb-30">
+		<div class="header-left">
+			<div class="breadcrumb-mini">
+				<span>Logistique</span>
+				<i class="fa-solid fa-chevron-right"></i>
+				<strong>Atelier Central</strong>
 			</div>
-			<div class="header-right">
-				<a href="{{path('admin_agency_maintenance_add')}}" class="btn-refined btn-danger-gradient">
-					<i class="fa-solid fa-plus"></i>
-					<span>Déclarer une panne</span>
-				</a>
-			</div>
-		</header>
+			<h1>Maintenance & Carnet de Pannes</h1>
+			<p class="subtitle">Suivi technique et opérationnel de vos bus.</p>
+		</div>
+		<div class="header-right">
+			<a href="{{path('admin_agency_maintenance_declare')}}" class="btn-refined btn-danger-gradient">
+				<i class="fa-solid fa-plus"></i>
+				<span>Déclarer une panne</span>
+			</a>
+		</div>
+	</header>
 
-		{# --- STATS RAPIDES --- #}
-		<div class="fleet-stats-grid mb-25">
-			<div class="stat-card card-refined alert">
-				<div class="icon-wrap">
-					<i class="fa-solid fa-screwdriver-wrench"></i>
-				</div>
-				<div class="info">
-					<h3>2</h3>
-					<span>Au Garage</span>
-				</div>
+	{# --- STATS RAPIDES --- #}
+	<div class="fleet-stats-grid mb-25">
+		<div class="stat-card card-refined alert">
+			<div class="icon-wrap">
+				<i class="fa-solid fa-screwdriver-wrench"></i>
 			</div>
-			<div class="stat-card card-refined total">
-				<div class="icon-wrap">
-					<i class="fa-solid fa-bus"></i>
-				</div>
-				<div class="info">
-					<h3>12</h3>
-					<span>Total Flotte</span>
-				</div>
+			<div class="info">
+				<h3>2</h3>
+				<span>Au Garage</span>
 			</div>
-			<div class="stat-card card-refined active">
-				<div class="icon-wrap">
-					<i class="fa-solid fa-circle-check"></i>
-				</div>
-				<div class="info">
-					<h3>8</h3>
-					<span>En Service</span>
-				</div>
+		</div>
+		<div class="stat-card card-refined total">
+			<div class="icon-wrap">
+				<i class="fa-solid fa-bus"></i>
 			</div>
-
+			<div class="info">
+				<h3>12</h3>
+				<span>Total Flotte</span>
+			</div>
+		</div>
+		<div class="stat-card card-refined active">
+			<div class="icon-wrap">
+				<i class="fa-solid fa-circle-check"></i>
+			</div>
+			<div class="info">
+				<h3>8</h3>
+				<span>En Service</span>
+			</div>
 		</div>
 
-		{# --- ZONE DE FILTRES AVANCÉS --- #}
-		<div class="trip-filters-card mb-20">
-			<form action="#" method="GET" class="field-group">
-				<div class="field">
-					<label class="admin-bus-layout-add-label">Numéro de plaque</label>
-					<input type="text" name="search_query" class="admin-bus-layout-add-input" placeholder="Ex: TCK-2607-001">
-				</div>
-				<div class="field">
-					<label class="admin-bus-layout-add-label">Statut</label>
-					<select name="ticket_status" class="admin-bus-layout-add-select">
-						<option value="">-- Tous les statuts --</option>
-						<option value="resolu">Résolu</option>
-						<option value="broken">En panne</option>
-					</select>
-				</div>
-				<div class="field">
-					<label class="admin-bus-layout-add-label">Date de la panne</label>
-					<input type="date" name="search_query" class="admin-bus-layout-add-input" placeholder="Ex: TCK-2607-001">
-				</div>
-				<div class="field-actions">
-					<button type="submit" class="btn btn-reset">
-						<i class="fa-solid fa-filter"></i>
-						Filtrer
-					</button>
-				</div>
-			</form>
-		</div>
+	</div>
 
-		{# --- LISTE DE LA FLOTTE --- #}
-		<div class="table-responsive-wrappe">
-			<table class="table table-scrollable table-striped js-datatable">
-				<thead>
-					<tr>
-						<th>Véhicule</th>
-						<th>Date de la panne</th>
-						<th class="text-center">Details de la panne</th>
-						<th class="text-center">Solutions</th>
-						<th class="text-center">Date de la solution</th>
-						<th class="text-center">Status</th>
-						<th class="text-right">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for bus in fleet %}
-						<tr>
-							<td>
-								<div class="bus-cell">
+	{# --- ZONE DE FILTRES AVANCÉS --- #}
+	<div class="trip-filters-card mb-20">
+		<form action="#" method="GET" class="field-group">
+			<div class="field">
+				<label class="admin-bus-layout-add-label">Numéro de plaque</label>
+				<input type="text" name="search_query" class="admin-bus-layout-add-input"
+					placeholder="Ex: TCK-2607-001">
+			</div>
+			<div class="field">
+				<label class="admin-bus-layout-add-label">Statut</label>
+				<select name="ticket_status" class="admin-bus-layout-add-select">
+					<option value="">-- Tous les statuts --</option>
+					<option value="resolu">Résolu</option>
+					<option value="broken">En panne</option>
+				</select>
+			</div>
+			<div class="field">
+				<label class="admin-bus-layout-add-label">Date de la panne</label>
+				<input type="date" name="search_query" class="admin-bus-layout-add-input"
+					placeholder="Ex: TCK-2607-001">
+			</div>
+			<div class="field-actions">
+				<button type="submit" class="btn btn-reset">
+					<i class="fa-solid fa-filter"></i>
+					Filtrer
+				</button>
+			</div>
+		</form>
+	</div>
 
-									<div class="info">
-										<span class="model">{{ bus.brand }}
-											{{ bus.model }}</span>
-										<span class="type-badge">{{ bus.plateNumber }}</span>
-									</div>
-								</div>
-							</td>
-							<td>
-								28/09/2026
-							</td>
-							<td class="{{ bus.status == 'broken' ? 'text-danger text-weight-700' : '' }}">
-								{{ bus.issue }}
-							</td>
-							<td class="text-success {{ bus.status == 'resolved' ? 'text-weight-700' : '' }}">
-								{{ bus.solution|default('En attente de diagnostic...') }}
-							</td>
-							<td>
-								Non définie
-							</td>
-							<td class="text-center">
-								<span class="status-pill-fleet {{ bus.status }}">
-									{{ bus.statusLabel }}
+	{# --- LISTE DE LA FLOTTE --- #}
+	<div class="table-responsive-wrappe">
+		<table class="table table-scrollable table-striped js-datatable">
+			<thead>
+				<tr>
+					<th>Véhicule</th>
+					<th>Date de la panne</th>
+					<th class="text-center">Details de la panne</th>
+					<th class="text-center">Solutions</th>
+					<th class="text-center">Date de la solution</th>
+					<th class="text-center">Status</th>
+					<th class="text-right">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for bus in fleet %}
+				<tr>
+					<td>
+						<div class="bus-cell">
+
+							<div class="info">
+								<span class="model">{{ bus.brand }}
+									{{ bus.model }}</span>
+								<span class="type-badge">{{ bus.plateNumber }}</span>
+							</div>
+						</div>
+					</td>
+					<td>
+						28/09/2026
+					</td>
+					<td class="{{ bus.status == 'broken' ? 'text-danger text-weight-700' : '' }}">
+						{{ bus.issue }}
+					</td>
+					<td class="text-success {{ bus.status == 'resolved' ? 'text-weight-700' : '' }}">
+						{{ bus.solution|default('En attente de diagnostic...') }}
+					</td>
+					<td>
+						Non définie
+					</td>
+					<td class="text-center">
+						<span class="status-pill-fleet {{ bus.status }}">
+							{{ bus.statusLabel }}
+						</span>
+					</td>
+					<td class="text-right">
+						<div class="action-group-refined">
+
+							{% if bus.status == 'broken' %}
+							<a href="{{path('admin_agency_maintenance_resolve',{'bus':'212'})}}"
+								class="action-link config" title="Reparer la panne">
+								<i class="fa-solid fa-screwdriver-wrench"></i>
+							</a>
+							<a data-href="{{path('admin_agency_maintenance_cancel',{'bus':'212'})}}"
+								class="action-link config text-danger js-modal" title="Annuler la panne">
+								<i class="fa-solid fa-trash-can"></i>
+							</a>
+							{% else %}
+							<a href="" class="action-link config" title="Reparer la panne">
+								<span class="text-success">
+									<i class="fa-solid fa-square-check"></i>
 								</span>
-							</td>
-							<td class="text-right">
-								<div class="action-group-refined">
-									<a href="{{path('admin_agency_bus_show',{code:'bus-001'})}}" class="action-link edit" title="Voir détails">
-										<i class="fa-solid fa-eye"></i>
-									</a>
-									<a href="#" class="action-link config" title="Reparer la panne">
-										<i class="fa-solid fa-screwdriver-wrench"></i>
-									</a>
+							</a>
+							{% endif %}
+						</div>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 
-								</div>
-							</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+	{# ---MODAL QUESTION --- #}
+	<div class="wrapper-modal" id="wrapper-modal">
+		<div class="card-modal">
+
+			<div class="text-center">
+				<span class="text-danger text-size-18"><i class="fa-solid fa-triangle-exclamation"></i></span>
+				<span class="message">Voulez-vous vraiment effectuer cette opération</span>
+				<p><small>Cette operation est irreversible</small></p>
+			</div>
+
+			<div class="actions">
+				<a href="" class="btn-refined btn-success-gradient">Annuler</a>
+				<a href="" class="btn-refined btn-danger-gradient" id="confirm">confirmer</a>
+			</div>
 		</div>
 	</div>
+
+</div>
 {% endblock %}

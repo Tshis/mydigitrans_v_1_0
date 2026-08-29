@@ -8,19 +8,19 @@
     {# --- HEADER --- #}
     <header class="header-refined mb-30">
         <div class="header-left">
+            <a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </div>
+        <div class="header-right">
             <div class="title">
                 <div class="sub-header-flex">
                     <span class="text-gray text-size-13">Logistique</span>
                     <span class="arrow-divider">•</span>
-                    <span class="text-gray text-size-13 text-highlight">Atelier Central</span>
+                    <span class="text-size-13 text-primary">Atelier Central</span>
                 </div>
                 <h1 class="mt-5">Déclarer un Incident / Panne</h1>
             </div>
-        </div>
-        <div class="header-right">
-            <a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
         </div>
     </header>
 
@@ -36,27 +36,26 @@
                         Véhicule & Métriques d'Alerte
                     </h2>
 
-                    <div class="fields-row mb-20">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Sélectionner le Bus en panne *</label>
-                            <select name="bus_code" class="matrix-select" required>
-                                <option value="">-- Choisir le bus immobilisé --</option>
-                                {% for bus in active_buses %}
-                                <option value="{{ bus.code }}">{{ bus.brand }}
-                                    {{ bus.model }}
-                                    ({{ bus.plateNumber }})</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Kilométrage au compteur au moment de la panne
-                                *</label>
-                            <input type="number" name="reported_mileage" class="matrix-input" min="0"
-                                placeholder="Ex: 89400" required>
-                        </div>
+
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Sélectionner le Bus en panne *</label>
+                        <select name="bus_code" class="matrix-select" required>
+                            <option value="">-- Choisir le bus immobilisé --</option>
+                            {% for bus in active_buses %}
+                            <option value="{{ bus.code }}">{{ bus.brand }}
+                                {{ bus.model }}
+                                ({{ bus.plateNumber }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Kilométrage au compteur au moment de la panne
+                            *</label>
+                        <input type="number" name="reported_mileage" class="matrix-input" min="0"
+                            placeholder="Ex: 89400" required>
                     </div>
 
-                    <div class="fields-row">
+                    <div class="field-group">
                         <div class="field">
                             <label class="admin-bus-layout-add-label">Date du constat de l'incident *</label>
                             <input type="date" name="reported_at" class="matrix-input" value="{{ " now"|date("Y-m-d")
@@ -80,14 +79,14 @@
                         Rapport d'Anomalie Diagnostic
                     </h2>
 
-                    <div class="fields-row">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Détails précis de la panne (Symptômes constatés)
-                                *</label>
-                            <textarea name="issue_description" class="matrix-textarea"
-                                placeholder="Ex: Surchauffe moteur brutale après 50 Km sur la RN1, fuite de liquide vert sous le radiateur..."
-                                required></textarea>
-                        </div>
+
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Détails précis de la panne (Symptômes constatés)
+                            *</label>
+                        <textarea name="issue_description" class="matrix-textarea"
+                            placeholder="Ex: Surchauffe moteur brutale après 50 Km sur la RN1, fuite de liquide vert sous le radiateur..."
+                            required></textarea>
+
                     </div>
 
                     <div class="field-button-right">

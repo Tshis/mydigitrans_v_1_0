@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",()=>{let e=document.getElementById("wrapper-modal"),t=document.getElementById("confirm");function d(){e.classList.toggle("active")}document.querySelectorAll(".js-modal").forEach(e=>{e.addEventListener("click",e=>{d(),t.setAttribute("href",e.target.dataset.href)})}),e.addEventListener("click",d)});

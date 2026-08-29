@@ -61,8 +61,8 @@ final class MaintenanceController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/maintenance/add', name: 'admin_agency_maintenance_add')]
-    public function add(Request $request): Response
+    #[Route('/admin/agency/maintenance/declare', name: 'admin_agency_maintenance_declare')]
+    public function declare(Request $request): Response
     {
 
 
@@ -89,9 +89,65 @@ final class MaintenanceController extends AbstractController
 
 
 
-        return $this->render('admin/agency/maintenance/add.html.twig', [
+        return $this->render('admin/agency/maintenance/declare.html.twig', [
             'page' => 'maintenance',
             'active_buses' => $activeBuses
         ]);
-    } //add
+    } //declare
+
+
+    #[Route('/admin/agency/maintenance/{bus}/resolve', name: 'admin_agency_maintenance_resolve')]
+    public function resolve(int $bus, Request $request): Response
+    {
+        // 1. Simulation du Véhicule (bus) lié au ticket d'incident
+        $bus = [
+            'brand' => 'Toyota',
+            'model' => 'Coaster',
+            'plateNumber' => 'A-5678-DE',
+            'capacity' => 30,
+            'mileage' => 89400,
+            'currency' => 'CDF' // Devise appelée par ton tableau : {{ bus.currency }}
+        ];
+
+        // 2. Simulation de l'Incident courant (log) à clore
+        // Le statut de départ est impérativement 'broken'
+        $log = [
+            'id' => $bus,
+            'issue' => 'Réchauffement du radiateur et fuite de liquide sur la RN1',
+            'status' => 'broken',
+            'reportedAt' => new \DateTime('2026-08-25')
+        ];
+
+        // 3. Traitement de la clôture lors de la soumission du formulaire
+        if ($request->isMethod('POST')) {
+            // Récupération des données de ton formulaire (solution, mécanicien, date)
+            $solutionDescription = $request->request->get('solution_description');
+            $updatedBy = $request->request->get('updated_by');
+            $resolvedAt = $request->request->get('resolved_at');
+
+            // Ici, ton code Doctrine fera basculer le statut à 'resolved' en base de données
+            $this->addFlash('success', sprintf(
+                'La panne du bus %s a été résolue par %s. Le véhicule repasse au statut RESOLVED.',
+                $bus['plateNumber'],
+                $updatedBy
+            ));
+
+            // Redirection vers le registre central de l'Atelier
+            return $this->redirectToRoute('admin_agency_maintenance_index');
+        }
+
+        // 4. Envoi des variables exactes requises par ton architecture HTML Twig
+        return $this->render('admin/agency/maintenance/resolve.html.twig', [
+            'page' => 'maintenance_resolve',
+            'bus' => $bus,
+            'log' => $log
+        ]);
+    } //resolve
+
+    #[Route('/admin/agency/maintenance/{bus}/cancel', name: 'admin_agency_maintenance_cancel')]
+    public function cancel(int $bus, Request $request): Response
+    {
+        return $this->redirectToRoute('admin_agency_maintenance_index');
+    } //cancel
+
 }

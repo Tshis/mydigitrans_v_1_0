@@ -2,6 +2,7 @@
 
 .admin-agency-maintenance-index-scope {
     padding-block: 2.5rem;
+    position: relative;
 
     // --- HEADER REFINÉ ---
     .header-refined {
@@ -144,6 +145,39 @@
             &.refund:hover { background: $danger; color: $white; border-color: $danger; }
         }
     }
+
+    //MODAL
+    .wrapper-modal{
+        background: rgba($color: $dark, $alpha: .60);
+        position: fixed ;
+        top: 56px;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: 99;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        cursor: pointer;
+
+        &.active{
+            display: flex;
+        }
+
+        .card-modal{
+            max-width: 320px;
+            margin: auto;
+            background: $white;
+            padding: 2rem;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+    }
 }
 
 // --- DARK MODE ---
@@ -167,25 +201,25 @@
     }
 
     .fleet-stats-grid .stat-card {background: $dm-bg;}
+
+    .action-link.config{background: $mute; &:hover{background: $dark;}}
+
+    .card-modal{background-color: $dm-bg; color: $mute;}
 }
 
 
 //=========================
-//========PAGE ADD=========
+//========PAGE DECLARE=========
 //=========================
 
 .admin-agency-maintenance-add-scope {
     padding-block: 2rem;
 
-    // --- EN-TÊTE DE LA PAGE ---
-    .header-refined {
-        display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap;
-        .header-main-info h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
-    }
+   
 
     // --- HEADER REFINÉ ---
     .header-refined {
-        display: flex; justify-content: space-between; align-items: flex-end;
+        display: flex; align-items: flex-end;
         flex-wrap: wrap; gap: 2rem;
         .breadcrumb-mini {
             font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
@@ -286,3 +320,78 @@
     .matrix-input, .matrix-select, .matrix-textarea { background: $dm-bg-main; color: $white; border-color: rgba(255,255,255,0.1); }
     .notice-box-info { background: rgba(0, 0, 0, 0.2); color: $mute; border-color: rgba(255,255,255,0.05); }
 }
+
+//========================
+//=======PAGE RESOLVE=====
+//========================
+.admin-agency-maintenance-resolve-scope {
+    padding-block: 2rem;
+
+    // --- HEADER ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+        .agency-back-action {
+            border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+            background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; &:hover { transform: scale(1.05); }
+        }
+    }
+
+    // --- DOUBLE COLONNE ---
+    .maintenance-form-layout {
+        width: 100%;
+        .maintenance-container-grid { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
+        .main-form-panel { flex: 1; min-width: 0; width: 100%; }
+        .sidebar-action-panel {
+            flex: 0 0 320px; width: 320px;
+            @media (max-width: 1100px) { flex: 1 1 100%; width: 100%; }
+            .sticky-aside-card { position: sticky; top: 130px; z-index: 10; background: $white; padding: 1.5rem; border: 1px solid $mute; border-radius: $radius-card; border-top: 4px solid $success; }
+        }
+    }
+
+    .control-card {
+        padding: 1.5rem; border-top: 4px solid $primary; background: $white; border-radius: $radius-card;
+        &.success-accent { border-top-color: $success; }
+        &.error-accent { border-top-color: $danger; }
+        .info-value { font-size: 14px; color: $dark; margin-top: 4px; }
+    }
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    .direct-pricing-row {
+        display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; width: 100%;
+        .field { flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; } }
+    }
+
+    // --- ENTRÉES COMPACTES ---
+    .admin-bus-layout-add-input, .matrix-textarea {
+        width: 100%; border: 1px solid $mute; border-radius: 8px; font-weight: 700; color: $dark; background: $white; box-sizing: border-box;
+        &:focus { border-color: $primary; outline: none; }
+    }
+    .admin-bus-layout-add-input { height: 40px; padding-inline: 12px; font-size: 13px; }
+    .matrix-textarea { height: 90px; padding: 12px; resize: none; font-size: 13.5px; font-weight: 600; line-height: 1.5; }
+
+    // --- TABLEAU PRESERVE ---
+    .table-responsive-wrapper { background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; }
+    .table {
+        width: 100%; border-collapse: collapse; min-width: 600px;
+        th { background: rgba($gray, 0.03); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
+        td { padding: 12px 15px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; font-size: 13px; color: $dark; }
+    }
+    .font-bold { font-weight: 800; }
+    .text-success-mode { color: $success; }
+
+    .notice-box { background: rgba($success, 0.04); border-radius: 8px; padding: 12px 15px; font-size: 12px; color: darken($success, 10%); line-height: 1.5; border: 1px solid rgba($success, 0.1); }
+    .section-divider { border: 0; border-top: 1px dashed $mute; }
+}
+
+// --- DARK MODE ---
+.dark .admin-agency-maintenance-resolve-scope {
+    .header h1, .card-title-fix, .control-card .info-value, .table td, .direct-pricing-row .field label { color: $white; }
+    .control-card, .table-responsive-wrapper, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .table th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); color: $mute; }
+    .table td { border-bottom-color: rgba($white, 0.05); }
+    .admin-bus-layout-add-input, .matrix-textarea { background: $dm-bg-main; color: white; border-color: rgba(255,255,255,0.1); }
+    .notice-box { background: rgba(0, 0, 0, 0.2); color: $mute; border-color: rgba(255,255,255,0.05); }
+}
+
+
