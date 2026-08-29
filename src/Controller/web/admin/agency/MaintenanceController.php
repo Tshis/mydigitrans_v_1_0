@@ -138,7 +138,7 @@ final class MaintenanceController extends AbstractController
 
         // 4. Envoi des variables exactes requises par ton architecture HTML Twig
         return $this->render('admin/agency/maintenance/resolve.html.twig', [
-            'page' => 'maintenance_resolve',
+            'page' => 'maintenance',
             'bus' => $bus,
             'log' => $log
         ]);
