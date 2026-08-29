@@ -2,138 +2,135 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-<div class="admin-agency-maintenance-add-scope container">
+	<div
+		class="admin-agency-maintenance-add-scope container">
 
 
-    {# --- HEADER --- #}
-    <header class="header-refined mb-30">
-        <div class="header-left">
-            <a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-        </div>
-        <div class="header-right">
-            <div class="title">
-                <div class="sub-header-flex">
-                    <span class="text-gray text-size-13">Logistique</span>
-                    <span class="arrow-divider">•</span>
-                    <span class="text-size-13 text-primary">Atelier Central</span>
-                </div>
-                <h1 class="mt-5">Déclarer un Incident / Panne</h1>
-            </div>
-        </div>
-    </header>
+		{# --- HEADER --- #}
+		<header class="header-refined mb-30">
+			<div class="header-left">
+				<a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+			</div>
+			<div class="header-right">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Logistique</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-size-13 text-primary">Atelier Central</span>
+					</div>
+					<h1 class="mt-5">Déclarer un Incident / Panne</h1>
+				</div>
+			</div>
+		</header>
 
-    {# --- LAYOUT DOUBLE COLONNE EXCLUSIF DE CETTE PAGE --- #}
-    <form id="maintenance-declaration-form" action="#" method="POST" class="maintenance-form-layout">
-        <div class="maintenance-container-grid">
+		{# --- LAYOUT DOUBLE COLONNE EXCLUSIF DE CETTE PAGE --- #}
+		<form id="maintenance-declaration-form" action="#" method="POST" class="maintenance-form-layout">
+			<div
+				class="maintenance-container-grid">
 
-            {# COLONNE GAUCHE : FORMULAIRE DE SAISIE #}
-            <div class="main-form-panel">
-                <div class="card control-card mb-20">
-                    <h2 class="card-title-fix">
-                        <i class="fa-solid fa-bus text-primary"></i>
-                        Véhicule & Métriques d'Alerte
-                    </h2>
-
-
-                    <div class="field mb-20">
-                        <label class="admin-bus-layout-add-label">Sélectionner le Bus en panne *</label>
-                        <select name="bus_code" class="matrix-select" required>
-                            <option value="">-- Choisir le bus immobilisé --</option>
-                            {% for bus in active_buses %}
-                            <option value="{{ bus.code }}">{{ bus.brand }}
-                                {{ bus.model }}
-                                ({{ bus.plateNumber }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="field mb-20">
-                        <label class="admin-bus-layout-add-label">Kilométrage au compteur au moment de la panne
-                            *</label>
-                        <input type="number" name="reported_mileage" class="matrix-input" min="0"
-                            placeholder="Ex: 89400" required>
-                    </div>
-
-                    <div class="field-group">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Date du constat de l'incident *</label>
-                            <input type="date" name="reported_at" class="matrix-input" value="{{ " now"|date("Y-m-d")
-                                }}" required>
-                        </div>
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Niveau de gravité / Urgence *</label>
-                            <select name="severity" class="matrix-select" required>
-                                <option value="minor">Mineure (Le bus peut rouler, réparation mineure)</option>
-                                <option value="major">Moyenne (Nécessite un passage à l'atelier rapide)</option>
-                                <option value="critical" selected>Critique (Bus totalement immobilisé / En panne)
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card control-card danger-accent">
-                    <h2 class="card-title-fix">
-                        <i class="fa-solid fa-comment-medical text-danger"></i>
-                        Rapport d'Anomalie Diagnostic
-                    </h2>
+				{# COLONNE GAUCHE : FORMULAIRE DE SAISIE #}
+				<div class="main-form-panel">
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-bus text-primary"></i>
+							Véhicule & Métriques d'Alerte
+						</h2>
 
 
-                    <div class="field">
-                        <label class="admin-bus-layout-add-label">Détails précis de la panne (Symptômes constatés)
-                            *</label>
-                        <textarea name="issue_description" class="matrix-textarea"
-                            placeholder="Ex: Surchauffe moteur brutale après 50 Km sur la RN1, fuite de liquide vert sous le radiateur..."
-                            required></textarea>
+						<div class="field mb-20">
+							<label class="admin-bus-layout-add-label">Sélectionner le Bus en panne *</label>
+							<select name="bus_code" class="matrix-select" required>
+								<option value="">-- Choisir le bus immobilisé --</option>
+								{% for bus in active_buses %}
+									<option value="{{ bus.code }}">{{ bus.brand }}
+										{{ bus.model }}
+										({{ bus.plateNumber }})</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="field mb-20">
+							<label class="admin-bus-layout-add-label">Kilométrage au compteur au moment de la panne
+								                            *</label>
+							<input type="number" name="reported_mileage" class="matrix-input" min="0" placeholder="Ex: 89400" required>
+						</div>
 
-                    </div>
+						<div class="field-group">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Date du constat de l'incident *</label>
+								<input type="date" name="reported_at" class="matrix-input" value="{{ " now"|date("Y-m-d") }}" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Niveau de gravité / Urgence *</label>
+								<select name="severity" class="matrix-select" required>
+									<option value="minor">Mineure (Le bus peut rouler, réparation mineure)</option>
+									<option value="major">Moyenne (Nécessite un passage à l'atelier rapide)</option>
+									<option value="critical" selected>Critique (Bus totalement immobilisé / En panne)
+									</option>
+								</select>
+							</div>
+						</div>
+					</div>
 
-                    <div class="field-button-right">
+					<div class="card control-card danger-accent">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-comment-medical text-danger"></i>
+							Rapport d'Anomalie Diagnostic
+						</h2>
 
-                        <button type="submit" form="maintenance-declaration-form"
-                            class="mt-20 btn-refined btn-danger-gradient">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                            Enregistrer l'alerte
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            {# COLONNE DROITE : SÉCURITÉ DE FLOTTE & EFFETS DE CASCADE #}
-            <aside class="sidebar-action-panel">
-                <div class="card sticky-aside-card">
-                    <h2 class="card-title-fix">
-                        <i class="fa-solid fa-gears"></i>
-                        Automatisme Système
-                    </h2>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Détails précis de la panne (Symptômes constatés)
+								                            *</label>
+							<textarea name="issue_description" class="matrix-textarea" placeholder="Ex: Surchauffe moteur brutale après 50 Km sur la RN1, fuite de liquide vert sous le radiateur..." required></textarea>
 
-                    <div class="notice-box-info mb-15">
-                        <p>
-                            <strong>
-                                <i class="fa-solid fa-lock text-danger"></i>
-                                Blocage des affectations :</strong>
-                            Valider ce formulaire va automatiquement basculer le statut opérationnel de ce véhicule à
-                            l'état
-                            <strong>Broken (En panne)</strong>.
-                        </p>
-                    </div>
+						</div>
 
-                    <div class="notice-box-info">
-                        <p>
-                            <strong>
-                                <i class="fa-solid fa-calendar-xmark"></i>
-                                Sécurité Voyages :</strong>
-                            Ce bus sera immédiatement banni et rendu indisponible pour toute planification de voyage
-                            tant que le ticket de panne n'est pas marqué comme
-                            <strong>Résolu</strong>
-                            par l'atelier.
-                        </p>
-                    </div>
-                </div>
-            </aside>
+						<div class="field-button-right">
 
-        </div>
-    </form>
-</div>
+							<button type="submit" form="maintenance-declaration-form" class="mt-20 btn-refined btn-danger-gradient">
+								<i class="fa-solid fa-triangle-exclamation"></i>
+								Enregistrer l'alerte
+							</button>
+						</div>
+					</div>
+				</div>
+
+				{# COLONNE DROITE : SÉCURITÉ DE FLOTTE & EFFETS DE CASCADE #}
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-gears"></i>
+							Automatisme Système
+						</h2>
+
+						<div class="notice-box-info mb-15">
+							<p>
+								<strong>
+									<i class="fa-solid fa-lock text-danger"></i>
+									Blocage des affectations :</strong>
+								Valider ce formulaire va automatiquement basculer le statut opérationnel de ce véhicule à
+								                            l'état
+								<strong>Broken (En panne)</strong>.
+							</p>
+						</div>
+
+						<div class="notice-box-info">
+							<p>
+								<strong>
+									<i class="fa-solid fa-calendar-xmark"></i>
+									Sécurité Voyages :</strong>
+								Ce bus sera immédiatement banni et rendu indisponible pour toute planification de voyage
+								                            tant que le ticket de panne n'est pas marqué comme
+								<strong>Résolu</strong>
+								par l'atelier.
+							</p>
+						</div>
+					</div>
+				</aside>
+
+			</div>
+		</form>
+	</div>
 {% endblock %}

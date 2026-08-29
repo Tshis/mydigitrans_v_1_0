@@ -2,138 +2,80 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-	<div
-		class="admin-agency-maintenance-resolve-scope container">
-		{# --- HEADER DE LA CONSOLE --- #}
-		<header class="header mb-25">
-			<div class="header-main-info">
-				<a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action">
-					<i class="fa-solid fa-arrow-left"></i>
-				</a>
-				<div class="title">
-					<div class="sub-header-flex">
-						<span class="text-gray text-size-13">Logistique</span>
-						<span class="arrow-divider">•</span>
-						<span class="text-gray text-size-13 text-highlight">Atelier Central</span>
-					</div>
-					<h1 class="mt-5">Résolution & Clôture de Panne</h1>
-				</div>
-			</div>
-			<div class="header-actions">
-				<button type="submit" form="maintenance-resolve-form" class="btn btn-success">
-					<i class="fa-solid fa-circle-check"></i>
-					<span>Clôturer & Libérer le bus</span>
-				</button>
-			</div>
-		</header>
+<div class="admin-agency-maintenance-resolve-scope container">
+    {# --- HEADER DE LA CONSOLE --- #}
+    <header class="header mb-25">
+        <a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="title">
+            <div class="sub-header-flex">
+                <span class="text-gray text-size-13">Logistique</span>
+                <span class="arrow-divider">•</span>
+                <span class="text-size-13 text-primary">Atelier Central</span>
+            </div>
+            <h1 class="mt-5">Résolution & Clôture de Panne</h1>
+        </div>
+    </header>
 
-		{# --- LAYOUT DOUBLE COLONNE --- #}
-		<form id="maintenance-resolve-form" action="#" method="POST" class="maintenance-form-layout">
-			<div
-				class="maintenance-container-grid">
+    {# --- LAYOUT DOUBLE COLONNE --- #}
+    <form id="maintenance-resolve-form" action="#" method="POST" class="maintenance-form-layout">
+        <div class="maintenance-container-grid">
 
-				{# COLONNE GAUCHE : RAPPORT DE RÉPARATION #}
-				<div
-					class="main-form-panel">
+            {# COLONNE GAUCHE : ACTION DE REPARATION #}
+            <div class="card control-card success-accent">
+                <h2 class="card-title-fix">
+                    <i class="fa-solid fa-screwdriver-wrench text-success"></i>
+                    Solution & Intervention mécanique
+                </h2>
+                <div class="field mb-20">
+                    <label class="admin-bus-layout-add-label">Date de résolution *</label>
+                    <input type="date" name="resolved_at" class="admin-bus-layout-add-input" value="{{ "
+                        now"|date("Y-m-d") }}" required>
+                </div>
+                <div class="direct-pricing-row">
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Description des réparations effectuées *</label>
+                        <textarea name="solution_description" class="matrix-textarea"
+                            placeholder="Renseignez ici les actions correctives apportées..." required></textarea>
+                    </div>
+                </div>
+                <div class="field-button-right mt-20">
+                    <button type="submit" form="maintenance-resolve-form" class="btn btn-success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Clôturer & Libérer le bus</span>
+                    </button>
+                </div>
+            </div>
 
-					{# RAPPEL DE L'INCIDENT #}
-					<div class="card control-card mb-20 error-accent">
-						<h2 class="card-title-fix">
-							<i class="fa-solid fa-triangle-exclamation text-danger"></i>
-							Panne active sur le véhicule</h2>
-						<div class="direct-pricing-row">
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Bus concerné</label>
-								<div class="info-value">
-									<strong>{{ bus.brand }}
-										{{ bus.model }}</strong>
-									({{ bus.plateNumber }})</div>
-							</div>
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Détails du problème signalé</label>
-								<div class="info-value text-danger">
-									<strong>{{ log.issue }}</strong>
-								</div>
-							</div>
-						</div>
-					</div>
+            {# COLONNE DROITE : RAPPEL DE L'INCIDENT #}
+            <aside class="sidebar-action-panel">
+                <div class="card control-card mb-20 error-accent">
+                    <h2 class="card-title-fix">
+                        <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                        Panne active sur le véhicule
+                    </h2>
+                    <div class="direct-pricing-row">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Bus concerné</label>
+                            <div class="info-value">
+                                <strong>{{ bus.brand }}
+                                    {{ bus.model }}</strong>
+                                ({{ bus.plateNumber }})
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Détails du problème signalé</label>
+                            <div class="info-value text-danger">
+                                <strong>{{ log.issue }}</strong>
+                            </div>
+                        </div>
+                    </div>
 
-					{# ACTION DE REPARATION #}
-					<div class="card control-card success-accent">
-						<h2 class="card-title-fix">
-							<i class="fa-solid fa-screwdriver-wrench text-success"></i>
-							Solution & Intervention mécanique</h2>
-						<div class="direct-pricing-row">
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Description des réparations effectuées *</label>
-								<textarea name="solution_description" class="matrix-textarea" placeholder="Renseignez ici les actions correctives apportées..." required></textarea>
-							</div>
-						</div>
-					</div>
+                </div>
+            </aside>
 
-					{# TA STRUCTURE DE TABLEAU STRICTEMENT CONSERVÉE #}
-					<div class="table-responsive-wrapper my-20">
-						<h2 class="card-title-fix text-size-16 py-10">
-							<i class="fa-solid fa-gears text-primary"></i>
-							Pièces de rechange associées au ticket
-						</h2>
-						<table class="table table-scrollable table-striped js-datatable">
-							<thead>
-								<tr>
-									<th>Désignation de la pièce</th>
-									<th>Fournisseur / Provenance</th>
-									<th class="text-right">Quantité</th>
-									<th class="text-right">Prix Unitaire ({{ bus.currency }})</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>Joint de culasse renforcé</td>
-									<td>Congo Pièces (Limete)</td>
-									<td class="text-right">1</td>
-									<td class="text-right font-bold">180 000</td>
-								</tr>
-								<tr>
-									<td>Bidon Liquide de refroidissement 5L</td>
-									<td>Quincaillerie Centrale</td>
-									<td class="text-right">2</td>
-									<td class="text-right font-bold">35 000</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-
-				{# COLONNE DROITE : SÉCURITÉ & ATTRBUTIONS #}
-				<aside class="sidebar-action-panel">
-					<div class="card sticky-aside-card">
-						<h2 class="card-title-fix">
-							<i class="fa-solid fa-user-gear text-primary"></i>
-							Suivi Atelier</h2>
-
-						<div class="field mb-20">
-							<label class="admin-bus-layout-add-label">Mécanicien / Responsable *</label>
-							<input type="text" name="updated_by" class="admin-bus-layout-add-input" value="Kalonji Beya" required>
-						</div>
-
-						<div class="field mb-20">
-							<label class="admin-bus-layout-add-label">Date de résolution *</label>
-							<input type="date" name="resolved_at" class="admin-bus-layout-add-input" value="{{ "now"|date("Y-m-d") }}" required>
-						</div>
-
-						<hr class="section-divider mb-20">
-
-						<div class="notice-box">
-							<p>
-								<strong>
-									<i class="fa-solid fa-lock-open text-success"></i>
-									Remise en service :</strong>
-								Enregistrer la clôture va basculer automatiquement le statut du bus à l'état **resolved** (Disponible).</p>
-						</div>
-					</div>
-				</aside>
-
-			</div>
-		</form>
-	</div>
+        </div>
+    </form>
+</div>
 {% endblock %}
