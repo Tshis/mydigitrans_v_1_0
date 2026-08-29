@@ -124,7 +124,36 @@ final class BusController extends AbstractController
                     'resolvedAt' => null,
                     'updatedBy' => null,
                 ]
-            ]
+            ],
+
+
+            // --- NOUVEAU : PORTFOLIO ADMINISTRATIF DU BUS ---
+            'documents' => [
+                [
+                    'type' => 'Assurance Obligatoire SONAS',
+                    'referenceNumber' => 'AS-SON-2026-884',
+                    'issuedAt' => new \DateTime('2025-09-01'),
+                    'expiredAt' => new \DateTime('2026-09-01'), // Expire bientôt par rapport au 29 août 2026
+                    'status' => 'warning',
+                ],
+                [
+                    'type' => 'Contrôle Technique (Feuille Jaune)',
+                    'referenceNumber' => 'CT-CTCE-9942',
+                    'issuedAt' => new \DateTime('2026-03-15'),
+                    'expiredAt' => new \DateTime('2026-09-15'),
+                    'status' => 'valid',
+                ],
+                [
+                    'type' => 'Autorisation de Transport Interurbain',
+                    'referenceNumber' => 'AT-MIN-00482',
+                    'issuedAt' => new \DateTime('2025-01-10'),
+                    'expiredAt' => new \DateTime('2026-01-10'), // Déjà expiré !
+                    'status' => 'expired',
+                ]
+            ],
+
+
+
         ];
 
 
