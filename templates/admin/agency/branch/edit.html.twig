@@ -1,145 +1,158 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-	{# Conserve vos scripts globaux existants #}
-	{{ parent() }}
+{# Conserve vos scripts globaux existants #}
+{{ parent() }}
 
-	{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
-	{{ importmap('app') }}
+{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
+{{ importmap('app') }}
 {% endblock %}
 
 {% block body %}
-	<div
-		class="branch-wrapper">
+<div class="admin-agency-branch-edit-scope branch-scope container">
 
-		{# 1. EN-TÊTE DE LA PAGE #}
-		<header class="branch-wrapper_header">
-			<h2 class="branch-wrapper_title">
-				<i class="fas fa-cog"></i>
-				Configurer : Succursale de Limete
-			</h2>
-			<a href="{{path('admin_agency_branch_index')}}" class="btn btn-dark border-radius-5">
-				<i class="fas fa-arrow-left"></i>
-				Retour à la liste
+	{# --- HEADER DE LA CONSOLE --- #}
+	<header class="header-refined mb-30">
+		<div class="header-left">
+			<div class="breadcrumb-mini">
+				<span>Paramètres Réseau</span>
+				<i class="fa-solid fa-chevron-right"></i>
+				<strong>Points de Vente</strong>
+			</div>
+			<h1>Configuration de Succursale</h1>
+			<p class="subtitle">Configurer la succursale : bureau de limete</p>
+		</div>
+		<div class="header-right">
+			<a href="{{path('admin_agency_branch_index')}}" class="btn-refined btn-success-gradient">
+				<i class="fa-solid fa-arrow-left"></i>
+				<span>Retour aux succursales</span>
 			</a>
-		</header>
+		</div>
+	</header>
 
-		{# 2. DISPOSITION EN GRILLE (Formulaire vs Actions de Session) #}
-		<div
-			class="branch-edit-grid my-20">
 
-			{# COLONNE GAUCHE (2fr) : Formulaire de modification #}
-			<div class="c-form-card">
-				{{ form_start(form, {'method': 'POST','attr': {'class': 'c-form-card_form'} }) }}
+	{# 2. DISPOSITION EN GRILLE (Formulaire vs Actions de Session) #}
+	<div class="branch-edit-grid my-20">
 
-				{# Section : Informations Générales #}
-				<div class="c-form-card_section">
-					<h3 class="c-form-card_section-title">
-						<i class="fas fa-info-circle"></i>
-						Informations de la succursale
-					</h3>
+		{# COLONNE GAUCHE (2fr) : Formulaire de modification #}
+		<div class="c-form-card">
+			{{ form_start(form, {'method': 'POST','attr': {'class': 'c-form-card_form'} }) }}
 
-					<div class="field mb-20">
+			{# Section : Informations Générales #}
+			<div class="c-form-card_section">
+				<h3 class="c-form-card_section-title">
+					<i class="fas fa-info-circle"></i>
+					Informations de la succursale
+				</h3>
+
+				<div class="field-group mb-20">
+					<div class="field">
 						<label for="">Nom de la succursale</label>
 						<input type="text" placeholder="Ex: Agence de limete">
 					</div>
 
-
-					<div class="field-group">
-						<div class="field">
-							<label for="">Ville de la succursale</label>
-							<input type="text" placeholder="Ex: Kinshasa">
-						</div>
-						<div class="field">
-							<label for="">Pays de la succursale</label>
-							{# <input type="text" placeholder="Ex: RDCongo"> #}
-							{{ form_widget(form.pays) }}
-						</div>
+					<div class="field">
+						<label for="">Code de la succursale (Facultatif)</label>
+						<input type="text" placeholder="Ex: Ag-001">
 					</div>
 				</div>
 
-				{# Section :Responsable #}
-				<div class="c-form-card_section">
-					<h3 class="c-form-card_section-title">
-						<i class="fas fa-user-circle"></i>
-						Gestionnaire
-					</h3>
-
-					<div class="field mb-20">
-						<div class="c-form-card_group">
-							<label for="branch_city">
-								Gerant (Directeur d'agence)
-							</label>
-							<select id="branch_city" required>
-								<option value="">Billy Branham</option>
-								<option value="kinshasa">Dieudonné Okito</option>
-							</select>
-						</div>
-
+				<div class="field-group">
+					<div class="field">
+						<label for="">Ville de la succursale</label>
+						<input type="text" placeholder="Ex: Kinshasa">
 					</div>
-
-
-				</div>
-
-				<div class="c-form-card_actions">
-					<button type="button" class="btn btn-success border-radius-5">
-						<i class="fas fa-save"></i>
-						Enregistrer les modifications
-					</button>
-				</div>
-				{{ form_end(form) }}
-			</div>
-
-			{# COLONNE DROITE (1fr) : Zone de Danger / Actions de Session #}
-			<div class="c-session-panel">
-				<h3 class="c-session-panel_title">
-					<i class="fas fa-shield-alt"></i>
-					Contrôle de Session</h3>
-
-				{# État Actuel #}
-				<div class="c-session-panel_status-box opened">
-					<span class="status-dot"></span>
-					<div>
-						<strong>Session Ouverte</strong>
-						<p>Activité commerciale en cours</p>
+					<div class="field">
+						<label for="">Pays de la succursale</label>
+						{# <input type="text" placeholder="Ex: RDCongo"> #}
+						{{ form_widget(form.pays) }}
 					</div>
-				</div>
-
-
-				{# <div class="c-session-panel_status-box closed">
-									<span class="status-dot"></span>
-									<div>
-										<strong>Session Fermée</strong>
-										<p>Activité commerciale suspendues</p>
-									</div>
-								</div> #}
-
-				<div class="c-session-panel_info">
-					<p>Clôturer la session va geler les ventes de billets pour cette succursale jusqu'à la prochaine réouverture réglementaire.</p>
-				</div>
-
-				{# Boutons d'action dédiés #}
-				<div
-					class="c-session-panel_actions">
-					{# Action Clôture (Ici en mode actif car la session est ouverte) #}
-					<a href="" class="btn btn-danger w-100 mb-10">
-						<i class="fas fa-lock"></i>
-						Clôturer la Session du Jour
-					</a>
-					{# <a href="" class="btn btn-success w-100 mb-10">
-											<i class="fa-solid fa-lock-open"></i>
-											Ouvrir la Session du Jour
-										</a> #}
-
-					{# Option avancée de suppression/désactivation globale #}
-					<a href="" class="btn btn-outline-danger w-100">
-						<i class="fas fa-trash"></i>
-						Archiver la succursale
-					</a>
 				</div>
 			</div>
 
+			{# Section :Responsable #}
+			<div class="c-form-card_section">
+				<h3 class="c-form-card_section-title">
+					<i class="fas fa-user-circle"></i>
+					Gestionnaire
+				</h3>
+
+				<div class="field mb-20">
+					<div class="c-form-card_group">
+						<label for="branch_city">
+							Gerant (Directeur d'agence)
+						</label>
+						<select id="branch_city" required>
+							<option value="">Billy Branham</option>
+							<option value="kinshasa">Dieudonné Okito</option>
+						</select>
+					</div>
+
+				</div>
+
+
+			</div>
+
+			<div class="c-form-card_actions">
+				<button type="button" class="btn btn-success border-radius-5">
+					<i class="fas fa-save"></i>
+					Enregistrer les modifications
+				</button>
+			</div>
+			{{ form_end(form) }}
+		</div>
+
+		{# COLONNE DROITE (1fr) : Zone de Danger / Actions de Session #}
+		<div class="c-session-panel">
+			<h3 class="c-session-panel_title">
+				<i class="fas fa-shield-alt"></i>
+				Contrôle de Session
+			</h3>
+
+			{# État Actuel #}
+			<div class="c-session-panel_status-box opened">
+				<span class="status-dot"></span>
+				<div>
+					<strong>Session Ouverte</strong>
+					<p>Activité commerciale en cours</p>
+				</div>
+			</div>
+
+
+			{# <div class="c-session-panel_status-box closed">
+				<span class="status-dot"></span>
+				<div>
+					<strong>Session Fermée</strong>
+					<p>Activité commerciale suspendues</p>
+				</div>
+			</div> #}
+
+			<div class="c-session-panel_info">
+				<p>Clôturer la session va geler les ventes de billets pour cette succursale jusqu'à la prochaine
+					réouverture réglementaire.</p>
+			</div>
+
+			{# Boutons d'action dédiés #}
+			<div class="c-session-panel_actions">
+				{# Action Clôture (Ici en mode actif car la session est ouverte) #}
+				<a href="" class="btn btn-danger w-100 mb-10">
+					<i class="fas fa-lock"></i>
+					Clôturer la Session du Jour
+				</a>
+				{# <a href="" class="btn btn-success w-100 mb-10">
+					<i class="fa-solid fa-lock-open"></i>
+					Ouvrir la Session du Jour
+				</a> #}
+
+				{# Option avancée de suppression/désactivation globale #}
+				<a href="" class="btn btn-outline-danger w-100">
+					<i class="fas fa-trash"></i>
+					Archiver la succursale
+				</a>
+			</div>
 		</div>
 
 	</div>
+
+</div>
 {% endblock %}
