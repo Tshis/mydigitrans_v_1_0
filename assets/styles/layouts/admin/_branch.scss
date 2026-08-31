@@ -1,13 +1,9 @@
 @use'../../abstract/variables' as *;
 
-//==========================
-//=====INDEX 
-//========================
-.admin-agency-branch-index-scope{
+//==========COMMUN==========
+.branch-scope{
 
-    padding-block: 2rem;
-
-    // --- HEADER REFINÉ ---
+  // --- HEADER REFINÉ ---
     .header-refined {
         display: flex; justify-content: space-between; align-items: flex-end;
         flex-wrap: wrap; gap: 2rem;
@@ -41,6 +37,22 @@
         }
         &.btn-full { width: 100%; justify-content: center; }
     }
+
+}//branch-scope
+
+// --- DARK MODE ---
+.dark .branch-scope {
+    .header-refined h1{color: $white;}
+}
+
+//==========================
+//=====INDEX 
+//========================
+.admin-agency-branch-index-scope{
+
+    padding-block: 2rem;
+
+    
 
     // --- GRID DES STATS ---
     .branch-stats-grid {
@@ -88,6 +100,18 @@
 .dark .admin-agency-branch-index-scope {
     .branch-stats-grid .stat-card {background: $dm-bg; h3{color: $white;}}
     .header-refined h1{color: $white;}
+}
+
+
+//========================================
+//=====ADD FORM
+//========================
+.admin-agency-branch-add-scope{
+
+    padding-block: 2rem;
+
+   
+
 }
 
 /* ==========================================================================
