@@ -23,9 +23,9 @@
 			<p class="subtitle">Ajouter une nouvelle succursale à votre réseau</p>
 		</div>
 		<div class="header-right">
-			<a href="{{path('admin_agency_branch_add')}}" class="btn-refined btn-primary-gradient">
-				<i class="fa-solid fa-plus"></i>
-				<span>Ouvrir une succursale</span>
+			<a href="{{path('admin_agency_branch_index')}}" class="btn-refined btn-success-gradient">
+				<i class="fa-solid fa-arrow-left"></i>
+				<span>Retour aux succursales</span>
 			</a>
 		</div>
 	</header>
@@ -42,10 +42,18 @@
 				Informations de la succursale
 			</h3>
 
-			<div class="field mb-20">
-				<label for="">Nom de la succursale</label>
-				<input type="text" placeholder="Ex: Agence de limete">
+			<div class="field-group mb-20">
+				<div class="field">
+					<label for="">Nom de la succursale</label>
+					<input type="text" placeholder="Ex: Agence de limete">
+				</div>
+
+				<div class="field">
+					<label for="">Code de la succursale (Facultatif)</label>
+					<input type="text" placeholder="Ex: Ag-001">
+				</div>
 			</div>
+
 
 
 			<div class="field-group">
@@ -86,8 +94,9 @@
 
 		{# 3. ACTIONS DU FORMULAIRE #}
 		<div class="c-form-card_actions">
-			<a href="{{path('admin_agency_branch_index')}}" class="btn btn-danger border-radius-5">Annuler</a>
-			<button type="button" class="btn btn-success border-radius-5">
+			<a href="{{path('admin_agency_branch_index')}}"
+				class="btn-refined btn-danger-gradient border-radius-5">Annuler</a>
+			<button type="button" class="btn-refined btn-success-gradient border-radius-5">
 				<i class="fas fa-check"></i>
 				Créer la succursale
 			</button>
