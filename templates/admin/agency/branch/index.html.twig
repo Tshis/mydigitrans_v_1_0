@@ -1,218 +1,130 @@
+{# templates/admin/agency/branch/index.html.twig #}
 {% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
 
 {% block body %}
 	<div
-		class="branch-wrapper">
-
-		{# 1. EN-TÊTE DE LA PAGE #}
-		<header class="branch-wrapper_header">
-			<h2 class="branch-wrapper_title">
-				<i class="fas fa-network-wired"></i>
-				Gestion des Succursales
-			</h2>
-			<a href="{{path('admin_agency_branch_add')}}" class="btn btn-success border-radius-8">
-				<i class="fas fa-plus"></i>
-				Ajouter une succursale
-			</a>
+		class="admin-agency-branch-index-scope container">
+		{# --- HEADER DE LA CONSOLE --- #}
+		<header class="header-refined mb-30">
+			<div class="header-left">
+				<div class="breadcrumb-mini">
+					<span>Paramètres Réseau</span>
+					<i class="fa-solid fa-chevron-right"></i>
+					<strong>Points de Vente</strong>
+				</div>
+				<h1>Gestion des Succursales</h1>
+				<p class="subtitle">Registre et suivi opérationnel de vos agences de quartier et guichets.</p>
+			</div>
+			<div class="header-right">
+				<a href="{{path('admin_agency_branch_add')}}" class="btn-refined btn-primary-gradient">
+					<i class="fa-solid fa-plus"></i>
+					<span>Ouvrir une succursale</span>
+				</a>
+			</div>
 		</header>
 
-		{# 2. BARRE DE FILTRES ET RECHERCHE (Statique) #}
-		<div class="c-filter-bar my-20">
-			<form action="#" method="GET" class="c-filter-bar_form">
-				<div class="c-filter-bar_group">
-					<input type="text" placeholder="Rechercher une succursale..." class="c-filter-bar_input">
+		{# --- STATS RAPIDES --- #}
+		<div class="branch-stats-grid mb-25">
+			<div class="stat-card card-refined total">
+				<div class="icon-wrap">
+					<i class="fas fa-network-wired"></i>
 				</div>
-				<div class="c-filter-bar_group">
-					<select class="c-filter-bar_select">
-						<option value="">Toutes les villes</option>
-						<option value="kinshasa">Kinshasa</option>
-						<option value="matadi">Matadi</option>
-						<option value="lubumbashi">Lubumbashi</option>
-					</select>
+				<div class="info">
+					<h3>12</h3>
+					<span>Total Succursales</span>
 				</div>
-				<div class="c-filter-bar_group">
-					<select class="c-filter-bar_select">
-						<option value="">Tous les statuts</option>
-						<option value="open">Session Ouverte</option>
-						<option value="closed">Session Fermée</option>
-					</select>
-				</div>
-				<button type="button" class="btn btn-primary">Filtrer</button>
-			</form>
-		</div>
-
-		{# 3. BANDEAU DES MÉTRIQUES GLOBALES (Réutilisation de vos classes KPI) #}
-		<div
-			class="branch-wrapper_kpi-grid">
-			{# KPI 1 : Total Sites #}
-			<div class="c-kpi-card">
-				<h4 class="c-kpi-card_title">Réseau Global</h4>
-				<div class="c-kpi-card_value">
-					4
-					<span class="c-kpi-card_unit">Sites</span>
-				</div>
-				<div class="c-kpi-card_sub">3 sessions ouvertes / 1 fermée</div>
 			</div>
-			{# KPI 2 : CA Cumulé #}
-			<div class="c-kpi-card">
-				<h4 class="c-kpi-card_title">Recettes Globales (Jour)</h4>
-				<div class="c-kpi-card_value c-kpi-card_value--green">
-					6.450.000
-					<span class="c-kpi-card_unit">FC</span>
+			<div class="stat-card card-refined active">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-circle-check"></i>
 				</div>
-				<div class="c-kpi-card_conversion">~ 3.000
-					<span class="c-kpi-card_unit">USD</span>
+				<div class="info">
+					<h3>8</h3>
+					<span>Actives</span>
 				</div>
-				<div class="c-kpi-card_sub">Cumul de toutes les succursales</div>
 			</div>
-			{# KPI 3 : Top Performance #}
-			<div class="c-kpi-card">
-				<h4 class="c-kpi-card_title">Top Performance</h4>
-				<div class="c-kpi-card_value c-kpi-card_value--blue">Limete</div>
-				<div class="c-kpi-card_sub">92% de l'objectif atteint</div>
+			<div class="stat-card card-refined alert">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-building-lock"></i>
+				</div>
+				<div class="info">
+					<h3>4</h3>
+					<span>Suspendues</span>
+				</div>
 			</div>
 		</div>
 
-		{# 4. LA GRILLE DES CARTES SUCCURSALES #}
-		<div
-			class="c-branches-grid py-20">
 
-			{# Carte 1 : Limete #}
-			<div class="c-branch-card">
-				<div class="c-branch-card_header">
-					<h3>
-						<i class="fas fa-building"></i>
-						Limete</h3>
-					<span class="badge online">Session Ouverte</span>
-				</div>
-				<div class="c-branch-card_body">
-					<p class="c-branch-card_info">
-						<span>Ville :</span>
-						<strong>Kinshasa</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Gérant :</span>
-						<strong>Kambale Pierre</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Bus Actifs :</span>
-						<strong>8 en service</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Ventes :</span>
-						<strong>2.800.000 FC</strong>
-					</p>
-				</div>
-				<div class="c-branch-card_actions">
-					<a href="{{path('admin_agency_branch_dashboard',{slug:'trans-david-kinshasa-001'})}}" class="btn btn-success btn-sm">Dashboard</a>
-					<a href="{{path('admin_agency_branch_edit',{code:'agcLMT-001'})}}" class="btn btn-secondary btn-sm">
-						<i class="fas fa-cog"></i>
-						Configurer</a>
-				</div>
-			</div>
-
-			{# Carte 2 : Gombe #}
-			<div class="c-branch-card">
-				<div class="c-branch-card_header">
-					<h3>
-						<i class="fas fa-building"></i>
-						Gombe</h3>
-					<span class="badge online">Session Ouverte</span>
-				</div>
-				<div class="c-branch-card_body">
-					<p class="c-branch-card_info">
-						<span>Ville :</span>
-						<strong>Kinshasa</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Gérant :</span>
-						<strong>Mbuyi Jean</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Bus Actifs :</span>
-						<strong>5 en service</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Ventes :</span>
-						<strong>1.950.000 FC</strong>
-					</p>
-				</div>
-				<div class="c-branch-card_actions">
-					<a href="{{path('admin_agency_branch_dashboard',{slug:'trans-david-kinshasa-001'})}}" class="btn btn-success btn-sm">Dashboard</a>
-					<a href="{{path('admin_agency_branch_edit',{code:'agcLMT-001'})}}" class="btn btn-secondary btn-sm">
-						<i class="fas fa-cog"></i>
-						Configurer</a>
-				</div>
-			</div>
-
-			{# Carte 3 : Matadi Centre #}
-			<div class="c-branch-card">
-				<div class="c-branch-card_header">
-					<h3>
-						<i class="fas fa-building"></i>
-						Matadi Centre</h3>
-					<span class="badge online">Session Ouverte</span>
-				</div>
-				<div class="c-branch-card_body">
-					<p class="c-branch-card_info">
-						<span>Ville :</span>
-						<strong>Kongo Central</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Gérant :</span>
-						<strong>Nsimba Sarah</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Bus Actifs :</span>
-						<strong>4 en service</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Ventes :</span>
-						<strong>1.700.000 FC</strong>
-					</p>
-				</div>
-				<div class="c-branch-card_actions">
-					<a href="{{path('admin_agency_branch_dashboard',{slug:'trans-david-kinshasa-001'})}}" class="btn btn-success btn-sm">Dashboard</a>
-					<a href="{{path('admin_agency_branch_edit',{code:'agcLMT-001'})}}" class="btn btn-secondary btn-sm">
-						<i class="fas fa-cog"></i>
-						Configurer</a>
-				</div>
-			</div>
-
-			{# Carte 4 : Lubumbashi (Fermée) #}
-			<div class="c-branch-card c-branch-card--closed">
-				<div class="c-branch-card_header">
-					<h3>
-						<i class="fas fa-building"></i>
-						Lubumbashi</h3>
-					<span class="badge offline">Session Fermée</span>
-				</div>
-				<div class="c-branch-card_body">
-					<p class="c-branch-card_info">
-						<span>Ville :</span>
-						<strong>Haut-Katanga</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Gérant :</span>
-						<strong>Ilunga Marc</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Bus Actifs :</span>
-						<strong>0 en service</strong>
-					</p>
-					<p class="c-branch-card_info">
-						<span>Ventes :</span>
-						<strong>0 FC</strong>
-					</p>
-				</div>
-				<div class="c-branch-card_actions">
-					<a href="{{path('admin_agency_branch_dashboard',{slug:'trans-david-kinshasa-001'})}}" class="btn btn-primary disabled btn-sm">Dashboard</a>
-					<a href="{{path('admin_agency_branch_edit',{code:'agcLMT-001'})}}" class="btn btn-secondary btn-sm">
-						<i class="fas fa-cog"></i>
-						Configurer</a>
-				</div>
-			</div>
-
+		{# --- LISTE DE LA FLOTTE --- #}
+		<div class="table-responsive-wrappe">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Code & Nom</th>
+						<th>Ville / Province</th>
+						<th>Adresse Physique</th>
+						<th>Gérant Responsable</th>
+						<th>Status</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for branch in branches %}
+						<tr>
+							<td>
+								<span class="text-primary">#{{ branch.code }}</span>
+								<div>
+									<strong>{{ branch.name }}</strong>
+								</div>
+							</td>
+							<td>
+								{{ branch.city }}
+							</td>
+							<td>
+								{{ branch.address|default('Non spécifiée') }}
+							</td>
+							<td>
+								<i class="fa-solid fa-user-tie text-gray"></i>
+								{{ branch.managerName }}
+							</td>
+							<td>
+								<span class="pill-branch-status {{ branch.status }}">
+									{{branch.status == 'active' ? 'Active' : 'Suspendue'}}
+								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									<a href="{{path('admin_agency_branch_dashboard',{slug:'trans-david-kinshasa-001'})}}" class="action-link" title="Paramettrer">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+									{% if branch.status === 'active' %}
+										<a href="{{path('admin_agency_branch_edit',{code:'agcLMT-001'})}}" class="action-link" title="Paramettrer">
+											<i class="fa-solid fa-gear"></i>
+										</a>
+									{% else %}
+										<a href="" class="action-link" title="Details">
+											<i class="fa-solid fa-lock-open"></i>
+										</a>
+									{% endif %}
+								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="5" class="text-center text-gray italic padding-20">
+								Aucune succursale n'est configurée pour cette agence pour le moment.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
+
+
 	</div>
 {% endblock %}
