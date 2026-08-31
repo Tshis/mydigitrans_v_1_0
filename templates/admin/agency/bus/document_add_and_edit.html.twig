@@ -1,0 +1,144 @@
+{# templates/admin/agency/fleet/document_add.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div class="admin-agency-fleet-document-add-scope container">
+	{# --- HEADER DE LA CONSOLE --- #}
+	<header class="header mb-25">
+		<div class="header-main-info">
+			<a href="{{ path('admin_agency_bus_show',{'code':bus_code}) }}" class="agency-back-action">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Logistique</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-primary text-size-13 text-highlight">Portefeuille Documentaire</span>
+				</div>
+				<h1 class="mt-5">{{title}} un document du vehicule</h1>
+			</div>
+		</div>
+
+	</header>
+
+	{# --- LAYOUT DOUBLE COLONNE TOTALEMENT ISOLÉ --- #}
+	<form id="document-registration-form" action="#" method="POST" enctype="multipart/form-data"
+		class="document-form-layout">
+		<div class="document-container-grid">
+
+			{# COLONNE GAUCHE : FORMULAIRE DE CONFIGURATION #}
+			<div class="main-form-panel">
+
+				{# CARD 1 : LIEN VÉHICULE & NATURE DU DOCUMENT #}
+				<div class="card control-card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-passport text-primary"></i>
+						Spécifications Administratives
+					</h2>
+
+					<div class="direct-pricing-row mb-20">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Associer à un véhicule *</label>
+							<select name="bus_code" class="admin-bus-layout-add-select" required>
+								<option value="">-- Choisir le bus concerné --</option>
+								{% for bus in fleet %}
+								<option {{bus.code==bus_code ? 'selected' : '' }} value="{{ bus.code }}">{{ bus.brand }}
+									{{ bus.model }}
+									({{ bus.plateNumber }})</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Type de pièce légale *</label>
+							<input type="text" name="doc_type" class="admin-bus-layout-add-input"
+								value="{{document ? document.type : '' }}"
+								placeholder="Ex: Assurance, Carte rose, etc..." autocomplete="off">
+						</div>
+					</div>
+
+					<div class="direct-pricing-row">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Numéro du document / Référence de série</label>
+							<input type="text" name="reference_number" class="admin-bus-layout-add-input"
+								value="{{document ? document.referenceNumber : '' }}" placeholder="Ex: POL-SON-99824..."
+								autocomplete="off">
+						</div>
+					</div>
+				</div>
+
+				{# CARD 2 : CYCLE DE VALIDITÉ (UNIQUEMENT TES DEUX ÉTATS VALID ET EXPIRED) #}
+				<div class="card control-card success-accent">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-calendar-days text-success"></i>
+						Dates de Validité & Statut Légal
+					</h2>
+
+					<div class="direct-pricing-row">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Date d'Émission (issuedAt) *</label>
+							<input value="{{ document ? document.issuedAt|date('Y-m-d') : '' }}" type="date"
+								name="issued_at" class="admin-bus-layout-add-input" required>
+						</div>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Date d'Expiration (expiredAt) *</label>
+							<input value="{{ document ? document.expiredAt|date('Y-m-d') : '' }}" type="date"
+								name="expired_at" class="admin-bus-layout-add-input" required>
+						</div>
+
+
+					</div>
+
+					<h2 class="card-title-fix my-20">
+						<i class="fa-solid fa-user-shield text-success"></i>
+						Audit Système
+					</h2>
+					<div class="field mb-15">
+						<label class="admin-bus-layout-add-label">Agent Inspecteur</label>
+						<input type="text" class="admin-bus-layout-add-input text-disabled"
+							value="{{ app.user.username|default('Daniel Lukonu') }}" readonly>
+					</div>
+
+					<hr class="section-divider mb-15">
+					<div class="field-button-right">
+						<button type="submit" form="document-registration-form" class="btn btn-success">
+							<i class="fa-solid fa-file-circle-check"></i>
+							Enregistrer le document
+						</button>
+					</div>
+				</div>
+			</div>
+
+			{# COLONNE DROITE : TÉLÉVERSEMENT NUMÉRIQUE & TRAÇABILITÉ #}
+			<aside class="sidebar-action-panel">
+				{# BLOC LIEN SCAN NUMÉRIQUE #}
+				<div class="card control-card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-cloud-arrow-up text-primary"></i>
+						Scan du Document
+					</h2>
+					<div class="field mb-25">
+						<label class="admin-bus-layout-add-label">Fichier numérique (PDF, Image)</label>
+						<input type="file" name="document_file" class="admin-bus-layout-add-input-file">
+						<small class="text-gray text-size-11 mt-5 block">
+							<i class="fa-solid fa-circle-info"></i>
+							Recommandé pour présentation mobile au chauffeur.</small>
+					</div>
+				</div>
+
+				{# METADONNÉES DE SÉCURITÉ DE TON MCD #}
+				<div class="card sticky-aside-card">
+
+					<div class="notice-box-info">
+						<p>
+							<i class="fa-solid fa-shield-halved"></i>
+							La date de mise à jour ainsi que le statut seront synchronisés automatiquement par
+							le Système au moment de la validation.
+						</p>
+					</div>
+				</div>
+			</aside>
+
+		</div>
+	</form>
+</div>
+{% endblock %}

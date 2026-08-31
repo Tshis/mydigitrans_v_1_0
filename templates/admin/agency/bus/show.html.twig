@@ -23,12 +23,105 @@
 				<p class="agency-bus-profile-subtitle">Gestion et suivi technique de l'unité de transport</p>
 				<p class="text-dark text-size-13 my-10">Ligne d'attache : Matadi - Kinshasa</p>
 			</div>
-			<div class="agency-bus-profile-status-badge-zone">
+			<div class="agency-bus-profile-status-badge-zone text-weight-700 text-size-20">
 				<span class="agency-bus-state-badge agency-bus-state-badge--on-route" id="current-global-status">
 					En route
 				</span>
 			</div>
 		</header>
+
+
+		{# DOCUMENTS DU VEHICULES #}
+		<div class="admin-agency-fleet-document-scope">
+
+			<div class="action-header">
+
+				<div class="title">
+					<h3>
+						<i class="fa-solid fa-file-lines"></i>
+						Documents du véhicule
+					</h3>
+					<p class="subtitle">Suivi des assurances, cartes roses et pièces légales obligatoires.</p>
+				</div>
+
+				<a href="{{path('admin_agency_bus_document_add',{'bus_code':'bus-001'})}}"
+					class="btn btn-primary text-size-14">
+					<i class="fa-solid fa-file-circle-plus"></i>
+					Nouveau document
+				</a>
+			</div>
+
+
+			{# --- LE TABLEAU DOCUMENTAIRE --- #}
+			<div class="table-responsive-wrapper">
+				<table class="table table-scrollable table-striped js-datatable">
+					<thead>
+						<tr>
+							<th>Type de Document</th>
+							<th>Réference</th>
+							<th>Date d'Émission</th>
+							<th>Date d'Expiration</th>
+							<th class="text-center">Status</th>
+							<th class="text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for doc in documents %}
+						<tr>
+
+							<td>
+								<strong>{{ doc.type }}</strong>
+							</td>
+							<td>
+								{{ doc.referenceNumber|default('Non spécifié') }}
+							</td>
+							<td>
+								{{ doc.issuedAt|date('d/m/Y') }}
+							</td>
+							<td>
+								{{ doc.expiredAt|date('d/m/Y') }}
+							</td>
+							<td class="text-center">
+								<span class="pill-document-status {{ doc.status }}">
+									{{ doc.status }}
+								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+
+									{% if doc.url %}
+									<a href="{{path('admin_agency_bus_download_file',{'code':doc.code}) }}"
+										target="_blank" class="action-link view-file" title="Télécharger le scan">
+										<i class="fa-solid fa-download"></i>
+									</a>
+									{% endif %}
+
+									{% if doc.status === 'expired' %}
+									<a href="{{path('admin_agency_bus_document_renew',{'bus_code':'bus-001','doc_code':'dx-001'})}}"
+										class="action-link" title="Renouveller">
+										<i class="fa-solid fa-arrows-rotate"></i>
+									</a>
+									{% else %}
+									<a href="{{path('admin_agency_bus_document_edit',{'bus_code':'bus-001','doc_code':'dx-001'})}}"
+										class="action-link" title="Modifier">
+										<i class="fa-solid fa-file-pen"></i>
+									</a>
+									{% endif %}
+								</div>
+							</td>
+						</tr>
+						{% else %}
+						<tr>
+							<td colspan="7" class="text-center text-gray italic padding-20">
+								Aucun document administratif répertorié pour le moment.
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
 
 		{# --- FORMULAIRES & BLOCS --- #}
 		<div class="agency-bus-profile-layout">
@@ -108,7 +201,8 @@
 				{# COLONNE INFERIEURE : DÉCLASSEMENT (ZÔNE CRITIQUE) #}
 				<div class="agency-bus-profile-card agency-bus-profile-card--critical">
 					<h3 class="agency-bus-profile-card-title text-danger">
-						<i class="fa-solid fa-triangle-exclamation"></i> Zone de Danger
+						<i class="fa-solid fa-triangle-exclamation"></i>
+						Zone de Danger
 					</h3>
 					<div class="agency-bus-maintenance-status-box border-dark">
 						<p>Le déclassement retire définitivement le bus du réseau actif. Utilisez cette option si le
@@ -116,7 +210,8 @@
 
 						<button type="button" id="btn-trigger-decommission"
 							class="btn btn-danger btn-full text-size-12">
-							<i class="fa-solid fa-trash-can"></i> Déclasser / Rendre inactif ce bus
+							<i class="fa-solid fa-trash-can"></i>
+							Déclasser / Rendre inactif ce bus
 						</button>
 					</div>
 
@@ -144,55 +239,59 @@
 				</div>
 
 				{# HISTORIQUE DES PANNES #}
-				<div class="table-responsive-wrapper my-20">
-					<h2 class="card-title-fix text-size-16 py-10">
-						<i class="fa-solid fa-screwdriver-wrench text-primary"></i>
-						Historique des Pannes & Interventions
-					</h2>
-					<table class="table table-scrollable table-striped js-datatable">
-						<thead>
-							<tr>
-								<th>Date panne</th>
-								<th>Details de la panne</th>
-								<th>Solutions</th>
-								<th>Status</th>
-								<th>Date solution</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for log in bus.maintenance_history %}
-							{# Ligne 1 : Vente de billet en CDF #}
-							<tr>
-								<td>
-									{{ log.reportedAt|date('d/m/Y') }}
-								</td>
-								<td>
-									<strong>{{ log.issue }}</strong>
-								</td>
-								<td>
-									{{ log.solution|default('En attente de diagnostic...') }}
-								</td>
-								<td>
-									<span class="pill-maintenance {{ log.status }}">
-										{{ log.status == 'in_progress' ? 'Panne' : 'Resolue' }}
-									</span>
-								</td>
-								<td class="text-right text-success-mode font-bold">
-									{{ log.resolvedAt ? log.resolvedAt|date('d/m/Y') : 'En attente...' }}
-								</td>
-							</tr>
-							{% else %}
-							<tr>
-								<td colspan="5" class="text-center text-gray italic padding-20">
-									Aucun incident technique signalé sur ce véhicule. Excellent état.
-								</td>
-							</tr>
-							{% endfor %}
+				<div class="maintenance-history-wrapper">
+					<div class="table-responsive-wrapper my-20">
+						<h2 class="card-title-fix text-size-16 py-10">
+							<i class="fa-solid fa-screwdriver-wrench text-primary"></i>
+							Historique des Pannes & Interventions
+						</h2>
+						<table class="table table-scrollable table-striped js-datatable">
+							<thead>
+								<tr>
+									<th>Date panne</th>
+									<th>Details de la panne</th>
+									<th>Solutions</th>
+									<th>Status</th>
+									<th>Date solution</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for log in bus.maintenance_history %}
+								{# Ligne 1 : Vente de billet en CDF #}
+								<tr>
+									<td>
+										{{ log.reportedAt|date('d/m/Y') }}
+									</td>
+									<td>
+										<strong>{{ log.issue }}</strong>
+									</td>
+									<td>
+										{{ log.solution|default('En attente de diagnostic...') }}
+									</td>
+									<td>
+										<span class="pill-maintenance {{ log.status }}">
+											{{ log.status == 'in_progress' ? 'Panne' : 'Resolue' }}
+										</span>
+									</td>
+									<td class="text-right text-success-mode font-bold">
+										{{ log.resolvedAt ? log.resolvedAt|date('d/m/Y') : 'En attente...' }}
+									</td>
+								</tr>
+								{% else %}
+								<tr>
+									<td colspan="5" class="text-center text-gray italic padding-20">
+										Aucun incident technique signalé sur ce véhicule. Excellent état.
+									</td>
+								</tr>
+								{% endfor %}
 
 
-						</tbody>
-					</table>
+							</tbody>
+						</table>
+					</div>
 				</div>
+
+
 
 			</div>
 			<!--left-side-->
@@ -200,7 +299,7 @@
 			{# --- COULOIR DE TEST MULTI-MODÈLES --- #}
 			<div class="right-side seatmap-section">
 
-				{# COLONNE INFERIEURE : MAINTENANCE #}
+				{# COLONNE SUPERIEURE : MAINTENANCE #}
 				<div class="agency-bus-profile-card">
 					<h3 class="agency-bus-profile-card-title" id="maintenance-card-title">
 						<i class="fa-solid fa-wrench"></i>
@@ -269,6 +368,7 @@
 
 				</div>
 
+				{# COLONNE DU PLAN DE SIEGE DU VEHICULE #}
 				<div class="seatmap-zone">
 
 					<div class="seatmap-section-header">
@@ -278,6 +378,7 @@
 					{# Rendu dynamique des plans des bus en incluant le composant autonome #}
 					{{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
 				</div>
+
 
 			</div>
 			<!--right-side-->
