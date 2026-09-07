@@ -1,802 +1,133 @@
 @use '../../abstract/variables' as *;
 
-/* ========================================================================== 
-   DESIGN WOW : EN-TÊTE & DATATABLE DES AGENTS (SANS COULEURS INVENTÉES)
-   ========================================================================== */
+.admin-agency-user-index-scope {
+    padding-block: 2.5rem;
 
-.user-wrapper {
-  padding: 2rem;
-
-  // Alignement strict de la ligne du titre
-  &_header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.5rem;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }//&_header 
-
-  .c-datatable {
-    background-color: $white;
-    border-radius: $radius-card;
-    border: 1px solid lighten($gray, 45%);
-    box-shadow: 0 4px 12px rgba($black, 0.03); // Ombre plus douce
-    overflow: hidden;
-    margin-top: 1.25rem;
-
-    // Header de table unifié et aligné
-    &_header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid lighten($gray, 45%);
-      background-color: lighten($gray, 54%);
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    &_search {
-      position: relative;
-      flex: 1;
-      max-width: 380px;
-
-      i {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: lighten($gray, 10%);
-      }
-    }
-
-    &_input {
-      width: 100%;
-      padding: 0.65rem 1rem 0.65rem 2.5rem;
-      border: 1px solid lighten($gray, 30%);
-      border-radius: $radius-input;
-      font-size: 0.98rem;
-      color: $black;
-      outline: none;
-      background-color: $white;
-      box-sizing: border-box;
-      transition: border-color 0.2s;
-
-      &:focus {
-        border-color: $primary;
-      }
-    }
-
-    &_filters {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    &_select {
-      padding: 0.65rem 1rem;
-      border: 1px solid lighten($gray, 30%);
-      border-radius: $radius-input;
-      font-size: 0.98rem;
-      color: $gray;
-      background-color: $white;
-      outline: none;
-      cursor: pointer;
-      transition: border-color 0.2s;
-
-      &:focus {
-        border-color: $primary;
-      }
-    }
-
-    &_footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      border-top: 1px solid lighten($gray, 45%);
-      background-color: lighten($gray, 54%);
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    &_info {
-      font-size: 0.95rem;
-      color: $gray;
-    }
-
-    &_pagination {
-      display: flex;
-      gap: 0.35rem;
-
-      .btn {
-        padding: 6px 12px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-        text-decoration: none;
-
-        &.btn-secondary {
-          background-color: lighten($gray, 48%);
-          border: 1px solid lighten($gray, 35%);
-          color: $gray;
-
-          &:hover:not([disabled]) {
-            background-color: lighten($gray, 40%);
-          }
+   
+    // --- HEADER REFINÉ ---
+    .header-refined {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        flex-wrap: wrap; gap: 2rem;
+        .breadcrumb-mini {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
+            i { font-size: 8px; margin-inline: 5px; }
+            strong { color: $primary; }
         }
+        h1 { font-size: 2rem; font-weight: 900; color: $dark; margin: 0; }
+        .subtitle { color: $gray; font-size: 14px; margin-top: 5px; }
+    }
 
-        &.btn-primary {
-          background-color: $primary;
-          border: 1px solid $primary;
-          color: $white;
+    // --- BOUTONS ---
+    .btn-refined {
+        padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; border: none; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;
+        &.btn-success-gradient {
+            background: linear-gradient(135deg, $success 0%, darken($success, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($success, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($success, 0.4); }
         }
-
-        &[disabled] {
-          opacity: 0.5;
-          cursor: not-allowed;
+        &.btn-primary-gradient {
+            background: linear-gradient(135deg, $primary 0%, darken($primary, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($primary, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($primary, 0.4); }
         }
-      }
-    }
-  }//.c-datatable
-
-  // --- NETTOYAGE ET FINITION DES DONNÉES DU TABLEAU ---
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-  }// .table-responsive
-
-  .custom-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-
-    th {
-      background-color: $white;
-      color: $dark;
-      font-weight: 700;
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 1rem 1.5rem;
-      border-bottom: 2px solid lighten($gray, 42%);
-    }//th
-
-    td {
-      padding: 1.1rem 1.5rem; 
-      vertical-align: middle;
-      border-bottom: 1px solid lighten($gray, 46%);
-      font-size: 1rem;
-    }//td
-
-    // Alterne subtilement les lignes pour une lecture fluide
-    tbody tr:nth-child(even) {
-      background-color: lighten($gray, 55%);
-    }
-
-    // Effet hover sur les lignes de données
-    tbody tr:hover {
-      background-color: rgba($primary, 0.01);
-    }
-  }//custom table
-
-  // Composant Identité de l'agent
-  .c-user-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }//c-user-info
-
-  .c-user-avatar {
-    width: 40px;
-    height: 40px;
-    background-color: lighten($gray, 48%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $dark;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }//c-user-avatar
-
-  .c-user-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-
-    strong {
-      color: $dark;
-      font-weight: 600;
-      font-size: 1rem;
-    }//strong
-  }//c-user-meta
-
-  // Structuration des colonnes secondaires
-  .c-user-phone {
-    display: block;
-    font-weight: 600;
-    color: $black;
-    margin-bottom: 0.15rem;
-  }//c-user-phone
-
-  .c-user-email {
-    display: block;
-    font-size: 0.9rem;
-    color: $gray;
-  }//c-user-email 
-
-  .c-user-branch {
-    font-weight: 600;
-    color: $dark;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-
-    i {
-      color: lighten($gray, 15%);
-      font-size: 0.95rem;
-    }
-  }//.c-user-branch
-
-  // Styles des Badges basés uniquement sur vos couleurs réelles
-  .badge-role {
-    display: inline-block;
-    padding: 0.35rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    background-color: lighten($gray, 48%);
-    color: $dark;
-
-    &--guichetier {
-      background-color: rgba($primary, 0.1);
-      color: $primary;
-    }
-    
-    &--convoyeur {
-      background-color: lighten($gray, 40%);
-      color: $black;
-    }
-  }//badge-role
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.65rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 700;
-
-    &.online {
-      background-color: rgba($primary, 0.12);
-      color: $primary;
-    }
-    &.offline {
-      background-color: rgba($danger, 0.12);
-      color: $danger;
-    }
-  }//badge 
-
-  // Ligne spécifique d'un agent bloqué (Utilise $danger et $gray existants)
-  .user-row.row-suspended {
-    background-color: rgba($danger, 0.02) !important;
-
-    .c-user-avatar {
-      background-color: rgba($danger, 0.1);
-      color: $danger;
-    }
-
-    strong, .c-user-phone {
-      color: lighten($gray, 10%);
-    }
-  }//user-row.row-suspended
-
-  // Alignement propre des boutons d'actions
-  .c-table-actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-
-    .btn-xs {
-      width: 32px;
-      height: 32px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      padding: 0;
-      box-sizing: border-box;
-      text-decoration: none;
-    }
-  }//c-table-actions 
-
-  /* ==========================================================================
-     📱 RESPONSIVE DESIGN EMPILEMENT (Cartes fluides sous 768px)
-     ========================================================================== */
-  @media (max-width: 768px) {
-    padding: 1rem;
-
-    &_header {
-      flex-direction: column;
-      align-items: stretch;
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    .c-datatable {
-      &_header {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 1rem;
-        gap: 1rem;
-      }
-
-      &_search {
-        max-width: 100%;
-      }
-
-      &_filters {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-
-        .c-datatable_select, .btn {
-          width: 100%;
+        &.btn-danger-gradient {
+            background: linear-gradient(135deg, $danger 0%, darken($danger, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($danger, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($danger, 0.4); }
         }
-      }
-
-      &_footer {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-      }
+        &.btn-full { width: 100%; justify-content: center; }
     }
 
-    // Transformation du tableau HTML en Cartes responsives
-    .custom-table {
-      display: block;
-
-      thead {
-        display: none; 
-      }
-
-      tbody {
-        display: block;
-      }
-
-      tr.user-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr; 
-        gap: 0.75rem;
-        padding: 1.25rem 1rem;
-        border-bottom: 5px solid lighten($gray, 45%); 
-        background-color: $white;
-
-        td {
-          display: block;
-          padding: 0 !important;
-          border: none !important;
-          width: 100% !important;
-          text-align: left !important;
-
-          &.text-right {
-            grid-column: span 2;
-            margin-top: 0.5rem;
-            padding-top: 0.75rem !important;
-            border-top: 1px dashed lighten($gray, 40%) !important;
-          }
+    // --- BARRE DE FILTRES UNIQUE ---
+    .user-filters-card {
+        background: $white; padding: 1.25rem; border-radius: $radius-card; border: 1px solid $mute;
+        .field-group {
+            display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; width: 100%;
+            .field {
+                flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px;
+                label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 0; }
+            }
+            .field-actions { display: flex; align-items: flex-end; .btn-reset { height: 40px; padding-inline: 15px; font-weight: 700; } }
         }
+    }
 
-        td:nth-child(1) { grid-column: span 2; } 
-        td:nth-child(2) { grid-column: span 2; margin: 0.25rem 0; } 
-        td:nth-child(3) { grid-column: span 1; } 
-        td:nth-child(4) { grid-column: span 1; display: flex; justify-content: flex-end; } 
-        td:nth-child(5) { grid-column: span 2; } 
-      }
-    }//.custom-table
+    // --- STRUCTURE COMMUNE DU TABLEAU TEXTUEL ---
+    .table-responsive-wrapper { background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; }
+    .table {
+        width: 100%; border-collapse: collapse; min-width: 950px;
+        th { background: rgba($gray, 0.04); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
+        td { padding: 14px 15px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; font-size: 13px; color: $dark; }
+    }
 
-    .c-table-actions {
-      justify-content: space-between; 
-      
-      .btn {
-        flex: 1;
-        justify-content: center;
-      }
-    }//.c-table-actions
-
-  }//@media max 768px
-} //user-wrapper
-
-//========Page ajout agent =============
-// Ajoutez ce bloc à l'intérieur de votre sélecteur .user-wrapper existant
-.add-agent{
-
-
-    .c-card {
-      background-color: $white;
-      border-radius: $radius-card;
-      border: 1px solid lighten($gray, 45%);
-      box-shadow: 0 4px 12px rgba($black, 0.03);
-      padding: 2rem;
-      
-    }//c-card
-    
-    .c-form {
-        
-      &_grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr; // Deux colonnes équitables sur grand écran
-        gap: 2.5rem;
-        
-      }//&_grid
-    
-      &_section {
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
-        
-        label{
-            font-size: 1.4rem;
-            .required{
-                color: $primary !important;
-            }//required
-        }//label
-
-      }//&_section
-    
-      &_subtitle {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: $dark;
-        margin: 0 0 0.5rem 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid lighten($gray, 45%);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    
-        i {
-          color: $primary;
-          font-size: 1rem;
+    // --- CELLULE DU PROFIL AVATAR ---
+    .user-profile-cell {
+        display: flex; align-items: center; gap: 14px;
+        .avatar-circle {
+            width: 42px; height: 42px; background: rgba($primary, 0.08); color: $primary; border: 1px solid rgba($primary, 0.15);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;
+            position: relative;
+            
+            &.online-pulse::after {
+                content: ''; position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; 
+                background: $success; border: 2px solid $white; border-radius: 50%;
+            }
         }
-      }//&_subtitle
-    
-    
-      &_actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 1rem;
-        margin-top: 2.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid lighten($gray, 45%);
-      }//&_actions
-    
-      // 📱 GESTION DU RESPONSIVE MOBILE
-      @media (max-width: 768px) {
-        &_grid {
-          grid-template-columns: 1fr; // Bascule sur une seule colonne sur mobile
-          gap: 2rem;
+        .meta {
+            display: flex; flex-direction: column; gap: 2px;
+            .full-name { font-size: 14px; color: $dark; }
+            .online-indicator-text { font-size: 11px; color: $gray; font-weight: 600; i { font-size: 8px; margin-right: 2px; } }
         }
-    
-        &_actions {
-          flex-direction: column-reverse; // Met le bouton valider en haut au clic tactile
-          gap: 0.75rem;
-    
-          .btn {
-            width: 100%;
-            justify-content: center;
-          }
+    }
+
+    .contact-stack { display: flex; flex-direction: column; .email-text { font-weight: 600; } .phone-text { color: $gray; } }
+
+    // --- TYPES & ROLES RBAC (MCD 3 & 4) ---
+    .user-type-tag {
+        font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block;
+        &.agency { background: rgba($primary, 0.08); color: $primary; }
+        &.partner { background: rgba($danger, 0.1); color: $danger; }
+    }
+    .role-pill-code {
+        font-family: monospace; font-size: 11px; color: $gray; background: $mute; border: 1px solid $mute;
+        padding: 1px 5px; border-radius: 4px; margin-right: 4px; font-weight: 700; display: inline-block;
+    }
+
+    // --- ACCOUNTS STATUS PILLS ---
+    .pill-user-account-status {
+        padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; text-transform: uppercase;
+        &.active { background: rgba($success, 0.2); color: $success; }
+        &.inactive { background: rgba($danger, 0.2); color: $danger; }
+    }
+
+     // --- ACTIONS ---
+    .action-group-refined {
+        display: flex; gap: 8px; justify-content: flex-end;
+        .action-link {
+            width: 34px; height: 34px; border-radius: 10px; border: 1px solid $mute; background: $white;
+            display: flex;align-items: center;justify-content: center;
+            color: $dark; cursor: pointer; transition: all 0.2s;
+            &:hover { background: $dark; color: $white; border-color: $dark; }
+            &.refund:hover { background: $danger; color: $white; border-color: $danger; }
         }
-      }
-    }//c-form
-
-}//add-agent
-
-// ===== Agency-agent-permission-wrapper ====
-.agency-agent-permission-wrapper {
-  padding: 2.5rem;
-  //font-family: system-ui, -apple-system, sans-serif;
-
-  // --- COMPOSANTS D'EN-TÊTE ---
-  .agency-permission-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-
-    .agency-profile-block {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-
-      .agency-back-action {
-        color: $gray;
-        font-size: 1.5rem;
-        text-decoration: none;
-        &:hover { color: $success; }
-      }
-
-      .agency-profile-name {
-        font-size: 2rem;
-        margin: 0;
-        font-weight: 700;
-        color: $dark;
-      }
-
-      .agency-profile-badge-row {
-        display: flex;
-        gap: 0.8rem;
-        margin-top: 0.3rem;
-        align-items: center;
-
-        .agency-badge-role {
-          background: rgba($gray, 0.1);
-          color: darken($gray, 20%);
-          padding: 3px 8px;
-          border-radius: 4px;
-          font-size: 0.85rem;
-          font-weight: 600;
-        }
-
-        .agency-agent-serial {
-          font-size: 0.85rem;
-          color: $gray;
-        }
-      }
     }
 
-    .agency-btn-control {
-      padding: 10px 20px;
-      border-radius: $radius-input;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      
-      &.btn-save {
-        background: $success;
-        color: $white;
-        &:hover { opacity: 0.9; }
-      }
-    }
-  }
-
-  // --- BANNIÈRE DE SÉCURITÉ ---
-  .agency-security-notice {
-    background: rgba($primary, 0.08);
-    border-left: 4px solid $primary;
-    padding: 12px 20px;
-    border-radius: 4px;
-    margin-bottom: 2.5rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    i { color: $primary; font-size: 1.3rem; }
-    p { margin: 0; font-size: 0.95rem; color: darken($gray, 15%); line-height: 1.4; }
-  }
-
-  // --- CARTE ET STRUCTURE DU TABLEAU ---
-  .agency-permission-card {
-    background: $white;
-    border: 1px solid $mute;
-    border-radius: $radius-card;
-    overflow: hidden;
-
-    .agency-card-topbar {
-      padding: 20px 24px;
-      border-bottom: 1px solid rgba($mute, 0.15);
-
-      .agency-card-heading { margin: 0; font-size: 1.5rem; color: $dark; font-weight: 600; }
-      .agency-card-subheading { margin: 4px 0 0 0; font-size: 1.15rem; color: $gray; }
-    }
-  }
-
-  // --- LE CONTENEUR SCROLLABLE ---
-  .responsive-permission-table {
-    width: 100%;
-    overflow-x: auto; // Active le défilement de gauche à droite
-    -webkit-overflow-scrolling: touch;
-    padding: 0 24px 20px 24px;
-
-    // Scrollbar fine sur mobile
-    &::-webkit-scrollbar { height: 5px; }
-    &::-webkit-scrollbar-track { background: rgba($mute, 0.05); }
-    &::-webkit-scrollbar-thumb { background: rgba($mute, 0.2); border-radius: 4px; }
-  }
-
-  // --- LA TABLE DES PERMISSIONS ---
-  .agency-permission-table {
-    width: 100%;
-    border-collapse: collapse;
-
-    // Fige la largeur pour forcer un défilement propre sans écraser le texte sur mobile
-    @media (max-width: 768px) {
-      min-width: 750px;
-    }
-
-    th, td {
-      padding: 16px 12px;
-      border-bottom: 1px solid rgba($mute, 0.12);
-      vertical-align: middle;
-    }
-
-    th {
-      text-align: left;
-      font-size: 1.25rem;
-      color: $dark;
-      font-weight: 600;
-    }
-
-    // Gestion de la largeur fixe des colonnes d'options radio
-    th:not(:first-child),
-    td:not(:first-child) {
-      width: 130px;
-    }
-
-    .column-radio-center {
-      text-align: center;
-    }
-
-    .agency-permission-row {
-      &:last-child td { border-bottom: none; }
-    }
-
-    .agency-feature-description {
-      strong { font-size: 1.25rem; color: $dark; display: block; }
-      p { margin: 3px 0 0 0; font-size: 0.95rem; color: $gray; line-height: 1.4; }
-    }
-
-    .agency-custom-radio {
-      accent-color: $success;
-      transform: scale(1.25);
-      cursor: pointer;
-    }
-  }
+    .text-success-mode { color: $success !important; }
+    .monospace { font-family: monospace; }
+    .admin-bus-layout-add-input, .admin-bus-layout-add-select { height: 40px; border: 1px solid $mute; border-radius: 8px; padding-inline: 10px; background: $white; font-weight: 600; }
 }
-// === Agency-agent-permission-wrapper ===
 
-.dark{
-
-    .c-datatable {
-        background-color: $dm-bg;
-        border: 1px solid lighten($gray, 45%);
-
-        // Header de table unifié et aligné
-        &_header {
-            border-bottom: 1px solid lighten($gray, 25%);
-            background-color: darken($gray, 15%);
-        }//header
-
-        &_footer {
-            border-top: 1px solid lighten($gray, 25%);
-            background-color: darken($gray, 15%);
-        }//footer
-
-        
-        .custom-table {
-
-            th {
-            background-color: darken($gray, 15%);
-            color: $white;
-            border-bottom: 2px solid lighten($gray, 42%);
-            }//th
-
-            td{
-                color: $white;
-            }
-        
-        }//custom table
-
-
-        .c-user-avatar {
-            width: 40px;
-            height: 40px;
-            background-color: lighten($gray, 48%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: $dark;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }//c-user-avatar
-
-        .c-user-meta {
-            strong {
-            color: $mute;
-            }//strong
-        }//c-user-meta
-
-        // Structuration des colonnes secondaires
-        .c-user-phone {
-            color: $mute;
-        }//c-user-phone
-
-        .c-user-email {
-            color: $mute;
-        }//c-user-email 
-
-        .c-user-branch {
-            color: $mute;
-
-            i {
-            color: lighten($gray, 25%);
-            font-size: 0.95rem;
-            }
-        }//.c-user-branch
-      
-    }//.c-datatable
-
-    .add-agent{
-
-        .c-card {
-             background-color: $dm-bg;
-        }//c-card
-
-        .c-form{
-            &_subtitle {
-                color: $success;
-                border-bottom: 1px solid lighten($gray, 45%);
-                   
-            }//&_subtitle
-        }//c-form
-        
-
-    }//add-agent
-
-    .agency-agent-permission-wrapper {
-        .agency-permission-header {
-        .agency-profile-name { color: lighten($success, 25%); }
-        .agency-profile-badge-row .agency-badge-role { background: rgba($white, 0.05); color: $mute; }
-        .agency-back-action { color: $mute; &:hover { color: lighten($success, 25%); } }
-        }
-
-        .agency-security-notice {
-            background: rgba($primary, 0.04);
-            p { color: $mute; }
-        }
-
-        .agency-permission-card {
-        background: $dm-bg !important;
-        border-color: $mute !important;
-
-        .agency-card-topbar {
-            border-color: rgba($mute, 0.15);
-            .agency-card-heading { color: lighten($success, 20%) !important; }
-            .agency-card-subheading { color: $mute; }
-        }
-        }
-
-        .agency-permission-table {
-        th { color: lighten($success, 25%) !important; border-color: rgba($mute, 0.15); }
-        td { border-color: rgba($mute, 0.15); }
-        
-        .agency-feature-description {
-            strong { color: $white; }
-            p { color: $mute; }
-        }
-        }
-    }//agency-agent-permission-wrapper
-
-}//dark
-
-
-
-
-
-
+// --- CONFIGURATION SOMBRE (DARK MODE) ---
+.dark .admin-agency-user-index-scope {
+    .header-refined h1, .card-title-fix, .table td, .user-profile-cell .meta .full-name, .contact-stack .email-text, .user-filters-card .field label { color: $white; }
+    .table-responsive-wrapper, .user-filters-card { background: $dm-bg; border-color: rgba($white,0.1); }
+    .table th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); color: $mute; }
+    .table td { border-bottom-color: rgba($white, 0.05); }
+    .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); }
+    .user-profile-cell .avatar-circle { background: rgba($white,0.05); border-color: rgba($white,0.1); color: $white; &.online-pulse::after { border-color: $dm-bg-surface; } }
+    .role-pill-code { background: rgba($dark,0.2); border-color: rgba($white,0.1); color: $mute; }
+    .pill-user-account-status {
+        &.active { background: rgba($success, 0.2); color: $success; }
+        &.inactive { background: rgba($danger, 0.2); color: $danger; }
+    }
+}
