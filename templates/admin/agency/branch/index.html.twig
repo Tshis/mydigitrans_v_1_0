@@ -60,7 +60,7 @@
 		</div>
 
 
-		{# --- LISTE DE LA FLOTTE --- #}
+		{# --- LISTE DES SUCCURSALES --- #}
 		<div class="table-responsive-wrappe">
 			<table class="table table-scrollable table-striped js-datatable">
 				<thead>
@@ -99,17 +99,14 @@
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									<a href="{{path('admin_agency_branch_dashboard',{slug:'trans-david-kinshasa-001'})}}" class="action-link" title="Paramettrer">
+									<a href="{{path('admin_agency_branch_show',{code:'trans-david-kinshasa-001'})}}" class="action-link" title="Fiche de la succursale">
 										<i class="fa-solid fa-eye"></i>
 									</a>
 									{% if branch.status === 'active' %}
-										<a href="{{path('admin_agency_branch_edit',{code:'agcLMT-001'})}}" class="action-link" title="Paramettrer">
-											<i class="fa-solid fa-gear"></i>
+										<a href="{{path('admin_agency_branch_edit',{code:'agcLMT-001'})}}" class="action-link" title="Modification">
+											<i class="fa-solid fa-edit"></i>
 										</a>
-									{% else %}
-										<a href="" class="action-link" title="Details">
-											<i class="fa-solid fa-lock-open"></i>
-										</a>
+
 									{% endif %}
 								</div>
 							</td>

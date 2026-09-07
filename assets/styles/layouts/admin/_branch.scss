@@ -231,7 +231,7 @@
     // Grille principale de la page d'édition
     .branch-edit-grid {
         display: grid;
-        grid-template-columns: 2fr 1fr;
+        grid-template-columns: 1fr;
         gap: 2rem;
         align-items: start; // Aligne le haut du formulaire et du panneau latéral
 
@@ -348,100 +348,100 @@
     }//c-branch-card
 
     // Le panneau latéral de contrôle des sessions
-.c-session-panel {
-  background-color: $white;
-  border-radius: $radius-card;
-  padding: 1.5rem;
-  border: 1px solid lighten($gray, 45%);
-  box-shadow: 0 4px 6px rgba($black, 0.02);
+    .c-session-panel {
+      background-color: $white;
+      border-radius: $radius-card;
+      padding: 1.5rem;
+      border: 1px solid lighten($gray, 45%);
+      box-shadow: 0 4px 6px rgba($black, 0.02);
 
-  &_title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: $dark;
-    margin: 0 0 1.25rem 0;
-  }
+      &_title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: $dark;
+        margin: 0 0 1.25rem 0;
+      }
 
-  // Boîte d'état visuelle (Vert si ouvert, Gris/Rouge si fermé)
-  &_status-box {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-radius: $radius-input;
-    margin-bottom: 1.25rem;
+      // Boîte d'état visuelle (Vert si ouvert, Gris/Rouge si fermé)
+      &_status-box {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border-radius: $radius-input;
+        margin-bottom: 1.25rem;
 
-    strong {
-      display: block;
-      font-size: 0.95rem;
-    }
+        strong {
+          display: block;
+          font-size: 0.95rem;
+        }
 
-    p {
-      margin: 0;
-      font-size: 0.8rem;
-      color: $gray;
-    }
+        p {
+          margin: 0;
+          font-size: 0.8rem;
+          color: $gray;
+        }
 
-    &.opened{
-        strong{color: $dark;}
-        background-color: lighten($success, 50%); // Fond bleu/vert très clair
-        border: 1px solid lighten($success, 30%);
+        &.opened{
+            strong{color: $dark;}
+            background-color: lighten($success, 50%); // Fond bleu/vert très clair
+            border: 1px solid lighten($success, 30%);
+
+            // Le point lumineux d'état actif
+            .status-dot {
+                background-color: $success;
+                box-shadow: 0 0 0 3px rgba($success, 0.2);
+            }
+        }
+
+        &.closed{
+            strong{color: $danger;}
+            background-color: lighten($danger, 50%); // Fond bleu/vert très clair
+            border: 1px solid lighten($danger, 30%);
+
+            // Le point lumineux d'état actif
+            .status-dot {
+                background-color: $danger;
+                box-shadow: 0 0 0 3px rgba($danger, 0.2);
+            }
+
+        }
 
         // Le point lumineux d'état actif
         .status-dot {
-            background-color: $success;
-            box-shadow: 0 0 0 3px rgba($success, 0.2);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
         }
-    }
+          
+      }//_status-box
 
-    &.closed{
-        strong{color: $danger;}
-        background-color: lighten($danger, 50%); // Fond bleu/vert très clair
-        border: 1px solid lighten($danger, 30%);
+      &_info {
+        font-size: 0.85rem;
+        color: $gray;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        padding: 0 0.25rem;
+      }
 
-         // Le point lumineux d'état actif
-        .status-dot {
+      &_actions {
+        .w-100 { width: 100%; }
+        .mb-10 { margin-bottom: 0.75rem; }
+        
+        // Customisation pour le bouton outline danger
+        .btn-outline-danger {
+          display: block;
+          background: transparent;
+          border: 1px solid $danger;
+          color: $danger;
+          
+          &:hover {
             background-color: $danger;
-            box-shadow: 0 0 0 3px rgba($danger, 0.2);
+            color: $white;
+          }
         }
-
-    }
-
-    // Le point lumineux d'état actif
-    .status-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-    }
-       
-  }//_status-box
-
-  &_info {
-    font-size: 0.85rem;
-    color: $gray;
-    line-height: 1.5;
-    margin-bottom: 1.5rem;
-    padding: 0 0.25rem;
-  }
-
-  &_actions {
-    .w-100 { width: 100%; }
-    .mb-10 { margin-bottom: 0.75rem; }
-    
-    // Customisation pour le bouton outline danger
-    .btn-outline-danger {
-      display: block;
-      background: transparent;
-      border: 1px solid $danger;
-      color: $danger;
-      
-      &:hover {
-        background-color: $danger;
-        color: $white;
       }
     }
-  }
-}
 
 }
 
@@ -455,6 +455,87 @@
   }
 
 }
+
+
+//========================================
+//===========SHOW PAGE
+//======================================
+
+.admin-agency-branch-show-scope {
+    padding-block: 2.5rem;
+
+    // --- HEADER ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info { display: flex; align-items: center; gap: 1.2rem; h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; } }
+        .agency-back-action {
+            border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+            background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; &:hover { transform: scale(1.05); }
+        }
+    }
+
+    // --- LAYOUT GRID DOUBLE COLONNE ---
+    .branch-show-grid-layout {
+        display: flex; gap: 1.5rem; align-items: flex-start; width: 100%;
+        @media (max-width: 1100px) { flex-direction: column; }
+        .main-info-panel { flex: 1; min-width: 0; width: 100%; }
+        .sidebar-action-panel { flex: 0 0 340px; width: 340px; @media (max-width: 1100px) { flex: 1 1 100%; width: 100%; } }
+    }
+
+    .control-card { padding: 1.5rem; border-top: 4px solid $primary; background: $white; border-radius: $radius-card; }
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    // --- TABLEAU STRUCTURÉ ---
+    .table-responsive-wrapper { background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; }
+    .table {
+        width: 100%; border-collapse: collapse; min-width: 700px;
+        th { background: rgba($gray, 0.03); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
+        td { padding: 14px 15px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; font-size: 13px; color: $dark; }
+    }
+    .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+
+    .role-badge { font-size: 11px; font-weight: 700; color: $gray; background: #f1f3f5; padding: 3px 8px; border-radius: 4px; }
+
+    .pill-user-status {
+        padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; text-transform: uppercase;
+        &.online { background: #e6f4ea; color: #1e7e34; }
+        &.offline { background: #f1f3f5; color: $gray; }
+    }
+
+    // --- ACCENTS BOÎTE DE DIALOGUE INTERNE ---
+    .fields-display-row {
+        display: flex; gap: 2rem; flex-wrap: wrap;
+        .info-block {
+            flex: 1 1 180px; display: flex; flex-direction: column; gap: 6px;
+            .label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
+            .value { font-size: 14px; color: $dark; }
+        }
+    }
+    .value-badge-plate { font-family: 'Monaco', monospace; background: #f8f9fa; border: 2px solid $dark; color: $dark; padding: 4px 10px; border-radius: 6px; font-weight: 800; width: max-content; }
+
+    // --- BARRE DE COMMANDE DE STATUTS ---
+    .sticky-aside-card {
+        position: sticky; top: 130px; z-index: 10; background: $white; padding: 1.5rem; border-radius: $radius-card; border: 1px solid $mute;
+        &.status-border-active { border-top: 4px solid $success; }
+        &.status-border-inactive { border-top: 4px solid $danger; }
+    }
+    .current-status-box { .label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; } .status-text { display: block; font-size: 1.5rem; font-weight: 900; margin-top: 4px; &.active { color: $success; } &.inactive { color: $danger; } } }
+    .matrix-select { width: 100%; height: 40px; padding-inline: 10px; border: 1px solid $mute; border-radius: 8px; font-weight: 700; background: white; }
+    .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 8px; display: block; }
+}
+
+// --- CONFIGURATION SOMBRE (DARK MODE) ---
+.dark .admin-agency-branch-show-scope {
+    .header .header-main-info h1, .card-title-fix, .current-status-box .status-text, .fields-display-row .info-block .value, .table td { color: $white; }
+    .control-card, .table-responsive-wrapper, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .table th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); color: $mute; }
+    .table td { border-bottom-color: rgba($white, 0.05); }
+    .matrix-select { background: $dm-bg-main; color: white; border-color: rgba(255,255,255,0.1); }
+    .role-badge { background: rgba(255,255,255,0.05); color: $mute; }
+    .pill-user-status { &.online { background: rgba(#1e7e34, 0.2); color: #81c995; } &.offline { background: rgba(255,255,255,0.05); color: $mute; } }
+}
+
 
 /* ==========================================================================
 PAGE : GESTION DES SUCCURSALES (.branch-wrapper)

@@ -1,0 +1,143 @@
+{# templates/admin/agency/branch/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-agency-branch-show-scope container">
+    {# --- HEADER DE LA FICHE --- #}
+    <header class="header mb-25">
+        <div class="header-main-info">
+            <a href="{{ path('admin_agency_branch_index') }}" class="agency-back-action">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Réseau</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">Fiche Succursale</span>
+                </div>
+                <h1 class="mt-5">{{ branch.name }}
+                    <small class="text-gray text-size-18">(#{{ branch.code }})</small>
+                </h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="branch-show-grid-layout">
+        {# COLONNE GAUCHE : PARAMÈTRES ET PERSONNEL AFFECTÉ #}
+        <div class="main-info-panel">
+
+            {# BLOC A : IDENTITÉ GÉOGRAPHIQUE #}
+            <div class="card control-card mb-20">
+                <h2 class="card-title-fix">
+                    <i class="fa-solid fa-location-dot text-primary"></i>
+                    Localisation & Contacts
+                </h2>
+                <div class="fields-display-row">
+                    <div class="info-block">
+                        <span class="label">Ville / Province</span>
+                        <div class="value">
+                            <strong>{{ branch.city }}</strong>
+                        </div>
+                    </div>
+                    <div class="info-block">
+                        <span class="label">Adresse Physique</span>
+                        <div class="value">{{ branch.address }}</div>
+                    </div>
+                    <div class="info-block">
+                        <span class="label">Contact Téléphone</span>
+                        <div class="value monospace">
+                            <strong>{{ branch.phone }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# BLOC B : TABLEAU DES PERSONNELS AFFECTÉS (TA STRUCTURE TEXTUELLE STRICTE) #}
+            <div class="table-responsive-wrapper my-20">
+                <h2 class="card-title-fix text-size-16 py-10">
+                    <i class="fa-solid fa-users-gear text-success"></i>
+                    Agents & Caissiers Affectés à ce Point de Vente
+                </h2>
+                <table class="table table-scrollable table-striped js-datatable">
+                    <thead>
+                        <tr>
+                            <th>Matricule & Nom</th>
+                            <th>Rôle Système</th>
+                            <th>Adresse Email</th>
+                            <th>Contact mobile</th>
+                            <th class="text-center">Statut Session</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in branch.staff %}
+                        <tr>
+                            <td>
+                                <strong>{{ user.name }}</strong>
+                            </td>
+                            <td>
+                                <span class="role-badge">{{ user.roleLabel }}</span>
+                            </td>
+                            <td>
+                                {{ user.email }}
+                            </td>
+                            <td class="monospace font-bold">
+                                {{ user.phone }}
+                            </td>
+                            <td class="text-center">
+                                <span class="pill-user-status {{ user.isOnline ? 'online' : 'offline' }}">
+                                    {{ user.isOnline ? 'Connecté' : 'Hors-ligne' }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-gray italic padding-20">
+                                Aucun personnel n'est actuellement affecté aux guichets de cette succursale.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# COLONNE DROITE : CONSOLE DE COMMANDE OPÉRATIONNELLE #}
+        <aside class="sidebar-action-panel">
+            <div class="card sticky-aside-card status-border-{{ branch.status }}">
+                <h2 class="card-title-fix">
+                    <i class="fa-solid fa-toggle-on text-primary"></i>
+                    Statut du Guichet
+                </h2>
+
+                <div class="current-status-box mb-20">
+                    <span class="label">État d'activité :</span>
+                    <strong class="status-text {{ branch.status }}">{{ branch.statusLabel|upper }}</strong>
+                </div>
+
+                <hr class="section-divider mb-20">
+
+                <form action="#" method="POST" class="status-update-form">
+                    <div class="field mb-15">
+                        <label class="admin-bus-layout-add-label">Modifier l'accès réseau</label>
+                        <select name="branch_status" class="matrix-select" required>
+                            <option value="active" {% if branch.status=='active' %} selected {% endif %}>Active
+                                (Guichets Ouverts)</option>
+                            <option value="inactive" {% if branch.status=='inactive' %} selected {% endif %}>Suspendue
+                                (Ventes Bloquées)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full py-12">
+                        <i class="fa-solid fa-rotate"></i>
+                        Mettre à jour la Succursale
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
