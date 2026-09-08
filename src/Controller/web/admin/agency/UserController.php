@@ -4,6 +4,7 @@ namespace App\Controller\web\admin\agency;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -26,6 +27,7 @@ final class UserController extends AbstractController
                 'lastLoginAt' => new \DateTime('now'),
                 'branchName' => null, // Administrateur général (Siège)
                 'branchCode' => null,
+                'code' => 'agt-512',
                 'roles' => [
                     ['code' => 'ROLE_AGENCY_ADMIN', 'description' => 'Gestion totale de l\'agence']
                 ]
@@ -41,6 +43,7 @@ final class UserController extends AbstractController
                 'lastLoginAt' => new \DateTime('-1 day'),
                 'branchName' => 'Victoire - Rond Point',
                 'branchCode' => 'SUC-KIN-01',
+                'code' => 'agt-510',
                 'roles' => [
                     ['code' => 'ROLE_CASHIER', 'description' => 'Vente de billets et encaissement colis']
                 ]
@@ -56,6 +59,7 @@ final class UserController extends AbstractController
                 'lastLoginAt' => null,
                 'branchName' => 'Matadi Ville - Port',
                 'branchCode' => 'SUC-MAT-02',
+                'code' => 'agt-513',
                 'roles' => [
                     ['code' => 'ROLE_CONTROLLER', 'description' => 'Vérification des TripSeats à l\'embarquement']
                 ]
@@ -70,23 +74,69 @@ final class UserController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/agent/new', name: 'admin_agency_agent_add')]
-    public function add(): Response
+    #[Route('/admin/agency/agent/add', name: 'admin_agency_agent_add')]
+    #[Route('/admin/agency/agent/{code}/edit', name: 'admin_agency_agent_edit')]
+    public function add_and_edit(Request $request, ?string $code = null): Response
     {
-        return $this->render('admin/agency/agent/form.html.twig', [
-            'page' => 'agent',
-            'action' => 'ajout'
-        ]);
-    } //add
 
-    #[Route('/admin/agency/agent/{code}/modify', name: 'admin_agency_agent_edit')]
-    public function edit(): Response
-    {
+        $isEdit = $code !== null;
+        $agent = null;
+
+        // Simulation de ta liste de succursales pour l'affectation guichet
+        $branches = [
+            ['code' => 'SUC-KIN-01', 'name' => 'Victoire - Rond Point'],
+            ['code' => 'SUC-MAT-02', 'name' => 'Matadi Ville - Port']
+        ];
+
+        // Simulation des rôles disponibles au sein du scope Agency [MCD 4]
+        $availableRoles = [
+            ['code' => 'ROLE_CASHIER', 'name' => 'Caissier / Guichetier', 'description' => 'Vente de billets'],
+            ['code' => 'ROLE_CONTROLLER', 'name' => 'Contrôleur de bord', 'description' => 'Check-in passagers'],
+            ['code' => 'ROLE_ACCOUNTANT', 'name' => 'Comptable d\'agence', 'description' => 'Audit financier']
+        ];
+
+        if ($isEdit) {
+            // Extraction fictive de ton utilisateur [MCD 3 & 5] pour pré-remplir le formulaire
+            $agent = [
+                'firstname' => 'Antoinette',
+                'lastname' => 'Mputu',
+                'code' => $code,
+                'email' => 'a.mputu@mydigitrans.com',
+                'phone' => '+243 897 112 233',
+                'userType' => 'agency',
+                'branchCode' => 'SUC-KIN-01',
+                'currentRoleCode' => 'ROLE_CASHIER',
+                'isActive' => true
+            ];
+        }
+
+        if ($request->isMethod('POST')) {
+            $firstname = $request->request->get('firstname');
+            $lastname = $request->request->get('lastname');
+
+            $this->addFlash(
+                'success',
+                $isEdit
+                    ? sprintf('Les habilitations de l\'agent %s %s ont été mises à jour.', $firstname, $lastname)
+                    : sprintf('Le compte de l\'agent %s %s a été créé et déployé.', $firstname, $lastname)
+            );
+
+            return $this->redirectToRoute('admin_agency_user_index');
+        }
+
+
+
+
         return $this->render('admin/agency/agent/form.html.twig', [
             'page' => 'agent',
-            'action' => 'edition'
+            'isEdit' => $isEdit,
+            'branches' => $branches,
+            'available_roles' => $availableRoles,
+            'agent' => $agent
         ]);
-    } //edit
+    } //add_and_edit
+
+
 
     #[Route('/admin/agency/agent/{code}/access/control', name: 'admin_agency_agent_permission')]
     public function permission(): Response
@@ -96,7 +146,5 @@ final class UserController extends AbstractController
             'action' => 'edition'
         ]);
     } //permission
-
-
 
 }

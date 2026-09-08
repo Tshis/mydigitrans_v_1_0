@@ -1,151 +1,147 @@
+{# templates/admin/agency/user/form.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-<div class="user-wrapper add-agent">
-    {# En-tête de la page #}
-    <header class="user-wrapper_header">
-        <h2 class="user-wrapper_title">
-            {% if action is same as('edition') %}
-            <i class="fas fa-user-edit"></i>
-            Modification de l'agent
-            {% else %}
-            <i class="fas fa-user-plus"></i>
-            Ajouter un nouvel agent
-            {% endif %}
-        </h2>
-        <a href="{{path('admin_agency_agent_index')}}" class="btn btn-dark border-radius-5">
-            <i class="fas fa-arrow-left"></i>
-            Retour à la liste
-        </a>
-    </header>
+	<div
+		class="admin-agency-user-form-scope container">
+		{# --- HEADER DYNAMIQUE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_agent_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Administration</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">
+							{{ isEdit ? 'Habilitations ' : 'Nouveau Collaborateur ' }}
+						</span>
+					</div>
+					<h1 class="mt-5">{{ isEdit ? 'Modifier le Compte Agent' : 'Créer un Nouvel Utilisateur' }}</h1>
+				</div>
+			</div>
+			<div class="header-actions">
+				<button type="submit" form="user-master-form" class="btn btn-success">
+					<i class="fa-solid {{ isEdit ? 'fa-user-check' : 'fa-user-plus' }}"></i>
+					<span>{{ isEdit ? 'Enregistrer les modifications' : 'Déployer le compte' }}</span>
+				</button>
+			</div>
+		</header>
 
-    {# Formulaire de création #}
-    <div class="c-card my-20">
-        <form action="#" method="POST" class="form">
+		{# --- FORMULAIRE UNIQUE MULTI-RÔLES --- #}
+		<form id="user-master-form" action="#" method="POST" class="user-form-layout">
+			<div
+				class="user-container-grid">
 
-            <div class="c-form_grid">
+				{# COLONNE GAUCHE : IDENTITÉ & RATTACEMENT #}
+				<div
+					class="main-form-panel">
 
-                {# Section 1 : Informations Générales #}
-                <div class="c-form_section">
-                    <h3 class="c-form_subtitle">
-                        <i class="fas fa-id-card"></i>
-                        Identité de l'agent
-                    </h3>
+					{# CARD 1 : IDENTITÉ DE L'AGENT (MCD 3) #}
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-id-card text-primary"></i>
+							Identité Civile de l'Agent</h2>
 
-                    <div class="field-group mb-15">
+						<div class="direct-pricing-row mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Prénom (firstname) *</label>
+								<input type="text" name="firstname" class="admin-bus-layout-add-input" value="{{ isEdit ? agent.firstname : '' }}" placeholder="Ex: Antoinette" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Nom de famille (lastname) *</label>
+								<input type="text" name="lastname" class="admin-bus-layout-add-input" value="{{ isEdit ? agent.lastname : '' }}" placeholder="Ex: Mputu" required>
+							</div>
+						</div>
 
-                        <div class="field">
-                            <label for="">
-                                Nom
-                                <span class="required">*</span>
-                            </label>
-                            <input type="text">
-                        </div>
+						<div class="direct-pricing-row">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Adresse Email Professionnelle *</label>
+								<input type="email" name="email" class="admin-bus-layout-add-input" value="{{ isEdit ? agent.email : '' }}" placeholder="Ex: a.mputu@mydigitrans.cd" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Numéro de Téléphone mobile *</label>
+								<input type="text" name="phone" class="admin-bus-layout-add-input font-bold" value="{{ isEdit ? agent.phone : '' }}" placeholder="Ex: +243 897 112 233" required>
+							</div>
+						</div>
 
-                        <div class="field">
-                            <label for="">
-                                Prenom
-                                <span class="required">*</span>
-                            </label>
-                            <input type="text">
-                        </div>
+						{# Le mot de passe n'est requis qu'à la création #}
+						{% if not isEdit %}
+							<div class="direct-pricing-row mt-20">
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Mot de passe initial *</label>
+									<input type="password" name="password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
+								</div>
+							</div>
+						{% endif %}
+					</div>
 
-                    </div>
-                    <!--field-group-->
+					{# CARD 2 : PIVOT RATTACEMENT MULTI-TENANT (MCD 3 & 5) #}
+					<div class="card control-card success-accent">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-circle-nodes text-success"></i>
+							Périmètre d'Affectation Réseau</h2>
 
-                    <div class="field mb-25">
-                        <label for="agent_phone">
-                            Téléphone
-                            <span class="required">*</span>
-                        </label>
-                        <input type="tel" id="agent_phone" name="phone" placeholder="Ex: +243 812 000 000" required
-                            class="c-form_input">
-                    </div>
-                    <!--field-->
+						<div class="direct-pricing-row">
 
-                    <div class="field mb-25">
-                        <label for="agent_email">
-                            Adresse Email
-                            <span class="required">*</span>
-                        </label>
-                        <input type="email" id="agent_email" name="email" placeholder="Ex: m.ilunga@transport.cd"
-                            class="c-form_input">
-                    </div>
-                    <!--field-->
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Succursale d'affectation *</label>
+								<select name="branch_code" class="admin-bus-layout-add-select">
+									<option value="">-- Siège Central (Accès Général) --</option>
+									{% for branch in branches %}
+										<option value="{{ branch.code }}" {% if isEdit and agent.branchCode == branch.code %} selected {% endif %}>{{ branch.name }}
+											(#{{ branch.code }})</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
 
-                </div>
-                <!--section-->
+				{# COLONNE DROITE : ATTRIBUTION DES RÔLES & STATUT DU COMPTE #}
+				<aside
+					class="sidebar-action-panel">
 
-                {# Section 2 : Affectation & Sécurité #}
-                <div class="c-form_section">
-                    <h3 class="c-form_subtitle">
-                        <i class="fas fa-shield-alt"></i>
-                        Affectation & Accès
-                    </h3>
+					{# COMPOSANT RBAC : SÉLECTION DES RÔLES (MCD 4 & 5) #}
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-user-shield text-primary"></i>
+							Rôles & Habilitations (RBAC)</h2>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Attribuer un Rôle Système *</label>
+							<select name="role_code" class="admin-bus-layout-add-select" required>
+								<option value="">-- Choisir un profil de droits --</option>
+								{% for role in available_roles %}
+									<option value="{{ role.code }}" {% if isEdit and agent.currentRoleCode == role.code %} selected {% endif %} title="{{ role.description }}">{{ role.name }}
+										({{ role.code }})</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
 
-                    <div class="field-group mb-15">
+					{# BLOC ACTIVATION COMPTE (MCD 3) #}
+					<div class="card sticky-aside-card">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-sliders text-gray"></i>
+							État du Compte</h2>
+						<div class="field mb-20">
+							<label class="admin-bus-layout-add-label">Autoriser la connexion</label>
+							<select name="is_active" class="admin-bus-layout-add-select" required>
+								<option value="1" {% if not isEdit or agent.isActive %} selected {% endif %}>Compte Actif (Accès autorisé)</option>
+								<option value="0" {% if isEdit and not agent.isActive %} selected {% endif %}>Compte Bloqué (Connexion interdite)</option>
+							</select>
+						</div>
+						<hr class="section-divider my-15">
+						<div class="notice-box-info">
+							<p>
+								<i class="fa-solid fa-bolt"></i>
+								Les permissions (<strong>Permission</strong>) associées à ce rôle s'appliqueront automatiquement à l'agent lors de sa prochaine authentification.</p>
+						</div>
+					</div>
+				</aside>
 
-                        <div class="field">
-                            <label for="agent_branch">Succursale d'affectation
-                                <span class="required">*</span>
-                            </label>
-                            <select id="agent_branch" name="branch" required class="c-form_select">
-                                <option value="" disabled selected>Choisir une succursale</option>
-                                <option value="Limete">Limete (Kinshasa)</option>
-                                <option value="Gombe">Gombe (Kinshasa)</option>
-                                <option value="Matadi Centre">Matadi Centre</option>
-                            </select>
-
-                        </div>
-
-                        <div class="field">
-                            <label for="agent_role">Rôle / Niveau d'accès
-                                <span class="required">*</span>
-                            </label>
-                            <select id="agent_role" name="role" required class="c-form_select">
-                                <option value="" disabled selected>Choisir un rôle</option>
-                                <option value="ROLE_MANAGER">Gérant</option>
-                                <option value="ROLE_GUICHETIER">Guichetier</option>
-                                <option value="ROLE_OPERATEUR">Opérateur Fret</option>
-                                <option value="ROLE_CONVOYEUR">Convoyeur</option>
-                            </select>
-                        </div>
-                    </div>
-
-
-                    <div class="field mb-25">
-                        <label for="agent_password">Mot de passe temporaire
-                            <span class="required">*</span>
-                        </label>
-                        <input type="password" id="agent_password" name="password" placeholder="••••••••" required
-                            class="c-form_input">
-                    </div>
-
-                    <div class="field mb-25">
-                        <label for="agent_status">Statut initial</label>
-                        <select id="agent_status" name="status" class="c-form_select">
-                            <option value="active">Actif (Accès autorisé immédiatement)</option>
-                            <option value="suspended">Bloqué (Accès suspendu)</option>
-                        </select>
-                    </div>
-                </div>
-                <!--section-->
-            </div>
-            <!--c-form_grid-->
-
-            {# Actions du formulaire #}
-            <div class="c-form_actions">
-                <a href="{{path('admin_agency_agent_index')}}" class="btn btn-dark">
-                    <i class="fas fa-undo"></i>
-                    Annuler
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    Enregistrer l'agent
-                </button>
-            </div>
-
-        </form>
-    </div>
-</div>
+			</div>
+		</form>
+	</div>
 {% endblock %}
