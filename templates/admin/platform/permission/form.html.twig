@@ -1,0 +1,119 @@
+{# templates/admin/platform/permission/form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-platform-permission-form-scope container">
+		{# --- HEADER DE LA PLATEFORME --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="#" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Super Admin Plateforme</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-gray text-size-13 text-highlight">Sécurité Système [MCD 6]</span>
+					</div>
+					<h1 class="mt-5">Générer une Permission Système</h1>
+				</div>
+			</div>
+			<div class="header-actions">
+				<button type="submit" form="platform-permission-form" class="btn btn-primary-gradient">
+					<i class="fa-solid fa-key"></i>
+					Injecter la permission
+				</button>
+			</div>
+		</header>
+
+		{# --- LAYOUT DOUBLE COLONNE --- #}
+		<form id="platform-permission-form" action="#" method="POST" class="matrix-form-layout">
+			<div
+				class="matrix-container-grid">
+
+				{# COLONNE GAUCHE : CONFIGURATION TECHNIQUE (POUR LE CODE PHP) #}
+				<div class="main-content-panel">
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-code text-primary"></i>
+							Identification Technique En Base de Données</h2>
+
+						<div class="direct-pricing-row mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Nom de l'accès (name) *</label>
+								<input type="text" name="name" class="admin-bus-layout-add-input" placeholder="Ex: Annuler un billet de bus" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Code Technique Strict (code) *</label>
+								<input type="text" name="code" class="admin-bus-layout-add-input font-bold" placeholder="Ex: ticket.cancel" required>
+								<small class="text-gray text-size-11 mt-5">
+									<i class="fa-solid fa-circle-info"></i>
+									Doit correspondre exactement au tag utilisé dans le contrôleur Symfony.</small>
+							</div>
+						</div>
+
+						<div class="direct-pricing-row">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Module d'appartenance (module) *</label>
+								<select name="module" class="admin-bus-layout-add-select" required>
+									<option value="dashboard">Dashboard / Statistiques</option>
+									<option value="ticket">Ticket / Billetterie</option>
+									<option value="trip">Trip / Planification Voyages</option>
+									<option value="cargo">Cargo / Gestion des Colis</option>
+									<option value="agency">Agency / Paramètres Compagnie</option>
+									<option value="branch">Branch / Succursales</option>
+								</select>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Périmètre d'application (scope) *</label>
+								<select name="scope" class="admin-bus-layout-add-select" required>
+									<option value="agency" selected>Agency (Droit distribuable aux compagnies de transport)</option>
+									<option value="platform">Platform (Droit exclusif aux administrateurs du SaaS)</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					{# TEXTAREA EXCLUSIF #}
+					<div class="card control-card success-accent">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-comment-dots text-success"></i>
+							Documentation Métier</h2>
+						<div class="direct-pricing-row">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Description explicite (Sera visible par le client) *</label>
+								<textarea name="description" class="matrix-textarea" placeholder="Ex: Autorise l'agent à révoquer un titre de transport acheté et à procéder au remboursement ou à la création d'un avoir financier..." required></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{# COLONNE DROITE : NOTICE INFRASTRUCTURE #}
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-server text-primary"></i>
+							Intégrité du Noyau</h2>
+						<div class="notice-box-info">
+							<p>
+								<strong>
+									<i class="fa-solid fa-triangle-exclamation"></i>
+									Action irréversible :</strong>
+								La création d'une permission système impacte instantanément le dictionnaire de sécurité de la plateforme.</p>
+						</div>
+						<hr class="section-divider my-15">
+						<div class="notice-box-info">
+							<p>
+								<strong>
+									<i class="fa-solid fa-users-gear"></i>
+									Distribution :</strong>
+								Dès validation, ce nouveau droit sera automatiquement listé dans les consoles de tous tes clients agences de transport.</p>
+						</div>
+					</div>
+				</aside>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}

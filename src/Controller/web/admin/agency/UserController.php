@@ -139,11 +139,87 @@ final class UserController extends AbstractController
 
 
     #[Route('/admin/agency/agent/{code}/access/control', name: 'admin_agency_agent_permission')]
-    public function permission(): Response
+    public function permission(string $code, Request $request): Response
     {
+
+        // 1. Profil de l'agent ciblé (Mukendi Jean)
+        $agent = [
+            'firstname' => 'Jean',
+            'lastname' => 'Mukendi',
+            'email' => 'j.mukendi@mydigitrans.com',
+            'code' => $code,
+            'roleLabel' => 'Guichetier Principal'
+        ];
+
+        // 2. Matrice complète des segments métiers [MCD 6 & 7] avec leurs valeurs par défaut
+        $modules = [
+            [
+                'key' => 'dashboard',
+                'label' => 'Dashboard',
+                'icon' => 'fa-gauge',
+                'value' => 'read',
+                'description' => 'Vue d\'ensemble des statistiques de vente de la journée et graphiques d\'évolution.'
+            ],
+            [
+                'key' => 'branches',
+                'label' => 'Branch (Succursales)',
+                'icon' => 'fa-folder-tree',
+                'value' => 'none',
+                'description' => 'Consulter ou modifier l\'arborescence, les fiches et les états des autres succursales.'
+            ],
+            [
+                'key' => 'agents',
+                'label' => 'Agents (Utilisateurs)',
+                'icon' => 'fa-users',
+                'value' => 'none',
+                'description' => 'Gestion des comptes du personnel, des affectations et consultation de leurs fiches.'
+            ],
+            [
+                'key' => 'bus',
+                'label' => 'Bus',
+                'icon' => 'fa-bus-simple',
+                'value' => 'read',
+                'description' => 'Gestion de la flotte automobile, fiches techniques des véhicules et assignations.'
+            ],
+            [
+                'key' => 'routes',
+                'label' => 'Trajets (Lignes de transport)',
+                'icon' => 'fa-route',
+                'value' => 'read_write',
+                'description' => 'Configuration des lignes, des arrêts intermédiaires et de la planification horaire.'
+            ],
+            [
+                'key' => 'reservations',
+                'label' => 'Réservations',
+                'icon' => 'fa-file-circle-check',
+                'value' => 'read',
+                'description' => 'Consultation des listes d\'attente, enregistrement et validation des billets passagers.'
+            ],
+            [
+                'key' => 'cargo',
+                'label' => 'Colis (Fret / Messagerie)',
+                'icon' => 'fa-box-open',
+                'value' => 'write',
+                'description' => 'Enregistrement des colis au départ, suivi de livraison et gestion des réceptions.'
+            ]
+        ];
+
+        if ($request->isMethod('POST')) {
+            // Récupération des choix radios de l'administrateur
+            $submittedPerms = $request->request->all('perms');
+
+            $this->addFlash('success', sprintf('Les privilèges d\'accès de %s %s ont été reconfigurés.', $agent['firstname'], $agent['lastname']));
+            return $this->redirectToRoute('admin_agency_user_index');
+        }
+
+
+
+
         return $this->render('admin/agency/agent/permission.html.twig', [
             'page' => 'agent',
-            'action' => 'edition'
+            'action' => 'edition',
+            'modules' => $modules,
+            'agent' => $agent,
         ]);
     } //permission
 

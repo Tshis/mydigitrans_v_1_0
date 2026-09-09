@@ -1,54 +1,60 @@
+{# templates/admin/agency/caisse/permission.html.twig #}
 {% extends "admin/base.html.twig" %}
 
-
 {% block body %}
+<div class="agency-agent-permission-wrapper container">
 
-	{# templates/agency/permissions/agent_fine_tuning.html.twig #}
-	<div
-		class="agency-agent-permission-wrapper">
+	{# --- EN-TÊTE DU PROFIL AGENT --- #}
+	<header class="agency-permission-header">
+		<div class="agency-profile-block">
+			<a href="{{path('admin_agency_agent_index')}}" class="agency-back-action">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="agency-profile-meta">
+				<h2 class="agency-profile-name">{{ agent.firstname }}
+					{{ agent.lastname }}</h2>
+				<div class="agency-profile-badge-row">
+					<span class="agency-badge-role">{{ agent.roleLabel }}</span>
 
-		{# --- EN-TÊTE DU PROFIL AGENT --- #}
-		<header class="agency-permission-header">
-			<div class="agency-profile-block">
-				<a href="{{path('admin_agency_agent_index')}}" class="agency-back-action">
-					<i class="fa-solid fa-arrow-left"></i>
-				</a>
-				<div class="agency-profile-meta">
-					<h2 class="agency-profile-name">Mukendi Jean</h2>
-					<div class="agency-profile-badge-row">
-						<span class="agency-badge-role">Guichetier Principal</span>
-					</div>
 				</div>
 			</div>
-
-			<div class="agency-action-bar">
-				<button class="agency-btn-control btn btn-success">
-					<i class="fa-solid fa-floppy-disk"></i>
-					Enregistrer les droits</button>
-			</div>
-		</header>
-
-		{# --- AVERTISSEMENT SÉCURITÉ --- #}
-		<div class="agency-security-notice">
-			<i class="fa-solid fa-shield-halved"></i>
-			<p>
-				<strong>Rappel de sécurité :</strong>
-				Le mode
-				<em>"Écriture seule"</em>
-				permet à l'agent de soumettre ou modifier des données à l'aveugle sans pouvoir consulter l'historique ou les listes existantes.</p>
 		</div>
 
-		{# --- MATRICE DES DROITS GRANULAIRES --- #}
-		<div class="agency-permission-card">
-			<div class="agency-card-topbar">
-				<div>
-					<h3 class="agency-card-heading">Permissions Granulaires : Gestion des flux</h3>
-					<p class="agency-card-subheading">Ajustez les privilèges d'exécution de l'agent sur chaque segment métier de la succursale.</p>
-				</div>
-			</div>
+		<div class="agency-action-bar">
+			<button type="submit" form="js-form-fine-tuning" class="agency-btn-control btn btn-success">
+				<i class="fa-solid fa-floppy-disk"></i>
+				Enregistrer les droits
+			</button>
+		</div>
+	</header>
 
-			{# Zone de défilement horizontal sécurisé #}
-			<div class="responsive-permission-table">
+	{# --- AVERTISSEMENT SÉCURITÉ --- #}
+	<div class="agency-security-notice">
+		<i class="fa-solid fa-shield-halved"></i>
+		<p>
+			<strong>Rappel de sécurité :</strong>
+			Le mode
+			<em>"Écriture seule"</em>
+			permet à l'agent de soumettre ou modifier des données à l'aveugle sans pouvoir consulter l'historique ou les
+			listes existantes.
+		</p>
+	</div>
+
+	{# --- MATRICE DES DROITS GRANULAIRES --- #}
+	<div class="agency-permission-card">
+		<div class="agency-card-topbar">
+			<div>
+				<h3 class="agency-card-heading">Permissions Granulaires : Gestion des flux (
+					{% if action == 'edition' %}Édition
+					{% endif %})</h3>
+				<p class="agency-card-subheading">Ajustez les privilèges d'exécution de l'agent sur chaque segment
+					métier de la succursale.</p>
+			</div>
+		</div>
+
+		{# Zone de défilement horizontal sécurisé #}
+		<div class="responsive-permission-table">
+			<form id="js-form-fine-tuning" action="#" method="POST">
 				<table class="agency-permission-table">
 					<thead>
 						<tr>
@@ -60,151 +66,39 @@
 						</tr>
 					</thead>
 					<tbody>
-
-						{# 1. Dashboard #}
+						{% for module in modules %}
 						<tr class="agency-permission-row">
 							<td>
 								<div class="agency-feature-description">
 									<span class="module-icon-inline">
-										<i class="fa-solid fa-gauge"></i>
+										<i class="fa-solid {{ module.icon }}"></i>
 									</span>
-									<strong>Dashboard</strong>
-									<p>Vue d'ensemble des statistiques de vente de la journée et graphiques d'évolution.</p>
+									<strong>{{ module.label }}</strong>
 								</div>
+								<p class="permission-description">{{ module.description }}</p>
 							</td>
-							<td class="column-radio-center"><input type="radio" name="perm_dashboard" value="none" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_dashboard" value="read" class="agency-custom-radio" checked></td>
-							<td class="column-radio-center"><input type="radio" name="perm_dashboard" value="write" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_dashboard" value="read_write" class="agency-custom-radio"></td>
-						</tr>
-
-						{# 2. Branch #}
-						<tr class="agency-permission-row">
-							<td>
-								<div class="agency-feature-description">
-									<span class="module-icon-inline">
-										<i class="fa-solid fa-folder-tree"></i>
-									</span>
-									<strong>Branch (Succursales)</strong>
-									<p>Consulter ou modifier l'arborescence, les fiches et les états des autres succursales.</p>
-								</div>
+							<td class="column-radio-center">
+								<input type="radio" name="perms[{{ module.key }}]" value="none"
+									class="agency-custom-radio" {% if module.value=='none' %} checked {% endif %}>
 							</td>
-							<td class="column-radio-center"><input type="radio" name="perm_branches" value="none" class="agency-custom-radio" checked></td>
-							<td class="column-radio-center"><input type="radio" name="perm_branches" value="read" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_branches" value="write" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_branches" value="read_write" class="agency-custom-radio"></td>
-						</tr>
-
-						{# 3. Agents #}
-						<tr class="agency-permission-row">
-							<td>
-								<div class="agency-feature-description">
-									<span class="module-icon-inline">
-										<i class="fa-solid fa-users"></i>
-									</span>
-									<strong>Agents (Utilisateurs)</strong>
-									<p>Gestion des comptes du personnel, des affectations et consultation de leurs fiches.</p>
-								</div>
+							<td class="column-radio-center">
+								<input type="radio" name="perms[{{ module.key }}]" value="read"
+									class="agency-custom-radio" {% if module.value=='read' %} checked {% endif %}>
 							</td>
-							<td class="column-radio-center"><input type="radio" name="perm_agents" value="none" class="agency-custom-radio" checked></td>
-							<td class="column-radio-center"><input type="radio" name="perm_agents" value="read" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_agents" value="write" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_agents" value="read_write" class="agency-custom-radio"></td>
-						</tr>
-
-						{# 4. Bus #}
-						<tr class="agency-permission-row">
-							<td>
-								<div class="agency-feature-description">
-									<span class="module-icon-inline">
-										<i class="fa-solid fa-bus-simple"></i>
-									</span>
-									<strong>Bus</strong>
-									<p>Gestion de la flotte automobile, fiches techniques des véhicules et assignations.</p>
-								</div>
+							<td class="column-radio-center">
+								<input type="radio" name="perms[{{ module.key }}]" value="write"
+									class="agency-custom-radio" {% if module.value=='write' %} checked {% endif %}>
 							</td>
-							<td class="column-radio-center"><input type="radio" name="perm_bus" value="none" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_bus" value="read" class="agency-custom-radio" checked></td>
-							<td class="column-radio-center"><input type="radio" name="perm_bus" value="write" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_bus" value="read_write" class="agency-custom-radio"></td>
-						</tr>
-
-						{# 5. Trajets #}
-						<tr class="agency-permission-row">
-							<td>
-								<div class="agency-feature-description">
-									<span class="module-icon-inline">
-										<i class="fa-solid fa-route"></i>
-									</span>
-									<strong>Trajets (Lignes de transport)</strong>
-									<p>Configuration des lignes, des arrêts intermédiaires et de la planification horaire.</p>
-								</div>
+							<td class="column-radio-center">
+								<input type="radio" name="perms[{{ module.key }}]" value="read_write"
+									class="agency-custom-radio" {% if module.value=='read_write' %} checked {% endif %}>
 							</td>
-							<td class="column-radio-center"><input type="radio" name="perm_routes" value="none" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_routes" value="read" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_routes" value="write" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_routes" value="read_write" class="agency-custom-radio" checked></td>
 						</tr>
-
-						{# 6. Réservations #}
-						<tr class="agency-permission-row">
-							<td>
-								<div class="agency-feature-description">
-									<span class="module-icon-inline">
-										<i class="fa-solid fa-file-circle-check"></i>
-									</span>
-									<strong>Réservations</strong>
-									<p>Consultation des listes d'attente, enregistrement et validation des billets passagers.</p>
-								</div>
-							</td>
-							<td class="column-radio-center"><input type="radio" name="perm_reservations" value="none" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_reservations" value="read" class="agency-custom-radio" checked></td>
-							<td class="column-radio-center"><input type="radio" name="perm_reservations" value="write" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_reservations" value="read_write" class="agency-custom-radio"></td>
-						</tr>
-
-						{# 7. Colis #}
-						<tr class="agency-permission-row">
-							<td>
-								<div class="agency-feature-description">
-									<span class="module-icon-inline">
-										<i class="fa-solid fa-box-open"></i>
-									</span>
-									<strong>Colis (Fret / Messagerie)</strong>
-									<p>Enregistrement des colis au départ, suivi de livraison et gestion des réceptions.</p>
-								</div>
-							</td>
-							<td class="column-radio-center"><input type="radio" name="perm_colis" value="none" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_colis" value="read" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_colis" value="write" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_colis" value="read_write" class="agency-custom-radio" checked></td>
-						</tr>
-
-						{# 8. Caisse #}
-						<tr class="agency-permission-row">
-							<td>
-								<div class="agency-feature-description">
-									<span class="module-icon-inline">
-										<i class="fa-solid fa-cash-register"></i>
-									</span>
-									<strong>Caisse</strong>
-									<p>Ouverture, suivi des flux d'espèces physiques du guichet et clôtures journalières.</p>
-								</div>
-							</td>
-							<td class="column-radio-center"><input type="radio" name="perm_caisse" value="none" class="agency-custom-radio" checked></td>
-							<td class="column-radio-center"><input type="radio" name="perm_caisse" value="read" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_caisse" value="write" class="agency-custom-radio"></td>
-							<td class="column-radio-center"><input type="radio" name="perm_routes" value="read_write" class="agency-custom-radio" checked></td>
-						</tr>
-
-
+						{% endfor %}
 					</tbody>
-
-
 				</table>
-			</div>
+			</form>
 		</div>
 	</div>
-
-
+</div>
 {% endblock %}

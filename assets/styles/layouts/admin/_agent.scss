@@ -198,3 +198,97 @@
     .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); &.text-disabled { background: rgba($dark,0.2); } }
     .notice-box-info { background: rgba($dark, 0.2); color: $mute; }
 }
+
+
+///========================================
+/// =====AGENT PERMISSION =================
+/// =======================================
+.agency-agent-permission-wrapper {
+    padding-block: 2rem;
+
+    // --- EN-TÊTE ÉPURÉ ---
+    .agency-permission-header {
+        display: flex; justify-content: space-between; align-items: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 25px;
+
+        .agency-profile-block {
+            display: flex; align-items: center; gap: 1.2rem;
+            .agency-back-action {
+                border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+                background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; transition: transform 0.2s;
+                &:hover { transform: scale(1.05); }
+            }
+            .agency-profile-meta {
+                display: flex; flex-direction: column; gap: 4px;
+                .agency-profile-name { font-size: 1.8rem; font-weight: 800; color: $dark; margin: 0; }
+                .agency-badge-role { font-size: 11px; font-weight: 800; text-transform: uppercase; color: $primary; }
+            }
+        }
+    }
+
+    // --- AVERTISSEMENT DE SECURITE ---
+    .agency-security-notice {
+        display: flex; align-items: center; gap: 15px; padding: 15px 20px; 
+        background: rgba($danger, 0.04); border: 1px solid rgba($danger, 0.1); 
+        border-radius: 12px; margin-bottom: 25px; color: darken($danger, 10%);
+        i { font-size: 1.4rem; }
+        p { margin: 0; font-size: 13px; line-height: 1.5; }
+    }
+
+    // --- CARTE MATRICE COMPLÈTE ---
+    .agency-permission-card {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card; overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+
+        .agency-card-topbar {
+            padding: 1.5rem 2rem; border-bottom: 1px solid $mute; background: rgba($gray, 0.01);
+            .agency-card-heading { font-size: 14px; font-weight: 800; text-transform: uppercase; color: $dark; margin: 0 0 4px 0; }
+            .agency-card-subheading { font-size: 12px; color: $gray; margin: 0; }
+        }
+    }
+
+    // --- TABLEAU DE CONFIGURATION ---
+    .responsive-permission-table {
+        width: 100%; overflow-x: auto;
+
+        .agency-permission-table {
+            width: 100%; border-collapse: collapse; min-width: 850px;
+
+            th { background: rgba($gray, 0.03); font-size: 11px; text-transform: uppercase; color: $gray; padding: 15px 20px; text-align: left; border-bottom: 2px solid $mute; }
+            td { padding: 18px 20px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; }
+        }
+
+        .agency-permission-row {
+            transition: background 0.15s;
+            &:hover { background: rgba($gray, 0.01); }
+        }
+    }
+
+    // DESCRIPTION METIER DU MODULE
+    .agency-feature-description {
+        display: flex; align-items: flex-start; gap: 5px;
+        .module-icon-inline { font-size: 1.2rem; color: $primary; margin-top: 2px; display: inline-block; }
+        strong { font-size: 14px; color: $dark; display: block; margin-bottom: 2px; }
+      }
+      p.permission-description { font-size: 12.5px; color: $gray; margin: 0; line-height: 1.4; }
+
+    // ALIGNEMENT DES RADIOS
+    .column-radio-center {
+        text-align: center; width: 130px;
+        .agency-custom-radio {
+            width: 18px; height: 18px; cursor: pointer; accent-color: $success;
+        }
+    }
+    .pl-10 { padding-left: 10px; }
+    .monospace { font-family: monospace; }
+}
+
+// --- THÈME DARK MODE ---
+.dark .agency-agent-permission-wrapper {
+    .agency-permission-header .agency-profile-block .agency-profile-meta .agency-profile-name, .agency-permission-card .agency-card-topbar .agency-card-heading, .agency-feature-description strong { color: $white; }
+    .agency-permission-header .agency-profile-block .agency-back-action { background: $dm-bg-surface; color: $white; border-color: rgba(255,255,255,0.1); }
+    .agency-permission-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .agency-permission-card .agency-card-topbar { background: rgba(0,0,0,0.15); border-bottom-color: rgba(255,255,255,0.1); }
+    .responsive-permission-table .agency-permission-table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
+    .responsive-permission-table .agency-permission-table td { border-bottom-color: rgba(255,255,255,0.05); }
+    .agency-security-notice { background: rgba(0, 0, 0, 0.2); color: $mute; border-color: rgba(255,255,255,0.05); }
+}
