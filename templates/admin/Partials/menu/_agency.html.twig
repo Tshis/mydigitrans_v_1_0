@@ -88,11 +88,18 @@
 	<span class="text">Branches</span>
 </a>
 
-<a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Rôles et Personnels">
+<a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
 	<span class="icon">
 		<i class="fa-solid fa-users"></i>
 	</span>
-	<span class="text">Agents & Chauffeurs</span>
+	<span class="text">Utilisateurs</span>
+</a>
+
+<a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
+	<span class="icon">
+		<i class="fa-solid fa-users"></i>
+	</span>
+	<span class="text">Fonctions du Personnel</span>
 </a>
 
 {# 5. PILOTAGE #}

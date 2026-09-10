@@ -1,0 +1,132 @@
+{# templates/admin/agency/job/form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-agency-job-form-scope container">
+		{# --- HEADER DYNAMIQUE (AJOUT / ÉDITION) --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_user_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Organigramme</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-gray text-size-13 text-highlight">
+							{{ isEdit ? 'Configuration [MCD 4]' : 'Nouvelle Fonction [MCD 4]' }}
+						</span>
+					</div>
+					<h1 class="mt-5">{{ isEdit ? 'Modifier la Fonction' : 'Créer une Fonction / Poste' }}</h1>
+				</div>
+			</div>
+			<div class="header-actions">
+				<button type="submit" form="job-master-form" class="btn btn-success">
+					<i class="fa-solid fa-floppy-disk"></i>
+					<span>Enregistrer le poste</span>
+				</button>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE UNIQUE ET ETANCHE --- #}
+		<form id="job-master-form" action="#" method="POST" class="job-form-layout">
+			<div
+				class="job-container-grid">
+
+				{# COLONNE GAUCHE : INTITULÉ & MATRICE DE PERMISSIONS TEXTUELLE #}
+				<div
+					class="main-form-panel">
+
+					{# SÉGMENT 1 : INTITULÉ DU POSTE #}
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-briefcase text-primary"></i>
+							Définition de la Fonction</h2>
+						<div class="direct-pricing-row">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Intitulé de la fonction / Poste commercial *</label>
+								<input type="text" name="name" class="admin-bus-layout-add-input" value="{{ isEdit ? role.name : '' }}" placeholder="Ex: Guichetier de Nuit, Percepteur Fret, Chauffeur RN1..." required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Description des responsabilités</label>
+								<input type="text" name="description" class="admin-bus-layout-add-input" value="{{ isEdit ? role.description : '' }}" placeholder="Ex: En charge des ventes de billets sur la tranche horaire 22h - 6h...">
+							</div>
+						</div>
+					</div>
+
+					{# SÉGMENT 2 : TA MATRICE TEXTUELLE DE BOUTONS RADIOS REPRISE #}
+					<div class="agency-permission-card">
+						<div class="agency-card-topbar">
+							<div>
+								<h3 class="agency-card-heading">Permissions Granulaires : Gestion des flux</h3>
+								<p class="agency-card-subheading">Ajustez les privilèges d'exécution de ce poste sur chaque segment métier de la succursale.</p>
+							</div>
+						</div>
+
+						<div class="responsive-permission-table">
+							<table class="agency-permission-table">
+								<thead>
+									<tr>
+										<th>Module du Menu & Droits Métiers</th>
+										<th class="column-radio-center">Aucun Accès</th>
+										<th class="column-radio-center">Lecture Seule</th>
+										<th class="column-radio-center">Écriture Seule</th>
+										<th class="column-radio-center">Lecture / Écriture</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for module in modules %}
+										<tr class="agency-permission-row">
+											<td>
+												<div class="agency-feature-description">
+													<span class="module-icon-inline">
+														<i class="fa-solid {{ module.icon }}"></i>
+													</span>
+													<strong>{{ module.label }}</strong>
+													<p>{{ module.description }}</p>
+												</div>
+											</td>
+											<td class="column-radio-center">
+												<input type="radio" name="perms[{{ module.key }}]" value="none" class="agency-custom-radio" {% if not isEdit or module.value == 'none' %} checked {% endif %}>
+											</td>
+											<td class="column-radio-center">
+												<input type="radio" name="perms[{{ module.key }}]" value="read" class="agency-custom-radio" {% if isEdit and module.value == 'read' %} checked {% endif %}>
+											</td>
+											<td class="column-radio-center">
+												<input type="radio" name="perms[{{ module.key }}]" value="write" class="agency-custom-radio" {% if isEdit and module.value == 'write' %} checked {% endif %}>
+											</td>
+											<td class="column-radio-center">
+												<input type="radio" name="perms[{{ module.key }}]" value="read_write" class="agency-custom-radio" {% if isEdit and module.value == 'read_write' %} checked {% endif %}>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				{# COLONNE DROITE : TRAÇABILITÉ MULTI-TENANT #}
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-shield-halved text-gray"></i>
+							Portée du Rôle</h2>
+						<div class="field mb-15">
+							<label class="admin-bus-layout-add-label">Code Technique Auto-généré</label>
+							<input type="text" class="admin-bus-layout-add-input text-disabled" value="{{ isEdit ? role.code : 'ROLE_AGENCY_CUSTOM_...' }}" readonly>
+						</div>
+						<hr class="section-divider my-15">
+						<div class="notice-box-info">
+							<p>
+								<i class="fa-solid fa-circle-info"></i>
+								En créant ce poste, il sera instantanément disponible dans la liste déroulante d'affectation lors de la création d'un compte agent (User).</p>
+						</div>
+					</div>
+				</aside>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}
