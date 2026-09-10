@@ -107,14 +107,16 @@
 					<div class="card control-card mb-20">
 						<h2 class="card-title-fix">
 							<i class="fa-solid fa-user-shield text-primary"></i>
-							Rôles & Habilitations (RBAC)</h2>
+							Fonction & Habilitations
+						</h2>
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Attribuer un Rôle Système *</label>
+							<label class="admin-bus-layout-add-label">Attribuer une Fonction ou un poste *</label>
 							<select name="role_code" class="admin-bus-layout-add-select" required>
 								<option value="">-- Choisir un profil de droits --</option>
 								{% for role in available_roles %}
-									<option value="{{ role.code }}" {% if isEdit and agent.currentRoleCode == role.code %} selected {% endif %} title="{{ role.description }}">{{ role.name }}
-										({{ role.code }})</option>
+									<option value="{{ role.code }}" {% if isEdit and agent.currentRoleCode == role.code %} selected {% endif %} title="{{ role.description }}">
+										{{ role.name }}
+									</option>
 								{% endfor %}
 							</select>
 						</div>

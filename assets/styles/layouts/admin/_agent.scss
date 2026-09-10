@@ -3,7 +3,7 @@
 //=======================================
 //========INDEX
 //=================================
-.admin-agency-user-index-scope {
+.admin-agency-agent-index-scope {
     padding-block: 2.5rem;
 
    
@@ -43,7 +43,7 @@
     }
 
     // --- BARRE DE FILTRES UNIQUE ---
-    .user-filters-card {
+    .agent-filters-card {
         background: $white; padding: 1.25rem; border-radius: $radius-card; border: 1px solid $mute;
         .field-group {
             display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; width: 100%;
@@ -64,7 +64,7 @@
     }
 
     // --- CELLULE DU PROFIL AVATAR ---
-    .user-profile-cell {
+    .agent-profile-cell {
         display: flex; align-items: center; gap: 14px;
         .avatar-circle {
             width: 42px; height: 42px; background: rgba($primary, 0.08); color: $primary; border: 1px solid rgba($primary, 0.15);
@@ -86,7 +86,7 @@
     .contact-stack { display: flex; flex-direction: column; .email-text { font-weight: 600; } .phone-text { color: $gray; } }
 
     // --- TYPES & ROLES RBAC (MCD 3 & 4) ---
-    .user-type-tag {
+    .agent-type-tag {
         font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block;
         &.agency { background: rgba($primary, 0.08); color: $primary; }
         &.partner { background: rgba($danger, 0.1); color: $danger; }
@@ -97,7 +97,7 @@
     }
 
     // --- ACCOUNTS STATUS PILLS ---
-    .pill-user-account-status {
+    .pill-agent-account-status {
         padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; text-transform: uppercase;
         &.active { background: rgba($success, 0.2); color: $success; }
         &.inactive { background: rgba($danger, 0.2); color: $danger; }
@@ -121,15 +121,15 @@
 }
 
 // --- CONFIGURATION SOMBRE (DARK MODE) ---
-.dark .admin-agency-user-index-scope {
-    .header-refined h1, .card-title-fix, .table td, .user-profile-cell .meta .full-name, .contact-stack .email-text, .user-filters-card .field label { color: $white; }
-    .table-responsive-wrapper, .user-filters-card { background: $dm-bg; border-color: rgba($white,0.1); }
+.dark .admin-agency-agent-index-scope {
+    .header-refined h1, .card-title-fix, .table td, .agent-profile-cell .meta .full-name, .contact-stack .email-text, .agent-filters-card .field label { color: $white; }
+    .table-responsive-wrapper, .agent-filters-card { background: $dm-bg; border-color: rgba($white,0.1); }
     .table th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); color: $mute; }
     .table td { border-bottom-color: rgba($white, 0.05); }
     .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); }
-    .user-profile-cell .avatar-circle { background: rgba($white,0.05); border-color: rgba($white,0.1); color: $white; &.online-pulse::after { border-color: $dm-bg-surface; } }
+    .agent-profile-cell .avatar-circle { background: rgba($white,0.05); border-color: rgba($white,0.1); color: $white; &.online-pulse::after { border-color: $dm-bg-surface; } }
     .role-pill-code { background: rgba($dark,0.2); border-color: rgba($white,0.1); color: $mute; }
-    .pill-user-account-status {
+    .pill-agent-account-status {
         &.active { background: rgba($success, 0.2); color: $success; }
         &.inactive { background: rgba($danger, 0.2); color: $danger; }
     }
@@ -138,7 +138,7 @@
 //=======================================
 //========ADD & EDIT FORM
 //=================================
-.admin-agency-user-form-scope {
+.admin-agency-agent-form-scope {
     padding-block: 2rem;
 
     // --- HEADER STANDARD ---
@@ -155,9 +155,9 @@
     }
 
     // --- GRILLE DOUBLE COLONNE EXCLUSIVE ---
-    .user-form-layout {
+    .agent-form-layout {
         width: 100%;
-        .user-container-grid { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
+        .agent-container-grid { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
         .main-form-panel { flex: 1; min-width: 0; width: 100%; }
         .sidebar-action-panel {
             flex: 0 0 320px; width: 320px;
@@ -192,7 +192,7 @@
 }
 
 // --- THÈME DARK MODE ---
-.dark .admin-agency-user-form-scope {
+.dark .admin-agency-agent-form-scope {
     header h1, .card-title-fix, .direct-pricing-row .field label { color: $white; }
     .control-card, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba($white,0.1); }
     .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); &.text-disabled { background: rgba($dark,0.2); } }
@@ -201,94 +201,80 @@
 
 
 ///========================================
-/// =====AGENT PERMISSION =================
+/// =====AGENT SHOW =================
 /// =======================================
-.agency-agent-permission-wrapper {
+.admin-agency-agent-history-scope {
     padding-block: 2rem;
 
-    // --- EN-TÊTE ÉPURÉ ---
-    .agency-permission-header {
-        display: flex; justify-content: space-between; align-items: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 25px;
-
-        .agency-profile-block {
-            display: flex; align-items: center; gap: 1.2rem;
-            .agency-back-action {
-                border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
-                background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; transition: transform 0.2s;
-                &:hover { transform: scale(1.05); }
-            }
-            .agency-profile-meta {
-                display: flex; flex-direction: column; gap: 4px;
-                .agency-profile-name { font-size: 1.8rem; font-weight: 800; color: $dark; margin: 0; }
-                .agency-badge-role { font-size: 11px; font-weight: 800; text-transform: uppercase; color: $primary; }
-            }
+    // --- HEADER ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+        .agency-back-action {
+            border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+            background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; &:hover { transform: scale(1.05); }
         }
     }
 
-    // --- AVERTISSEMENT DE SECURITE ---
-    .agency-security-notice {
-        display: flex; align-items: center; gap: 15px; padding: 15px 20px; 
-        background: rgba($danger, 0.04); border: 1px solid rgba($danger, 0.1); 
-        border-radius: 12px; margin-bottom: 25px; color: darken($danger, 10%);
-        i { font-size: 1.4rem; }
-        p { margin: 0; font-size: 13px; line-height: 1.5; }
+    // --- DOUBLE COLONNE GRID ---
+    .agent-history-grid-layout {
+        display: flex; gap: 1.5rem; align-items: flex-start; width: 100%;
+        @media (max-width: 1100px) { flex-direction: column; }
+        .main-info-panel { flex: 1; min-width: 0; width: 100%; }
+        .sidebar-action-panel { flex: 0 0 320px; width: 320px; @media (max-width: 1100px) { flex: 1 1 100%; width: 100%; } }
     }
 
-    // --- CARTE MATRICE COMPLÈTE ---
-    .agency-permission-card {
-        background: $white; border: 1px solid $mute; border-radius: $radius-card; overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    .control-card { padding: 1.5rem; border-top: 4px solid $primary; background: $white; border-radius: $radius-card; }
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
 
-        .agency-card-topbar {
-            padding: 1.5rem 2rem; border-bottom: 1px solid $mute; background: rgba($gray, 0.01);
-            .agency-card-heading { font-size: 14px; font-weight: 800; text-transform: uppercase; color: $dark; margin: 0 0 4px 0; }
-            .agency-card-subheading { font-size: 12px; color: $gray; margin: 0; }
+    // --- ALIGNEMENT DES CHAMPS EN DIRECT-PRICING-ROW ---
+    .direct-pricing-row {
+        display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; width: 100%;
+        .field { 
+            flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; 
+            label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 0; white-space: nowrap; } 
         }
     }
 
-    // --- TABLEAU DE CONFIGURATION ---
-    .responsive-permission-table {
-        width: 100%; overflow-x: auto;
-
-        .agency-permission-table {
-            width: 100%; border-collapse: collapse; min-width: 850px;
-
-            th { background: rgba($gray, 0.03); font-size: 11px; text-transform: uppercase; color: $gray; padding: 15px 20px; text-align: left; border-bottom: 2px solid $mute; }
-            td { padding: 18px 20px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; }
-        }
-
-        .agency-permission-row {
-            transition: background 0.15s;
-            &:hover { background: rgba($gray, 0.01); }
-        }
+    // --- TABLEAU DE STRUCTURE TEXTUELLE UNIQUE ---
+    .table-responsive-wrapper { background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; }
+    .table {
+        width: 100%; border-collapse: collapse; min-width: 750px;
+        th { background: rgba($gray, 0.03); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
+        td { padding: 14px 15px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; font-size: 13px; color: $dark; }
     }
-
-    // DESCRIPTION METIER DU MODULE
-    .agency-feature-description {
-        display: flex; align-items: flex-start; gap: 5px;
-        .module-icon-inline { font-size: 1.2rem; color: $primary; margin-top: 2px; display: inline-block; }
-        strong { font-size: 14px; color: $dark; display: block; margin-bottom: 2px; }
-      }
-      p.permission-description { font-size: 12.5px; color: $gray; margin: 0; line-height: 1.4; }
-
-    // ALIGNEMENT DES RADIOS
-    .column-radio-center {
-        text-align: center; width: 130px;
-        .agency-custom-radio {
-            width: 18px; height: 18px; cursor: pointer; accent-color: $success;
-        }
-    }
-    .pl-10 { padding-left: 10px; }
     .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+
+    .pill-branch-status {
+        padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; text-transform: uppercase;
+        &.active { background: #e6f4ea; color: #1e7e34; }
+    }
+
+    // --- INPUTS COMPACTS ---
+    .admin-bus-layout-add-input {
+        width: 100%; height: 40px; padding-inline: 12px; border: 1px solid $mute; border-radius: 8px; font-weight: 700; color: $dark; background: $white; box-sizing: border-box;
+        &.text-disabled { background: #f8f9fa; color: $gray; cursor: not-allowed; border-color: rgba($mute, 0.6); }
+    }
+    .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 0; }
+
+    // --- SIDEBAR ---
+    .sidebar-action-panel {
+        .sticky-aside-card { position: sticky; top: 130px; z-index: 10; background: $white; padding: 1.5rem; border: 1px solid $mute; border-radius: $radius-card; border-top: 4px solid $primary; }
+        .current-status-box { .label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; } .status-text { display: block; font-size: 1.5rem; font-weight: 900; margin-top: 4px; &.online { color: #1e7e34; } &.offline { color: $gray; } } }
+    }
+    .notice-box-info { background: rgba($primary, 0.04); border-radius: 8px; padding: 12px 15px; font-size: 12px; color: darken($primary, 15%); line-height: 1.5; border: 1px solid rgba($primary, 0.1); }
+    .section-divider { border: 0; border-top: 1px dashed $mute; }
 }
 
-// --- THÈME DARK MODE ---
-.dark .agency-agent-permission-wrapper {
-    .agency-permission-header .agency-profile-block .agency-profile-meta .agency-profile-name, .agency-permission-card .agency-card-topbar .agency-card-heading, .agency-feature-description strong { color: $white; }
-    .agency-permission-header .agency-profile-block .agency-back-action { background: $dm-bg-surface; color: $white; border-color: rgba(255,255,255,0.1); }
-    .agency-permission-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
-    .agency-permission-card .agency-card-topbar { background: rgba(0,0,0,0.15); border-bottom-color: rgba(255,255,255,0.1); }
-    .responsive-permission-table .agency-permission-table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
-    .responsive-permission-table .agency-permission-table td { border-bottom-color: rgba(255,255,255,0.05); }
-    .agency-security-notice { background: rgba(0, 0, 0, 0.2); color: $mute; border-color: rgba(255,255,255,0.05); }
+// --- RENDU THÈME SOMBRE ---
+.dark .admin-agency-agent-history-scope {
+    .header .header-main-info h1, .card-title-fix, .table td, .direct-pricing-row .field label, .sidebar-action-panel .current-status-box .status-text { color: $white; }
+    .control-card, .table-responsive-wrapper, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
+    .table td { border-bottom-color: rgba(255,255,255,0.05); }
+    .admin-bus-layout-add-input { background: $dm-bg-main; color: white; border-color: rgba(255,255,255,0.1); &.text-disabled { background: rgba(0,0,0,0.2); } }
+    .notice-box-info { background: rgba(0, 0, 0, 0.2); color: $mute; }
+    .pill-branch-status.active { background: rgba(#1e7e34, 0.2); color: #81c995; }
 }
+

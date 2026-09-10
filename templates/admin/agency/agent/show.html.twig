@@ -1,0 +1,134 @@
+{# templates/admin/agency/user/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-agency-agenthistory-scope container">
+		{# --- EN-TÊTE DU PROFIL --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_agent_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Ressources Humaines</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-gray text-size-13 text-highlight">Fiche Agent [MCD ]</span>
+					</div>
+					<h1 class="mt-5">{{ agent.firstname }}
+						{{ agent.lastname }}</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- LAYOUT DOUBLE COLONNE --- #}
+		<div
+			class="agenthistory-grid-layout">
+
+			{# COLONNE GAUCHE : IDENTITÉ ET TABLEAU HISTORIQUE TEXTUEL (MCD 5) #}
+			<div
+				class="main-info-panel">
+
+				{# RAPPEL CONTACTS #}
+				<div class="card control-card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-id-card text-primary"></i>
+						Coordonnées Professionnelles</h2>
+					<div class="direct-pricing-row">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Adresse Email</label>
+							<div class="admin-bus-layout-add-input text-disabled">{{ agent.email }}</div>
+						</div>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Téléphone mobile</label>
+							<div class="admin-bus-layout-add-input text-disabled font-bold">{{ agent.phone }}</div>
+						</div>
+					</div>
+				</div>
+
+				{# TA STRUCTURE DE TABLEAU TEXTUELLE POUR L'HISTORIQUE DES MUTATIONS [MCD ] #}
+				<div class="table-responsive-wrapper my-20">
+					<h2 class="card-title-fix text-size-16 py-10">
+						<i class="fa-solid fa-history text-primary"></i>
+						Historique des Fonctions & Affectations en Succursales
+					</h2>
+					<table class="table table-scrollable table-striped js-datatable">
+						<thead>
+							<tr>
+								<th>Fonction (Poste)</th>
+								<th>Succursale (Branch)</th>
+								<th>Date d'affectation</th>
+								<th>Date de fin (Mutation)</th>
+								<th class="text-right">Opérateur Système</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for history in agent.career_history %}
+								<tr>
+									<td>
+										<strong>{{ history.roleName }}</strong>
+									</td>
+									<td>
+										{{ history.branchName|default('Siège Central (Général)') }}
+									</td>
+									<td>
+										{{ history.assignedAt|date('d/m/Y') }}
+									</td>
+									<td>
+										{# Si revokedAt est renseigné, l'affectation est passée, sinon elle est active #}
+										{% if history.revokedAt %}
+											<span class="text-danger-mode font-bold">{{ history.revokedAt|date('d/m/Y') }}</span>
+										{% else %}
+											<span class="pill-branch-status active">Actuel</span>
+										{% endif %}
+									</td>
+									<td class="text-right text-gray text-size-12">
+										<small>Par :
+											{{ history.assignedBy }}</small>
+										{% if history.revokedBy %}
+											<br><small>Clos par :
+												{{ history.revokedBy }}</small>
+										{% endif %}
+									</td>
+								</tr>
+							{% else %}
+								<tr>
+									<td colspan="5" class="text-center text-gray italic padding-20">
+										Aucun historique d'affectation ou de mutation enregistré pour cet agent.
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			{# COLONNE DROITE : CONSOLE STATUS #}
+			<aside class="sidebar-action-panel">
+				<div class="card sticky-aside-card">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-fingerprint text-primary"></i>
+						Session Utilisateur</h2>
+					<div class="current-status-box mb-15">
+						<span class="label">Activité Courante :</span>
+						<strong class="status-text {{ agent.isOnline ? 'online' : 'offline' }}">
+							{{ agent.isOnline ? 'EN LIGNE' : 'HORS-LIGNE' }}
+						</strong>
+					</div>
+					<hr class="section-divider mb-15">
+					<div class="notice-box-info">
+						<p>
+							<i class="fa-solid fa-circle-info"></i>
+							Ce registre historique est obligatoire pour auditer la responsabilité financière des caisses de chaque guichet.</p>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</div>
+{% endblock %}

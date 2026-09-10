@@ -11,19 +11,33 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class RoleController extends AbstractController
 {
 
+    #[Route('/admin/agency/roles', name: 'admin_agency_role_index')]
+    public function index(): Response
+    {
+        // Simulation du registre des fiches de postes de l'agence [MCD 4]
+        $roles = [
+            ['name' => 'Super Admin Agence', 'code' => 'ROLE_AGENCY_ADMIN', 'description' => 'Gestion totale de la compagnie, des gares et de la flotte.', 'scope' => 'platform', 'isActive' => true],
+            ['name' => 'Guichetier de Nuit', 'code' => 'ROLE_AGENCY_GUICHETIER_DE_NUIT', 'description' => 'Encaissement des billets sur la tranche de nuit.', 'scope' => 'agency', 'isActive' => true],
+            ['name' => 'Percepteur Fret / Colis', 'code' => 'ROLE_AGENCY_PERCEPTEUR_FRET', 'description' => 'Supervision de la soute et pesage messagerie.', 'scope' => 'agency', 'isActive' => false]
+        ];
 
-    #[Route('/admin/agency/job/add', name: 'admin_agency_job_add', methods: ['GET', 'POST'])]
-    #[Route('/admin/agency/job/{code}/edit', name: 'admin_agency_job_edit', methods: ['GET', 'POST'])]
-    public function form(Request $request, ?string $code = null): Response
+        return $this->render('admin/agency/role/index.html.twig', [
+            'page' => 'job title',
+            'roles' => $roles
+        ]);
+    } //index
+
+    #[Route('/admin/agency/role/add', name: 'admin_agency_role_add')]
+    #[Route('/admin/agency/role/{code}/edit', name: 'admin_agency_role_edit')]
+    public function add_and_edit(Request $request, ?string $code = null): Response
     {
         $isEdit = $code !== null;
         $role = null;
 
-        // Ta liste de segments métiers exacte passée au tableau radio
+        // Liste fixe des segments fonctionnels de MyDigitrans
         $modules = [
-            ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fa-gauge', 'value' => 'read', 'description' => 'Vue d\'ensemble des statistiques de vente de la journée.'],
+            ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fa-gauge', 'value' => 'read', 'description' => 'Vue d\'ensemble des statistiques de la journée.'],
             ['key' => 'branches', 'label' => 'Branch (Succursales)', 'icon' => 'fa-folder-tree', 'value' => 'none', 'description' => 'Consulter ou modifier les fiches des succursales.'],
-            ['key' => 'agents', 'label' => 'Agents (Utilisateurs)', 'icon' => 'fa-users', 'value' => 'none', 'description' => 'Gestion des comptes du personnel et des fiches.'],
             ['key' => 'bus', 'label' => 'Bus', 'icon' => 'fa-bus-simple', 'value' => 'read', 'description' => 'Gestion de la flotte automobile et assignations.'],
             ['key' => 'routes', 'label' => 'Trajets (Lignes)', 'icon' => 'fa-route', 'value' => 'read_write', 'description' => 'Configuration des lignes et planification.'],
             ['key' => 'reservations', 'label' => 'Réservations', 'icon' => 'fa-file-circle-check', 'value' => 'read', 'description' => 'Validation des billets passagers.'],
@@ -31,33 +45,28 @@ final class RoleController extends AbstractController
         ];
 
         if ($isEdit) {
-            // Extraction fictive de ton entité Role [MCD 4] pour l'édition
             $role = [
                 'code' => $code,
                 'name' => 'Guichetier de Nuit',
-                'description' => 'En charge des guichets sur la tranche horaire 22h - 6h.'
+                'description' => 'Encaissement des billets sur la tranche de nuit.',
+                'isActive' => true
             ];
         }
 
         if ($request->isMethod('POST')) {
             $name = $request->request->get('name');
-            $submittedPerms = $request->request->all('perms'); // Intercepte la matrice radio
-
-            $this->addFlash(
-                'success',
-                $isEdit
-                    ? sprintf('La fonction "%s" et ses privilèges ont été mis à jour.', $name)
-                    : sprintf('La fonction "%s" a été créée et ajoutée à l\'organigramme.', $name)
-            );
-
-            return $this->redirectToRoute('admin_agency_user_index');
+            $this->addFlash('success', $isEdit ? sprintf('Le poste "%s" a été mis à jour.', $name) : sprintf('Le poste "%s" a été déployé.', $name));
+            return $this->redirectToRoute('admin_agency_role_index');
         }
 
-        return $this->render('admin/agency/job/form.html.twig', [
+        return $this->render('admin/agency/role/form.html.twig', [
+            'page' => 'job title',
             'isEdit' => $isEdit,
             'role' => $role,
             'modules' => $modules
         ]);
-    } //form
+    } //add_and_edit
+
+
 
 }

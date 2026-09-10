@@ -1,13 +1,13 @@
-{# templates/admin/agency/job/form.html.twig #}
+{# templates/admin/agency/role/form.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
 	<div
-		class="admin-agency-job-form-scope container">
-		{# --- HEADER DYNAMIQUE (AJOUT / ÉDITION) --- #}
+		class="admin-agency-role-form-scope container">
+		{# --- HEADER DYNAMIQUE --- #}
 		<header class="header mb-25">
 			<div class="header-main-info">
-				<a href="{{ path('admin_agency_user_index') }}" class="agency-back-action">
+				<a href="{{ path('admin_agency_role_index') }}" class="agency-back-action">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
@@ -15,47 +15,47 @@
 						<span class="text-gray text-size-13">Organigramme</span>
 						<span class="arrow-divider">•</span>
 						<span class="text-gray text-size-13 text-highlight">
-							{{ isEdit ? 'Configuration [MCD 4]' : 'Nouvelle Fonction [MCD 4]' }}
+							{{ isEdit ? 'Habilitations [MCD 4]' : 'Nouveau Poste [MCD 4]' }}
 						</span>
 					</div>
-					<h1 class="mt-5">{{ isEdit ? 'Modifier la Fonction' : 'Créer une Fonction / Poste' }}</h1>
+					<h1 class="mt-5">{{ isEdit ? 'Modifier la Fonction' : 'Créer un Poste / Fonction' }}</h1>
 				</div>
 			</div>
 			<div class="header-actions">
-				<button type="submit" form="job-master-form" class="btn btn-success">
+				<button type="submit" form="role-master-form" class="btn btn-success">
 					<i class="fa-solid fa-floppy-disk"></i>
-					<span>Enregistrer le poste</span>
+					<span>Enregistrer la fonction</span>
 				</button>
 			</div>
 		</header>
 
 		{# --- FORMULAIRE UNIQUE ET ETANCHE --- #}
-		<form id="job-master-form" action="#" method="POST" class="job-form-layout">
+		<form id="role-master-form" action="#" method="POST" class="role-form-layout">
 			<div
-				class="job-container-grid">
+				class="role-container-grid">
 
-				{# COLONNE GAUCHE : INTITULÉ & MATRICE DE PERMISSIONS TEXTUELLE #}
+				{# COLONNE GAUCHE : DÉFINITION ET MATRICE DE BOUTONS RADIOS TEXTUELLE #}
 				<div
 					class="main-form-panel">
 
-					{# SÉGMENT 1 : INTITULÉ DU POSTE #}
+					{# PARAMÈTRES DU POSTE #}
 					<div class="card control-card mb-20">
 						<h2 class="card-title-fix">
-							<i class="fa-solid fa-briefcase text-primary"></i>
-							Définition de la Fonction</h2>
+							<i class="fa-solid fa-id-card-clip text-primary"></i>
+							Définition Commerciale</h2>
 						<div class="direct-pricing-row">
 							<div class="field">
-								<label class="admin-bus-layout-add-label">Intitulé de la fonction / Poste commercial *</label>
-								<input type="text" name="name" class="admin-bus-layout-add-input" value="{{ isEdit ? role.name : '' }}" placeholder="Ex: Guichetier de Nuit, Percepteur Fret, Chauffeur RN1..." required>
+								<label class="admin-bus-layout-add-label">Intitulé du poste pour l'agence *</label>
+								<input type="text" name="name" class="admin-bus-layout-add-input" value="{{ isEdit ? role.name : '' }}" placeholder="Ex: Guichetier de Nuit, Percepteur Fret, Dispatcher..." required>
 							</div>
 							<div class="field">
-								<label class="admin-bus-layout-add-label">Description des responsabilités</label>
-								<input type="text" name="description" class="admin-bus-layout-add-input" value="{{ isEdit ? role.description : '' }}" placeholder="Ex: En charge des ventes de billets sur la tranche horaire 22h - 6h...">
+								<label class="admin-bus-layout-add-label">Description courte des attributions</label>
+								<input type="text" name="description" class="admin-bus-layout-add-input" value="{{ isEdit ? role.description : '' }}" placeholder="Ex: En charge de l'encaissement et de la validation des colis au départ...">
 							</div>
 						</div>
 					</div>
 
-					{# SÉGMENT 2 : TA MATRICE TEXTUELLE DE BOUTONS RADIOS REPRISE #}
+					{# TA MATRICE TEXTUELLE DE BOUTONS RADIOS REPRISE #}
 					<div class="agency-permission-card">
 						<div class="agency-card-topbar">
 							<div>
@@ -107,23 +107,22 @@
 					</div>
 				</div>
 
-				{# COLONNE DROITE : TRAÇABILITÉ MULTI-TENANT #}
+				{# COLONNE DROITE : SÉCURITÉ & AUDIT #}
 				<aside class="sidebar-action-panel">
-					<div class="card sticky-aside-card">
+					<div class="card control-card mb-20">
 						<h2 class="card-title-fix">
-							<i class="fa-solid fa-shield-halved text-gray"></i>
-							Portée du Rôle</h2>
-						<div class="field mb-15">
-							<label class="admin-bus-layout-add-label">Code Technique Auto-généré</label>
-							<input type="text" class="admin-bus-layout-add-input text-disabled" value="{{ isEdit ? role.code : 'ROLE_AGENCY_CUSTOM_...' }}" readonly>
-						</div>
-						<hr class="section-divider my-15">
-						<div class="notice-box-info">
-							<p>
-								<i class="fa-solid fa-circle-info"></i>
-								En créant ce poste, il sera instantanément disponible dans la liste déroulante d'affectation lors de la création d'un compte agent (User).</p>
+							<i class="fa-solid fa-gears text-primary"></i>
+							Statut d'Habilitation</h2>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">État du poste</label>
+							<select name="is_active" class="admin-bus-layout-add-select" required>
+								<option value="1" {% if not isEdit or role.isActive %} selected {% endif %}>Actif (Sélectionnable pour le personnel)</option>
+								<option value="0" {% if isEdit and not role.isActive %} selected {% endif %}>Inactif (Désactivé temporairement)</option>
+							</select>
 						</div>
 					</div>
+
+
 				</aside>
 
 			</div>
