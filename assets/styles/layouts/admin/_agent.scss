@@ -3,7 +3,7 @@
 //=======================================
 //========INDEX
 //=================================
-.admin-agency-agent-index-scope {
+.admin-agency-user-index-scope {
     padding-block: 2.5rem;
 
    
@@ -43,7 +43,7 @@
     }
 
     // --- BARRE DE FILTRES UNIQUE ---
-    .agent-filters-card {
+    .user-filters-card {
         background: $white; padding: 1.25rem; border-radius: $radius-card; border: 1px solid $mute;
         .field-group {
             display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; width: 100%;
@@ -64,7 +64,7 @@
     }
 
     // --- CELLULE DU PROFIL AVATAR ---
-    .agent-profile-cell {
+    .user-profile-cell {
         display: flex; align-items: center; gap: 14px;
         .avatar-circle {
             width: 42px; height: 42px; background: rgba($primary, 0.08); color: $primary; border: 1px solid rgba($primary, 0.15);
@@ -86,7 +86,7 @@
     .contact-stack { display: flex; flex-direction: column; .email-text { font-weight: 600; } .phone-text { color: $gray; } }
 
     // --- TYPES & ROLES RBAC (MCD 3 & 4) ---
-    .agent-type-tag {
+    .user-type-tag {
         font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block;
         &.agency { background: rgba($primary, 0.08); color: $primary; }
         &.partner { background: rgba($danger, 0.1); color: $danger; }
@@ -97,7 +97,7 @@
     }
 
     // --- ACCOUNTS STATUS PILLS ---
-    .pill-agent-account-status {
+    .pill-user-account-status {
         padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; text-transform: uppercase;
         &.active { background: rgba($success, 0.2); color: $success; }
         &.inactive { background: rgba($danger, 0.2); color: $danger; }
@@ -121,15 +121,15 @@
 }
 
 // --- CONFIGURATION SOMBRE (DARK MODE) ---
-.dark .admin-agency-agent-index-scope {
-    .header-refined h1, .card-title-fix, .table td, .agent-profile-cell .meta .full-name, .contact-stack .email-text, .agent-filters-card .field label { color: $white; }
-    .table-responsive-wrapper, .agent-filters-card { background: $dm-bg; border-color: rgba($white,0.1); }
+.dark .admin-agency-user-index-scope {
+    .header-refined h1, .card-title-fix, .table td, .user-profile-cell .meta .full-name, .contact-stack .email-text, .user-filters-card .field label { color: $white; }
+    .table-responsive-wrapper, .user-filters-card { background: $dm-bg; border-color: rgba($white,0.1); }
     .table th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); color: $mute; }
     .table td { border-bottom-color: rgba($white, 0.05); }
     .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); }
-    .agent-profile-cell .avatar-circle { background: rgba($white,0.05); border-color: rgba($white,0.1); color: $white; &.online-pulse::after { border-color: $dm-bg-surface; } }
+    .user-profile-cell .avatar-circle { background: rgba($white,0.05); border-color: rgba($white,0.1); color: $white; &.online-pulse::after { border-color: $dm-bg-surface; } }
     .role-pill-code { background: rgba($dark,0.2); border-color: rgba($white,0.1); color: $mute; }
-    .pill-agent-account-status {
+    .pill-user-account-status {
         &.active { background: rgba($success, 0.2); color: $success; }
         &.inactive { background: rgba($danger, 0.2); color: $danger; }
     }
@@ -138,7 +138,7 @@
 //=======================================
 //========ADD & EDIT FORM
 //=================================
-.admin-agency-agent-form-scope {
+.admin-agency-user-form-scope {
     padding-block: 2rem;
 
     // --- HEADER STANDARD ---
@@ -155,9 +155,9 @@
     }
 
     // --- GRILLE DOUBLE COLONNE EXCLUSIVE ---
-    .agent-form-layout {
+    .user-form-layout {
         width: 100%;
-        .agent-container-grid { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
+        .user-container-grid { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
         .main-form-panel { flex: 1; min-width: 0; width: 100%; }
         .sidebar-action-panel {
             flex: 0 0 320px; width: 320px;
@@ -192,7 +192,7 @@
 }
 
 // --- THÈME DARK MODE ---
-.dark .admin-agency-agent-form-scope {
+.dark .admin-agency-user-form-scope {
     header h1, .card-title-fix, .direct-pricing-row .field label { color: $white; }
     .control-card, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba($white,0.1); }
     .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); &.text-disabled { background: rgba($dark,0.2); } }
@@ -203,7 +203,7 @@
 ///========================================
 /// =====AGENT SHOW =================
 /// =======================================
-.admin-agency-agent-history-scope {
+.admin-agency-user-history-scope {
     padding-block: 2rem;
 
     // --- HEADER ---
@@ -217,7 +217,7 @@
     }
 
     // --- DOUBLE COLONNE GRID ---
-    .agent-history-grid-layout {
+    .user-history-grid-layout {
         display: flex; gap: 1.5rem; align-items: flex-start; width: 100%;
         @media (max-width: 1100px) { flex-direction: column; }
         .main-info-panel { flex: 1; min-width: 0; width: 100%; }
@@ -268,7 +268,7 @@
 }
 
 // --- RENDU THÈME SOMBRE ---
-.dark .admin-agency-agent-history-scope {
+.dark .admin-agency-user-history-scope {
     .header .header-main-info h1, .card-title-fix, .table td, .direct-pricing-row .field label, .sidebar-action-panel .current-status-box .status-text { color: $white; }
     .control-card, .table-responsive-wrapper, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
     .table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
