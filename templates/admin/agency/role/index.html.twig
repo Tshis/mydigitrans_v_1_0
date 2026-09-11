@@ -18,7 +18,7 @@
 					<strong>Postes & Fonctions</strong>
 				</div>
 				<h1>Structure des Postes</h1>
-				<p class="subtitle">Définissez les fonctions de votre personnel et configurez leurs accès granulaires [MCD 4].</p>
+				<p class="subtitle">Définissez les fonctions de votre personnel et configurez leurs accès granulaires.</p>
 			</div>
 			<div class="header-right">
 				<a href="{{ path('admin_agency_role_add') }}" class="btn-refined btn-primary-gradient">
@@ -62,10 +62,6 @@
 										<a href="{{ path('admin_agency_role_edit', {code: role.code}) }}" class="action-link config" title="Modifier l'intitulé et les droits">
 											<i class="fa-solid fa-user-gear"></i>
 										</a>
-									{% else %}
-										<span class="action-link text-disabled" title="Rôle système non modifiable">
-											<i class="fa-solid fa-lock"></i>
-										</span>
 									{% endif %}
 								</div>
 							</td>

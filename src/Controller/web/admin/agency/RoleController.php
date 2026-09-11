@@ -16,7 +16,6 @@ final class RoleController extends AbstractController
     {
         // Simulation du registre des fiches de postes de l'agence [MCD 4]
         $roles = [
-            ['name' => 'Super Admin Agence', 'code' => 'ROLE_AGENCY_ADMIN', 'description' => 'Gestion totale de la compagnie, des gares et de la flotte.', 'scope' => 'platform', 'isActive' => true],
             ['name' => 'Guichetier de Nuit', 'code' => 'ROLE_AGENCY_GUICHETIER_DE_NUIT', 'description' => 'Encaissement des billets sur la tranche de nuit.', 'scope' => 'agency', 'isActive' => true],
             ['name' => 'Percepteur Fret / Colis', 'code' => 'ROLE_AGENCY_PERCEPTEUR_FRET', 'description' => 'Supervision de la soute et pesage messagerie.', 'scope' => 'agency', 'isActive' => false]
         ];
