@@ -7,6 +7,15 @@
     .header-refined {
         display: flex; justify-content: space-between; align-items: flex-end;
         flex-wrap: wrap; gap: 2rem;
+        .header-main-info{
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+             .agency-back-action {
+            background: $white !important; border: 1px solid $mute; width: 3.25rem; height: 3.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: $dark; text-decoration: none; transition: all .3s;
+            &:hover { transform: translateX(-.5rem); background: rgba($primary, 0.04); color: $primary; }
+        }
+        }
         .breadcrumb-mini {
             font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
             i { font-size: 8px; margin-inline: 5px; }
@@ -118,8 +127,8 @@
         display: flex; align-items: flex-start; gap: 12px;
         .module-icon-inline { font-size: 1.2rem; color: $primary; margin-top: 2px; width: 24px; display: inline-block; }
         strong { font-size: 14px; color: $dark; display: block; margin-bottom: 2px; }
-        p { font-size: 12.5px; color: $gray; margin: 0; line-height: 1.4; }
     }
+    p.role-description { font-size: 12.5px; color: $gray; margin: 0; line-height: 1.4; }
     .column-radio-center { text-align: center; width: 130px; .agency-custom-radio { width: 18px; height: 18px; cursor: pointer; accent-color: $success; } }
 
     // --- ENTRÉES ---
