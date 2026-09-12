@@ -1,0 +1,149 @@
+{# templates/admin/agency/report/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-agency-reports-index-scope container">
+		{# --- HEADER DE LA CONSOLE --- #}
+		<header class="header-refined mb-30">
+			<div class="header-left">
+				<div class="breadcrumb-mini">
+					<span>Finance & Audit</span>
+					<i class="fa-solid fa-chevron-right"></i>
+					<strong>Consolidations</strong>
+				</div>
+				<h1>Rapports & Analyses Commerciales</h1>
+				<p class="subtitle">Analyse des flux financiers, statistiques de billetterie et performances du réseau.</p>
+			</div>
+			<div class="header-right">
+				<button type="button" class="btn-refined btn-primary-gradient" onclick="window.print();">
+					<i class="fa-solid fa-print"></i>
+					<span>Imprimer le rapport</span>
+				</button>
+			</div>
+		</header>
+
+		{# --- CARTES DE STATISTIQUES CONSOLIDÉES --- #}
+		<div class="fleet-stats-grid mb-25">
+			<div class="stat-card card-refined total">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-money-bill-trend-up"></i>
+				</div>
+				<div class="info">
+					<h3>{{ total_revenue|number_format(0, ',', ' ') }}
+						<small class="text-size-12">{{ currency }}</small>
+					</h3>
+					<span>Recettes Totales</span>
+				</div>
+			</div>
+			<div class="stat-card card-refined active">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-ticket"></i>
+				</div>
+				<div class="info">
+					<h3>{{ total_tickets }}</h3>
+					<span>Billets Émis</span>
+				</div>
+			</div>
+			<div class="stat-card card-refined alert">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-box-open"></i>
+				</div>
+				<div class="info">
+					<h3>{{ total_cargo_consignments }}</h3>
+					<span>Expéditions Colis</span>
+				</div>
+			</div>
+		</div>
+
+		{# --- FILTRES DE RECHERCHE AVANCÉS --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="#" method="GET" class="field-group">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Période du</label>
+					<input type="date" name="date_from" class="admin-bus-layout-add-input" value="{{ date_from }}">
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Au</label>
+					<input type="date" name="date_to" class="admin-bus-layout-add-input" value="{{ date_to }}">
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Filtrer par Succursale</label>
+					<select name="branch_code" class="admin-bus-layout-add-select">
+						<option value="">-- Toutes les succursales --</option>
+						{% for branch in branches_list %}
+							<option value="{{ branch.code }}" {% if current_branch == branch.code %} selected {% endif %}>{{ branch.name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="field-actions">
+					<button type="submit" class="btn btn-reset">
+						<i class="fa-solid fa-chart-line"></i>
+						Calculer
+					</button>
+				</div>
+			</form>
+		</div>
+
+		{# --- LE TABLEAU STRICT ET CONFORME (TA STRUCTURE TEXTUELLE REPRISE) --- #}
+		<div class="table-responsive-wrapper">
+			<h2 class="card-title-fix text-size-16 py-10">
+				<i class="fa-solid fa-list-check text-primary"></i>
+				Ventilation Financière par Segment et par Succursale
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Date de clôture</th>
+						<th>Succursale / Point d'Émission</th>
+						<th class="text-right">Ventes Billetterie</th>
+						<th class="text-right">Recettes Fret / Colis</th>
+						<th class="text-right">Total Général</th>
+						<th class="text-center">Audit Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for row in report_matrix %}
+						<tr>
+							<td>
+								<strong>{{ row.date|date('d/m/Y') }}</strong>
+							</td>
+							<td>
+								<span class="branch-code-badge-inline">#{{ row.branchCode }}</span>
+								{{ row.branchName }}
+							</td>
+							<td class="text-right font-bold">
+								{{ row.ticketRevenue|number_format(0, ',', ' ') }}
+								<small>{{ row.currency }}</small>
+							</td>
+							<td class="text-right font-bold text-success-mode">
+								{{ row.cargoRevenue|number_format(0, ',', ' ') }}
+								<small>{{ row.currency }}</small>
+							</td>
+							<td class="text-right font-bold text-primary-mode">
+								{{ (row.ticketRevenue + row.cargoRevenue)|number_format(0, ',', ' ') }}
+								<small>{{ row.currency }}</small>
+							</td>
+							<td class="text-center">
+								<span class="pill-report-audit {{ row.auditStatus }}">
+									{{ row.auditStatusLabel }}
+								</span>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="6" class="text-center text-gray italic padding-20">
+								Aucun flux financier enregistré pour les critères sélectionnés.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock %}

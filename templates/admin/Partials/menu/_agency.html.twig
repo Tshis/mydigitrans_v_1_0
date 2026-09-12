@@ -103,7 +103,7 @@
 </a>
 
 {# 5. PILOTAGE #}
-<a href="#" class="menu-link" data-tooltip="Rapports & Statistiques">
+<a href="{{path('admin_agency_report_index')}}" class="menu-link {{ page is same as('report') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
 	<span class="icon">
 		<i class="fa-solid fa-newspaper"></i>
 	</span>

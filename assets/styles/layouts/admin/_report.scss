@@ -1,0 +1,82 @@
+@use '../../abstract/variables' as *;
+
+.admin-agency-reports-index-scope {
+    padding-block: 2.5rem;
+
+    // --- HEADER ---
+    .header-refined {
+        display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap;
+        .header-main-info h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+    }
+
+    // --- GRID DES STATS RAPIDES ---
+    .fleet-stats-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;
+        
+        .stat-card {
+            display: flex; align-items: center; gap: 18px; padding: 20px; background: $white; border: 1px solid $mute; border-radius: $radius-card;
+            .icon-wrap { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+            .info {
+                display: flex; flex-direction: column;
+                h3 { margin: 0; font-size: 1.5rem; font-weight: 900; color: $dark; }
+                span { font-size: 12px; color: $gray; font-weight: 700; text-transform: uppercase; }
+            }
+            &.total .icon-wrap { background: rgba($primary, 0.06); color: $primary; }
+            &.active .icon-wrap { background: rgba($success, 0.06); color: $success; }
+            &.alert .icon-wrap { background: rgba($danger, 0.08); color: $danger; }
+        }
+    }
+
+    // --- ZONE DE FILTRES ---
+    .trip-filters-card {
+        background: $white; padding: 1.25rem; border-radius: $radius-card; border: 1px solid $mute;
+        .field-group {
+            display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; width: 100%;
+            .field {
+                flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px;
+                label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 0; }
+            }
+            .field-actions { display: flex; align-items: flex-end; .btn-reset { height: 40px; padding-inline: 20px; font-weight: 700; } }
+        }
+    }
+
+    // --- TABLEAU DE STRUCTURATION UNIQUE ---
+    .table-responsive-wrapper { background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; }
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    .table {
+        width: 100%; border-collapse: collapse; min-width: 900px;
+        th { background: rgba($gray, 0.04); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
+        td { padding: 14px 15px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; font-size: 13.5px; color: $dark; }
+    }
+
+    .branch-code-badge-inline { font-family: monospace; font-size: 11px; font-weight: 700; color: $primary; background: rgba($primary, 0.05); padding: 1px 5px; border-radius: 4px; }
+    .font-bold { font-weight: 800; }
+    .text-success-mode { color: $success; }
+    .text-primary-mode { color: $primary; }
+
+    // PILLS D'AUDIT COMPTABLE
+    .pill-report-audit {
+        padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; text-transform: uppercase;
+        &.verified { background: $mute; color: $success; }
+        &.pending { background: rgba($primary, 0.2); color: $primary; }
+    }
+
+    .admin-bus-layout-add-input, .admin-bus-layout-add-select { height: 40px; border: 1px solid $mute; border-radius: 8px; padding-inline: 10px; background: white; font-weight: 600; width: 100%; }
+    .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
+}
+
+// --- CONFIGURATION SOMBRE (DARK MODE) ---
+.dark .admin-agency-reports-index-scope {
+    .header-refined h1, .card-title-fix, .table td, .trip-filters-card .field label, .fleet-stats-grid .stat-card .info h3 { color: $white; }
+    .table-responsive-wrapper, .trip-filters-card, .fleet-stats-grid .stat-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .table th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); color: $mute; }
+    .table td { border-bottom-color: rgba($white, 0.05); }
+    .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba(255,255,255,0.1); }
+    .branch-code-badge-inline { background: rgba(255,255,255,0.05); color: $mute; }
+    
+    .pill-report-audit {
+        &.verified { background: rgba($success, 0.2); color: $success; }
+        &.pending { background: rgba($primary, 0.2); color: $primary; }
+    }
+}

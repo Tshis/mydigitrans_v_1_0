@@ -1,0 +1,73 @@
+@use '../../abstract/variables' as *;
+
+.admin-agency-reports-center-scope {
+    padding-block: 2.5rem;
+
+    // --- HEADER ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+    }
+
+    // --- SYSTEME DOUBLE COLONNE ETANCHE ---
+    .reports-center-grid-layout {
+        display: flex; gap: 1.5rem; align-items: flex-start; width: 100%;
+        @media (max-width: 1100px) { flex-direction: column; }
+
+        .main-modules-panel { flex: 1; min-width: 0; width: 100%; }
+        .sidebar-info-panel {
+            flex: 0 0 320px; width: 320px;
+            @media (max-width: 1100px) { flex: 1 1 100%; width: 100%; }
+            .sticky-aside-card { position: sticky; top: 130px; z-index: 10; background: $white; padding: 1.5rem; border: 1px solid $mute; border-radius: $radius-card; border-top: 4px solid $primary; }
+        }
+    }
+
+    // --- CARTES DE SELECTION DES MODULES ---
+    .modules-cards-stack {
+        display: flex; flex-direction: column; gap: 1.25rem;
+    }
+
+    .control-card {
+        padding: 2rem; border-top: 4px solid $primary; background: $white; border-radius: $radius-card; border-left: 1px solid $mute; border-right: 1px solid $mute; border-bottom: 1px solid $mute;
+        &.success-accent { border-top-color: $success; }
+        &.warning-accent { border-top-color: $success; }
+    }
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    .module-card-body {
+        display: flex; gap: 1.5rem;
+        @media (max-width: 600px) { flex-direction: column; gap: 1rem; }
+
+        .module-icon-box {
+            font-size: 2.2rem; width: 50px; display: flex; justify-content: center; align-items: flex-start;
+            &.text-success { color: $success; }
+            &.text-primary { color: $primary; }
+            &.text-warning { color: $success; }
+        }
+
+        .module-meta-info {
+            flex: 1; display: flex; flex-direction: column; gap: 8px;
+            h2 { margin: 0; font-size: 1.35rem; font-weight: 800; color: $dark; }
+            p { margin: 0; font-size: 13px; color: $gray; line-height: 1.5; }
+            .card-action-link-row { margin-top: 10px; .btn-reset { font-weight: 700; font-size: 12.5px; height: 38px; padding-inline: 15px; } }
+        }
+    }
+
+    // --- SIDEBAR ---
+    .status-system-info {
+        .label-info-text { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
+        .monospace-time { font-family: monospace; font-size: 14px; color: $dark; }
+    }
+    .notice-box-info { background: rgba($primary, 0.04); border-radius: 8px; padding: 12px 15px; font-size: 12px; color: darken($primary, 15%); line-height: 1.5; border: 1px solid rgba($primary, 0.1); }
+    .section-divider { border: 0; border-top: 1px dashed $mute; }
+}
+
+// --- THÈME DARK MODE ---
+.dark .admin-agency-reports-center-scope {
+    .header .header-main-info h1, .card-title-fix, .module-card-body .module-meta-info h2, .status-system-info .monospace-time { color: $white; }
+    .control-card, .sidebar-info-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .module-card-body .module-meta-info p { color: $mute; }
+    .status-system-info .label-info-text { color: $gray; }
+    .notice-box-info { background: rgba(0, 0, 0, 0.2); border-color: rgba(255,255,255,0.05); color: $mute; }
+    .section-divider { border-top-color: rgba(255,255,255,0.1); }
+}
