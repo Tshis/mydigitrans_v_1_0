@@ -187,6 +187,8 @@
     }
     .font-bold { font-weight: 800; }
 
+    
+
     .notice-box-info { background: rgba($primary, 0.04); border-radius: 8px; padding: 12px 15px; font-size: 12px; color: darken($primary, 15%); line-height: 1.5; border: 1px solid rgba($primary, 0.1); }
     .section-divider { border: 0; border-top: 1px dashed $mute; }
 }
@@ -280,17 +282,18 @@
         th { background: rgba($gray, 0.03); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
         td { padding: 14px 15px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; font-size: 13px; color: $dark; }
     }
+    
     .monospace { font-family: monospace; }
     .font-bold { font-weight: 800; }
 
     .pill-branch-status {
-        padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; text-transform: uppercase;
+        padding: 4px 10px; border-radius: 6px; font-size: 1rem; font-weight: 800; display: inline-block; text-transform: uppercase;
         &.active { background: rgba($success, 0.2); color: $success; }
     }
 
     // --- INPUTS COMPACTS ---
     .admin-bus-layout-add-input {
-        width: 100%; height: 40px; padding-inline: 12px; border: 1px solid $mute; border-radius: 8px; font-weight: 700; color: $dark; background: $white; box-sizing: border-box;
+        width: 100%; height: 40px; padding-inline: 12px; border: 1px solid $mute; border-radius: 8px; font-weight: 500; color: $dark; background: $white; box-sizing: border-box;font-size:1.25rem;
         &.text-disabled { background: rgba($mute, 0.2); color: $gray; cursor: not-allowed; border-color: rgba($mute, 0.6); align-content: center;}
     }
     .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 0; }
@@ -298,15 +301,26 @@
     // --- SIDEBAR ---
     .sidebar-action-panel {
         .sticky-aside-card { position: sticky; top: 130px; z-index: 10; background: $white; padding: 1.5rem; border: 1px solid $mute; border-radius: $radius-card; border-top: 4px solid $primary; }
-        .current-status-box { .label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; } .status-text { display: block; font-size: 1.5rem; font-weight: 900; margin-top: 4px; &.online { color: $success; } &.offline { color: $gray; } } }
+        .current-status-box { .label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; } 
+            .status-text { 
+                display: block; font-size: 1.5rem; font-weight: 900; margin-top: 4px; 
+                span{
+                    padding: 6px 14px; border-radius: 6px; font-size: 1.2rem; 
+                    font-weight: 800; display: inline-block; text-transform: uppercase;
+                    &.online,&.active {background-color: rgba($success, 0.2); color: $success; } 
+                    &.offline {background-color: rgba($gray, 0.2); color: $gray; } 
+                    &.inactive {background-color: rgba($danger, 0.2); color: $danger; } 
+                }
+            } 
+        }
     }
     .notice-box-info { background: rgba($primary, 0.04); border-radius: 8px; padding: 12px 15px; font-size: 12px; color: darken($primary, 15%); line-height: 1.5; border: 1px solid rgba($primary, 0.1); }
     .section-divider { border: 0; border-top: 1px dashed $mute; }
 }
 
 // --- RENDU THÈME SOMBRE ---
-.dark .admin-agency-user-history-scope {
-    .header .header-main-info h1, .card-title-fix, .table td, .direct-pricing-row .field label, .sidebar-action-panel .current-status-box .status-text { color: $white; }
+.dark .admin-agency-agent-history-scope {
+    .header-refined .header-main-info h1, .card-title-fix, .table td, .direct-pricing-row .field label, .sidebar-action-panel .current-status-box .status-text { color: $white; }
     .control-card, .table-responsive-wrapper, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
     .table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
     .table td { border-bottom-color: rgba(255,255,255,0.05); }

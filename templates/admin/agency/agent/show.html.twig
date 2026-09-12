@@ -15,13 +15,14 @@
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <div class="title">
+                <h1 class="mt-5">
+                    {{ agent.firstname|capitalize }} {{ agent.lastname|capitalize }}
+                </h1>
                 <div class="sub-header-flex">
-                    <span class="text-gray text-size-13">Ressources Humaines</span>
+                    <span class="text-gray text-size-13">Poste actuel</span>
                     <span class="arrow-divider">•</span>
-                    <span class="text-primary text-size-13 text-highlight">Fiche Agent</span>
+                    <span class="text-primary text-size-13 text-highlight">{{agent.role.name|upper}}</span>
                 </div>
-                <h1 class="mt-5">{{ agent.firstname }}
-                    {{ agent.lastname }}</h1>
             </div>
         </div>
     </header>
@@ -52,7 +53,7 @@
 
             {# TA STRUCTURE DE TABLEAU TEXTUELLE POUR L'HISTORIQUE DES MUTATIONS [MCD ] #}
             <div class="table-responsive-wrapper my-20">
-                <h2 class="card-title-fix text-size-16 py-10">
+                <h2 class="card-title-fix text-size-13 py-10">
                     <i class="fa-solid fa-history text-primary"></i>
                     Historique des Fonctions & Affectations en Succursales
                 </h2>
@@ -116,8 +117,31 @@
                 </h2>
                 <div class="current-status-box mb-15">
                     <span class="label">Activité Courante :</span>
-                    <strong class="status-text {{ agent.isOnline ? 'online' : 'offline' }}">
-                        {{ agent.isOnline ? 'EN LIGNE' : 'HORS-LIGNE' }}
+                    <strong class="status-text">
+
+                        <span class="{{ agent.isOnline ? 'online' : 'offline' }}">
+                            <i class="fa-solid fa-globe"></i>
+                            {{ agent.isOnline ? 'EN LIGNE' : 'HORS LIGNE' }}
+                        </span>
+
+                    </strong>
+
+                </div>
+                <div class="current-status-box mb-15">
+                    <span class="label">Status Du Poste :</span>
+                    <strong class="status-text">
+
+                        {% if not agent.role.isActive %}
+                        <span class="inactive">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            Poste Suspendu
+                        </span>
+                        {% else %}
+                        <span class="active">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Poste Actif
+                        </span>
+                        {% endif %}
                     </strong>
                 </div>
                 <hr class="section-divider mb-15">

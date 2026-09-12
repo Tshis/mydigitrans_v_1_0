@@ -2,138 +2,155 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script src="/js/datatable.js" defer></script>
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-user-index-scope container">
-		{# --- HEADER DE LA CONSOLE --- #}
-		<header class="header-refined mb-30">
-			<div class="header-left">
-				<div class="breadcrumb-mini">
-					<span>Administration</span>
-					<i class="fa-solid fa-chevron-right"></i>
-					<strong>Ressources Humaines</strong>
-				</div>
-				<h1>Registre des Utilisateurs</h1>
-				<p class="subtitle">Gestion des comptes agents, affectations aux guichets et habilitations RBAC.</p>
+<div class="admin-agency-user-index-scope container">
+	{# --- HEADER DE LA CONSOLE --- #}
+	<header class="header-refined mb-30">
+		<div class="header-left">
+			<div class="breadcrumb-mini">
+				<span>Administration</span>
+				<i class="fa-solid fa-chevron-right"></i>
+				<strong>Ressources Humaines</strong>
 			</div>
-			<div class="header-right">
-				<a href="{{path('admin_agency_agent_add')}}" class="btn-refined btn-primary-gradient">
-					<i class="fa-solid fa-user-plus"></i>
-					<span>Créer un utilisateur</span>
-				</a>
+			<h1>Registre des Utilisateurs</h1>
+			<p class="subtitle">Gestion des comptes agents, affectations aux guichets et habilitations RBAC.</p>
+		</div>
+		<div class="header-right">
+			<a href="{{path('admin_agency_agent_add')}}" class="btn-refined btn-primary-gradient">
+				<i class="fa-solid fa-user-plus"></i>
+				<span>Créer un utilisateur</span>
+			</a>
+		</div>
+	</header>
+
+	{# --- ZONE DE FILTRES AVANCÉS --- #}
+	<div class="user-filters-card mb-20">
+		<form action="#" method="GET" class="field-group">
+			<div class="field">
+				<label class="admin-bus-layout-add-label">Rechercher un agent</label>
+				<input type="text" name="search" class="admin-bus-layout-add-input"
+					placeholder="Nom, email ou téléphone...">
 			</div>
-		</header>
-
-		{# --- ZONE DE FILTRES AVANCÉS --- #}
-		<div class="user-filters-card mb-20">
-			<form action="#" method="GET" class="field-group">
-				<div class="field">
-					<label class="admin-bus-layout-add-label">Rechercher un agent</label>
-					<input type="text" name="search" class="admin-bus-layout-add-input" placeholder="Nom, email ou téléphone...">
-				</div>
-				<div class="field">
-					<label class="admin-bus-layout-add-label">Succursale / Affectation</label>
-					<select name="branch" class="admin-bus-layout-add-select">
-						<option value="">-- Toutes les succursales --</option>
-						<option value="SUC-KIN-01">Victoire - Rond Point</option>
-						<option value="SUC-MAT-02">Matadi Ville - Port</option>
-					</select>
-				</div>
-				<div class="field">
-					<label class="admin-bus-layout-add-label">État du compte</label>
-					<select name="status" class="admin-bus-layout-add-select">
-						<option value="">-- Tous --</option>
-						<option value="active">Actif</option>
-						<option value="inactive">Bloqué / Suspendu</option>
-					</select>
-				</div>
-				<div class="field-actions">
-					<button type="submit" class="btn-refined btn-success-gradient">
-						<i class="fa-solid fa-filter"></i>
-						Filtrer
-					</button>
-				</div>
-			</form>
-		</div>
-
-		{# --- LE TABLEAU STRICT ET CONFORME (TA STRUCTURE TEXTUELLE REPRISE) --- #}
-		<div class="table-responsive-wrapper">
-			<table class="table table-scrollable table-striped js-datatable">
-				<thead>
-					<tr>
-						<th>Utilisateur</th>
-						<th>Contact & Email</th>
-						<th>Affectation Guichet</th>
-						<th class="text-center">Dernière Connexion</th>
-						<th class="text-center">Status</th>
-						<th class="text-right">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for agent in users %}
-						<tr>
-							<td>
-								<div class="user-profile-cell">
-
-									<div class="meta">
-										<span class="full-name">
-											<strong>{{ agent.firstname }}
-												{{ agent.lastname }}</strong>
-										</span>
-										<span class="online-indicator-text">
-											<i class="fa-solid fa-circle {{ agent.isOnline ? 'text-success' : 'text-muted' }}"></i>
-											{{ agent.isOnline ? 'En ligne' : 'Hors-ligne' }}
-										</span>
-									</div>
-								</div>
-							</td>
-							<td>
-								<div class="contact-stack">
-									<span class="email-text">{{ agent.email }}</span>
-									<small class="phone-text monospace">{{ agent.phone }}</small>
-								</div>
-							</td>
-
-							<td>
-								{% if agent.branchName %}
-									<strong>{{ agent.branchName }}</strong>
-									<br><small class="text-muted">#{{ agent.branchCode }}</small>
-								{% else %}
-									<span class="text-gray italic">Siège Central (Général)</span>
-								{% endif %}
-							</td>
-							<td class="text-center monospace text-size-12">
-								{{ agent.lastLoginAt ? agent.lastLoginAt|date('d/m/Y H:i') : 'Jamais connecté' }}
-							</td>
-							<td class="text-center">
-								<span class="pill-user-account-status {{ agent.isActive ? 'active' : 'inactive' }}">
-									{{ agent.isActive ? 'Actif' : 'Bloqué' }}
-								</span>
-							</td>
-							<td class="text-right">
-								<div class="action-group-refined">
-									<a href="{{path('admin_agency_agent_show',{'code':agent.code})}}" class="action-link config" title="Détails sur l'agent">
-										<i class="fa-solid fa-eye"></i>
-									</a>
-									<a href="{{path('admin_agency_agent_edit',{'code':agent.code})}}" class="action-link config" title="Modifier le compte">
-										<i class="fa-solid fa-user-pen"></i>
-									</a>
-								</div>
-							</td>
-						</tr>
-					{% else %}
-						<tr>
-							<td colspan="7" class="text-center text-gray italic padding-20">
-								Aucun agent utilisateur n'est répertorié pour cette agence.
-							</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
+			<div class="field">
+				<label class="admin-bus-layout-add-label">Succursale / Affectation</label>
+				<select name="branch" class="admin-bus-layout-add-select">
+					<option value="">-- Toutes les succursales --</option>
+					<option value="SUC-KIN-01">Victoire - Rond Point</option>
+					<option value="SUC-MAT-02">Matadi Ville - Port</option>
+				</select>
+			</div>
+			<div class="field">
+				<label class="admin-bus-layout-add-label">État du compte</label>
+				<select name="status" class="admin-bus-layout-add-select">
+					<option value="">-- Tous --</option>
+					<option value="active">Actif</option>
+					<option value="inactive">Bloqué / Suspendu</option>
+				</select>
+			</div>
+			<div class="field-actions">
+				<button type="submit" class="btn-refined btn-success-gradient">
+					<i class="fa-solid fa-filter"></i>
+					Filtrer
+				</button>
+			</div>
+		</form>
 	</div>
+
+	{# --- LE TABLEAU STRICT ET CONFORME (TA STRUCTURE TEXTUELLE REPRISE) --- #}
+	<div class="table-responsive-wrapper">
+		<table class="table table-scrollable table-striped js-datatable">
+			<thead>
+				<tr>
+					<th>Utilisateur</th>
+					<th>Contact & Email</th>
+					<th>Affectation Guichet</th>
+					<th>Status du poste/Fonction</th>
+					<th class="text-center">Dernière Connexion</th>
+					<th class="text-center">Status</th>
+					<th class="text-right">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for agent in users %}
+				<tr>
+					<td>
+						<div class="user-profile-cell">
+
+							<div class="meta">
+								<span class="full-name">
+									<strong>{{ agent.firstname }}
+										{{ agent.lastname }}</strong>
+								</span>
+								<span class="online-indicator-text">
+									<i
+										class="fa-solid fa-circle {{ agent.isOnline ? 'text-success' : 'text-muted' }}"></i>
+									{{ agent.isOnline ? 'En ligne' : 'Hors-ligne' }}
+								</span>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div class="contact-stack">
+							<span class="email-text">{{ agent.email }}</span>
+							<small class="phone-text monospace">{{ agent.phone }}</small>
+						</div>
+					</td>
+
+					<td>
+						{% if agent.branchName %}
+						<strong>{{ agent.branchName }}</strong>
+						<br><small class="text-muted">#{{ agent.branchCode }}</small>
+						{% else %}
+						<span class="text-gray italic">Siège Central (Général)</span>
+						{% endif %}
+					</td>
+					<td>
+						{% if not agent.role.isActive %}
+						<span class="pill-user-account-status inactive">
+							<i class="fa-solid fa-triangle-exclamation"></i>
+							Poste Suspendu
+						</span>
+						{% else %}
+						<span class="pill-user-account-status active">
+							<i class="fa-solid fa-circle-check"></i>
+							Poste Actif
+						</span>
+						{% endif %}
+					</td>
+					<td class="text-center monospace text-size-12">
+						{{ agent.lastLoginAt ? agent.lastLoginAt|date('d/m/Y H:i') : 'Jamais connecté' }}
+					</td>
+					<td class="text-center">
+						<span class="pill-user-account-status {{ agent.isActive ? 'active' : 'inactive' }}">
+							{{ agent.isActive ? 'Actif' : 'Bloqué' }}
+						</span>
+					</td>
+					<td class="text-right">
+						<div class="action-group-refined">
+							<a href="{{path('admin_agency_agent_show',{'code':agent.code})}}" class="action-link config"
+								title="Détails sur l'agent">
+								<i class="fa-solid fa-eye"></i>
+							</a>
+							<a href="{{path('admin_agency_agent_edit',{'code':agent.code})}}" class="action-link config"
+								title="Modifier le compte">
+								<i class="fa-solid fa-user-pen"></i>
+							</a>
+						</div>
+					</td>
+				</tr>
+				{% else %}
+				<tr>
+					<td colspan="7" class="text-center text-gray italic padding-20">
+						Aucun agent utilisateur n'est répertorié pour cette agence.
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
 {% endblock %}

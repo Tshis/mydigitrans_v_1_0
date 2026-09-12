@@ -28,8 +28,10 @@ final class UserController extends AbstractController
                 'branchName' => null, // Administrateur général (Siège)
                 'branchCode' => null,
                 'code' => 'agt-512',
-                'roles' => [
-                    ['code' => 'ROLE_AGENCY_ADMIN', 'description' => 'Gestion totale de l\'agence']
+                'role' => [
+                    'code' => 'ROLE_AGENCY_ADMIN',
+                    'description' => 'Gestion totale de l\'agence',
+                    'isActive' => true
                 ]
             ],
             [
@@ -44,8 +46,10 @@ final class UserController extends AbstractController
                 'branchName' => 'Victoire - Rond Point',
                 'branchCode' => 'SUC-KIN-01',
                 'code' => 'agt-510',
-                'roles' => [
-                    ['code' => 'ROLE_CASHIER', 'description' => 'Vente de billets et encaissement colis']
+                'role' => [
+                    'code' => 'ROLE_CASHIER',
+                    'description' => 'Vente de billets et encaissement colis',
+                    'isActive' => false
                 ]
             ],
             [
@@ -60,8 +64,10 @@ final class UserController extends AbstractController
                 'branchName' => 'Matadi Ville - Port',
                 'branchCode' => 'SUC-MAT-02',
                 'code' => 'agt-513',
-                'roles' => [
-                    ['code' => 'ROLE_CONTROLLER', 'description' => 'Vérification des TripSeats à l\'embarquement']
+                'role' => [
+                    'code' => 'ROLE_CONTROLLER',
+                    'description' => 'Vérification des TripSeats à l\'embarquement',
+                    'isActive' => true
                 ]
             ]
         ];
@@ -148,6 +154,12 @@ final class UserController extends AbstractController
             'code' => $code,
             'phone' => '+243 897 000 000', // Nettoyage du format
             'isOnline' => true,
+            'role' => [
+                'name' => 'Caissier Principal',
+                'code' => 'ROLE_CASHIER',
+                'description' => 'Vente de billets et encaissement colis',
+                'isActive' => true
+            ],
             'career_history' => [
                 // Jointure temporelle issue de la table pivot  
                 [
@@ -174,5 +186,5 @@ final class UserController extends AbstractController
             'page' => 'agent',
             'agent' => $agent
         ]);
-    }
+    } //show
 }
