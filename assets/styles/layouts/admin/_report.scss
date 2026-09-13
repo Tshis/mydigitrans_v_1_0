@@ -138,7 +138,7 @@
         }
         &.btn-full { width: 100%; justify-content: center; }
     }
-    
+
     // --- ZONE DE FILTRES ALIGNÉS PAR LE BAS ---
     .trip-filters-card {
         background: $white; padding: 1.25rem; border-radius: $radius-card; border: 1px solid $mute;
@@ -160,6 +160,18 @@
         width: 100%; border-collapse: collapse; min-width: 900px;
         th { background: rgba($gray, 0.04); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
         td { padding: 14px 15px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; font-size: 13.5px; color: $dark; }
+    }
+
+      // --- ACTIONS ---
+    .action-group-refined {
+        display: flex; gap: 8px; justify-content: flex-end;
+        .action-link {
+            width: 34px; height: 34px; border-radius: 10px; border: 1px solid $mute; background: $white;
+            display: flex;align-items: center;justify-content: center;
+            color: $dark; cursor: pointer; transition: all 0.2s;
+            &:hover { background: $dark; color: $white; border-color: $dark; }
+            &.refund:hover { background: $danger; color: $white; border-color: $danger; }
+        }
     }
 
     .branch-code-badge-inline { font-family: monospace; font-size: 11px; font-weight: 700; color: $primary; background: rgba($primary, 0.05); padding: 1px 5px; border-radius: 4px; }

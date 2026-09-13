@@ -76,6 +76,7 @@
 						<th class="text-right">Recettes Fret / Colis</th>
 						<th class="text-right">Chiffre d'Affaires Brut</th>
 						<th class="text-center">Vérification Audit</th>
+						<th class="text-center">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -104,6 +105,13 @@
 								<span class="pill-report-audit {{ row.auditStatus }}">
 									{{ row.auditStatusLabel }}
 								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									<a href="{{ path('admin_agency_report_financial_show', {date: row.date|date('Y-m-d'), branch_code: row.branchCode}) }}" class="action-link edit" title="Voir le détail de cette journée">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								</div>
 							</td>
 						</tr>
 					{% else %}
