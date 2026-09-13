@@ -1,149 +1,159 @@
-{# templates/admin/agency/report/index.html.twig #}
+{# templates/admin/agency/report/center.html.twig #}
 {% extends "admin/base.html.twig" %}
-
-{% block javascripts %}
-	{{ parent() }}
-	<script src="/js/datatable.js" defer></script>
-{% endblock %}
 
 {% block body %}
 	<div
-		class="admin-agency-reports-index-scope container">
+		class="admin-agency-reports-center-scope container">
 		{# --- HEADER DE LA CONSOLE --- #}
-		<header class="header-refined mb-30">
-			<div class="header-left">
-				<div class="breadcrumb-mini">
-					<span>Finance & Audit</span>
-					<i class="fa-solid fa-chevron-right"></i>
-					<strong>Consolidations</strong>
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Finance & Logistique</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Centre de Rapports</span>
+					</div>
+					<h1 class="mt-5">Générateur de Rapports</h1>
 				</div>
-				<h1>Rapports & Analyses Commerciales</h1>
-				<p class="subtitle">Analyse des flux financiers, statistiques de billetterie et performances du réseau.</p>
-			</div>
-			<div class="header-right">
-				<button type="button" class="btn-refined btn-primary-gradient" onclick="window.print();">
-					<i class="fa-solid fa-print"></i>
-					<span>Imprimer le rapport</span>
-				</button>
 			</div>
 		</header>
 
-		{# --- CARTES DE STATISTIQUES CONSOLIDÉES --- #}
-		<div class="fleet-stats-grid mb-25">
-			<div class="stat-card card-refined total">
-				<div class="icon-wrap">
-					<i class="fa-solid fa-money-bill-trend-up"></i>
-				</div>
-				<div class="info">
-					<h3>{{ total_revenue|number_format(0, ',', ' ') }}
-						<small class="text-size-12">{{ currency }}</small>
-					</h3>
-					<span>Recettes Totales</span>
-				</div>
-			</div>
-			<div class="stat-card card-refined active">
-				<div class="icon-wrap">
-					<i class="fa-solid fa-ticket"></i>
-				</div>
-				<div class="info">
-					<h3>{{ total_tickets }}</h3>
-					<span>Billets Émis</span>
-				</div>
-			</div>
-			<div class="stat-card card-refined alert">
-				<div class="icon-wrap">
-					<i class="fa-solid fa-box-open"></i>
-				</div>
-				<div class="info">
-					<h3>{{ total_cargo_consignments }}</h3>
-					<span>Expéditions Colis</span>
-				</div>
-			</div>
-		</div>
+		{# --- LAYOUT DOUBLE COLONNE --- #}
+		<div
+			class="reports-center-grid-layout">
 
-		{# --- FILTRES DE RECHERCHE AVANCÉS --- #}
-		<div class="trip-filters-card mb-20">
-			<form action="#" method="GET" class="field-group">
-				<div class="field">
-					<label class="admin-bus-layout-add-label">Période du</label>
-					<input type="date" name="date_from" class="admin-bus-layout-add-input" value="{{ date_from }}">
-				</div>
-				<div class="field">
-					<label class="admin-bus-layout-add-label">Au</label>
-					<input type="date" name="date_to" class="admin-bus-layout-add-input" value="{{ date_to }}">
-				</div>
-				<div class="field">
-					<label class="admin-bus-layout-add-label">Filtrer par Succursale</label>
-					<select name="branch_code" class="admin-bus-layout-add-select">
-						<option value="">-- Toutes les succursales --</option>
-						{% for branch in branches_list %}
-							<option value="{{ branch.code }}" {% if current_branch == branch.code %} selected {% endif %}>{{ branch.name }}</option>
-						{% endfor %}
-					</select>
-				</div>
-				<div class="field-actions">
-					<button type="submit" class="btn btn-reset">
-						<i class="fa-solid fa-chart-line"></i>
-						Calculer
-					</button>
-				</div>
-			</form>
-		</div>
+			{# COLONNE GAUCHE : LES MODULES DE RAPPORTS (ENRICHIE) #}
+			<div class="main-modules-panel">
+				<div
+					class="modules-cards-stack">
 
-		{# --- LE TABLEAU STRICT ET CONFORME (TA STRUCTURE TEXTUELLE REPRISE) --- #}
-		<div class="table-responsive-wrapper">
-			<h2 class="card-title-fix text-size-16 py-10">
-				<i class="fa-solid fa-list-check text-primary"></i>
-				Ventilation Financière par Segment et par Succursale
-			</h2>
-			<table class="table table-scrollable table-striped js-datatable">
-				<thead>
-					<tr>
-						<th>Date de clôture</th>
-						<th>Succursale / Point d'Émission</th>
-						<th class="text-right">Ventes Billetterie</th>
-						<th class="text-right">Recettes Fret / Colis</th>
-						<th class="text-right">Total Général</th>
-						<th class="text-center">Audit Status</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for row in report_matrix %}
-						<tr>
-							<td>
-								<strong>{{ row.date|date('d/m/Y') }}</strong>
-							</td>
-							<td>
-								<span class="branch-code-badge-inline">#{{ row.branchCode }}</span>
-								{{ row.branchName }}
-							</td>
-							<td class="text-right font-bold">
-								{{ row.ticketRevenue|number_format(0, ',', ' ') }}
-								<small>{{ row.currency }}</small>
-							</td>
-							<td class="text-right font-bold text-success-mode">
-								{{ row.cargoRevenue|number_format(0, ',', ' ') }}
-								<small>{{ row.currency }}</small>
-							</td>
-							<td class="text-right font-bold text-primary-mode">
-								{{ (row.ticketRevenue + row.cargoRevenue)|number_format(0, ',', ' ') }}
-								<small>{{ row.currency }}</small>
-							</td>
-							<td class="text-center">
-								<span class="pill-report-audit {{ row.auditStatus }}">
-									{{ row.auditStatusLabel }}
-								</span>
-							</td>
-						</tr>
-					{% else %}
-						<tr>
-							<td colspan="6" class="text-center text-gray italic padding-20">
-								Aucun flux financier enregistré pour les critères sélectionnés.
-							</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+					{# CARD 1 : RAPPORT FINANCIER BILLETTERIE #}
+					<div class="card control-card success-accent">
+						<div class="module-card-body">
+							<div class="module-icon-box text-success">
+								<i class="fa-solid fa-circle-dollar-to-slot"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Rapports Financiers & Comptabilité</h2>
+								<p>Analyse consolidée du chiffre d'affaires et ventilation globale des recettes de billetterie passagers par succursale.</p>
+								<div class="card-action-link-row">
+									<a href="{{ path('admin_agency_report_financial_index') }}" class="btn-refined btn-success-gradient">
+										<i class="fa-solid fa-chart-pie"></i>
+										Ouvrir le registre financier
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# CARD 2 : RAPPORT DE CAISSE & AUDIT DES AGENTS (NOUVEAU MANQUE COMBLÉ) #}
+					<div class="card control-card success-accent">
+						<div class="module-card-body">
+							<div class="module-icon-box text-success">
+								<i class="fa-solid fa-user-check"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Audit des Caissiers & États de Caisse</h2>
+								<p>Suivi nominatif de la production de chaque agent au guichet. Idéal pour vérifier les clôtures de caisse manuelles et traquer les écarts de fonds.</p>
+								<div class="card-action-link-row">
+									<a href="{{ path('admin_agency_report_index', {type: 'cashier'}) }}" class="btn-refined btn-success-gradient">
+										<i class="fa-solid fa-users-gear"></i>
+										Auditer les fiches de caisse
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# CARD 3 : RAPPORT FRET & MESSAGERIE COLIS (NOUVEAU MANQUE COMBLÉ) #}
+					<div class="card control-card warning-accent">
+						<div class="module-card-body">
+							<div class="module-icon-box text-warning">
+								<i class="fa-solid fa-box-open"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Rapport Fret & Messagerie Colis</h2>
+								<p>Analyse du chiffre d'affaires généré par la soute. Suivi des colis payés au départ (Kinshasa) et des colis payés à destination (Matadi/Kikwit).</p>
+								<div class="card-action-link-row">
+									<a href="{{ path('admin_agency_report_index', {type: 'cargo'}) }}" class="btn-refined btn-success-gradient">
+										<i class="fa-solid fa-boxes-packing"></i>
+										Analyser les flux marchandises
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# CARD 4 : RAPPORT DE FLOTTE #}
+					<div class="card control-card">
+						<div class="module-card-body">
+							<div class="module-icon-box text-primary">
+								<i class="fa-solid fa-bus-simple"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Analyses de Flotte & Maintenance</h2>
+								<p>Suivi analytique du taux d'occupation des bus, historique condensé des coûts de réparation et calcul de rentabilité par trajet.</p>
+								<div class="card-action-link-row">
+									<a href="#" class="btn-refined btn-primary-gradient">
+										<i class="fa-solid fa-screwdriver-wrench"></i>
+										Analyser l'atelier
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# CARD 5 : RAPPORT DOCUMENTAIRE #}
+					<div class="card control-card warning-accent">
+						<div class="module-card-body">
+							<div class="module-icon-box text-warning">
+								<i class="fa-solid fa-file-shield"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Audit Documentaire & Conformité</h2>
+								<p>Rapport d'échéance des pièces légales obligatoires (Assurances, contrôles techniques). Prévoyez vos budgets de renouvellement.</p>
+								<div class="card-action-link-row">
+									<a href="" class="btn-refined btn-success-gradient">
+										<i class="fa-solid fa-folder-open"></i>
+										Voir le portefeuille
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			{# COLONNE DROITE : CONSOLE DE CONTRÔLE ET RECOMMANDATIONS #}
+			<aside class="sidebar-info-panel">
+				<div class="card sticky-aside-card">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-clock-rotate-left text-primary"></i>
+						Statut du Système
+					</h2>
+
+					<div class="status-system-info mb-20">
+						<span class="label-info-text">Dernière synchronisation des caisses :</span>
+						<div class="monospace-time mt-5">
+							<strong>{{ "now"|date("d/m/Y - H:i") }}</strong>
+						</div>
+					</div>
+
+					<hr class="section-divider mb-20">
+
+					<div class="notice-box-info">
+						<p>
+							<strong>
+								<i class="fa-solid fa-circle-info"></i>
+								Format de sortie :</strong>
+							Tous les rapports de MyDigitrans génèrent des structures tabulaires compatibles avec le
+																																			                        téléchargement immédiat aux formats CSV, Excel et PDF imprimable.
+						</p>
+					</div>
+				</div>
+			</aside>
+
 		</div>
 	</div>
 {% endblock %}
