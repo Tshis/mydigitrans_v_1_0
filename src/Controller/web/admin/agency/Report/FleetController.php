@@ -1,7 +1,6 @@
 <?php
 
-// src/Controller/Admin/Agency/AdvancedReportController.php
-namespace App\Controller\Admin\Agency\Report;
+namespace App\Controller\web\admin\agency\Report;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

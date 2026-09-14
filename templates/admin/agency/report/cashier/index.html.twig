@@ -4,13 +4,14 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/datatable.js" defer></script>
+	<script src="/js/admin/csv_export.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div class="admin-agency-report-cashier-scope container">
+	<div class="admin-agency-report-scope container">
 		<header class="header mb-25">
 			<div class="header-main-info">
-				<a href="{{ path('admin_agency_report_center') }}" class="agency-back-action">
+				<a href="{{ path('admin_agency_report_index') }}" class="agency-back-action">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
@@ -22,18 +23,54 @@
 					<h1 class="mt-5">Situation des Caissiers</h1>
 				</div>
 			</div>
+			<div class="header-actions">
+				<button type="button" class="btn-refined btn-success-gradient" onclick="executeAdvancedExport('Audit Caissiers');">
+					<i class="fa-solid fa-file-excel"></i>
+					<span>Exporter le rapport</span>
+				</button>
+			</div>
 		</header>
 
+		{# --- COMMENCEMENT DE LA ZONE DE FILTRES ALIGNÉS PAR LE BAS --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="#" method="GET" class="field-group">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Période du</label>
+					<input type="date" name="date_from" class="admin-bus-layout-add-input" value="{{ date_from }}">
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Au</label>
+					<input type="date" name="date_to" class="admin-bus-layout-add-input" value="{{ date_to }}">
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Filtrer par caissier</label>
+					<select name="cashier_code" class="admin-bus-layout-add-select">
+						<option value="">-- Tous les Caissiers --</option>
+						{% for cashier in cashier_matrix %}
+							<option value="{{ cashier.code }}" {% if current_cashier==cashier.code %} selected {% endif %}>{{
+						cashier.cashierName }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="field-actions">
+					<button type="submit" class="btn-refined btn-primary-gradient">
+						<i class="fa-solid fa-chart-line"></i>
+						Filtrer les flux
+					</button>
+				</div>
+			</form>
+		</div>
+
 		<div class="table-responsive-wrapper">
-			<table class="table table-scrollable table-striped js-datatable-export">
+			<table class="table table-scrollable table-striped js-datatable js-datatable-export">
 				<thead>
 					<tr>
 						<th>Agent Guichetier</th>
 						<th>Succursale</th>
 						<th class="text-right">Total Billets Émis</th>
-						<th class="text-right">Volume Encaissé (CDF)</th>
-						<th class="text-right">Volume Encaissé (USD)</th>
+						<th class="text-right">Volume Encaissé</th>
 						<th class="text-center">Statut Session</th>
+						<th class="text-center">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -42,16 +79,28 @@
 							<td>
 								<strong>{{ row.cashierName }}</strong>
 							</td>
-							<td>{{ row.branchName }}</td>
+							<td>{{ row.cashierName }}</td>
 							<td class="text-right">{{ row.ticketsCount }}</td>
-							<td class="text-right font-bold text-success-mode">{{ row.total_cdf|number_format(0, ',', ' ') }}
-								FC</td>
-							<td class="text-right font-bold text-primary-mode">{{ row.total_usd|number_format(2, ',', ' ') }}
-								$</td>
+							<td class="text-right font-bold text-success-mode">
+								{% for total in row.total_amount %}
+									<div class="amount-revenue">
+										{{ total.amount|number_format(0, ',', ' ') }}
+										<small>{{ total.currency }}</small>
+									</div>
+								{% endfor %}
+							</td>
+
 							<td class="text-center">
 								<span class="pill-report-audit {{ row.sessionStatus }}">
 									{{ row.sessionStatus == 'closed' ? 'Clôturée & Versée' : 'Ouverte (En cours)' }}
 								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									<a href="{{path('admin_agency_report_cashier_show',{'code':row.cashierCode, 'from':date_from,'to':date_to})}}" class="action-link edit" title="Voir le détail de cette journée">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								</div>
 							</td>
 						</tr>
 					{% endfor %}

@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class FinancialController extends AbstractController
 {
-    #[Route('/admin/agency/reports/financial', name: 'admin_agency_report_financial_index')]
+    #[Route('/admin/agency/report/financial', name: 'admin_agency_report_financial_index')]
     public function index(Request $request): Response
     {
         $dateFrom = $request->query->get('date_from', '2026-08-01');
@@ -88,7 +88,7 @@ final class FinancialController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/reports/financial/{date}/{branch_code}/details', name: 'admin_agency_report_financial_show')]
+    #[Route('/admin/agency/report/financial/{date}/{branch_code}/details', name: 'admin_agency_report_financial_show')]
     public function show(string $date, string $branch_code): Response
     {
         // Simulation des transactions détaillées de la journée sélectionnée
@@ -103,5 +103,5 @@ final class FinancialController extends AbstractController
             'current_branch' => $branch_code,
             'transactions' => $transactions
         ]);
-    }
+    } //show
 }
