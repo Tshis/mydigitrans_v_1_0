@@ -201,7 +201,7 @@
 
     
 
-    .admin-bus-layout-add-input, .admin-bus-layout-add-select { height: 40px; border: 1px solid $mute; border-radius: 8px; padding-inline: 10px; background: white; font-weight: 600; width: 100%; }
+    .admin-bus-layout-add-input, .admin-bus-layout-add-select { height: 40px; border: 1px solid $mute; border-radius: 8px; padding-inline: 10px; background: $white; font-weight: 600; width: 100%;display: flex; align-items: center;}
     .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
 }
 // --- CONFIGURATION SOMBRE (DARK MODE) ---

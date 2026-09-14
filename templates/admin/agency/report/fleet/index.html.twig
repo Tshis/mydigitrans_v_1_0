@@ -7,10 +7,10 @@
 {% endblock %}
 
 {% block body %}
-	<div class="admin-agency-report-fleet-index-scope container">
+	<div class="admin-agency-report-scope container">
 		<header class="header mb-25">
 			<div class="header-main-info">
-				<a href="{{ path('admin_agency_reports_center') }}" class="agency-back-action">
+				<a href="{{ path('admin_agency_report_index') }}" class="agency-back-action">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
@@ -23,6 +23,27 @@
 				</div>
 			</div>
 		</header>
+
+		{# --- COMMENCEMENT DE LA ZONE DE FILTRES ALIGNÉS PAR LE BAS --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="#" method="GET" class="field-group">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Période du</label>
+					<input type="date" name="date_from" class="admin-bus-layout-add-input" value="{{ date_from }}">
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Au</label>
+					<input type="date" name="date_to" class="admin-bus-layout-add-input" value="{{ date_to }}">
+				</div>
+
+				<div class="field-actions">
+					<button type="submit" class="btn-refined btn-primary-gradient">
+						<i class="fa-solid fa-chart-line"></i>
+						Filtrer les flux
+					</button>
+				</div>
+			</form>
+		</div>
 
 		<div class="table-responsive-wrapper">
 			<h2 class="card-title-fix text-size-16 py-10">
