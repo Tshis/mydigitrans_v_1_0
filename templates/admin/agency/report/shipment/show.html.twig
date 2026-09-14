@@ -1,0 +1,73 @@
+{# templates/admin/agency/report/cargo/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div class="admin-agency-report-cargo-show-scope container">
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_report_cargo_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Analyse Messagerie</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Journal de Soute</span>
+					</div>
+					<h1 class="mt-5">Registre des Marchandises : #{{ branch_code }}</h1>
+				</div>
+			</div>
+		</header>
+
+		<div class="table-responsive-wrapper">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Code Colis</th>
+						<th>Expéditeur & Destinataire</th>
+						<th>Nature du Colis</th>
+						<th class="text-right">Poids</th>
+						<th>Type Paiement</th>
+						<th class="text-right">Taxe Perçue</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for colis in items %}
+						<tr>
+							<td class="monospace">
+								<strong>{{ colis.code }}</strong>
+							</td>
+							<td>
+								<div>
+									<small>Exp:</small>
+									{{ colis.sender }}</div>
+								<div>
+									<small>Dest:</small>
+									{{ colis.receiver }}</div>
+							</td>
+							<td>
+								<strong>{{ colis.label }}</strong>
+							</td>
+							<td class="text-right">{{ colis.weight }}
+								Kg</td>
+							<td>
+								<span class="pill-payment-type {{ colis.paymentMethod }}">
+									{{ colis.paymentMethod == 'prepaid' ? 'PAYÉ AU DÉPART' : 'À DESTINATION' }}
+								</span>
+							</td>
+							<td class="text-right font-bold text-primary-mode">
+								{{ colis.price|number_format(0, ',', ' ') }}
+								<small>{{ colis.currency }}</small>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock %}

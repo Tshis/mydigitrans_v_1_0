@@ -4,11 +4,12 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/datatable.js" defer></script>
+	<script src="/js/admin/csv_export.js" defer></script>
 {% endblock %}
 
 {% block body %}
 	<div
-		class="admin-agency-report-financial-show-scope container">
+		class="admin-agency-report-scope container">
 		{# --- HEADER --- #}
 		<header class="header mb-25">
 			<div class="header-main-info">
@@ -26,7 +27,7 @@
 				</div>
 			</div>
 			<div class="header-actions">
-				<button type="button" class="btn-refined btn-primary-gradient">
+				<button type="button" class="btn-refined btn-primary-gradient" onclick="executeAdvancedExport('Audit des ecritures');">
 					<i class="fa-solid fa-file-excel"></i>
 					<span>Exporter le rapport</span>
 				</button>
@@ -39,7 +40,7 @@
 				<i class="fa-solid fa-receipt text-primary"></i>
 				Journal Journalier des Ventes & Opérations de Caisse - #{{ current_branch }}
 			</h2>
-			<table class="table table-scrollable table-striped js-datatable">
+			<table class="table table-scrollable table-striped js-datatable js-datatable-export">
 				<thead>
 					<tr>
 						<th>Heure</th>

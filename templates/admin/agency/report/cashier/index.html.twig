@@ -1,0 +1,62 @@
+{# templates/admin/agency/report/financial/cashier_report.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div class="admin-agency-report-cashier-scope container">
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_report_center') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Audit RH</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">États de Caisse</span>
+					</div>
+					<h1 class="mt-5">Situation des Caissiers</h1>
+				</div>
+			</div>
+		</header>
+
+		<div class="table-responsive-wrapper">
+			<table class="table table-scrollable table-striped js-datatable-export">
+				<thead>
+					<tr>
+						<th>Agent Guichetier</th>
+						<th>Succursale</th>
+						<th class="text-right">Total Billets Émis</th>
+						<th class="text-right">Volume Encaissé (CDF)</th>
+						<th class="text-right">Volume Encaissé (USD)</th>
+						<th class="text-center">Statut Session</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for row in cashier_matrix %}
+						<tr>
+							<td>
+								<strong>{{ row.cashierName }}</strong>
+							</td>
+							<td>{{ row.branchName }}</td>
+							<td class="text-right">{{ row.ticketsCount }}</td>
+							<td class="text-right font-bold text-success-mode">{{ row.total_cdf|number_format(0, ',', ' ') }}
+								FC</td>
+							<td class="text-right font-bold text-primary-mode">{{ row.total_usd|number_format(2, ',', ' ') }}
+								$</td>
+							<td class="text-center">
+								<span class="pill-report-audit {{ row.sessionStatus }}">
+									{{ row.sessionStatus == 'closed' ? 'Clôturée & Versée' : 'Ouverte (En cours)' }}
+								</span>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock %}

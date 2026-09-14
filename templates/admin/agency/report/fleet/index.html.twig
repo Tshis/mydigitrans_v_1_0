@@ -1,0 +1,76 @@
+{# templates/admin/agency/report/fleet/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div class="admin-agency-report-fleet-index-scope container">
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_reports_center') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Logistique Automobile</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Rendement Parc</span>
+					</div>
+					<h1 class="mt-5">Rentabilité & Performance Analytique des Bus</h1>
+				</div>
+			</div>
+		</header>
+
+		<div class="table-responsive-wrapper">
+			<h2 class="card-title-fix text-size-16 py-10">
+				<i class="fa-solid fa-chart-line text-primary"></i>
+				Bilan Financier par Véhicule (Chiffre d'Affaires vs Dépenses Atelier)
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Véhicule</th>
+						<th>Immatriculation</th>
+						<th class="text-right">Recettes Voyage</th>
+						<th class="text-right">Frais Maintenance</th>
+						<th class="text-right">Rendement Net</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for bus in vehicles_matrix %}
+						<tr>
+							<td>
+								<strong>{{ bus.brand }}
+									{{ bus.model }}</strong>
+							</td>
+							<td>
+								<span class="value-badge-plate">{{ bus.plateNumber }}</span>
+							</td>
+							<td class="text-right font-bold">{{ bus.grossRevenue|number_format(0, ',', ' ') }}
+								<small>{{ bus.currency }}</small>
+							</td>
+							<td class="text-right font-bold text-danger-mode">{{ bus.maintenanceCost|number_format(0, ',', ' ') }}
+								<small>{{ bus.currency }}</small>
+							</td>
+							<td class="text-right font-bold {% if (bus.grossRevenue - bus.maintenanceCost) >= 0 %}text-success-mode{% else %}text-danger-mode{% endif %}">
+								{{ (bus.grossRevenue - bus.maintenanceCost)|number_format(0, ',', ' ') }}
+								<small>{{ bus.currency }}</small>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									<a href="{{ path('admin_agency_report_fleet_show', {plate: bus.plateNumber}) }}" class="action-link edit" title="Fiche analytique complète">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock %}

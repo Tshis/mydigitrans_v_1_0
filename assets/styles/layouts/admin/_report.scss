@@ -101,7 +101,7 @@
 //=================================
 //=====FINANCIAL REPORTS INDEX=========
 //==============================
-.admin-agency-report-index-scope {
+.admin-agency-report-scope {
     padding-block: 2.5rem;
 
     // --- HEADER COMPACT ---
@@ -159,7 +159,19 @@
     .table {
         width: 100%; border-collapse: collapse; min-width: 900px;
         th { background: rgba($gray, 0.04); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
-        td { padding: 14px 15px; border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; font-size: 13.5px; color: $dark; }
+        td { 
+            padding: 14px 15px; 
+            border-bottom: 1px solid rgba($mute, 0.5); vertical-align: middle; 
+            font-size: 13.5px; color: $dark; 
+
+             .amount-revenue{
+                padding-block: 1rem;
+                border-top: 1px dashed $gray;
+                &:nth-child(1){
+                    border-top: none;
+                }
+            }
+        }
     }
 
       // --- ACTIONS ---
@@ -189,55 +201,8 @@
     .admin-bus-layout-add-input, .admin-bus-layout-add-select { height: 40px; border: 1px solid $mute; border-radius: 8px; padding-inline: 10px; background: white; font-weight: 600; width: 100%; }
     .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
 }
-
-
-///==================================
-/// FINACIAL REPORT SHOW
-/// =====================
-.admin-agency-report-financial-show-scope{
-    padding-block: 2.5rem;
-
-    // --- HEADER COMPACT ---
-    .header {
-        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
-        .header-main-info {
-            display: flex; align-items: center; gap: 1.2rem;
-            h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
-            .agency-back-action {
-                border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
-                background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; &:hover { transform: scale(1.05); }
-            }
-        }
-    }
-
-      // --- BOUTONS ---
-    .btn-refined {
-        padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; border: none; cursor: pointer;
-        display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;
-        &.btn-success-gradient {
-            background: linear-gradient(135deg, $success 0%, darken($success, 15%) 100%);
-            color: $white; box-shadow: 0 4px 15px rgba($success, 0.3);
-            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($success, 0.4); }
-        }
-        &.btn-primary-gradient {
-            background: linear-gradient(135deg, $primary 0%, darken($primary, 15%) 100%);
-            color: $white; box-shadow: 0 4px 15px rgba($primary, 0.3);
-            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($primary, 0.4); }
-        }
-        &.btn-danger-gradient {
-            background: linear-gradient(135deg, $danger 0%, darken($danger, 15%) 100%);
-            color: $white; box-shadow: 0 4px 15px rgba($danger, 0.3);
-            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($danger, 0.4); }
-        }
-        &.btn-full { width: 100%; justify-content: center; }
-    }
-}
-
-
-
 // --- CONFIGURATION SOMBRE (DARK MODE) ---
-.dark .admin-agency-report-index-scope,
-.dark .admin-agency-report-financial-show-scope {
+.dark .admin-agency-report-scope {
     .header .header-main-info h1, .card-title-fix, .table td, .trip-filters-card .field label { color: $white; }
     .table-responsive-wrapper, .trip-filters-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
     .table th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); color: $mute; }
@@ -250,3 +215,89 @@
         &.pending { background: rgba(#b06000, 0.2); color: #fdd663; }
     }
 }
+
+
+///============================================================
+/// SHIPMENT(CARGO) - FLEET - 
+/// =============================================
+.admin-agency-report-cargo-index-scope, 
+.admin-agency-report-cargo-show-scope, 
+.admin-agency-report-fleet-index-scope, 
+.admin-agency-report-fleet-show-scope {
+    padding-block: 2.5rem;
+
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info {
+            display: flex; align-items: center; gap: 1.2rem;
+            h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+            .agency-back-action {
+                border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+                background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; &:hover { transform: scale(1.05); }
+            }
+        }
+    }
+
+    .trip-filters-card {
+        background: $white; padding: 1.25rem; border-radius: $radius-card; border: 1px solid $mute;
+        .field-group {
+            display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;
+            .field { flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px; label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; } }
+            .field-actions { display: flex; align-items: flex-end; .btn-primary-gradient { height: 40px; font-weight: 700; padding-inline: 20px; } }
+        }
+    }
+
+    .table-responsive-wrapper { background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 1.5rem; }
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    .table {
+        width: 100%; border-collapse: collapse;
+        th { background: rgba($gray, 0.04); font-size: 11px; text-transform: uppercase; color: $gray; padding: 12px 15px; border-bottom: 2px solid $mute; text-align: left; }
+        td { 
+            padding: 14px 15px; 
+            border-bottom: 1px solid rgba($mute, 0.5); 
+            vertical-align: middle; font-size: 13.5px; color: $dark; 
+
+           
+        }
+    }
+
+    .font-bold { font-weight: 800; }
+    .monospace { font-family: monospace; }
+    .text-success-mode { color: $success; }
+    .text-danger-mode { color: $danger; }
+    .text-primary-mode { color: $primary; }
+
+    .value-badge-plate { font-family: 'Monaco', monospace; background: #f8f9fa; border: 2px solid $dark; color: $dark; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 12px; }
+
+    .pill-payment-type {
+        padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800;
+        &.prepaid { background: rgba($primary, 0.06); color: $primary; }
+        &.postpaid { background: rgba($success, 0.06); color: $success; }
+    }
+
+    // Double colonne pour show fleet
+    .reports-center-grid-layout {
+        display: flex; gap: 1.5rem; width: 100%; .main-modules-panel { flex: 1; }
+    }
+    .control-card { padding: 1.5rem; border-top: 4px solid $primary; background: $white; border-radius: $radius-card; }
+    .direct-pricing-row {
+        display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end;
+        .field { flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; } }
+    }
+    .admin-bus-layout-add-input { height: 40px; border: 1px solid $mute; border-radius: 8px; padding-inline: 10px; background: white; font-weight: 600; width: 100%; &.text-disabled { background: #f8f9fa; color: $gray; cursor: not-allowed; } }
+}
+
+// DARK MODE
+.dark {
+    .admin-agency-report-cargo-index-scope, .admin-agency-report-cargo-show-scope, .admin-agency-report-fleet-index-scope, .admin-agency-report-fleet-show-scope {
+        .header .header-main-info h1, .card-title-fix, .table td, .trip-filters-card .field label, .table td strong, .direct-pricing-row .field label { color: $white; }
+        .table-responsive-wrapper, .trip-filters-card, .control-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+        .table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
+        .table td { border-bottom-color: rgba(255,255,255,0.05); }
+        .admin-bus-layout-add-input { background: $dm-bg-main; color: white; border-color: rgba(255,255,255,0.1); &.text-disabled { background: rgba(0,0,0,0.2); } }
+        .value-badge-plate { background: $dm-bg-main; border-color: rgba(255,255,255,0.2); color: white; }
+        .pill-payment-type { &.prepaid { background: rgba($primary, 0.2); color: white; } &.postpaid { background: rgba($success, 0.2); color: white; } }
+    }
+}
+

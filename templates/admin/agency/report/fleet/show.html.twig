@@ -1,0 +1,50 @@
+{# templates/admin/agency/report/fleet/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div class="admin-agency-report-fleet-show-scope container">
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_report_fleet_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Rendement Parc</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Audit Véhicule</span>
+					</div>
+					<h1 class="mt-5">Analyse de Performance :
+						{{ plate_number }}</h1>
+				</div>
+			</div>
+		</header>
+
+		<div class="reports-center-grid-layout">
+			<div class="main-modules-panel">
+				<div class="card control-card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-chart-pie text-primary"></i>
+						Synthèse Logistique Globale</h2>
+					<div class="direct-pricing-row">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Taux d'occupation moyen du bus</label>
+							<div class="admin-bus-layout-add-input text-disabled font-bold">{{ stats.occupancyRate }}
+								%</div>
+						</div>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Nombre de voyages effectués</label>
+							<div class="admin-bus-layout-add-input text-disabled font-bold">{{ stats.totalTrips }}
+								Trajets</div>
+						</div>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Distance parcourue estimée</label>
+							<div class="admin-bus-layout-add-input text-disabled font-bold">{{ stats.kmTraveled|number_format(0, ',', ' ') }}
+								Km</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

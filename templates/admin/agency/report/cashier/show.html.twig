@@ -1,0 +1,99 @@
+{# templates/admin/agency/report/financial/cashier_show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-agency-report-financial-show-scope container">
+		{# --- HEADER --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_report_cashier_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Audit Comptable</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Fiche Agent</span>
+					</div>
+					<h1 class="mt-5">Journal des Sessions :
+						{{ cashier.name }}</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- COMPOSANT STRICT DU TABLEAU REPRISE --- #}
+		<div class="table-responsive-wrapper">
+			<h2 class="card-title-fix text-size-16 py-10">
+				<i class="fa-solid fa-vault text-primary"></i>
+				Historique des Clôtures et Versements de Caisse Multi-Devises
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable-export">
+				<thead>
+					<tr>
+						<th>Session Réf</th>
+						<th>Ouverture / Clôture</th>
+						<th class="text-right">Attendu (Système)</th>
+						<th class="text-right">Encaissé (Réel)</th>
+						<th class="text-right">Écart / Balance</th>
+						<th class="text-center">Statut Coffre</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for session in cashier.sessions %}
+						<tr>
+							<td class="monospace">
+								<strong>#{{ session.id }}</strong>
+							</td>
+							<td>
+								<div>
+									<small>Ouv:</small>
+									{{ session.openedAt|date('d/m/Y H:i') }}</div>
+								<div>
+									<small>Ferm:</small>
+									{{ session.closedAt ? session.closedAt|date('d/m/Y H:i') : 'En cours' }}</div>
+							</td>
+							<!-- Double Devise sur la même cellule ou séparée pour rester conforme -->
+							<td class="text-right">
+								<div class="font-bold">{{ session.expected_cdf|number_format(0, ',', ' ') }}
+									FC</div>
+								<div class="text-primary-mode font-bold">{{ session.expected_usd|number_format(2, ',', ' ') }}
+									$</div>
+							</td>
+							<td class="text-right">
+								<div class="font-bold text-success-mode">{{ session.received_cdf|number_format(0, ',', ' ') }}
+									FC</div>
+								<div class="text-primary-mode font-bold">{{ session.received_usd|number_format(2, ',', ' ') }}
+									$</div>
+							</td>
+							<!-- Calcul dynamique de l'écart -->
+							<td class="text-right">
+								{% set diff_cdf = session.received_cdf - session.expected_cdf %}
+								{% set diff_usd = session.received_usd - session.expected_usd %}
+
+								<div class="font-bold {% if diff_cdf < 0 %}text-danger-mode{% else %}text-success-mode{% endif %}">
+									{{ diff_cdf|number_format(0, ',', ' ') }}
+									FC
+								</div>
+								<div class="font-bold {% if diff_usd < 0 %}text-danger-mode{% else %}text-primary-mode{% endif %}">
+									{{ diff_usd|number_format(2, ',', ' ') }}
+									$
+								</div>
+							</td>
+							<td class="text-center">
+								<span class="pill-report-audit {{ session.status }}">
+									{{ session.statusLabel }}
+								</span>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock %}
