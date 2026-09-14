@@ -99,7 +99,7 @@
 
 
 //=================================
-//=====FINANCIAL REPORTS=========
+//=====FINANCIAL REPORTS INDEX=========
 //==============================
 .admin-agency-report-index-scope {
     padding-block: 2.5rem;
@@ -190,8 +190,54 @@
     .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
 }
 
+
+///==================================
+/// FINACIAL REPORT SHOW
+/// =====================
+.admin-agency-report-financial-show-scope{
+    padding-block: 2.5rem;
+
+    // --- HEADER COMPACT ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info {
+            display: flex; align-items: center; gap: 1.2rem;
+            h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+            .agency-back-action {
+                border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+                background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; &:hover { transform: scale(1.05); }
+            }
+        }
+    }
+
+      // --- BOUTONS ---
+    .btn-refined {
+        padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; border: none; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;
+        &.btn-success-gradient {
+            background: linear-gradient(135deg, $success 0%, darken($success, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($success, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($success, 0.4); }
+        }
+        &.btn-primary-gradient {
+            background: linear-gradient(135deg, $primary 0%, darken($primary, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($primary, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($primary, 0.4); }
+        }
+        &.btn-danger-gradient {
+            background: linear-gradient(135deg, $danger 0%, darken($danger, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($danger, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($danger, 0.4); }
+        }
+        &.btn-full { width: 100%; justify-content: center; }
+    }
+}
+
+
+
 // --- CONFIGURATION SOMBRE (DARK MODE) ---
-.dark .admin-agency-report-index-scope {
+.dark .admin-agency-report-index-scope,
+.dark .admin-agency-report-financial-show-scope {
     .header .header-main-info h1, .card-title-fix, .table td, .trip-filters-card .field label { color: $white; }
     .table-responsive-wrapper, .trip-filters-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
     .table th { background: rgba($white, 0.02); border-bottom-color: rgba($white, 0.1); color: $mute; }
