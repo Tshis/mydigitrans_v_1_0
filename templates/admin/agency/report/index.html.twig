@@ -2,164 +2,164 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-<div class="admin-agency-reports-center-scope container">
-	{# --- HEADER DE LA CONSOLE --- #}
-	<header class="header mb-25">
-		<div class="header-main-info">
-			<div class="title">
-				<div class="sub-header-flex">
-					<span class="text-gray text-size-13">Finance & Logistique</span>
-					<span class="arrow-divider">•</span>
-					<span class="text-primary text-size-13 text-highlight">Centre de Rapports</span>
+	<div
+		class="admin-agency-reports-center-scope container">
+		{# --- HEADER DE LA CONSOLE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Finance & Logistique</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Centre de Rapports</span>
+					</div>
+					<h1 class="mt-5">Générateur de Rapports</h1>
 				</div>
-				<h1 class="mt-5">Générateur de Rapports</h1>
 			</div>
+		</header>
+
+		{# --- LAYOUT DOUBLE COLONNE --- #}
+		<div
+			class="reports-center-grid-layout">
+
+			{# COLONNE GAUCHE : LES MODULES DE RAPPORTS (ENRICHIE) #}
+			<div class="main-modules-panel">
+				<div
+					class="modules-cards-stack">
+
+					{# CARD 1 : RAPPORT FINANCIER BILLETTERIE #}
+					<div class="card control-card success-accent">
+						<div class="module-card-body">
+							<div class="module-icon-box text-success">
+								<i class="fa-solid fa-circle-dollar-to-slot"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Rapports Financiers & Comptabilité</h2>
+								<p>Analyse consolidée du chiffre d'affaires et ventilation globale des recettes de
+																										billetterie passagers par succursale.</p>
+								<div class="card-action-link-row">
+									<a href="{{ path('admin_agency_report_financial_index') }}" class="btn-refined btn-success-gradient">
+										<i class="fa-solid fa-chart-pie"></i>
+										Ouvrir le registre financier
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# CARD 2 : RAPPORT DE CAISSE & AUDIT DES AGENTS (NOUVEAU MANQUE COMBLÉ) #}
+					<div class="card control-card success-accent">
+						<div class="module-card-body">
+							<div class="module-icon-box text-success">
+								<i class="fa-solid fa-user-check"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Audit des Caissiers & États de Caisse</h2>
+								<p>Suivi nominatif de la production de chaque agent au guichet. Idéal pour vérifier les
+																										clôtures de caisse manuelles et traquer les écarts de fonds.</p>
+								<div class="card-action-link-row">
+
+									<a href="{{ path('admin_agency_report_cashier_index') }}" class="btn-refined btn-success-gradient">
+										<i class="fa-solid fa-users-gear"></i>
+										Auditer les fiches de caisse
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# CARD 3 : RAPPORT FRET & MESSAGERIE COLIS (NOUVEAU MANQUE COMBLÉ) #}
+					<div class="card control-card warning-accent">
+						<div class="module-card-body">
+							<div class="module-icon-box text-warning">
+								<i class="fa-solid fa-box-open"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Rapport Fret & Messagerie Colis</h2>
+								<p>Analyse du chiffre d'affaires généré par la soute. Suivi des colis payés au départ
+																										(Kinshasa) et des colis payés à destination (Matadi/Kikwit).</p>
+								<div class="card-action-link-row">
+									<a href="{{ path('admin_agency_report_shipment_index') }}" class="btn-refined btn-success-gradient">
+										<i class="fa-solid fa-boxes-packing"></i>
+										Analyser les flux marchandises
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# CARD 4 : RAPPORT DE FLOTTE #}
+					<div class="card control-card">
+						<div class="module-card-body">
+							<div class="module-icon-box text-primary">
+								<i class="fa-solid fa-bus-simple"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Analyses de Flotte & Maintenance</h2>
+								<p>Suivi analytique du taux d'occupation des bus, historique condensé des coûts de
+																										réparation et calcul de rentabilité par trajet.</p>
+								<div class="card-action-link-row">
+									<a href="#" class="btn-refined btn-primary-gradient">
+										<i class="fa-solid fa-screwdriver-wrench"></i>
+										Analyser l'atelier
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# CARD 5 : RAPPORT DOCUMENTAIRE #}
+					<div class="card control-card warning-accent">
+						<div class="module-card-body">
+							<div class="module-icon-box text-warning">
+								<i class="fa-solid fa-file-shield"></i>
+							</div>
+							<div class="module-meta-info">
+								<h2>Audit Documentaire & Conformité</h2>
+								<p>Rapport d'échéance des pièces légales obligatoires (Assurances, contrôles techniques).
+																										Prévoyez vos budgets de renouvellement.</p>
+								<div class="card-action-link-row">
+									<a href="" class="btn-refined btn-success-gradient">
+										<i class="fa-solid fa-folder-open"></i>
+										Voir le portefeuille
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			{# COLONNE DROITE : CONSOLE DE CONTRÔLE ET RECOMMANDATIONS #}
+			<aside class="sidebar-info-panel">
+				<div class="card sticky-aside-card">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-clock-rotate-left text-primary"></i>
+						Statut du Système
+					</h2>
+
+					<div class="status-system-info mb-20">
+						<span class="label-info-text">Dernière synchronisation des caisses :</span>
+						<div class="monospace-time mt-5">
+							<strong>{{ "now"|date("d/m/Y - H:i") }}</strong>
+						</div>
+					</div>
+
+					<hr class="section-divider mb-20">
+
+					<div class="notice-box-info">
+						<p>
+							<strong>
+								<i class="fa-solid fa-circle-info"></i>
+								Format de sortie :</strong>
+							Tous les rapports de MyDigitrans génèrent des structures tabulaires compatibles avec le
+																				téléchargement immédiat aux formats CSV, Excel et PDF imprimable.
+						</p>
+					</div>
+				</div>
+			</aside>
+
 		</div>
-	</header>
-
-	{# --- LAYOUT DOUBLE COLONNE --- #}
-	<div class="reports-center-grid-layout">
-
-		{# COLONNE GAUCHE : LES MODULES DE RAPPORTS (ENRICHIE) #}
-		<div class="main-modules-panel">
-			<div class="modules-cards-stack">
-
-				{# CARD 1 : RAPPORT FINANCIER BILLETTERIE #}
-				<div class="card control-card success-accent">
-					<div class="module-card-body">
-						<div class="module-icon-box text-success">
-							<i class="fa-solid fa-circle-dollar-to-slot"></i>
-						</div>
-						<div class="module-meta-info">
-							<h2>Rapports Financiers & Comptabilité</h2>
-							<p>Analyse consolidée du chiffre d'affaires et ventilation globale des recettes de
-								billetterie passagers par succursale.</p>
-							<div class="card-action-link-row">
-								<a href="{{ path('admin_agency_report_financial_index') }}"
-									class="btn-refined btn-success-gradient">
-									<i class="fa-solid fa-chart-pie"></i>
-									Ouvrir le registre financier
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{# CARD 2 : RAPPORT DE CAISSE & AUDIT DES AGENTS (NOUVEAU MANQUE COMBLÉ) #}
-				<div class="card control-card success-accent">
-					<div class="module-card-body">
-						<div class="module-icon-box text-success">
-							<i class="fa-solid fa-user-check"></i>
-						</div>
-						<div class="module-meta-info">
-							<h2>Audit des Caissiers & États de Caisse</h2>
-							<p>Suivi nominatif de la production de chaque agent au guichet. Idéal pour vérifier les
-								clôtures de caisse manuelles et traquer les écarts de fonds.</p>
-							<div class="card-action-link-row">
-
-								<a href="{{ path('admin_agency_report_cashier_index') }}"
-									class="btn-refined btn-success-gradient">
-									<i class="fa-solid fa-users-gear"></i>
-									Auditer les fiches de caisse
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{# CARD 3 : RAPPORT FRET & MESSAGERIE COLIS (NOUVEAU MANQUE COMBLÉ) #}
-				<div class="card control-card warning-accent">
-					<div class="module-card-body">
-						<div class="module-icon-box text-warning">
-							<i class="fa-solid fa-box-open"></i>
-						</div>
-						<div class="module-meta-info">
-							<h2>Rapport Fret & Messagerie Colis</h2>
-							<p>Analyse du chiffre d'affaires généré par la soute. Suivi des colis payés au départ
-								(Kinshasa) et des colis payés à destination (Matadi/Kikwit).</p>
-							<div class="card-action-link-row">
-								<a href="{{ path('admin_agency_report_index', {type: 'cargo'}) }}"
-									class="btn-refined btn-success-gradient">
-									<i class="fa-solid fa-boxes-packing"></i>
-									Analyser les flux marchandises
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{# CARD 4 : RAPPORT DE FLOTTE #}
-				<div class="card control-card">
-					<div class="module-card-body">
-						<div class="module-icon-box text-primary">
-							<i class="fa-solid fa-bus-simple"></i>
-						</div>
-						<div class="module-meta-info">
-							<h2>Analyses de Flotte & Maintenance</h2>
-							<p>Suivi analytique du taux d'occupation des bus, historique condensé des coûts de
-								réparation et calcul de rentabilité par trajet.</p>
-							<div class="card-action-link-row">
-								<a href="#" class="btn-refined btn-primary-gradient">
-									<i class="fa-solid fa-screwdriver-wrench"></i>
-									Analyser l'atelier
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{# CARD 5 : RAPPORT DOCUMENTAIRE #}
-				<div class="card control-card warning-accent">
-					<div class="module-card-body">
-						<div class="module-icon-box text-warning">
-							<i class="fa-solid fa-file-shield"></i>
-						</div>
-						<div class="module-meta-info">
-							<h2>Audit Documentaire & Conformité</h2>
-							<p>Rapport d'échéance des pièces légales obligatoires (Assurances, contrôles techniques).
-								Prévoyez vos budgets de renouvellement.</p>
-							<div class="card-action-link-row">
-								<a href="" class="btn-refined btn-success-gradient">
-									<i class="fa-solid fa-folder-open"></i>
-									Voir le portefeuille
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-
-		{# COLONNE DROITE : CONSOLE DE CONTRÔLE ET RECOMMANDATIONS #}
-		<aside class="sidebar-info-panel">
-			<div class="card sticky-aside-card">
-				<h2 class="card-title-fix">
-					<i class="fa-solid fa-clock-rotate-left text-primary"></i>
-					Statut du Système
-				</h2>
-
-				<div class="status-system-info mb-20">
-					<span class="label-info-text">Dernière synchronisation des caisses :</span>
-					<div class="monospace-time mt-5">
-						<strong>{{ "now"|date("d/m/Y - H:i") }}</strong>
-					</div>
-				</div>
-
-				<hr class="section-divider mb-20">
-
-				<div class="notice-box-info">
-					<p>
-						<strong>
-							<i class="fa-solid fa-circle-info"></i>
-							Format de sortie :</strong>
-						Tous les rapports de MyDigitrans génèrent des structures tabulaires compatibles avec le
-						téléchargement immédiat aux formats CSV, Excel et PDF imprimable.
-					</p>
-				</div>
-			</div>
-		</aside>
-
 	</div>
-</div>
 {% endblock %}

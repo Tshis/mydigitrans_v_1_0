@@ -17,6 +17,7 @@ final class ShipmentController extends AbstractController
             ['branchCode' => 'SUC-MAT-02', 'branchName' => 'Matadi Ville', 'totalColis' => 124, 'totalWeight' => 1890, 'prepaidRevenue' => 920000, 'postpaidRevenue' => 140000, 'currency' => 'CDF']
         ];
         return $this->render('admin/agency/report/shipment/index.html.twig', [
+            'page' => 'report',
             'date_from' => '2026-08-01',
             'date_to' => '2026-08-31',
             'shipment_matrix' => $shipmentMatrix
@@ -27,9 +28,25 @@ final class ShipmentController extends AbstractController
     public function Show(string $branch_code): Response
     {
         $items = [
-            ['code' => 'CL-9942', 'sender' => 'Kalonji B.', 'receiver' => 'Mputu A.', 'label' => 'Sac de marchandises', 'weight' => 45, 'paymentMethod' => 'prepaid', 'price' => 25000, 'currency' => 'CDF']
+            [
+                'code' => 'CL-9942',
+                'sender' => 'Kalonji B.',
+                'receiver' => 'Mputu A.',
+                'label' => 'Sac de marchandises',
+                'weight' => 45,
+                'paymentMethod' => 'prepaid',
+                'price' => 25000,
+                'currency' => 'CDF',
+                'createdAt' => '2026-06-06'
+            ]
         ];
-        return $this->render('admin/agency/report/shipment/show.html.twig', ['branch_code' => $branch_code, 'items' => $items]);
+        return $this->render('admin/agency/report/shipment/show.html.twig', [
+            'page' => 'report',
+            'branch_code' => $branch_code,
+            'items' => $items,
+            'date_from' => '2026 - 08 - 31',
+            'date_to' => '2026 - 09 - 14',
+        ]);
     } //show
 
 }

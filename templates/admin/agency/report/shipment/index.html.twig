@@ -7,10 +7,10 @@
 {% endblock %}
 
 {% block body %}
-	<div class="admin-agency-report-cargo-index-scope container">
+	<div class="admin-agency-report-scope container">
 		<header class="header mb-25">
 			<div class="header-main-info">
-				<a href="{{ path('admin_agency_reports_center') }}" class="agency-back-action">
+				<a href="{{ path('admin_agency_report_index') }}" class="agency-back-action">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
@@ -62,7 +62,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{% for row in cargo_matrix %}
+					{% for row in shipment_matrix%}
 						<tr>
 							<td>
 								<strong>{{ row.branchName }}</strong>
@@ -79,7 +79,7 @@
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									<a href="{{ path('admin_agency_report_cargo_show', {branch_code: row.branchCode}) }}" class="action-link edit" title="Voir le registre des colis">
+									<a href="{{ path('admin_agency_report_shipment_show', {branch_code: row.branchCode}) }}" class="action-link edit" title="Voir le registre des colis">
 										<i class="fa-solid fa-eye"></i>
 									</a>
 								</div>
