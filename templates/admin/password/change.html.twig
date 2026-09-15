@@ -1,48 +1,99 @@
+{# templates/admin/agency/user/settings_password.html.twig #}
 {% extends "admin/base.html.twig" %}
 
-
 {% block body %}
+<div class="admin-agency-user-settings-scope container">
+	{# --- HEADER DE LA CONSOLE --- #}
+	<header class="header mb-25">
+		<div class="header-main-info">
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Mon Compte</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-primary text-size-13 text-highlight">Sécurité Accès</span>
+				</div>
+				<h1 class="mt-5">Mettre à jour mon mot de passe</h1>
+			</div>
+		</div>
+	</header>
 
-	<section class="page-header container">
-		<h1>Changer votre mot de passe</h1>
-		<p>Veuillez choisir un nouveau mot de passe sécurisé pour accéder à votre compte.</p>
-	</section>
-	<!--page header-->
+	{# --- LAYOUT DOUBLE COLONNE TOTALEMENT ISOLÉ --- #}
+	<form id="password-update-form" action="#" method="POST" class="settings-form-layout">
+		<div class="settings-container-grid">
 
-	<section class="login-container">
+			{# COLONNE GAUCHE : FORMULAIRE DE MODIFICATION #}
+			<div class="main-form-panel">
+				<div class="card control-card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-lock text-primary"></i>
+						Renouvellement des Identifiants
+					</h2>
 
-		<div class="login-card">
+					{# Rangée 1 : Mot de passe actuel #}
+					<div class="direct-pricing-row mb-20">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Mot de passe actuel *</label>
+							<input type="password" name="current_password" class="admin-bus-layout-add-input"
+								placeholder="Saisissez votre mot de passe actuel" required>
+						</div>
+					</div>
 
-			<form method="post">
+					{# Rangée 2 : Nouveau mot de passe + Confirmation #}
+					<div class="direct-pricing-row">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Nouveau mot de passe *</label>
+							<input type="password" name="new_password" class="admin-bus-layout-add-input"
+								placeholder="Minimum 8 caractères" required>
+						</div>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Confirmer le nouveau mot de passe *</label>
+							<input type="password" name="confirm_password" class="admin-bus-layout-add-input"
+								placeholder="Répétez le nouveau mot de passe" required>
+						</div>
+					</div>
 
-
-				<div class="field mb-25">
-					<div class="form-group">
-						<label>Ancien mot de passe</label>
-						<input type="password" placeholder="••••••••" required>
+					<div class="justify-button-right my-20">
+						<button type="submit" form="password-update-form" class="btn btn-success btn-full">
+							<i class="fa-solid fa-key"></i>
+							Enregistrer le mot de passe
+						</button>
 					</div>
 				</div>
-				<div class="field mb-25">
-					<div class="form-group">
-						<label>Nouveau mot de passe</label>
-						<input type="password" placeholder="••••••••" required>
+
+
+			</div>
+
+			{# COLONNE DROITE : BARRE LATERALE CONTRÔLE DE SÉCURITÉ #}
+			<aside class="sidebar-action-panel">
+				<div class="card sticky-aside-card">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-shield-halved text-primary"></i>
+						Exigences Système
+					</h2>
+
+					<div class="notice-box-info mb-15">
+						<p>
+							<strong>
+								<i class="fa-solid fa-circle-check"></i>
+								Complexité requise :</strong>
+							Votre nouveau mot de passe doit comporter au moins 8 caractères, incluant des chiffres et
+							des lettres.
+						</p>
+					</div>
+
+					<div class="notice-box-info">
+						<p>
+							<strong>
+								<i class="fa-solid fa-bolt"></i>
+								Effet Immédiat :</strong>
+							Une fois modifié, votre session restera active mais toute nouvelle reconnexion sur un autre
+							appareil exigera le nouveau jeton d'accès.
+						</p>
 					</div>
 				</div>
-
-				<div class="field mb-25">
-					<div class="form-group">
-						<label>Confirmer</label>
-						<input type="password" placeholder="••••••••" required>
-					</div>
-				</div>
-
-
-				<button class="btn btn-primary btn-full">Valider</button>
-
-			</form>
+			</aside>
 
 		</div>
-
-	</section>
-
+	</form>
+</div>
 {% endblock %}
