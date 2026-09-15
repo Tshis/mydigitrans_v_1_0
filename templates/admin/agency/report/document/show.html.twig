@@ -1,0 +1,110 @@
+{# templates/admin/agency/report/document/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+<script src="/js/admin/csv_export.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-agency-report-scope container">
+    {# --- HEADER DE LA CONSOLE --- #}
+    <header class="header mb-25">
+        <div class="header-main-info">
+            <a href="{{ path('admin_agency_report_document_index') }}" class="agency-back-action">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Registre Automobile</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">Traçabilité Pièce</span>
+                </div>
+                <h1 class="mt-5">Historique Document :
+                    {{ document.type }}</h1>
+            </div>
+        </div>
+    </header>
+
+    {# --- BLOC NOUVEAU : VÉHICULE ASSOCIE (CONFORME À TES CHANTS ALIGNÉS) --- #}
+    <div class="card control-card mb-20">
+        <h2 class="card-title-fix">
+            <i class="fa-solid fa-bus text-primary"></i>
+            Véhicule Flotte Associé
+        </h2>
+        <div class="direct-pricing-row">
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Marque & Modèle du bus</label>
+                <div class="admin-bus-layout-add-input text-disabled font-bold">
+                    {{ document.busBrand }}
+                    {{ document.busModel }}
+                </div>
+            </div>
+            <div class="field">
+                <label class="admin-bus-layout-add-label">Numéro de Plaque d'immatriculation *</label>
+                <div class="mt-5">
+                    <span class="value-badge-plate">{{ document.busPlate }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# --- TABLEAU D'AUDIT REPRISE TEXTUELLE --- #}
+    <div class="table-responsive-wrapper">
+        <h2 class="card-title-fix text-size-16 py-10">
+            <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+            Journal d'Audit et Mises à Jour Métadonnées
+        </h2>
+        <table class="table table-scrollable table-striped js-datatable js-datatable-export">
+            <thead>
+                <tr>
+                    <th>Date de Création</th>
+                    <th>Agent Opérateur</th>
+                    <th>Référence Saisie</th>
+                    <th>Validité Validée</th>
+                    <th class="text-center">Statut Légal</th>
+                    <th>Scan Archivé</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>{{ document.createdAt|date('d/m/Y H:i') }}</strong>
+                    </td>
+                    <td>
+                        <i class="fa-solid fa-user-shield text-gray"></i>
+                        {{ document.createdBy }}
+                    </td>
+                    <td class="monospace font-bold">{{ document.referenceNumber|default('Non renseigné') }}</td>
+                    <td>Du
+                        {{ document.issuedAt|date('d/m/Y') }}
+                        au
+                        {{ document.expiredAt|date('d/m/Y') }}</td>
+                    <td class="text-center">
+                        <span
+                            class="pill-report-audit {% if document.status == 'valid' %}opened{% else %}closed{% endif %}">
+                            {{ document.status|upper }}
+                        </span>
+                    </td>
+                    <td class="text-right">
+                        {% if document.url %}
+
+                        <div class="action-group-refined">
+                            <a href="{{ document.url }}" target="_blank" class="action-link edit"
+                                title="Ouvrir le fichier">
+                                <i class="fa-solid fa-up-right-from-square"></i>
+                            </a>
+                        </div>
+                    </td>
+                    {% else %}
+                    <span class="text-gray italic">Aucune copie jointe</span>
+                    {% endif %}
+                </tr>
+            </tbody>
+            </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>{% endblock %}
