@@ -1,0 +1,175 @@
+{# templates/admin/agency/dashboard/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div class="admin-agency-dashboard-scope container">
+    {# --- HEADER DE LA CONSOLE OPERATIONNELLE --- #}
+    <header class="header mb-25">
+        <div class="header-main-info">
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Exploitation</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">
+                        {{ isCentral ? 'Console Générale (Siège Central)' : 'Console Locale : ' ~ current_branch_name }}
+                    </span>
+                </div>
+                <h1 class="mt-5">Tableau de bord Temps Réel</h1>
+            </div>
+        </div>
+    </header>
+
+    {# --- BARRE DE FILTRES : ACCESSIBLE UNIQUEMENT POUR LE CENTRAL --- #}
+    {% if isCentral %}
+    <div class="trip-filters-card mb-25">
+        <form action="#" method="GET" class="field-group">
+            <div class="direct-pricing-row">
+                <div class="field">
+                    <label class="admin-bus-layout-add-label">Observer une succursale</label>
+                    <select name="branch_code" class="admin-bus-layout-add-select">
+                        <option value="">-- Flux Globaux du Réseau --</option>
+                        {% for branch in branches_list %}
+                        <option value="{{ branch.code }}" {% if selected_branch==branch.code %} selected {% endif %}>{{
+                            branch.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field-actions">
+                    <button type="submit" class="btn-refined btn-primary-gradient">
+                        <i class="fa-solid fa-sync"></i>
+                        Synchroniser la vue
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {# --- STATS CARDS DU PRESENT (TIROIR-CAISSE & FLUX DU JOUR) --- #}
+    <div class="fleet-stats-grid mb-25">
+
+        <div class="stat-card card-refined total">
+            <div class="icon-wrap">
+                <i class="fa-solid fa-vault"></i>
+            </div>
+            <div class="info">
+                {% for rev in stats.revenue %}
+                <div class="amount-revenue">
+                    <h3>{{ rev.amount|number_format(0, ',', ' ') }}
+                        <small class="text-size-11 text-weight-600 text-primary">{{rev.currency|upper}}</small>
+                    </h3>
+                </div>
+                {% endfor %}
+
+                <span>Espèces en Coffre</span>
+            </div>
+        </div>
+
+        <div class="stat-card card-refined active">
+            <div class="icon-wrap">
+                <i class="fa-solid fa-bus"></i>
+            </div>
+            <div class="info">
+                <h3>{{ stats.active_trips }}</h3>
+                <span>Départs du Jour</span>
+            </div>
+        </div>
+
+        <div class="stat-card card-refined alert">
+            <div class="icon-wrap">
+                <i class="fa-solid fa-users-viewfinder"></i>
+            </div>
+            <div class="info">
+                <h3>{{ stats.booked_seats }}
+                    /
+                    {{ stats.total_seats }}</h3>
+                <span>Places Réservées</span>
+            </div>
+        </div>
+    </div>
+
+    {# --- LAYOUT DOUBLE COLONNE DU DASHBOARD --- #}
+    <div class="dashboard-grid-layout">
+
+        {# COLONNE GAUCHE : FLUX PRIORITAIRES (PROCHAINS DEPARTS À CHRONOMÉTRER) #}
+        <div class="main-dashboard-panel">
+            <div class="table-responsive-wrapper">
+                <h2 class="card-title-fix text-size-16 py-10">
+                    <i class="fa-solid fa-plane-departure text-primary"></i>
+                    Prochains Départs imminents (RN1 / Itinéraires)
+                </h2>
+                <table class="table table-scrollable table-striped">
+                    <thead>
+                        <tr>
+                            <th>Heure</th>
+                            <th>Bus / Véhicule</th>
+                            <th>Ligne / Itinéraire</th>
+                            <th class="text-center">Remplissage</th>
+                            <th class="text-right">Statut Embarquement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trip in upcoming_trips %}
+                        <tr>
+                            <td class="monospace font-bold">{{ trip.time }}</td>
+                            <td>
+                                <strong>{{ trip.bus }}</strong>
+                                <br><small class="value-badge-plate">{{ trip.plate }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ trip.route }}</strong>
+                            </td>
+                            <td class="text-center">
+                                <div class="font-bold">{{ trip.seats_taken }}
+                                    /
+                                    {{ trip.capacity }}</div>
+                            </td>
+                            <td>
+                                <span class="pill-dashboard-status {{ trip.status }}">
+                                    {{ trip.statusLabel }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# COLONNE DROITE : ALERTES CRITIQUES DE L'AGENCE #}
+        <aside class="sidebar-dashboard-panel">
+            {# ALERTE MAINTENANCE (LIEE À TON ATELIER CENTRAL) #}
+            <div class="card control-card mb-20 error-accent">
+                <h2 class="card-title-fix">
+                    <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                    Alertes Atelier Central
+                </h2>
+                <div class="notice-box-danger-dashboard">
+                    <p>
+                        <strong>{{ stats.broken_buses }}
+                            Véhicule(s) immobilisé(s)</strong>
+                        actuellement au statut
+                        <strong class="text-danger-mode">broken</strong>. Planification de voyages bloquée pour ces bus.
+                    </p>
+                </div>
+            </div>
+
+            {# ALERTE CONFORMITÉ #}
+            <div class="card control-card warning-accent">
+                <h2 class="card-title-fix">
+                    <i class="fa-solid fa-file-shield text-warning"></i>
+                    Alertes Conformité
+                </h2>
+                <div class="notice-box-warning-dashboard">
+                    <p>
+                        <strong>{{ stats.expired_docs }}
+                            Document(s) légal(aux)</strong>
+                        expiré(s) ou en attente urgente de renouvellement.
+                    </p>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+</div>
+{% endblock %}

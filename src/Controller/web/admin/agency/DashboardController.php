@@ -4,108 +4,69 @@ namespace App\Controller\web\admin\agency;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
-use Symfony\UX\Chartjs\Model\Chart;
 
 final class DashboardController extends AbstractController
 {
 
     #[Route('/admin/agency/dashboard', name: 'admin_agency_dashboard')]
-    public function index()
-    {
-        $user = "superd";
-        $route = "";
-
-        if ($user == "super") {
-            return $this->redirectToRoute('admin_agency_main_dashboard');
-        } else {
-            return $this->redirectToRoute('admin_agency_branch_dashboard', ['slug' => 'agence-de-limete']);
-        }
-    } //index
-
-    #[Route('/admin/agency/main/dashboard', name: 'admin_agency_main_dashboard')]
-    public function main(ChartBuilderInterface $chartBuilder): Response
+    public function index(Request $request): Response
     {
 
+        // 1. Simulation de l'utilisateur connecté via ton entité 3. User
+        // Modifie 'userBranch' à 'SUC-KIN-01' pour simuler la vue restrictive d'un guichetier !
+        $currentUser = [
+            'firstname' => 'Daniel',
+            'lastname' => 'Lukonu',
+            'userBranch' => null, // null = Siège Central / Général
+            'agencyId' => 1
+        ];
 
-        // --- 📊 GRAPH 1 : REVENUS (Barres - 7 derniers jours) ---
-        $revenueChart = $chartBuilder->createChart(Chart::TYPE_BAR);
-        $revenueChart->setData([
-            'labels' => ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-            'datasets' => [
+        $isCentral = $currentUser['userBranch'] === null;
+        $selectedBranch = $request->query->get('branch_code', '');
+
+        // Liste des succursales (uniquement pour le select du Central)
+        $branchesList = [
+            ['code' => 'SUC-KIN-01', 'name' => 'Victoire - Rond Point'],
+            ['code' => 'SUC-MAT-02', 'name' => 'Matadi Ville - Port']
+        ];
+
+        // 2. Hydratation dynamique des statistiques temps réel du tiroir-caisse
+        $stats = [
+            'revenue' => [
                 [
-                    'label' => 'Ventes Globale (FC)',
-                    'backgroundColor' => '#2563eb',
-                    'borderRadius' => 5,
-                    'data' => [1200000, 1900000, 1500000, 2500000, 2200000, 3000000, 2800000],
+                    'amount' => $isCentral ? 4850000 : 2160000,
+                    'currency' => 'CDF'
                 ],
-            ],
-        ]);
-        $revenueChart->setOptions([
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-            'plugins' => ['legend' => ['display' => false]],
-        ]);
-
-        // --- 🥧 GRAPH 2 : RÉPARTITION SUCCURSALES (Doughnut) ---
-        $branchChart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
-        $branchChart->setData([
-            'labels' => ['Kinshasa', 'Matadi', 'Boma', 'Muanda'],
-            'datasets' => [
                 [
-                    'backgroundColor' => ['#2563eb', '#10b981', '#f59e0b', '#6366f1'],
-                    'data' => [45, 30, 15, 10],
-                ],
-            ],
-        ]);
-        $branchChart->setOptions([
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-            'cutout' => '70%',
-            'plugins' => ['legend' => ['position' => 'bottom']],
-        ]);
-
-        // --- 📋 RENDU VUE AVEC LES KPI STATIQUES ---
-        return $this->render('admin/agency/dashboard/main.html.twig', [
-            'page' => 'dashboard',
-            'revenueChart' => $revenueChart,
-            'branchChart' => $branchChart,
-            // Données du bandeau KPI
-            'kpi' => [
-                'ca_global' => '15.100.000',
-                'ca_global_usd' => '6.000',
-                'croissance' => '+12.4',
-                'championne_nom' => 'Kinshasa',
-                'championne_ca' => '6.795.000',
-                'championne_ca_usd' => '2.800',
-                'transactions' => '1.420',
-            ],
-        ]);
-    } //main
-
-    #[Route('/admin/agency/branch/{slug}/dashboard', name: 'admin_agency_branch_dashboard')]
-    public function branch(ChartBuilderInterface $chartBuilder): Response
-    {
-        $chart = $chartBuilder->createChart(Chart::TYPE_BAR);
-        $chart->setData([
-            'labels' => ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-            'datasets' => [
-                [
-                    'label' => 'Recettes Hebdo (FC)',
-                    'borderColor' => '#1473bc', // Ta couleur $success
-                    'backgroundColor' => 'rgb(52, 119, 207)',
-                    'data' => [1800000, 2200000, 2800000, 1900000, 2400000, 3100000, 1500000],
-                    'tension' => 0.4
+                    'amount' => $isCentral ? 1420.00 : 340.00,
+                    'currency' => 'USD'
                 ]
-            ]
-        ]);
 
-        return $this->render('admin/agency/dashboard/branch.html.twig', [
+            ],
+            'active_trips' => $isCentral ? 12 : 4,
+            'booked_seats' => $isCentral ? 245 : 88,
+            'total_seats' => $isCentral ? 360 : 120,
+            'broken_buses' => $isCentral ? 2 : 1, // Lié au statut 'broken' de ton atelier
+            'expired_docs' => $isCentral ? 4 : 0  // Lié à l'entité BusDocuments
+        ];
+
+        // 3. Journal des départs imminents (RN1 / Itinéraires)
+        $upcomingTrips = [
+            ['time' => '14:30', 'bus' => 'Toyota Coaster', 'plate' => 'A-5678-DE', 'route' => 'Kinshasa ➔ Matadi', 'seats_taken' => 28, 'capacity' => 30, 'status' => 'loading', 'statusLabel' => 'En Embarquement'],
+            ['time' => '15:00', 'bus' => 'Mercedes Sprinter', 'plate' => 'A-1234-BC', 'route' => 'Kinshasa ➔ Kikwit', 'seats_taken' => 15, 'capacity' => 15, 'status' => 'ready', 'statusLabel' => 'Prêt au départ']
+        ];
+
+        return $this->render('admin/agency/dashboard/index.html.twig', [
             'page' => 'dashboard',
-            'chart' => $chart
+            'isCentral' => $isCentral,
+            'current_branch_name' => $isCentral ? 'Siège Central' : 'Victoire - Rond Point',
+            'selected_branch' => $selectedBranch,
+            'branches_list' => $branchesList,
+            'stats' => $stats,
+            'upcoming_trips' => $upcomingTrips
         ]);
-    } //branch
-
+    } //index
 }
