@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btnGenerateBuilder.addEventListener('click', generateBuilderGrid);
     }
 
+   
+
     function generateBuilderGrid() {
         if (!builderGrid) return;
         const rows = parseInt(scope.querySelector('#builder-rows').value) || 10;
@@ -84,15 +86,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.setAttribute('data-row', r);
                 cell.setAttribute('data-col', seatColIndex);
 
-                // Au départ, les allées par défaut (allée centrale) n'envoient rien
-                // Seules les modifications utilisateur généreront des inputs
                 cell.innerHTML = `<span class="-number"></span>`;
 
+                // CORRECTION ICI : Lecture dynamique depuis les attributs gravés sur la cellule cliquée
                 cell.addEventListener('click', () => {
                     activeCell = cell;
-                    labelR.textContent = r;
-                    labelC.textContent = seatColIndex;
-                    dropdownCellType.value = cell.getAttribute('data-type');
+                    labelR.textContent = cell.getAttribute('data-row');
+                    labelC.textContent = cell.getAttribute('data-col');
+                    
+                    // Sécurité : On va chercher la valeur de l'input type masqué s'il existe, sinon le type brut
+                    const inputType = cell.querySelector('input[name="specialPositionType[]"]');
+                    dropdownCellType.value = inputType ? inputType.value : cell.getAttribute('data-type');
+                    
                     cellCustomizerPanel.style.display = 'block';
                 });
 
@@ -106,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reindexAndRenderIcons();
         serializeAislesToForm();
     }
+
 
     if (btnApplyCell) {
         btnApplyCell.addEventListener('click', () => {
