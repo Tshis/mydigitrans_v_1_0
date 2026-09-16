@@ -48,3 +48,25 @@
     display: flex;
     justify-content: center;
 }//button-center
+
+// --- BOUTONS ---
+.btn-refined {
+    padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; border: none; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;
+    &.btn-success-gradient {
+        background: linear-gradient(135deg, $success 0%, darken($success, 15%) 100%);
+        color: $white; box-shadow: 0 4px 15px rgba($success, 0.3);
+        &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($success, 0.4); }
+    }
+    &.btn-primary-gradient {
+        background: linear-gradient(135deg, $primary 0%, darken($primary, 15%) 100%);
+        color: $white; box-shadow: 0 4px 15px rgba($primary, 0.3);
+        &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($primary, 0.4); }
+    }
+    &.btn-danger-gradient {
+        background: linear-gradient(135deg, $danger 0%, darken($danger, 15%) 100%);
+        color: $white; box-shadow: 0 4px 15px rgba($danger, 0.3);
+        &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($danger, 0.4); }
+    }
+    &.btn-full { width: 100%; justify-content: center; }
+}

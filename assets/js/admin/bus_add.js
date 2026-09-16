@@ -34,13 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btnToggleCustom.addEventListener('click', () => {
             if (customColumn.style.display === 'none') {
                 customColumn.style.display = 'block';
-                btnToggleCustom.innerHTML = '<i class="fa-solid fa-angle-left"></i> Utiliser standards';
+                btnToggleCustom.innerHTML = '<i class="fa-solid fa-angle-left"></i> Modèle standards';
                 generateBuilderGrid();
                 busLayoutSelector.setAttribute('disabled','disabled');
             } else {
                 busLayoutSelector.removeAttribute('disabled','disabled');
                 customColumn.style.display = 'none';
-                btnToggleCustom.innerHTML = '<i class="fa-solid fa-plus"></i> Sur-mesure';
+                btnToggleCustom.innerHTML = '<i class="fa-solid fa-plus"></i> Modèle sur mesure';
                 builderGrid.innerHTML = '';
             }
         });

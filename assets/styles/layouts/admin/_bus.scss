@@ -133,24 +133,68 @@
 
    // --- HEADER REFINÉ ---
     .header-refined {
-        display: flex; justify-content: space-between; align-items: flex-end;
-        flex-wrap: wrap; gap: 2rem;
-        .breadcrumb-mini {
-            font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
-            i { font-size: 8px; margin-inline: 5px; }
-            strong { color: $primary; }
+        .header-main-info{
+
+            display: flex; align-items: flex-end;
+            flex-wrap: wrap; gap: 1rem;
+            .breadcrumb-mini {
+                font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
+                i { font-size: 8px; margin-inline: 5px; }
+                strong { color: $primary; }
+            }
+            h1 { font-size: 2rem; font-weight: 900; color: $dark; margin: 0; }
+            .subtitle { color: $gray; font-size: 14px; margin-top: 5px; }
+            .agency-back-action {
+                    border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+                    background: $white; color: $dark; text-decoration: none; border: 1px solid $mute; &:hover { transform: scale(1.05); }
+                }
         }
-        h1 { font-size: 2rem; font-weight: 900; color: $dark; margin: 0; }
-        .subtitle { color: $gray; font-size: 14px; margin-top: 5px; }
+    }
+
+    // --- BOUTONS ---
+    .btn-refined {
+        padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; border: none; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;
+        &.btn-success-gradient {
+            background: linear-gradient(135deg, $success 0%, darken($success, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($success, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($success, 0.4); }
+        }
+        &.btn-primary-gradient {
+            background: linear-gradient(135deg, $primary 0%, darken($primary, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($primary, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($primary, 0.4); }
+        }
+        &.btn-danger-gradient {
+            background: linear-gradient(135deg, $danger 0%, darken($danger, 15%) 100%);
+            color: $white; box-shadow: 0 4px 15px rgba($danger, 0.3);
+            &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($danger, 0.4); }
+        }
+        &.btn-full { width: 100%; justify-content: center; }
     }
 
     .agency-bus-setup-layout {
-        display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem; align-items: start;
-        @media (max-width: 1100px) { grid-template-columns: 1fr; }
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+        gap: 2rem; 
+        align-items: start;
+        justify-content: center;
+        margin: auto;
+       // @media (max-width: 1100px) { grid-template-columns: 1fr; }
     }
 
     .agency-bus-add-card, .agency-bus-setup-card-builder {
         background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 24px;
+    }
+
+    .agency-bus-setup-card-builder{
+        text-align: center;
+        .agency-setup-card-subtitle{
+            text-align: center;
+            color: $gray;
+            margin-block: 8px;
+            font-size: 12px;
+        }
     }
 
     .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
@@ -165,7 +209,7 @@
     // --- CARROSSERIE INTERACTIVE DU SEATMAP ---
     .seatmap-card {
         background: rgba($gray, 0.03); border: 2px solid $mute; border-radius: 20px; padding: 25px; margin-top: 20px; position: relative;
-        .bus-head { background: $dark; color: white; text-align: center; padding: 6px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; }
+        .bus-head { background: $dark; color: $white; text-align: center; padding: 6px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; }
     }
 
     .seatmap-matrix {
@@ -177,24 +221,60 @@
             
             &[data-type="aisle"] { background: transparent; border: 2px dashed rgba($mute, 0.5); cursor: default; &:hover { border-color: rgba($mute, 0.5); transform: none; } }
             &[data-type="driver"] { background: rgba($primary, 0.05); color: $primary; border-color: $primary; }
-            &[data-type="wc"] { background: #f1f3f5; color: $gray; }
-            &[data-type="vip"] { border-color: #d97706; color: #d97706; background: rgba(#d97706, 0.03); }
+            &[data-type="wc"] { background:rgba($color: $mute, $alpha: .20); color: $gray; }
+            &[data-type="vip"] { border-color: $primary; color: $primary; background: rgba($primary, 0.03); }
         }
     }
 
-    .agency-cell-customizer-panel { background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 8px; margin-bottom: 15px; label, h4 { color: $dark; } }
-    .agency-builder-dimensions-bar { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; .dimension-field { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; input { width: 70px; height: 35px; text-align: center; border: 1px solid $mute; border-radius: 6px; } } }
-    .agency-bus-profile-btn { height: 40px; padding-inline: 15px; border-radius: 6px; font-weight: 700; font-size: 12px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; &--save { background: $success; color: white; } &--cancel { background: #f1f3f5; color: $dark; } }
+    .agency-cell-customizer-panel { 
+        background: rgba($color: $primary, $alpha: .40); 
+        border: 1px solid $primary; 
+        padding: 15px; border-radius: 8px;
+        margin-bottom: 15px; label, h4 { color: $dark; } 
+        text-align: justify;
+
+        .customizer-field{
+            margin-block:2rem;
+        }
+    }
+    .agency-builder-dimensions-bar { 
+
+        display: flex; gap: 10px; align-items: flex-end; 
+        margin-block: 2.5rem; justify-content: center;
+        .dimension-field { display: flex; 
+            flex-direction: column; gap: 4px; 
+            font-size: 11px; font-weight: 700; input 
+            { width: 70px; height: 35px; 
+                text-align: center; border: 1px solid $mute; border-radius: 6px; 
+            } 
+        } 
+
+       
+    }
+
+    .agency-bus-profile-btn { 
+        height: 40px; padding-inline: 15px; border-radius: 6px; font-weight: 700; 
+        font-size: 12px; border: none; cursor: pointer; display: inline-flex; 
+        align-items: center; gap: 6px; &--save { background: $success; color: $white; } 
+        &--cancel { background: $mute; color: $dark; } 
+    }
 }
 
 // --- DARK MODE ---
-.dark .agency-bus-add-container {
+.dark .admin-agency-bus-add-container {
+    .header-refined h1, .header h1, .card-title-fix, .direct-pricing-row .field label, .table td, .agency-permission-card .agency-card-topbar .agency-card-heading, .agency-feature-description strong, .responsive-permission-table .agency-permission-table td { color: $white; }
     .agency-bus-add-title, .agency-setup-card-title, .seatmap-matrix .cell-unit strong { color: $white; }
-    .agency-bus-add-card, .agency-bus-setup-card-builder { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
-    .agency-bus-add-form-input, .agency-bus-add-form-select, .agency-builder-dimensions-bar .dimension-field input { background: $dm-bg-main; color: white; border-color: rgba(255,255,255,0.1); }
-    .seatmap-card { background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.1); }
-    .seatmap-matrix .cell-unit { background: $dm-bg-main; border-color: rgba(255,255,255,0.1); color: white; &[data-type="aisle"] { background: transparent; } }
-    .agency-cell-customizer-panel { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); h4, label { color: white; } }
+    .agency-bus-add-card, 
+    .agency-bus-setup-card-builder { 
+        background: $dm-bg; 
+        border-color: rgba($white,0.1); 
+        color: $white;
+    }
+    .agency-bus-add-form-input, .agency-bus-add-form-select, .agency-builder-dimensions-bar .dimension-field input { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); }
+    .seatmap-card { background: rgba($dark,0.15); border-color: rgba($white,0.1); }
+    .seatmap-matrix .cell-unit { background: $dm-bg-main; border-color: rgba($white,0.1); color: $white; &[data-type="aisle"] { background: transparent; } }
+    .agency-cell-customizer-panel { background: rgba($dark,0.3); border-color: rgba($white,0.1); h4, label { color: $white; } }
+   
 }
 // === Fin Bus Add ===
 
@@ -313,10 +393,11 @@
         }
 
         .agency-bus-profile-subtitle {
-            margin: 4px 0 0 0;
-            font-size: 0.95rem;
+            
             color: $gray;
             font-weight: 500;
+            font-size: 12px;
+            margin-block: 8px;
 
             .dark & {
                 color: $mute;
@@ -368,7 +449,7 @@
         border: 1px solid $mute;
         border-radius: $radius-card;
         padding: 24px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.01);
+        box-shadow: 0 2px 5px rgba($dark,0.01);
         margin-bottom: 1.5rem;
 
         .dark & {
@@ -511,17 +592,17 @@
         &--danger-full {
             width: 100%;
             justify-content: center;
-            background-color: #c0392b; // Rouge profond d'avertissement
+            background-color: $danger; // Rouge profond d'avertissement
             color: $white;
-            &:hover { background-color: darken(#c0392b, 8%); }
+            &:hover { background-color: darken($danger, 8%); }
         }
 
         &--danger-half {
             flex: 1;
             justify-content: center;
-            background-color: #2c3e50; // Couleur sombre pour acter la fermeture
+            background-color: $dark; // Couleur sombre pour acter la fermeture
             color: $white;
-            &:hover { background-color: #1a252f; }
+            &:hover { background-color: $dark; }
         }
     }
 
@@ -733,13 +814,13 @@
         width: 100%; height: 40px; padding-inline: 12px; border: 1px solid $mute; border-radius: 8px;
         font-weight: 700; color: $dark; background: $white; box-sizing: border-box; transition: all 0.2s;
         &:focus { border-color: $primary; outline: none; }
-        &.text-disabled { background: #f8f9fa; color: $gray; cursor: not-allowed; }
+        &.text-disabled { background: $white; color: $gray; cursor: not-allowed; }
     }
 
     .admin-bus-layout-add-input-file {
         width: 100%; font-size: 13px; font-weight: 600; color: $gray;
         &::-webkit-file-upload-button {
-            background: $dark; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-right: 10px;
+            background: $dark; color: $white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-right: 10px;
         }
     }
 
@@ -750,10 +831,10 @@
 // --- DARK MODE CONFIGURATION ---
 .dark .admin-agency-fleet-document-add-scope {
     .header h1, .card-title-fix, .direct-pricing-row .field label { color: $white; }
-    .header .agency-back-action { background: $dm-bg-surface; color: $white; border-color: rgba(255,255,255,0.1); }
-    .document-form-layout .sidebar-action-panel .sticky-aside-card, .control-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
-    .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba(255,255,255,0.1); &[readonly] { background: rgba(0,0,0,0.2); color: $gray; } }
-    .notice-box-info { background: rgba(0, 0, 0, 0.2); color: $mute; border-color: rgba(255,255,255,0.05); }
+    .header .agency-back-action { background: $dm-bg; color: $white; border-color: rgba($white,0.1); }
+    .document-form-layout .sidebar-action-panel .sticky-aside-card, .control-card { background: $dm-bg; border-color: rgba($white,0.1); }
+    .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); &[readonly] { background: rgba($dark,0.2); color: $gray; } }
+    .notice-box-info { background: rgba($dark, 0.2); color: $mute; border-color: rgba($white,0.05); }
 }
 
 
