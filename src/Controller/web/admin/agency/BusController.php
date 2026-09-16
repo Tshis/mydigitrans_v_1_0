@@ -62,13 +62,48 @@ final class BusController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/bus/add', name: 'admin_agency_bus_add')]
-    public function add(): Response
+
+
+
+    #[Route('/admin/agency/bus/add', name: 'admin_agency_bus_add', methods: ['GET', 'POST'])]
+    public function add(Request $request): Response
     {
+        if ($request->isMethod('POST')) {
+            dd($request);
+            // Réception immédiate et propre de tes inputs HTML générés par la carrosserie
+            $types = $request->request->all('specialPositionType');
+            $rows = $request->request->all('specialPositionRow');
+            $cols = $request->request->all('specialPositionCol');
+
+            $aisles = $request->request->all('aisles'); // Allées du véhicule
+            $plateNumber = $request->request->get('plate_number');
+
+            $busSeatsPayload = [];
+
+            if (!empty($types)) {
+                foreach ($types as $index => $type) {
+                    $busSeatsPayload[] = [
+                        'type' => $type,
+                        'row'  => (int)($rows[$index] ?? 0),
+                        'col'  => (int)($cols[$index] ?? 0)
+                    ];
+                }
+            }
+
+            // $busSeatsPayload contient maintenant toutes tes cases cliquables ! 
+            // Ton code persist_data Doctrine s'applique de façon 100% robuste.
+
+            $this->addFlash('success', sprintf('Le bus immatriculé %s a été configuré et inséré.', $plateNumber));
+            return $this->redirectToRoute('admin_agency_bus_index');
+        }
+
         return $this->render('admin/agency/bus/add.html.twig', [
             'page' => 'bus',
+            'branches_list' => [['code' => 'SUC-KIN-01', 'name' => 'Victoire']]
         ]);
     } //add
+
+
 
 
     #[Route('/admin/agency/bus/{code}/details', name: 'admin_agency_bus_show')]

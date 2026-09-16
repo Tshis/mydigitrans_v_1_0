@@ -127,479 +127,75 @@
 
 
 // ================= PAGE D'AJOUT / CREATION BUS =================
-.agency-bus-add-container {
-    padding: 2.5rem;
-    font-family: system-ui, -apple-system, sans-serif;
-    box-sizing: border-box;
+.admin-agency-bus-add-container {
 
-    * {
-        box-sizing: border-box;
+    padding-block: 2.5rem;
+
+   // --- HEADER REFINÉ ---
+    .header-refined {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        flex-wrap: wrap; gap: 2rem;
+        .breadcrumb-mini {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
+            i { font-size: 8px; margin-inline: 5px; }
+            strong { color: $primary; }
+        }
+        h1 { font-size: 2rem; font-weight: 900; color: $dark; margin: 0; }
+        .subtitle { color: $gray; font-size: 14px; margin-top: 5px; }
     }
 
-    // --- EN-TÊTE DE LA PAGE ---
-    .agency-bus-add-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2.5rem;
-
-        .agency-profile-block {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-        }
-
-        .agency-back-action {
-            color: $gray;
-            font-size: 1.5rem;
-            text-decoration: none;
-            transition: color 0.2s;
-
-            &:hover { color: $success; }
-
-            .dark & {
-                color: $mute;
-                &:hover { color: lighten($success, 25%); }
-            }
-        }
-
-        .agency-bus-add-title {
-            font-size: 2rem;
-            margin: 0;
-            font-weight: 700;
-            color: $dark;
-
-            .dark & { color: lighten($success, 25%); }
-        }
-
-        .agency-bus-add-subtitle {
-            margin: 4px 0 0 0;
-            font-size: 0.95rem;
-            color: $gray;
-
-            .dark & { color: $mute; }
-        }
-    }
-
-    // --- COULOIR D'AFFICHAGE HYBRIDE ---
     .agency-bus-setup-layout {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        align-items: start;
-        max-width: 700px;
-        margin: 0 auto;
-        transition: all 0.3s ease-in-out;
-
-        &:has(#custom-layout-builder-column[style*="display: block"]) {
-            grid-template-columns: 1fr 1.2fr;
-            max-width: 100%;
-        }
-
-        @media (max-width: 992px) {
-            grid-template-columns: 1fr !important;
-            max-width: 700px !important;
-        }
+        display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem; align-items: start;
+        @media (max-width: 1100px) { grid-template-columns: 1fr; }
     }
 
-    // --- CARTES ET CONTENEURS STRUCTURAUX ---
-    .agency-bus-add-card, 
-    .agency-bus-setup-card-builder {
-        background: $white;
-        border: 1px solid $mute;
-        border-radius: $radius-card;
-        padding: 24px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.01);
-
-        .dark & {
-            background: $dm-bg !important;
-            border-color: $mute !important;
-        }
+    .agency-bus-add-card, .agency-bus-setup-card-builder {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 24px;
     }
 
-    .agency-bus-setup-card-builder {
-        border-color: $success;
-
-        .agency-setup-card-title {
-            margin: 0 0 4px 0;
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: $dark;
-
-            .dark & { color: lighten($success, 20%) !important; }
-        }
-
-        .agency-setup-card-subtitle {
-            margin: 0 0 20px 0;
-            font-size: 0.85rem;
-            color: $gray;
-
-            .dark & { color: $mute; }
-        }
+    .field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .agency-bus-add-form-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 8px; display: block; }
+    
+    .agency-bus-add-form-input, .agency-bus-add-form-select {
+        width: 100%; height: 40px; padding-inline: 12px; border: 1px solid $mute; border-radius: 8px; font-weight: 700; color: $dark; background: $white;
     }
 
-    // --- ELEMENTS DE FORMULAIRE ---
-    .agency-bus-add-form-layout {
-        display: flex;
-        flex-direction: column;
-    }
+    .agency-setup-select-action-zone { display: flex; gap: 10px; align-items: center; }
 
-    .field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .mb-20 {
-        margin-bottom: 20px;
-    }
-
-    .field-group {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.2rem;
-
-        @media (max-width: 576px) {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .agency-bus-add-form-label {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: $dark;
-        text-transform: uppercase;
-
-        .dark & { color: lighten($success, 20%) !important; }
-    }
-
-    .agency-bus-add-form-input, 
-    .agency-bus-add-form-select {
-        padding: 11px 14px;
-        border: 1px solid $mute;
-        border-radius: $radius-input;
-        background: $white;
-        color: $dark;
-        font-size: 0.95rem;
-        outline: none;
-        width: 100%;
-
-        &:focus { border-color: $success; }
-
-        .dark & {
-            background: darken($dm-bg, 4%);
-            border-color: rgba($mute, 0.2);
-            color: $mute;
-        }
-    }
-
-    .agency-setup-select-action-zone {
-        display: flex;
-        gap: 10px;
-        select { flex: 1; }
-    }
-
-    .agency-bus-help-text {
-        color: $gray;
-        font-size: 0.85rem;
-        margin-top: 4px;
-        display: block;
-
-        .dark & { color: rgba($mute, 0.6) !important; }
-    }
-
-    .agency-bus-add-action-zone, 
-    .agency-bus-profile-form-action-zone {
-        text-align: right;
-        padding-top: 15px;
-        border-top: 1px solid rgba($mute, 0.15);
-        margin-top: 10px;
-    }
-
-    // --- PANNEAU CONTEXTUEL POPOVER ---
-    .agency-cell-customizer-panel {
-        background: rgba($success, 0.03);
-        border: 1px solid rgba($success, 0.2);
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 20px;
-
-        .dark & {
-            background: rgba($white, 0.02);
-            border-color: rgba($mute, 0.2);
-        }
-
-        .customizer-title {
-            margin: 0 0 12px 0;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: $dark;
-
-            .dark & { color: lighten($success, 20%); }
-        }
-
-        .customizer-row {
-            display: grid;
-            grid-template-columns: 1fr; // Fixé à 1fr suite au retrait du champ libellé
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .customizer-field {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            label {
-                font-size: 0.8rem;
-                font-weight: 700;
-                color: $gray;
-                text-transform: uppercase;
-            }
-        }
-
-        .customizer-actions {
-            text-align: right;
-            button {
-                padding: 8px 16px;
-                font-size: 0.85rem;
-            }
-        }
-    }
-
-    // --- CONFIGURATEUR DIMENSIONS ---
-    .agency-builder-dimensions-bar {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        justify-content: center;
-        background: rgba($gray, 0.03);
-        padding: 12px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-
-        .dark & { background: rgba($white, 0.02); }
-
-        .dimension-field {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: $gray;
-
-            .dark & { color: $mute; }
-
-            input {
-                width: 70px;
-                padding: 6px;
-                border: 1px solid $mute;
-                border-radius: 4px;
-                text-align: center;
-
-                .dark & {
-                    background: darken($dm-bg, 4%);
-                    color: $white;
-                    border-color: rgba($mute, 0.2);
-                }
-            }
-        }
-    }
-
-    // --- SEATMAP CARD (ARCHITECTURE MATRICE) ---
+    // --- CARROSSERIE INTERACTIVE DU SEATMAP ---
     .seatmap-card {
-        width: max-content;
-        background: $white;
-        padding-inline: 2rem;
-        padding-bottom: 2rem;
-        padding-top: .5px;
-        margin: auto;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
+        background: rgba($gray, 0.03); border: 2px solid $mute; border-radius: 20px; padding: 25px; margin-top: 20px; position: relative;
+        .bus-head { background: $dark; color: white; text-align: center; padding: 6px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; }
+    }
 
-        .dark & { background-color: $dm-bg; }
-
-        .bus-head {
-            color: $success;
-            font-weight: 700;
-            background: $mute;
-            padding: 1rem;
-            width: 100%;
-            margin: 2rem auto;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            text-align: center;
+    .seatmap-matrix {
+        display: grid; grid-template-columns: repeat(var(--grid-cols, 4), 1fr); gap: 12px; justify-items: center;
+        
+        .cell-unit {
+            width: 44px; height: 44px; background: $white; border: 2px solid $mute; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: $dark; cursor: pointer; transition: all 0.2s;
+            &:hover { border-color: $success; transform: scale(1.05); }
+            
+            &[data-type="aisle"] { background: transparent; border: 2px dashed rgba($mute, 0.5); cursor: default; &:hover { border-color: rgba($mute, 0.5); transform: none; } }
+            &[data-type="driver"] { background: rgba($primary, 0.05); color: $primary; border-color: $primary; }
+            &[data-type="wc"] { background: #f1f3f5; color: $gray; }
+            &[data-type="vip"] { border-color: #d97706; color: #d97706; background: rgba(#d97706, 0.03); }
         }
+    }
 
-        // --- MATRICE STRICTE EN 40PX ---
-        .seatmap-matrix {
-            display: grid;
-            grid-template-columns: repeat(var(--grid-cols), 40px);
-            gap: 8px;
-            justify-content: center;
-            align-content: center;
-            padding: 10px;
+    .agency-cell-customizer-panel { background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 8px; margin-bottom: 15px; label, h4 { color: $dark; } }
+    .agency-builder-dimensions-bar { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; .dimension-field { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; input { width: 70px; height: 35px; text-align: center; border: 1px solid $mute; border-radius: 6px; } } }
+    .agency-bus-profile-btn { height: 40px; padding-inline: 15px; border-radius: 6px; font-weight: 700; font-size: 12px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; &--save { background: $success; color: white; } &--cancel { background: #f1f3f5; color: $dark; } }
+}
 
-            // Styles communs enfants
-            i { font-size: 1rem; }
-
-            .seat-radio {
-                display: none;
-
-                &:checked + label {
-                    outline: 3px solid $success;
-                    background: $success;
-                    color: $white;
-                    transform: scale(1.08);
-                    z-index: 2;
-                }
-
-                &:disabled + label {
-                    background: #9ca3af;
-                    cursor: not-allowed;
-                    opacity: 0.5;
-                }
-            }
-
-            // Cellule générique
-            .cell-unit {
-                width: 40px;
-                height: 40px;
-                border-radius: 6px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.8rem;
-                font-weight: 700;
-                border: 1px solid rgba(0, 0, 0, 0.1);
-                user-select: none;
-                transition: 0.15s ease;
-
-                // Mode édition de la grille sur-mesure
-                &.is-editing {
-                    box-shadow: 0 0 0 3px #f39c12;
-                    transform: scale(1.05);
-                    z-index: 5;
-                }
-
-                &.is-selected {
-                    background: $success !important;
-                    outline: 1px solid #111 !important;
-                    transform: scale(1.1) !important;
-                    z-index: 10;
-                    color: $white !important;
-                }
-
-                &.is-booked {
-                    background: rgba($danger, .225);
-                    color: $danger;
-                    pointer-events: none;
-                    cursor: not-allowed;
-                }
-
-                // --- CLASSIFICATION PAR TYPES ---
-                &[data-type="seat"] {
-                    background: rgba($success, .225);
-                    color: $success;
-                    cursor: pointer;
-                }
-
-                &[data-type="vip"] {
-                    background: linear-gradient($success, $dark);
-                    color: $white;
-                    cursor: pointer;
-                }
-
-
-&[data-type="driver"] {
-background: rgba($danger, .225);
-color: $danger;
+// --- DARK MODE ---
+.dark .agency-bus-add-container {
+    .agency-bus-add-title, .agency-setup-card-title, .seatmap-matrix .cell-unit strong { color: $white; }
+    .agency-bus-add-card, .agency-bus-setup-card-builder { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .agency-bus-add-form-input, .agency-bus-add-form-select, .agency-builder-dimensions-bar .dimension-field input { background: $dm-bg-main; color: white; border-color: rgba(255,255,255,0.1); }
+    .seatmap-card { background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.1); }
+    .seatmap-matrix .cell-unit { background: $dm-bg-main; border-color: rgba(255,255,255,0.1); color: white; &[data-type="aisle"] { background: transparent; } }
+    .agency-cell-customizer-panel { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); h4, label { color: white; } }
 }
-&[data-type="wc"] {
-background: $dark;
-color: $white;
-}
-&[data-type="door"] {
-background: $primary;
-color: $white;
-}
-&[data-type="cashier"] {
-background: rgba($success, .225);
-color: $success;
-border-color: rgba($success, 0.4);
-}
-&[data-type="porter"] {
-background: rgba($primary, .15);
-color: $primary;
-border-color: rgba($primary, 0.4);
-}
-&[data-type="aisle"] {
-background: $white !important;
-border: 1px dashed $mute;
-.dark & {
-background: transparent !important;
-border-color: rgba($mute, 0.3);
-}
-}
-}
-}
-// --- BARRE DE LEGENDE ---
-.seatmap-legend-bar {
-border-top: 1px solid $mute;
-width: max-content;
-margin: auto;
-padding-top: 1.25rem;
-margin-top: 1rem;
-border-bottom-left-radius: 8px;
-border-bottom-right-radius: 8px;
-background: $white;
-.dark & { background-color: $dm-bg; }
-.legend {
-font-size: .9rem;
-color: $gray;
-display: flex;
-gap: 1rem;
-span {
-text-align: center;
-padding: 6px 14px;
-border-radius: 6px;
-font-weight: bold;
-&.available { background: rgba($success, .225) !important; color: $success !important; }
-&.selected { background: $success; color: $white; }
-&.booked { background: rgba($danger, .225); color: $danger; }
-&.vip { background: rgba($primary, .225); color: $primary; }
-}
-}
-}
-}
-// --- TITRES ET COMPOSANTS INDEPENDANTS ---
-.seatmap-section-title {
-text-align: center;
-padding-block: 1.5rem;
-.dark & { color: $success; }
-}
-.agency-bus-profile-btn {
-padding: 10px 16px;
-border-radius: $radius-input;
-font-weight: 600;
-font-size: 0.9rem;
-cursor: pointer;
-display: inline-flex;
-align-items: center;
-gap: 6px;
-border: none;
-transition: opacity 0.15s;
-&:hover { opacity: 0.9; }
-&--save { background-color: $success; color: $white; }
-&--cancel {
-background-color: rgba($gray, 0.1);
-color: darken($gray, 25%);
-.dark & {
-background: rgba($white, 0.05);
-color: $mute;
-}
-}
-}
-} 
 // === Fin Bus Add ===
 
 
