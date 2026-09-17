@@ -1,0 +1,138 @@
+{# templates/admin/agency/bus_document/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-agency-report-scope container">
+		{# --- HEADER --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_bus_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Flotte Opérationnelle</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Portefeuille Administratif</span>
+					</div>
+					<h1 class="mt-5">Gestion des Documents</h1>
+				</div>
+			</div>
+			<div class="header-actions">
+				<a href="{{ path('admin_agency_bus_document_add') }}" class="btn-refined btn-success-gradient">
+					<i class="fa-solid fa-file-circle-plus"></i>
+					Enregistrer un document
+				</a>
+			</div>
+		</header>
+
+		{# --- ZONE DE FILTRES ALIGNÉS PAR LE BAS --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="#" method="GET" class="field-group">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Type de document</label>
+					<select name="type" class="admin-bus-layout-add-select">
+						<option value="">-- Tous --</option>
+						<option value="Assurance">Assurance Obligatoire (SONAS)</option>
+						<option value="contrôle technique">Contrôle Technique</option>
+						<option value="Carte Rose">Carte Rose / Autorisation</option>
+					</select>
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">État de Validité</label>
+					<select name="status" class="admin-bus-layout-add-select">
+						<option value="">-- Tous les statuts --</option>
+						<option value="valid">Valide (En règle)</option>
+						<option value="expired">Expired (Caduque / Alerte)</option>
+					</select>
+				</div>
+				<div class="field-actions">
+					<button type="submit" class="btn-refined btn-primary-gradient">
+						<i class="fa-solid fa-filter"></i>
+						Filtrer
+					</button>
+				</div>
+			</form>
+		</div>
+
+		{# --- LE TABLEAU COMPOSANT --- #}
+		<div
+			class="admin-agency-fleet-document-scope">
+
+			{# --- LE TABLEAU DOCUMENTAIRE --- #}
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Type de Document</th>
+						<th>Réference</th>
+						<th>Date d'Émission</th>
+						<th>Date d'Expiration</th>
+						<th class="text-center">Status</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for doc in documents %}
+						<tr>
+
+							<td>
+								<strong>{{ doc.type }}</strong>
+							</td>
+							<td>
+								{{ doc.referenceNumber|default('Non spécifié') }}
+							</td>
+							<td>
+								{{ doc.issuedAt|date('d/m/Y') }}
+							</td>
+							<td>
+								{{ doc.expiredAt|date('d/m/Y') }}
+							</td>
+							<td class="text-center">
+								<span class="pill-report-audit {% if date(doc.expiredAt) > date(" now") %}opened{% else %}closed{% endif %}">
+									{{ date(doc.expiredAt) > date(" now") ? 'VALIDE' : 'EXPIRE' }}
+								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+
+									{% if doc.url %}
+										<a href="{{path('admin_agency_bus_document_download_file',{'code':doc.code}) }}" target="_blank" class="action-link view-file" title="Télécharger le scan">
+											<i class="fa-solid fa-download"></i>
+										</a>
+										<a href="{{path('admin_agency_bus_document_open_file',{'code':doc.code}) }}" target="_blank" class="action-link view-file" title="Ouvrir le scan">
+											<i class="fa-solid fa-eye"></i>
+										</a>
+									{% endif %}
+
+									{% if doc.status === 'expired' %}
+										<a href="{{path('admin_agency_bus_document_renew',{'bus_code':'bus-001','doc_code':'dx-001'})}}" class="action-link" title="Renouveller">
+											<i class="fa-solid fa-arrows-rotate"></i>
+										</a>
+									{% else %}
+										<a href="{{path('admin_agency_bus_document_edit',{'bus_code':'bus-001','doc_code':'dx-001'})}}" class="action-link" title="Modifier">
+											<i class="fa-solid fa-file-pen"></i>
+										</a>
+									{% endif %}
+								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="7" class="text-center text-gray italic padding-20">
+								Aucun document administratif répertorié pour le moment.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+		</div>
+
+	</div>
+{% endblock %}
