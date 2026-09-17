@@ -118,6 +118,12 @@ final class BusController extends AbstractController
             'bus-001' => 1,
             'bus-002' => 2,
             'bus-003' => 3,
+            'bus-004' => 4,
+            'bus-005' => 5,
+            'bus-006' => 6,
+            'bus-007' => 7,
+            'bus-008' => 8,
+            'bus-009' => 9,
         ];
 
         $layoutId = $busToLayoutMap[$code] ?? null;
