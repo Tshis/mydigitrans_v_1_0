@@ -177,7 +177,19 @@
                 }
             }
         }
-    }    
+    }  
+    
+    // --- ACTIONS ---
+    .action-group-refined {
+        display: flex; gap: 8px; justify-content: flex-end;
+        .action-link {
+            width: 34px; height: 34px; border-radius: 10px; border: 1px solid $mute; background: $white;
+            display: flex;align-items: center;justify-content: center;
+            color: $dark; cursor: pointer; transition: all 0.2s;
+            &:hover { background: $dark; color: $white; border-color: $dark; }
+            &.refund:hover { background: $danger; color: $white; border-color: $danger; }
+        }
+    }
 
 }//admin-trip-wrapper
 
