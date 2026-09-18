@@ -88,9 +88,9 @@ class CashierController extends AbstractController
     public function dashboard(Request $request): Response
     {
 
-        $user_role = "admin";
+        $user_role = "cashierss";
 
-        if ($user_role === "admin") {
+        if ($user_role === "cashier") {
             return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
         }
 

@@ -2,194 +2,209 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script src="/js/admin/finance-show.js" defer></script>
+{{ parent() }}
+<script src="/js/admin/finance-show.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-finance-show-scope container">
+<div class="admin-agency-finance-show-scope container">
 
-		{# --- EN-TÊTE DE LA PAGE --- #}
-		<header class="header mb-25">
+	{# --- EN-TÊTE DE LA PAGE --- #}
+	<div class="header-refined my-30">
+		<div class="header-main-info">
 			<a href="{{ path('admin_agency_finance_index') }}" class="agency-back-action" title="Retour aux flux">
 				<i class="fa-solid fa-arrow-left"></i>
 			</a>
-			<div class="title">
-				<div class="sub-header-flex">
-					<span class="text-gray text-size-13">Finances & Flux</span>
-					<span class="arrow-divider">•</span>
-					<span class="text-gray text-size-13 text-highlight">Fiche d'audit unifiée</span>
-				</div>
-			</div>
-		</header>
-
-		{# --- CARTE MAÎTRESSE UNIQUE --- #}
-		<div class="layout-main-card card">
-			<div
-				class="card-inner-box">
-
-				{# 1. BANNIÈRE FINANCIÈRE DE LA CARTE #}
-				<div class="finance-hero-banner mb-25">
-					<div class="hero-amount-zone">
-						<span class="audit-label">Volume financier de la transaction</span>
-						{% if operation.type == 'payment' %}
-							<h1 class="hero-main-amount text-success">+
-								{{ operation.amount }}
-								{{ operation.currency }}</h1>
-							<span class="sub-meta-text">Encaissé sur le canal unifié de l'agence.</span>
-						{% else %}
-							<h1 class="hero-main-amount text-danger">-
-								{{ operation.amount }}
-								{{ operation.currency }}</h1>
-							<span class="sub-meta-text">Décaissement de caisse autorisé.</span>
-						{% endif %}
-					</div>
-
-					<div class="hero-status-zone">
-						<span class="audit-label">État du mouvement</span>
-						{% if operation.type == 'payment' %}
-							<span class="badge-status-confirmed">Confirmé & Encaissé</span>
-						{% else %}
-							<span class="badge-status-confirmed status-exit">Caisse Décaissée</span>
-						{% endif %}
-					</div>
+			<div class="right">
+				<!-- Fil d'ariane -->
+				<div class="breadcrumb-mini">
+					<span>Finances & Flux</span>
+					<i class="fa-solid fa-chevron-right"></i>
+					<strong>Audit</strong>
 				</div>
 
-				<hr
-				class="finance-divider mb-25">
+				<!-- Titre (Title) -->
+				<h1>
+					<i class="fa-solid fa-file-invoice-dollar"></i>
+					Fiche d'Audit Unifiée
+				</h1>
 
-				{# 2. BLOC DES PARAMÈTRES ET CARACTÉRISTIQUES MÉTIER #}
-				<h3 class="box-title mb-15">
-					<i class="fa-solid fa-file-invoice"></i>
-					Fiche d'Audit & Traçabilité
-				</h3>
-
-				<div class="audit-details-grid mb-25">
-					<div class="audit-item">
-						<span class="audit-label">Référence opération</span>
-						<p class="audit-value">Mydigitrans-TX-{{ operation.reference }}</p>
-					</div>
-
-					<div class="audit-item">
-						<span class="audit-label">Heure & Date de saisie</span>
-						<p class="audit-value">Le
-							{{ operation.date }}
-							à
-							{{ operation.time }}</p>
-					</div>
-
-					<div class="audit-item">
-						<span class="audit-label">Nature du flux</span>
-						<p class="audit-value">{{ operation.label }}</p>
-					</div>
-
-					<div class="audit-item">
-						<span class="audit-label">Succursale responsable</span>
-						<p class="audit-value">{{ operation.branch_name }}</p>
-					</div>
-
-					<div class="audit-item">
-						<span class="audit-label">Acteur / Tiers lié</span>
-						<p class="audit-value">{{ operation.actor }}</p>
-					</div>
-
-					<div class="audit-item">
-						<span class="audit-label">Source / Destination comptable</span>
-						<p class="audit-value">
-							{% if operation.type == 'payment' %}
-								<i class="fa-solid fa-mobile-screen-button font-color-entry"></i>
-								{{ operation.funding_source }}
-							{% else %}
-								<i class="fa-solid fa-cash-register font-color-exit"></i>
-								{{ operation.funding_source }}
-							{% endif %}
-						</p>
-					</div>
-
-					<div class="audit-item">
-						<span class="audit-label">Initié par (createdBy)</span>
-						<p class="audit-value">{{ operation.created_by }}</p>
-					</div>
-
-					<div class="audit-item">
-						<span class="audit-label">Confirmé par (confirmedBy)</span>
-						<p class="audit-value">{{ operation.confirmed_by }}</p>
-					</div>
-				</div>
-
-				{# 3. ZONE NOTE / DESCRIPTION COMPTABLE #}
-				<div class="audit-description-box mb-25">
-					<span class="audit-label">Description & Notes d'audit comptable</span>
-					<div class="description-text-container">
-						{{ operation.description }}
-					</div>
-				</div>
-
-				<hr
-				class="finance-divider mb-20">
-
-				{# 4. FOOTER ACTIONS #}
-				<div class="finance-actions-footer">
-					<button class="btn btn-dark text-size-13" onclick="window.print();">
-						<i class="fa-solid fa-print"></i>
-						Imprimer le reçu d'audit
-					</button>
-					{# {% if operation.type == 'payment' %}
-											<button type="button" class="btn btn-success text-size-13" id="js-open-refund">
-												<i class="fa-solid fa-arrow-rotate-left"></i>
-												Émettre un remboursement
-											</button>
-										{% endif %} #}
-				</div>
-
-			</div>
-		</div>
-
-		{# --- 5. MODALE DE REMBOURSEMENT SÉCURISÉE --- #}
-		<div id="refund-modal" class="modal-wrapper" style="display: none;">
-			<div class="card trip-filters-card modal-card-content">
-				<h3 class="modal-card-title">
-					<i class="fa-solid fa-arrow-rotate-left"></i>
-					Confirmer le Remboursement
-				</h3>
-				<p class="text-gray text-size-13 mb-15">
-					Vous vous apprêtez à annuler les effets financiers du paiement
-					<strong>#{{ operation.reference
-                    }}</strong>.
-																														                Cette action générera une écriture de sortie (Dépense) dans la devise native :
-					<strong>{{
-                    operation.currency }}</strong>.
+				<!-- Sous-titre (Subtitle) -->
+				<p class="subtitle">
+					Contrôlez la conformité des {{ operation.type == 'payment' ? 'encaissements' : 'décaissements' }} du
+					réseau.
 				</p>
-
-				<form action="#" method="POST" id="refund-processing-form" onsubmit="event.preventDefault(); alert('Remboursement traité. Écriture négative enregistrée.'); document.getElementById('refund-modal').style.display='none';">
-					<div class="field mb-15">
-						<label class="admin-bus-layout-add-label">Type de Remboursement *</label>
-						<select class="admin-bus-layout-add-select" id="refund-type" required>
-							<option value="total">Remboursement Intégral ({{ operation.amount }}
-								{{ operation.currency }})
-							</option>
-							<option value="partial">Remboursement Partiel (Retenue de frais d'annulation)</option>
-						</select>
-					</div>
-
-					<div class="field mb-15" id="partial-amount-wrapper" style="display: none;">
-						<label class="admin-bus-layout-add-label">Montant à restituer ({{ operation.currency }}) *</label>
-						<input type="number" name="refund_amount" id="refund-amount-input" class="admin-bus-layout-add-input" max="{{ operation.amount_raw }}" step="0.01" min="0.01">
-					</div>
-
-					<div class="field mb-20">
-						<label class="admin-bus-layout-add-label">Motif de l'annulation *</label>
-						<textarea class="admin-bus-layout-add-input text-area-fixed" placeholder="Ex: Client désisté avant le départ, erreur de saisie..." required></textarea>
-					</div>
-
-					<div class="modal-actions-footer">
-						<button type="button" class="btn btn-dark" id="js-close-refund">Annuler</button>
-						{# <button type="submit" class="btn btn-success">Valider la rétrocession</button> #}
-					</div>
-				</form>
 			</div>
 		</div>
-
 	</div>
+
+
+	{# --- CARTE MAÎTRESSE UNIQUE --- #}
+	<div class="layout-main-card card">
+		<div class="card-inner-box">
+
+			{# 1. BANNIÈRE FINANCIÈRE DE LA CARTE #}
+			<div class="finance-hero-banner mb-25">
+				<div class="hero-amount-zone">
+					<span class="audit-label">Volume financier de la transaction</span>
+					{% if operation.type == 'payment' %}
+					<h1 class="hero-main-amount text-success">+
+						{{ operation.amount }}
+						{{ operation.currency }}</h1>
+					<span class="sub-meta-text">Encaissé sur le canal unifié de l'agence.</span>
+					{% else %}
+					<h1 class="hero-main-amount text-danger">-
+						{{ operation.amount }}
+						{{ operation.currency }}</h1>
+					<span class="sub-meta-text">Décaissement de caisse autorisé.</span>
+					{% endif %}
+				</div>
+
+				<div class="hero-status-zone">
+					<span class="audit-label">État du mouvement</span>
+					{% if operation.type == 'payment' %}
+					<span class="badge-status-confirmed">Confirmé & Encaissé</span>
+					{% else %}
+					<span class="badge-status-confirmed status-exit">Caisse Décaissée</span>
+					{% endif %}
+				</div>
+			</div>
+
+			<hr class="finance-divider mb-25">
+
+			{# 2. BLOC DES PARAMÈTRES ET CARACTÉRISTIQUES MÉTIER #}
+			<h3 class="box-title mb-15">
+				<i class="fa-solid fa-file-invoice"></i>
+				Fiche d'Audit & Traçabilité
+			</h3>
+
+			<div class="audit-details-grid mb-25">
+				<div class="audit-item">
+					<span class="audit-label">Référence opération</span>
+					<p class="audit-value">Mydigitrans-TX-{{ operation.reference }}</p>
+				</div>
+
+				<div class="audit-item">
+					<span class="audit-label">Heure & Date de saisie</span>
+					<p class="audit-value">Le
+						{{ operation.date }}
+						à
+						{{ operation.time }}</p>
+				</div>
+
+				<div class="audit-item">
+					<span class="audit-label">Nature du flux</span>
+					<p class="audit-value">{{ operation.label }}</p>
+				</div>
+
+				<div class="audit-item">
+					<span class="audit-label">Succursale responsable</span>
+					<p class="audit-value">{{ operation.branch_name }}</p>
+				</div>
+
+				<div class="audit-item">
+					<span class="audit-label">Acteur / Tiers lié</span>
+					<p class="audit-value">{{ operation.actor }}</p>
+				</div>
+
+				<div class="audit-item">
+					<span class="audit-label">Source / Destination comptable</span>
+					<p class="audit-value">
+						{% if operation.type == 'payment' %}
+						<i class="fa-solid fa-mobile-screen-button font-color-entry"></i>
+						{{ operation.funding_source }}
+						{% else %}
+						<i class="fa-solid fa-cash-register font-color-exit"></i>
+						{{ operation.funding_source }}
+						{% endif %}
+					</p>
+				</div>
+
+				<div class="audit-item">
+					<span class="audit-label">Initié par (createdBy)</span>
+					<p class="audit-value">{{ operation.created_by }}</p>
+				</div>
+
+				<div class="audit-item">
+					<span class="audit-label">Confirmé par (confirmedBy)</span>
+					<p class="audit-value">{{ operation.confirmed_by }}</p>
+				</div>
+			</div>
+
+			{# 3. ZONE NOTE / DESCRIPTION COMPTABLE #}
+			<div class="audit-description-box mb-25">
+				<span class="audit-label">Description & Notes d'audit comptable</span>
+				<div class="description-text-container">
+					{{ operation.description }}
+				</div>
+			</div>
+
+			<hr class="finance-divider mb-20">
+
+			{# 4. FOOTER ACTIONS #}
+			<div class="finance-actions-footer">
+				<button class="btn-refined btn-success-gradient text-size-13" onclick="window.print();">
+					<i class="fa-solid fa-print"></i>
+					Imprimer le reçu d'audit
+				</button>
+				{# {% if operation.type == 'payment' %}
+				<button type="button" class="btn-refined btn-danger-gradient text-size-13" id="js-open-refund">
+					<i class="fa-solid fa-arrow-rotate-left"></i>
+					Émettre un remboursement
+				</button>
+				{% endif %} #}
+			</div>
+
+		</div>
+	</div>
+
+	{# --- 5. MODALE DE REMBOURSEMENT SÉCURISÉE --- #}
+	<div id="refund-modal" class="modal-wrapper" style="display: none;">
+		<div class="card trip-filters-card modal-card-content">
+			<h3 class="modal-card-title">
+				<i class="fa-solid fa-arrow-rotate-left"></i>
+				Confirmer le Remboursement
+			</h3>
+			<p class="text-gray text-size-13 mb-15">
+				Vous vous apprêtez à annuler les effets financiers du paiement
+				<strong>#{{ operation.reference
+					}}</strong>.
+				Cette action générera une écriture de sortie (Dépense) dans la devise native :
+				<strong>{{
+					operation.currency }}</strong>.
+			</p>
+
+			<form action="#" method="POST" id="refund-processing-form"
+				onsubmit="event.preventDefault(); alert('Remboursement traité. Écriture négative enregistrée.'); document.getElementById('refund-modal').style.display='none';">
+				<div class="field mb-15">
+					<label class="admin-bus-layout-add-label">Type de Remboursement *</label>
+					<select class="admin-bus-layout-add-select" id="refund-type" required>
+						<option value="total">Remboursement Intégral ({{ operation.amount }}
+							{{ operation.currency }})
+						</option>
+						<option value="partial">Remboursement Partiel (Retenue de frais d'annulation)</option>
+					</select>
+				</div>
+
+				<div class="field mb-15" id="partial-amount-wrapper" style="display: none;">
+					<label class="admin-bus-layout-add-label">Montant à restituer ({{ operation.currency }}) *</label>
+					<input type="number" name="refund_amount" id="refund-amount-input"
+						class="admin-bus-layout-add-input" max="{{ operation.amount_raw }}" step="0.01" min="0.01">
+				</div>
+
+				<div class="field mb-20">
+					<label class="admin-bus-layout-add-label">Motif de l'annulation *</label>
+					<textarea class="admin-bus-layout-add-input text-area-fixed"
+						placeholder="Ex: Client désisté avant le départ, erreur de saisie..." required></textarea>
+				</div>
+
+				<div class="modal-actions-footer">
+					<button type="button" class="btn-refined btn-success-gradient" id="js-close-refund">Annuler</button>
+					{# <button type="submit" class="btn btn-success">Valider la rétrocession</button> #}
+				</div>
+			</form>
+		</div>
+	</div>
+
+</div>
 {% endblock %}

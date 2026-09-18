@@ -11,16 +11,18 @@
 		class="admin-index-finance-scope container">
 
 		{# --- EN-TÊTE DE LA PAGE --- #}
-		<header class="header mb-25">
-			<div class="title">
-				<h2>
-					<i class="fa-solid fa-hand-holding-dollar"></i>
-					Gestion des Finances & Flux Multi-devises
-				</h2>
-				<p>Suivi en temps réel des recettes d'agences et enregistrement des dépenses opérationnelles par devise.</p>
+		<header class="header-refined my-30">
+			<div class="header-main-info">
+				<div class="info">
+					<h1>
+						<i class="fa-solid fa-hand-holding-dollar"></i>
+						Gestion des Finances & Flux Multi-devises
+					</h1>
+					<p class="subtitle">Suivi des recettes agences et saisie des dépenses par devise.</p>
+				</div>
 			</div>
-			<div class="admin-bus-layout-add-action-zone">
-				<a href="{{ path('admin_agency_finance_expense_add') }}" class="btn btn-success text-size-12">
+			<div class="right">
+				<a href="{{ path('admin_agency_finance_expense_add') }}" class="btn-refined btn-success-gradient text-size-12">
 					<i class="fa-solid fa-plus"></i>
 					Enregistrer une dépense
 				</a>

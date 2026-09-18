@@ -2,142 +2,148 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script src="/js/admin/cashier-expense-add.js" defer></script>
+{{ parent() }}
+<script src="/js/admin/cashier-expense-add.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-finance-expense-add-scope container">
+<div class="admin-finance-expense-add-scope container">
 
-		{# --- EN-TÊTE DE LA PAGE --- #}
-		<header class="header mb-25">
-			<div class="title">
-				<h2>
-					<i class="fa-solid fa-receipt"></i>
-					Enregistrer une Dépense / Décaissement
-				</h2>
-				<p>Saisissez les frais opérationnels ou les coûts liés aux abonnements de la plateforme.</p>
-			</div>
-			<div class="admin-bus-layout-add-action-zone">
-				<a href="{{ path('admin_agency_finance_index') }}" class="btn btn-dark text-size-12">
-					<i class="fa-solid fa-arrow-left"></i>
-					Retour aux flux
-				</a>
-			</div>
-		</header>
+	{# --- EN-TÊTE DE LA PAGE --- #}
+	<header class="header-refined my-30">
+		<div class="info">
+			<h1>
+				<i class="fa-solid fa-receipt"></i>
+				Enregistrer une Dépense / Décaissement
+			</h1>
+			<p class="subtitle">Saisie des frais opérationnels et des abonnements de la plateforme.</p>
+		</div>
+		<div class="right">
+			<a href="{{ path('admin_agency_finance_index') }}" class="btn-refined btn-success-gradient text-size-12">
+				<i class="fa-solid fa-arrow-left"></i>
+				Retour aux flux
+			</a>
+		</div>
+	</header>
 
-		{# --- FORMULAIRE DÉPENSE --- #}
-		<div class="card trip-filters-card mb-20">
-			<form
-				action="#" method="POST" id="expense-creation-form" onsubmit="event.preventDefault(); alert('Mouvement de dépenses enregistré dans le grand livre comptable !');">
+	{# --- FORMULAIRE DÉPENSE --- #}
+	<div class="card trip-filters-card mb-20">
+		<form action="#" method="POST" id="expense-creation-form"
+			onsubmit="event.preventDefault(); alert('Mouvement de dépenses enregistré dans le grand livre comptable !');">
 
-				{# LIGNE COMPOSITE 1 : TYPE, SUCCURSALE & LIBELLÉ (ALIGNEMENT CORRIGÉ) --- #}
-				<div
-					class="field-group mb-20">
-					{# Champ 1 : Type de Dépense #}
-					<div class="field">
-						<label class="admin-bus-layout-add-label">Type de dépense *</label>
-						<select name="expense_type" id="expense-type-select" class="admin-bus-layout-add-select" required>
-							<option value="other">Frais opérationnels généraux (Carburant, Bureau, Maintenance)</option>
-							<option value="subscription">Abonnement Plateforme SaaS (Mydigitrans)</option>
-						</select>
-					</div>
-
-					{# Champ 2 : Succursale (Contrôlé par Rôle) #}
-					{% if is_network_manager %}
-						<div class="field" id="branch-field-wrapper">
-							<label class="admin-bus-layout-add-label">Succursale bénéficiaire *</label>
-							<select name="expense_branch" id="expense-branch-select" class="admin-bus-layout-add-select" required>
-								<option value="">-- Choisir la succursale --</option>
-								{% for branch in branches %}
-									<option value="{{ branch.id }}">{{ branch.name }}</option>
-								{% endfor %}
-							</select>
-						</div>
-					{% else %}
-						{# Si Branch Manager : Choix bloqué en tâche de fond #}
-						<input type="hidden" name="expense_branch" id="expense-branch-select" value="{{ user_branch_id }}">
-					{% endif %}
-
-				</div>
-
-				{# Champ 3 : Nom / Libellé de la dépense (Intégré ici pour l'alignement parfait) #}
-				<div class="field mb-20 flex-double">
-					<label class="admin-bus-layout-add-label">Nom / Libellé de la dépense *</label>
-					<input type="text" name="expense_name" class="admin-bus-layout-add-input" placeholder="Ex: Achat carburant Bus #01, Abonnement SaaS..." required>
-				</div>
-
-				{# LIGNE COMPOSITE 2 : MONTANTS & DEVISES --- #}
-				<div class="field-group mb-20">
-					<div class="field">
-						<label class="admin-bus-layout-add-label">Montant *</label>
-						<input type="number" name="expense_amount" step="0.01" min="0.01" class="admin-bus-layout-add-input" placeholder="0.00" required>
-					</div>
-
-					<div class="field">
-						<label class="admin-bus-layout-add-label">Devise *</label>
-						<select name="expense_currency" class="admin-bus-layout-add-select" required>
-							{% for currency in active_currencies %}
-								<option value="{{ currency.code }}">{{ currency.code }}
-									({{ currency.symbol }})</option>
-							{% endfor %}
-						</select>
-					</div>
-				</div>
-
-				{# --- ZONE DYNAMIQUE : CHAMPS D'ABONNEMENT SAAS --- #}
-				<div class="field-group mb-20" id="subscription-dates-wrapper">
-					<div class="field">
-						<label class="admin-bus-layout-add-label">Valide du (validFrom) *</label>
-						<input type="date" name="expense_valid_from" id="valid-from-input" class="admin-bus-layout-add-input">
-					</div>
-					<div class="field">
-						<label class="admin-bus-layout-add-label">Valide jusqu'au (validUntil) *</label>
-						<input type="date" name="expense_valid_until" id="valid-until-input" class="admin-bus-layout-add-input">
-					</div>
-				</div>
-
-				{# Champ : Source des Fonds #}
-				<div class="field mb-20" id="funding-source-wrapper">
-					<label class="admin-bus-layout-add-label">Source du règlement / Financement *</label>
-					<select name="expense_funding_source" id="expense-funding-source" class="admin-bus-layout-add-select" required>
-						<option value="bank">Hors Caisse (Virement bancaire, Chèque, Mobile Money Global)</option>
-						<option value="cash_register">Depuis une Caisse de guichet (Espèces physiques)</option>
+			{# LIGNE COMPOSITE 1 : TYPE, SUCCURSALE & LIBELLÉ (ALIGNEMENT CORRIGÉ) --- #}
+			<div class="field-group mb-20">
+				{# Champ 1 : Type de Dépense #}
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Type de dépense *</label>
+					<select name="expense_type" id="expense-type-select" class="admin-bus-layout-add-select" required>
+						<option value="other">Frais opérationnels généraux (Carburant, Bureau, Maintenance)</option>
+						<option value="subscription">Abonnement Plateforme SaaS (Mydigitrans)</option>
 					</select>
 				</div>
 
-				{# Champ dynamique : Choix de la caisse #}
-				<div class="field mb-20" id="cash-session-field-wrapper">
-					<label class="admin-bus-layout-add-label">Sélectionner la Caisse émettrice *</label>
-					<select name="expense_cash_session" id="expense-cash-session" class="input-search-voucher admin-bus-layout-add-select">
-						<option value="">-- Choisir la caisse qui donne l'argent physique --</option>
-						{% for session in active_sessions %}
-							<option value="{{ session.id }}">{{ session.label }}
-								(Solde :
-								{{ session.balance }})</option>
+				{# Champ 2 : Succursale (Contrôlé par Rôle) #}
+				{% if is_network_manager %}
+				<div class="field" id="branch-field-wrapper">
+					<label class="admin-bus-layout-add-label">Succursale bénéficiaire *</label>
+					<select name="expense_branch" id="expense-branch-select" class="admin-bus-layout-add-select"
+						required>
+						<option value="">-- Choisir la succursale --</option>
+						{% for branch in branches %}
+						<option value="{{ branch.id }}">{{ branch.name }}</option>
 						{% endfor %}
 					</select>
-					<span class="sub-meta-text danger-hint">
-						<i class="fa-solid fa-triangle-exclamation"></i>
-						Attention : Cela diminuera directement le solde de ce guichet.
-					</span>
+				</div>
+				{% else %}
+				{# Si Branch Manager : Choix bloqué en tâche de fond #}
+				<input type="hidden" name="expense_branch" id="expense-branch-select" value="{{ user_branch_id }}">
+				{% endif %}
+
+			</div>
+
+			{# Champ 3 : Nom / Libellé de la dépense (Intégré ici pour l'alignement parfait) #}
+			<div class="field mb-20 flex-double">
+				<label class="admin-bus-layout-add-label">Nom / Libellé de la dépense *</label>
+				<input type="text" name="expense_name" class="admin-bus-layout-add-input"
+					placeholder="Ex: Achat carburant Bus #01, Abonnement SaaS..." required>
+			</div>
+
+			{# LIGNE COMPOSITE 2 : MONTANTS & DEVISES --- #}
+			<div class="field-group mb-20">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Montant *</label>
+					<input type="number" name="expense_amount" step="0.01" min="0.01" class="admin-bus-layout-add-input"
+						placeholder="0.00" required>
 				</div>
 
-				{# Champ : Description / Notes #}
-				<div class="field mb-20">
-					<label class="admin-bus-layout-add-label">Description / Notes complémentaires</label>
-					<textarea name="expense_description" class="admin-bus-layout-add-input text-area-fixed" placeholder="Ajoutez des précisions..."></textarea>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Devise *</label>
+					<select name="expense_currency" class="admin-bus-layout-add-select" required>
+						{% for currency in active_currencies %}
+						<option value="{{ currency.code }}">{{ currency.code }}
+							({{ currency.symbol }})</option>
+						{% endfor %}
+					</select>
 				</div>
+			</div>
 
-				<div class="field-button-right mt-15">
-					<button type="submit" class="btn btn-success">
-						<i class="fa-solid fa-check"></i>
-						Enregistrer la dépense
-					</button>
+			{# --- ZONE DYNAMIQUE : CHAMPS D'ABONNEMENT SAAS --- #}
+			<div class="field-group mb-20" id="subscription-dates-wrapper">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Valide du (validFrom) *</label>
+					<input type="date" name="expense_valid_from" id="valid-from-input"
+						class="admin-bus-layout-add-input">
 				</div>
-			</form>
-		</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Valide jusqu'au (validUntil) *</label>
+					<input type="date" name="expense_valid_until" id="valid-until-input"
+						class="admin-bus-layout-add-input">
+				</div>
+			</div>
 
+			{# Champ : Source des Fonds #}
+			<div class="field mb-20" id="funding-source-wrapper">
+				<label class="admin-bus-layout-add-label">Source du règlement / Financement *</label>
+				<select name="expense_funding_source" id="expense-funding-source" class="admin-bus-layout-add-select"
+					required>
+					<option value="bank">Hors Caisse (Virement bancaire, Chèque, Mobile Money Global)</option>
+					<option value="cash_register">Depuis une Caisse de guichet (Espèces physiques)</option>
+				</select>
+			</div>
+
+			{# Champ dynamique : Choix de la caisse #}
+			<div class="field mb-20" id="cash-session-field-wrapper">
+				<label class="admin-bus-layout-add-label">Sélectionner la Caisse émettrice *</label>
+				<select name="expense_cash_session" id="expense-cash-session"
+					class="input-search-voucher admin-bus-layout-add-select">
+					<option value="">-- Choisir la caisse qui donne l'argent physique --</option>
+					{% for session in active_sessions %}
+					<option value="{{ session.id }}">{{ session.label }}
+						(Solde :
+						{{ session.balance }})</option>
+					{% endfor %}
+				</select>
+				<span class="sub-meta-text danger-hint">
+					<i class="fa-solid fa-triangle-exclamation"></i>
+					Attention : Cela diminuera directement le solde de ce guichet.
+				</span>
+			</div>
+
+			{# Champ : Description / Notes #}
+			<div class="field mb-20">
+				<label class="admin-bus-layout-add-label">Description / Notes complémentaires</label>
+				<textarea name="expense_description" class="admin-bus-layout-add-input text-area-fixed"
+					placeholder="Ajoutez des précisions..."></textarea>
+			</div>
+
+			<div class="field-button-right mt-15">
+				<button type="submit" class="btn-refined btn-success-gradient">
+					<i class="fa-solid fa-check"></i>
+					Enregistrer la dépense
+				</button>
+			</div>
+		</form>
 	</div>
+
+</div>
 {% endblock %}
