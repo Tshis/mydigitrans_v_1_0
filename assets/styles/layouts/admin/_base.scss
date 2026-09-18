@@ -268,6 +268,41 @@ body#admin{
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }//card
 
+ // --- HEADER REFINÉ ---
+    .header-refined {
+        display: flex; 
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap; 
+        gap: 2rem;
+
+        .header-main-info{
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+             .agency-back-action {
+                background: $white !important;
+                border: 1px solid $mute; width: 3.25rem; 
+                height: 3.25rem; border-radius: 50%; 
+                display: flex; align-items: center; 
+                justify-content: center; 
+                color: $dark; text-decoration: none; 
+                transition: all .3s;
+                &:hover { transform: translateX(-.5rem); background: rgba($primary, 0.04); color: $primary; }
+            }
+        }
+
+        .breadcrumb-mini {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
+            i { font-size: 8px; margin-inline: 5px; }
+            strong { color: $primary; }
+        }
+
+        h1 { font-size: 2rem; font-weight: 900; color: $dark; margin: 0; }
+        
+        .subtitle { color: $gray; font-size: 14px; margin-top: 5px; }
+    } 
+
     /* ===============================
     FOOTER
     =================================*/

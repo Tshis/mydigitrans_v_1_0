@@ -9,14 +9,20 @@
 
      // --- HEADER REFINÉ ---
     .header-refined {
-        display: flex; justify-content: space-between; align-items: flex-end;
-        flex-wrap: wrap; gap: 2rem;
+        display: flex; 
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap; 
+        gap: 2rem;
+
         .breadcrumb-mini {
             font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: $gray; margin-bottom: 8px;
             i { font-size: 8px; margin-inline: 5px; }
             strong { color: $primary; }
         }
+
         h1 { font-size: 2rem; font-weight: 900; color: $dark; margin: 0; }
+        
         .subtitle { color: $gray; font-size: 14px; margin-top: 5px; }
     }   
 

@@ -2,148 +2,138 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/admin/layout_builder.js" defer></script>
+	{{ parent() }}
+	<script src="/js/admin/layout_builder.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-bus-layout-add-scope">
-    <div class="admin-bus-layout-add-container">
+	<div class="admin-bus-layout-add-scope">
+		<div
+			class="admin-bus-layout-add-container">
 
-        {# --- EN-TÊTE --- #}
-        <header class="admin-bus-layout-add-header">
-            <div class="agency-profile-block">
-                <a href="#" class="agency-back-action">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-                <div class="agency-profile-meta">
-                    <h2 class="admin-bus-layout-add-title">
-                        <i class="fa-solid fa-compass-drafting"></i>
-                        Concepteur de Gabarits (Système)
-                    </h2>
-                    <p class="admin-bus-layout-add-subtitle">Créez des modèles de sièges réutilisables avec
-                        multi-couloirs configurables.</p>
-                </div>
-            </div>
-        </header>
+			{# --- EN-TÊTE --- #}
+			<header class="admin-bus-layout-add-header">
+				<div class="agency-profile-block">
+					<a href="#" class="agency-back-action">
+						<i class="fa-solid fa-arrow-left"></i>
+					</a>
+					<div class="agency-profile-meta">
+						<h2 class="admin-bus-layout-add-title">
+							<i class="fa-solid fa-compass-drafting"></i>
+							Concepteur de Gabarits (Système)
+						</h2>
+						<p class="admin-bus-layout-add-subtitle">Créez des modèles de sièges réutilisables avec
+							                        multi-couloirs configurables.</p>
+					</div>
+				</div>
+			</header>
 
-        {# COMPOSANT DE LA PAGE #}
-        <form class="admin-bus-layout-add-grid-layout" id="bus_layout_add_form" method="post">
+			{# COMPOSANT DE LA PAGE #}
+			<form
+				class="admin-bus-layout-add-grid-layout" id="bus_layout_add_form" method="post">
 
-            {# --- COMPOSANT GAUCHE : CONFIGURATION & ALLÉES MULTIPLES --- #}
-            <div class="admin-bus-layout-add-column">
-                <div class="admin-bus-layout-add-card">
-                    <h3 class="card-inner-title mb-20">
-                        <i class="fa-solid fa-sliders"></i>
-                        Configuration Technique
-                    </h3>
+				{# --- COMPOSANT GAUCHE : CONFIGURATION & ALLÉES MULTIPLES --- #}
+				<div class="admin-bus-layout-add-column">
+					<div class="admin-bus-layout-add-card">
+						<h3 class="card-inner-title mb-20">
+							<i class="fa-solid fa-sliders"></i>
+							Configuration Technique
+						</h3>
 
-                    <div class="admin-bus-layout-add-form">
-                        <div class="field mb-20">
-                            <label class="admin-bus-layout-add-label">Nom du modèle / Gabarit *</label>
-                            <input type="text" id="layout-name" class="admin-bus-layout-add-input"
-                                placeholder="Ex: Grand Yutong Multi-Aisle" required name="name">
-                        </div>
+						<div class="admin-bus-layout-add-form">
+							<div class="field mb-20">
+								<label class="admin-bus-layout-add-label">Nom du modèle / Gabarit *</label>
+								<input type="text" id="layout-name" class="admin-bus-layout-add-input" placeholder="Ex: Grand Yutong Multi-Aisle" required name="name">
+							</div>
 
-                        <div class="field-group mb-20">
-                            <div class="field">
-                                <label class="admin-bus-layout-add-label">Nombre de Rangées *</label>
-                                <input type="number" id="layout-main-rows" class="admin-bus-layout-add-input" min="2"
-                                    max="22" placeholder="Ex: 12" name="rows" value="10" required>
-                            </div>
-                            <div class="field">
-                                <label class="admin-bus-layout-add-label">Colonnes de Sièges *</label>
-                                <input type="number" id="layout-main-cols" class="admin-bus-layout-add-input" min="2"
-                                    max="7" placeholder="Ex: 4" name="columns" value="4" required>
-                            </div>
-                        </div>
+							<div class="field-group mb-20">
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Nombre de Rangées *</label>
+									<input type="number" id="layout-main-rows" class="admin-bus-layout-add-input" min="2" max="22" placeholder="Ex: 12" name="rows" value="10" required>
+								</div>
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Colonnes de Sièges *</label>
+									<input type="number" id="layout-main-cols" class="admin-bus-layout-add-input" min="2" max="7" placeholder="Ex: 4" name="columns" value="4" required>
+								</div>
+							</div>
 
-                        {# --- CONFIGURATION DYNAMIQUE DES COULOIRS MULTIPLES --- #}
-                        <div class="field mb-20 toggle-field">
-                            <label class="checkbox-container">
-                                <input type="checkbox" id="layout-aisle-toggle" checked>
-                                <span class="checkmark"></span>
-                                Présence d'un ou plusieurs couloirs
-                            </label>
-                        </div>
+							{# --- CONFIGURATION DYNAMIQUE DES COULOIRS MULTIPLES --- #}
+							<div class="field mb-20 toggle-field">
+								<label class="checkbox-container">
+									<input type="checkbox" id="layout-aisle-toggle" checked>
+									<span class="checkmark"></span>
+									Présence d'un ou plusieurs couloirs
+								</label>
+							</div>
 
-                        <div class="js-aisle mb-20" id="aisle-logic-block"
-                            style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 8px;">
-                            <div id="aisles-container">{# Le JavaScript va insérer et empiler les lignes de couloirs ici
-                                #}
-                            </div>
-                            <div class="button-right" style="text-align: right; margin-top: 10px;">
-                                <button type="button" id="btn-add-aisle" class="agency-layout-btn"
-                                    style="padding: 6px 12px; font-size: 12px;">
-                                    <i class="fa-solid fa-plus"></i>
-                                    Ajouter un autre couloir
-                                </button>
-                            </div>
-                        </div>
+							<div class="js-aisle mb-20" id="aisle-logic-block" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 8px;">
+								<div
+									id="aisles-container">{# Le JavaScript va insérer et empiler les lignes de couloirs ici
+										                                #}
+								</div>
+								<div class="button-right" style="text-align: right; margin-top: 10px;">
+									<button type="button" id="btn-add-aisle" class="agency-layout-btn" style="padding: 6px 12px; font-size: 12px;">
+										<i class="fa-solid fa-plus"></i>
+										Ajouter un autre couloir
+									</button>
+								</div>
+							</div>
 
-                        <button type="button" id="btn-generate-matrix"
-                            class="agency-layout-btn agency-layout-btn--generate agency-layout-btn--full">
-                            <i class="fa-solid fa-arrows-rotate"></i>
-                            Générer la Grille de Dessin
-                        </button>
-                    </div>
-                </div>
-            </div>
+							<button type="button" id="btn-generate-matrix" class="agency-layout-btn agency-layout-btn--generate agency-layout-btn--full">
+								<i class="fa-solid fa-arrows-rotate"></i>
+								Générer la Grille de Dessin
+							</button>
+						</div>
+					</div>
+				</div>
 
-            {# --- COMPOSANT DROITE : SCHÉMA INTERACTIF DE L'AUTOCAR --- #}
-            <div class="admin-bus-layout-add-column">
-                <div class="admin-bus-layout-add-card card-highlight">
-                    <h3 class="card-inner-title text-center">
-                        <i class="fa-solid fa-bus"></i>
-                        Carrosserie & Aménagement Tactile
-                    </h3>
+				{# --- COMPOSANT DROITE : SCHÉMA INTERACTIF DE L'AUTOCAR --- #}
+				<div class="admin-bus-layout-add-column">
+					<div class="admin-bus-layout-add-card card-highlight">
+						<h3 class="card-inner-title text-center">
+							<i class="fa-solid fa-bus"></i>
+							Carrosserie & Aménagement Tactile
+						</h3>
 
-                    {# --- PANNEAU CONTEXTUEL D'ATTRIBUTION --- #}
-                    <div id="cell-customizer-panel" class="agency-cell-customizer-panel"
-                        style="display: none; background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <h4 class="customizer-title"
-                            style="margin: 0 0 10px 0; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #4b5563;">
-                            <i class="fa-solid fa-gears"></i>
-                            Paramétrer la case [R<span id="selected-r">1</span>, C<span id="selected-c">1</span>]
-                        </h4>
-                        <div class="customizer-field">
-                            <select id="cell-type-dropdown" class="admin-bus-layout-add-input"
-                                style="height: 40px; font-weight: 700;">
-                                <option value="seat">Siège Passager Standard</option>
-                                <option value="vip">Siège Passager VIP</option>
-                                <option value="driver">Chauffeur / Conducteur</option>
-                                <option value="cashier">Receveur (Cashier)</option>
-                                <option value="porter">Convoyeur (Porter)</option>
-                                <option value="wc">Toilettes (WC)</option>
-                                <option value="door">Portière / Escalier</option>
-                                <option value="aisle">Allée vide / Espace vide</option>
-                            </select>
-                        </div>
-                        <div class="customizer-actions" style="text-align: right; margin-top: 10px;">
-                            <button type="button" id="btn-apply-cell-changes"
-                                class="agency-layout-btn agency-layout-btn--save"
-                                style="padding: 6px 12px; font-size: 12px;">Appliquer</button>
-                        </div>
-                    </div>
+						{# --- PANNEAU CONTEXTUEL D'ATTRIBUTION --- #}
+						<div id="cell-customizer-panel" class="agency-cell-customizer-panel" style="display: none; background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+							<h4 class="customizer-title" style="margin: 0 0 10px 0; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #4b5563;">
+								<i class="fa-solid fa-gears"></i>
+								Paramétrer la case [R<span id="selected-r">1</span>, C<span id="selected-c">1</span>]
+							</h4>
+							<div class="customizer-field">
+								<select id="cell-type-dropdown" class="admin-bus-layout-add-input" style="height: 40px; font-weight: 700;">
+									<option value="seat">Siège Passager Standard</option>
+									<option value="vip">Siège Passager VIP</option>
+									<option value="driver">Chauffeur / Conducteur</option>
+									<option value="cashier">Receveur (Cashier)</option>
+									<option value="porter">Convoyeur (Porter)</option>
+									<option value="wc">Toilettes (WC)</option>
+									<option value="door">Portière / Escalier</option>
+									<option value="aisle">Allée vide / Espace vide</option>
+								</select>
+							</div>
+							<div class="customizer-actions" style="text-align: right; margin-top: 10px;">
+								<button type="button" id="btn-apply-cell-changes" class="agency-layout-btn agency-layout-btn--save" style="padding: 6px 12px; font-size: 12px;">Appliquer</button>
+							</div>
+						</div>
 
-                    {# Carrosserie #}
-                    <div class="seatmap-card">
-                        <div class="bus-head">Avant du véhicule</div>
-                        <div id="layout-interactive-grid" class="seatmap-matrix"></div>
-                    </div>
+						{# Carrosserie #}
+						<div class="seatmap-card">
+							<div class="bus-head">Avant du véhicule</div>
+							<div id="layout-interactive-grid" class="seatmap-matrix"></div>
+						</div>
 
-                    <div class="admin-bus-layout-add-action-zone"
-                        style="text-align: right; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
-                        <button type="submit" id="btn-submit-layout"
-                            class="agency-layout-btn agency-layout-btn--save text-size-12">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            Enregistrer ce Modèle en Session
-                        </button>
-                    </div>
-                </div>
-            </div>
+						<div class="admin-bus-layout-add-action-zone" style="text-align: right; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
+							<button type="submit" id="btn-submit-layout" class="agency-layout-btn agency-layout-btn--save text-size-12">
+								<i class="fa-solid fa-cloud-arrow-up"></i>
+								Enregistrer ce Modèle en Session
+							</button>
+						</div>
+					</div>
+				</div>
 
-        </form>
-    </div>
-</div>
+			</form>
+		</div>
+	</div>
 {% endblock %}

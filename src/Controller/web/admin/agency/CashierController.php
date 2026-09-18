@@ -23,7 +23,20 @@ class CashierController extends AbstractController
             return $this->redirectToRoute('admin_agency_cashier_awaiting_init');
         }
 
-        return $this->redirectToRoute('admin_agency_cashier_dashboard');
+        //======Redirection to the dashboard
+
+        $user_role = "admin";
+
+        if ($user_role === "admin") {
+            return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
+        }
+
+        if ($user_role === "cashier") {
+            return $this->redirectToRoute('admin_agency_cashier_dashboard');
+        }
+
+        //else if user_role === super_admin 
+        return $this->redirectToRoute('admin_agency_cashier_dashboard_global');
     } //index
 
     #[Route('/admin/agency/cash-register/create', name: 'admin_agency_cashier_add')]
@@ -75,6 +88,12 @@ class CashierController extends AbstractController
     public function dashboard(Request $request): Response
     {
 
+        $user_role = "admin";
+
+        if ($user_role === "admin") {
+            return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
+        }
+
 
         // 1. Simulation des fonds réels actuellement présents dans le tiroir physique
         $vaultBalances = [
@@ -103,8 +122,6 @@ class CashierController extends AbstractController
                 'amount' => '30.00',
             ],
         ];
-
-
 
         return $this->render('admin/agency/cashier/dashboard.html.twig', [
             'page' => 'cashier',

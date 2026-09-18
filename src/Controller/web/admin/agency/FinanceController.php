@@ -196,7 +196,7 @@ class FinanceController extends AbstractController
     public function journal_caissier(Request $request): Response
     {
         return $this->render('admin/agency/finance/journal_caissier.html.twig', [
-            'page' => 'paiement',
+            'page' => 'finances',
         ]);
     } //journal
 

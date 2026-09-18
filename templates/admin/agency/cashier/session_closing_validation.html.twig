@@ -2,98 +2,106 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-	<div class="admin-booking-creation-scope container">
+<div class="admin-booking-creation-scope container">
 
-		<header class="header mb-25">
+	<header class="header-refined mb-25">
+		<div class="header-main-info">
 			<a href="{{ path('admin_agency_cashier_dashboard_branch') }}" class="agency-back-action">
 				<i class="fa-solid fa-arrow-left"></i>
 			</a>
-			<div class="title">
-				<h2>Clôture de Caisse & Arbitrage Comptable</h2>
-				<p>Validation contradictoire de la session
+			<div class="info">
+				<h1>Clôture de Caisse & Arbitrage Comptable</h1>
+				<p class="subtitle">Validation contradictoire de la session
 					<strong class="text-primary">CS-2026-0711</strong>
 				</p>
 			</div>
-		</header>
+		</div>
+	</header>
 
-		<form action="#" method="POST" class="reservation-form">
-			<div
-				class="reservation-container">
+	<form action="#" method="POST" class="reservation-form">
+		<div class="reservation-container">
 
-				{# PANNEAU MAÎTRE (GAUCHE) #}
-				<div class="layout-main-panel">
-					<div class="card mb-20">
-						<h2>Comparatif des Écarts par Devise</h2>
+			{# PANNEAU MAÎTRE (GAUCHE) #}
+			<div class="layout-main-panel">
+				<div class="card mb-20">
+					<h2>Comparatif des Écarts par Devise</h2>
 
-						<div
-							class="dynamic-discrepancy-grid">
-							{# Boucle Twig sur chaque ligne de solde configurée #}
-							{% for balance in session_balances %}
-								<div class="currency-discrepancy-block">
-									<div class="block-header">
-										<h3>Devise de transaction :
-											<strong>{{ balance.currency }}</strong>
-										</h3>
-									</div>
-									<div class="field-group">
-										<div class="field">
-											<label>Solde Attendu</label>
-											<input type="text" class="input-readonly font-bold" value="{{ balance.closingBalanceExpected }} {{ balance.currency }}" readonly>
-										</div>
-										<div class="field">
-											<label>Solde Déclaré</label>
-											<input type="text" class="input-readonly text-highlight-input" value="{{ balance.closingBalanceDeclared }} {{ balance.currency }}" readonly>
-										</div>
-										<div class="field">
-											<label>Écart constaté</label>
-											<input type="text" class="input-readonly {% if balance.closingBalanceDifference < 0 %}text-danger-mode{% else %}text-success-mode{% endif %} font-bold" value="{{ balance.closingBalanceDifference }} {{ balance.currency }}" readonly>
-										</div>
-									</div>
+					<div class="dynamic-discrepancy-grid">
+						{# Boucle Twig sur chaque ligne de solde configurée #}
+						{% for balance in session_balances %}
+						<div class="currency-discrepancy-block">
+							<div class="block-header">
+								<h3>Devise de transaction :
+									<strong>{{ balance.currency }}</strong>
+								</h3>
+							</div>
+							<div class="field-group">
+								<div class="field">
+									<label>Solde Attendu</label>
+									<input type="text" class="input-readonly font-bold"
+										value="{{ balance.closingBalanceExpected }} {{ balance.currency }}" readonly>
 								</div>
-							{% endfor %}
+								<div class="field">
+									<label>Solde Déclaré</label>
+									<input type="text" class="input-readonly text-highlight-input"
+										value="{{ balance.closingBalanceDeclared }} {{ balance.currency }}" readonly>
+								</div>
+								<div class="field">
+									<label>Écart constaté</label>
+									<input type="text"
+										class="input-readonly {% if balance.closingBalanceDifference < 0 %}text-danger-mode{% else %}text-success-mode{% endif %} font-bold"
+										value="{{ balance.closingBalanceDifference }} {{ balance.currency }}" readonly>
+								</div>
+							</div>
 						</div>
-					</div>
-
-					{# Décision managériale commune #}
-					<div class="card">
-						<h2>Rapport d'Arbitrage & Signature du Gérant</h2>
-						<div class="field">
-							<label>Note explicative de décharge *</label>
-							<textarea name="manager_note" class="text-area-arbitrage" placeholder="Saisissez les conclusions de l'inventaire physique avec l'agent (ex: Erreur de rendu de monnaie sur le billet #44)..." required></textarea>
-						</div>
+						{% endfor %}
 					</div>
 				</div>
 
-				{# SIDEBAR DE CONFIRMATION (DROITE) #}
-				<aside class="summary">
-					<div class="card summary-sticky-card">
-						<h2>Validation Définitive</h2>
-						<div class="reservation-notice-zone mb-20">
-							<p class="notice-title">
-								<i class="fa-solid fa-triangle-exclamation"></i>
-								Action irréversible</p>
-							<p class="notice-text">La signature de cette décharge gèle définitivement les écritures comptables de la journée.</p>
-						</div>
-
-						<ul class="billing-details-list">
-							<li>
-								<strong>Caissier :</strong>
-								<span>Marie Kabedi</span>
-							</li>
-							<li>
-								<strong>Statut cible :</strong>
-								<span class="text-success-mode">validated</span>
-							</li>
-						</ul>
-
-						<button type="submit" class="btn btn-primary btn-full mt-20 py-12 btn-sign">
-							<i class="fa-solid fa-signature"></i>
-							Signer & Clôturer la Session
-						</button>
+				{# Décision managériale commune #}
+				<div class="card">
+					<h2>Rapport d'Arbitrage & Signature du Gérant</h2>
+					<div class="field">
+						<label>Note explicative de décharge *</label>
+						<textarea name="manager_note" class="text-area-arbitrage"
+							placeholder="Saisissez les conclusions de l'inventaire physique avec l'agent (ex: Erreur de rendu de monnaie sur le billet #44)..."
+							required></textarea>
 					</div>
-				</aside>
-
+				</div>
 			</div>
-		</form>
-	</div>
+
+			{# SIDEBAR DE CONFIRMATION (DROITE) #}
+			<aside class="summary">
+				<div class="card summary-sticky-card">
+					<h2>Validation Définitive</h2>
+					<div class="reservation-notice-zone mb-20">
+						<p class="notice-title">
+							<i class="fa-solid fa-triangle-exclamation"></i>
+							Action irréversible
+						</p>
+						<p class="notice-text">La signature de cette décharge gèle définitivement les écritures
+							comptables de la journée.</p>
+					</div>
+
+					<ul class="billing-details-list">
+						<li>
+							<strong>Caissier :</strong>
+							<span>Marie Kabedi</span>
+						</li>
+						<li>
+							<strong>Statut cible :</strong>
+							<span class="text-success-mode">validated</span>
+						</li>
+					</ul>
+
+					<button type="submit" class="btn btn-primary btn-full mt-20 py-12 btn-sign">
+						<i class="fa-solid fa-signature"></i>
+						Signer & Clôturer la Session
+					</button>
+				</div>
+			</aside>
+
+		</div>
+	</form>
+</div>
 {% endblock %}
