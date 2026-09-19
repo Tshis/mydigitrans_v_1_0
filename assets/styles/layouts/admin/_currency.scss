@@ -18,6 +18,37 @@
     
     }
 
+    /* Style par défaut : Mobile et Tablettes */
+    .settings-container-grid {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 1.5rem; /* Espace légèrement réduit sur mobile pour gagner de la place */
+    }
+
+    /* Style pour les grands écrans (ordinateurs) : à partir de 992px */
+    @media (min-width: 992px) {
+        .settings-container-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+    }
+
+
+    .sidebar-action-panel{
+        .card{
+            border-top: 4px solid $primary;
+            .card-title-fix{color: $primary;}
+            .card-body{
+                p{
+                    color: $gray;
+                }
+            }
+        }
+    }
+
+
     .reports-center-grid-layout { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; }
     .main-form-panel { flex: 1; min-width: 0; width: 100%; }
     .control-card { padding: 1.5rem; border-top: 4px solid $primary; background: $white; border-radius: $radius-card; border: 1px solid $mute; }
@@ -82,4 +113,14 @@
     .admin-bus-layout-add-select, .admin-bus-layout-add-input, .input-currency-wrapper .admin-bus-layout-add-input-with-prefix { background: $dm-bg-main; color: white; border-color: rgba($white,0.1); }
     .table th { background: rgba($white,0.02); border-bottom-color: rgba($white,0.1); color: $mute; }
     .table td { border-bottom-color: rgba($white,0.05); }
+    .sidebar-action-panel{
+        .card{
+            .card-title-fix{color: $white;}
+            .card-body{
+                p{
+                    color: $mute;
+                }
+            }
+        }
+    }
 }
