@@ -67,8 +67,9 @@ final class BusController extends AbstractController
     #[Route('/admin/agency/bus/add', name: 'admin_agency_bus_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
+        $session = $request->getSession();
         if ($request->isMethod('POST')) {
-            dd($request);
+
             // Réception immédiate et propre de tes inputs HTML générés par la carrosserie
             $types = $request->request->all('specialPositionType');
             $rows = $request->request->all('specialPositionRow');
@@ -92,8 +93,69 @@ final class BusController extends AbstractController
             // $busSeatsPayload contient maintenant toutes tes cases cliquables ! 
             // Ton code persist_data Doctrine s'applique de façon 100% robuste.
 
+            /**
+             * A SUPPRIMER : INSERTION DU DANS LA SESSION
+             */
+            //A supprimer : insertion dans la session :
+            //Insertion dans la session => A SUPPRIMER UNE FOIS LA BD Mise en place
+            // Récupérer TOUTES les données sous forme de tableau
+            $allData = $request->request->all();
+
+            // Construction des Special Position
+            $specialPositions = [];
+
+
+            if ($allData) {
+
+
+                $types = $allData['specialPositionType'] ?? [];
+                $rows = $allData['specialPositionRow'] ?? [];
+                $cols = $allData['specialPositionCol'] ?? [];
+
+                foreach ($types as $index => $type) {
+                    $specialPositions[] = [
+                        'type' => $type,
+                        'row'  => (int) ($rows[$index] ?? 0),
+                        'col'  => (int) ($cols[$index] ?? 0),
+                    ];
+                }
+            }
+
+
+            $layouts = $session->get('bus_layout', []);
+            $newId = empty($layouts)  ? 1 : max(array_keys($layouts)) + 1;
+
+            $codebus = 'bus-0' . (strlen($newId) < 2 ? "0" . $newId : $newId);
+
+
+            //==============================================================//
+
+            //Construction de Bus Layout
+            $busLayout = [
+                'id' => $newId,
+                'name' => 'Bus de l\'agence ',
+                'agency' => 1,
+                'rows' => (int) $rows,
+                'columns' => (int) $cols,
+                'aisles' => array_map('intval', $allData['aisles'] ?? []),
+                'specialPositions' => $specialPositions,
+                'hasBackExtraSeat' => isset($allData['backExtraSeat']),
+                'isValided' => false,
+                'createdAt' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+                'resolvedAt' => null,
+            ];
+
+
+            //Insertion dans la session => A SUPPRIMER UNE FOIS LA BD Mise en place
+            // ajout du nouveau layout
+            $layouts[$newId] = $busLayout;
+
+            // sauvegarde en session
+            $session->set('bus_layout', $layouts);
+            //==============================================================//
+
             $this->addFlash('success', sprintf('Le bus immatriculé %s a été configuré et inséré.', $plateNumber));
-            return $this->redirectToRoute('admin_agency_bus_index');
+            return $this->redirectToRoute('admin_agency_bus_show', ['code' =>  $codebus]);
         }
 
         return $this->render('admin/agency/bus/add.html.twig', [
@@ -122,7 +184,9 @@ final class BusController extends AbstractController
             'bus-006' => 6,
             'bus-007' => 7,
             'bus-008' => 8,
-            'bus-009' => 9,
+            'bus-010' => 10,
+            'bus-011' => 11,
+            'bus-012' => 12,
         ];
 
         $layoutId = $busToLayoutMap[$code] ?? null;

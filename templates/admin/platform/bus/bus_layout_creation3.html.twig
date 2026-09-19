@@ -1,0 +1,121 @@
+{# templates/admin/platform/bus/bus_layout_creation.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/admin/layout_builder.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div class="admin-bus-layout-add-scope">
+		<div
+			class="admin-bus-layout-add-container">
+
+			{# --- EN-TÊTE --- #}
+			<header class="admin-bus-layout-add-header">
+				<div class="agency-profile-block">
+					<a href="#" class="agency-back-action">
+						<i class="fa-solid fa-arrow-left"></i>
+					</a>
+					<div class="agency-profile-meta">
+						<h2 class="admin-bus-layout-add-title">
+							<i class="fa-solid fa-compass-drafting"></i>
+							Concepteur de Gabarits (Système)
+						</h2>
+						<p class="admin-bus-layout-add-subtitle">Créez des modèles de sièges d'usine réutilisables pour la flotte globale.</p>
+					</div>
+				</div>
+			</header>
+
+			{# COMPOSANT DE LA PAGE #}
+			<form
+				class="admin-bus-layout-add-grid-layout" id="bus_layout_add_form" method="post">
+
+				{# --- COMPOSANT GAUCHE : CONFIGURATION TECHNIQUE --- #}
+				<div class="admin-bus-layout-add-column">
+					<div class="admin-bus-layout-add-card">
+						<h3 class="card-inner-title mb-20">
+							<i class="fa-solid fa-sliders"></i>
+							Configuration Technique
+						</h3>
+
+						<div class="admin-bus-layout-add-form">
+							<div class="field mb-20">
+								<label class="admin-bus-layout-add-label">Nom du modèle / Gabarit *</label>
+								<input type="text" id="layout-name" class="admin-bus-layout-add-input" placeholder="Ex: Modèle Standard Coaster (2-2)" required name="name">
+							</div>
+
+							<div class="field-group mb-20">
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Nombre de Rangées *</label>
+									<input type="number" id="layout-main-rows" class="admin-bus-layout-add-input" min="2" max="22" placeholder="Ex: 10" name="rows" value="10" required>
+								</div>
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Colonnes de Sièges *</label>
+									<input type="number" id="layout-main-cols" class="admin-bus-layout-add-input" min="2" max="7" placeholder="Ex: 4" name="columns" value="4" required>
+								</div>
+							</div>
+
+							<div class="field mb-20 toggle-field">
+								<label class="checkbox-container">
+									<input type="checkbox" id="layout-back-extra" checked name="backExtraSeat">
+									<span class="checkmark"></span>
+									Banquette complète au fond
+								</label>
+							</div>
+
+							{# --- CONFIGURATION DYNAMIQUE DES COULOIRS MULTIPLES --- #}
+							<div class="field mb-20 toggle-field">
+								<label class="checkbox-container">
+									<input type="checkbox" id="layout-aisle-toggle" checked>
+									<span class="checkmark"></span>
+									Présence d'un ou plusieurs couloirs
+								</label>
+							</div>
+
+							<div class="js-aisle mb-20" id="aisle-logic-block" style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 8px;">
+								<div
+									id="aisles-container">{# Injecté dynamiquement par le script #}
+								</div>
+								<div class="button-right" style="text-align: right; margin-top: 10px;">
+									<button type="button" id="btn-add-aisle" class="agency-layout-btn" style="padding: 6px 12px; font-size: 12px;">
+										<i class="fa-solid fa-plus"></i>
+										Ajouter un autre couloir
+									</button>
+								</div>
+							</div>
+
+							<button type="button" id="btn-generate-matrix" class="agency-layout-btn agency-layout-btn--generate agency-layout-btn--full">
+								<i class="fa-solid fa-arrows-rotate"></i>
+								Générer la Grille de Dessin
+							</button>
+						</div>
+					</div>
+				</div>
+
+				{# --- COMPOSANT DROITE : SCHÉMA TECHNIQUE --- #}
+				<div class="admin-bus-layout-add-column">
+					<div class="admin-bus-layout-add-card card-highlight">
+						<h3 class="card-inner-title text-center">
+							<i class="fa-solid fa-bus"></i>
+							Aperçu de la Carrosserie d'Usine
+						</h3>
+
+						<div class="seatmap-card">
+							<div class="bus-head">Avant du véhicule</div>
+							<div id="layout-interactive-grid" class="seatmap-matrix"></div>
+						</div>
+
+						<div class="admin-bus-layout-add-action-zone" style="text-align: right; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
+							<button type="submit" id="btn-submit-layout" class="agency-layout-btn agency-layout-btn--save text-size-12">
+								<i class="fa-solid fa-cloud-arrow-up"></i>
+								Enregistrer le Modèle en Session
+							</button>
+						</div>
+					</div>
+				</div>
+
+			</form>
+		</div>
+	</div>
+{% endblock %}
