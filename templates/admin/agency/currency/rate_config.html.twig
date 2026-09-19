@@ -14,72 +14,70 @@
 					<div class="sub-header-flex">
 						<span class="text-gray text-size-13">Action B</span>
 						<span class="arrow-divider">•</span>
-						<span class="text-primary text-size-13 text-highlight">Planification Temporelle [MCD 16]</span>
+						<span class="text-primary text-size-13 text-highlight">Grille des Taux Quotidiens</span>
 					</div>
-					<h1 class="mt-5">Configuration du Taux Journalier</h1>
+					<h1 class="mt-5">Configuration des Taux Journaliers</h1>
 				</div>
 			</div>
 		</header>
 
-		{# --- LAYOUT DOUBLE COLONNE FORMULAIRE --- #}
+		{# --- LAYOUT DOUBLE COLONNE --- #}
 		<form action="#" method="POST" class="settings-form-layout">
 			<div
 				class="settings-container-grid">
 
-				{# COLONNE GAUCHE : FORMULAIRE DE SAISIE AVEC PLANIFICATION #}
+				{# COLONNE GAUCHE : FORMULAIRE DE SAISIE MUTLI-DEVISES #}
 				<div class="main-form-panel">
-					<div class="card control-card">
+					<div class="card control-card mb-20">
 						<h2 class="card-title-fix">
 							<i class="fa-solid fa-clock text-warning"></i>
-							Programmer l'Application du Taux</h2>
-
-						<div class="direct-pricing-row mb-25">
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Devise Cible</label>
-								<input type="text" class="admin-bus-layout-add-input text-disabled" value="1 USD ($)" disabled style="opacity: 0.7;">
-							</div>
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Équivalent en
-									{{ agency_config.baseCurrency }}
-									*</label>
-								<div class="input-currency-wrapper">
-									<input type="number" name="rate_value" class="admin-bus-layout-add-input-with-prefix" value="615" min="1" max="10000" required>
-									<span class="input-suffix-label">{{ agency_config.baseCurrency }}</span>
-								</div>
-							</div>
-						</div>
-
-						{# --- NOUVEAU CHAMP : DATE ET HEURE D'EFFECTIVITÉ [MCD 16] --- #}
+							1. Planification Temporelle</h2>
 						<div class="direct-pricing-row mb-25">
 							<div class="field">
 								<label class="admin-bus-layout-add-label">Date et Heure d'Effectivité (effectiveFrom) *</label>
-								{# Initialisé par défaut avec la date et l'heure actuelle pour gagner du temps #}
 								<input type="datetime-local" name="effective_from" class="admin-bus-layout-add-input" value="{{ "now"|date('Y-m-d\\TH:i') }}" required>
 							</div>
 						</div>
 
+						<h2 class="card-title-fix pt-10">
+							<i class="fa-solid fa-money-bill-trend-up text-primary"></i>
+							2. Fixation des Taux par rapport au
+							{{ agency_config.baseCurrency }}</h2>
+
+						{# BOUCLE DYNAMIQUE : Génère une ligne de taux pour chaque devise secondaire acceptée #}
+						{% for currency in accepted_currencies %}
+							{% if currency.code != agency_config.baseCurrency %}
+								<div class="direct-pricing-row mb-20">
+									<div class="field">
+										<label class="admin-bus-layout-add-label">Devise Source</label>
+										<input
+										type="text" class="admin-bus-layout-add-input text-disabled" value="1 {{ currency.code }} ({{ currency.symbol }})" disabled style="opacity: 0.7;">
+										{# Input caché pour transmettre le code de la devise cible à PHP #}
+										<input type="hidden" name="target_currency_code[]" value="{{ currency.code }}">
+									</div>
+									<div class="field">
+										<label class="admin-bus-layout-add-label">Équivalent en
+											{{ agency_config.baseCurrency }}
+											*</label>
+										<div class="input-currency-wrapper">
+											<input type="number" step="0.01" name="rate_value[]" class="admin-bus-layout-add-input-with-prefix" placeholder="Saisir la valeur du taux" required>
+											<span class="input-suffix-label">{{ agency_config.baseCurrency }}</span>
+										</div>
+									</div>
+								</div>
+							{% endif %}
+						{% else %}
+							<div class="notice-box-info mb-15">
+								<p class="text-gray italic">Aucune devise secondaire n'est activée dans l'Action A. Seule la devise de base est utilisée (Taux fixe à 1.00).</p>
+							</div>
+						{% endfor %}
+
 						<div class="admin-bus-layout-add-action-zone">
 							<a href="{{ path('admin_agency_currency_index') }}" class="btn btn-gray">Annuler</a>
-							<button type="submit" class="btn btn-success">
-								<i class="fa-solid fa-calendar-check"></i>
-								Déployer le taux programmé
-							</button>
-						</div>
-					</div>
-				</div>
-
-				{# COLONNE DROITE : INFORMATION REGLEMENTAIRE #}
-				<aside class="sidebar-action-panel">
-					<div class="card sticky-aside-card" style="border-top-color: #f2994a;">
-						<h2 class="card-title-fix" style="color: #d06d16;">
-							<i class="fa-solid fa-timeline"></i>
-							Gestion Chronologique</h2>
+							<button<i type="submit" class="btn btn-success" {% if accepted_currencies|length <= 1 %}disabled{% endif %}> <i class="fa-solid fa-sun"></i> Déployer la grille des taux </button> </div> </div> </div> {# COLONNE DROITE : CONTEXTE #} <aside class="sidebar-action-panel"> <div class="card sticky-aside-card" style="border-top-color: #f2994a;"> <h2 class="card-title-fix" style="color: #d06d16;"> class="fa-solid fa-circle-exclamation"></i>
+							Rappel Multi-Devises</h2>
 						<div class="notice-box-info info-warning mb-15">
-							<p>
-								<strong>
-									<i class="fa-solid fa-clock"></i>
-									Déclenchement Temporel :</strong>
-								Le système MyDigitrans basculera automatiquement sur ce taux dès que l'horloge système aura dépassé la date d'effectivité choisie à gauche.</p>
+							<p>Vous devez fixer simultanément la valeur de chaque monnaie acceptée. Le système MyDigitrans appliquera ces équivalences de manière synchronisée au guichet dès l'heure d'effectivité atteinte.</p>
 						</div>
 					</div>
 				</aside>

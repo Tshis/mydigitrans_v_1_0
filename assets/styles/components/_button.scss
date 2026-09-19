@@ -68,5 +68,15 @@
         color: $white; box-shadow: 0 4px 15px rgba($danger, 0.3);
         &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($danger, 0.4); }
     }
+    &.btn-dark-gradient {
+        background: linear-gradient(135deg, $dark 0%, darken($dark, 15%) 100%);
+        color: $white; box-shadow: 0 4px 15px rgba($dark, 0.3);
+        &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($dark, 0.4); }
+    }
+    &.btn-gray-gradient {
+        background: linear-gradient(135deg, $gray 0%, darken($gray, 15%) 100%);
+        color: $white; box-shadow: 0 4px 15px rgba($gray, 0.3);
+        &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($gray, 0.4); }
+    }
     &.btn-full { width: 100%; justify-content: center; }
 }

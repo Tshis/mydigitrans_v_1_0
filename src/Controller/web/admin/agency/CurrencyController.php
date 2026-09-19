@@ -119,38 +119,50 @@ final class CurrencyController extends AbstractController
     public function configureRate(Request $request): Response
     {
         $session = $request->getSession();
-        $baseCurrencyCode = 'XAF'; // Devise de base de l'agence issue de CurrencyAgency
+
+        // 1. Extraction de la devise de base de l'agence depuis CurrencyAgency
+        $baseCurrencyCode = 'XAF';
+
+        // 2. Extraction des devises acceptées au guichet via CurrencyAgency pour alimenter la grille dynamique
+        $acceptedCurrencies = [
+            ['code' => 'XAF', 'symbol' => 'FCFA', 'name' => 'Franc CFA (BEAC)'],
+            ['code' => 'USD', 'symbol' => '$', 'name' => 'Dollar Américain'],
+            ['code' => 'EUR', 'symbol' => '€', 'name' => 'Euro']
+        ];
 
         if ($request->isMethod('POST')) {
-            $rateValue = (float) $request->request->get('rate_value');
+            $effectiveFromInput = $request->request->get('effective_from');
+            $effectiveFrom = new \DateTimeImmutable($effectiveFromInput);
 
-            // EN ORM / DOCTRINE -> Insertion stricte dans "16. ExchangeRate" :
-            // $exchangeRate = new ExchangeRate();
-            // $exchangeRate->setBaseCurrencyId($baseCurrency); // Ex: XAF
-            // $exchangeRate->setTargetCurrencyId($usdCurrency); // Ex: USD
-            // $exchangeRate->setRate($rateValue);
-            // $exchangeRate->setAgency($currentAgency);
-            // $exchangeRate->setEffectiveFrom(new \DateTimeImmutable()); // Actif dès maintenant
+            // Réception des tableaux d'inputs parallèles générés dynamiquement par Twig
+            $targetCurrencyCodes = $request->request->all('target_currency_code');
+            $rateValues = $request->request->all('rate_value');
 
-            $this->addFlash('success', 'Le nouveau taux du matin a été inséré dans le registre ExchangeRate.');
+            if (!empty($targetCurrencyCodes)) {
+                foreach ($targetCurrencyCodes as $index => $targetCode) {
+                    $rate = (float) ($rateValues[$index] ?? 1.0);
+
+                    // EN INTEGRATION ORM / DOCTRINE FINALE :
+                    // On persiste une entité 16. ExchangeRate pour CHAQUE devise secondaire
+                    // $exchangeRate = new ExchangeRate();
+                    // $exchangeRate->setBaseCurrencyId($baseCurrencyCode); // Ex: XAF
+                    // $exchangeRate->setTargetCurrencyId($targetCode); // Ex: USD, puis EUR
+                    // $exchangeRate->setRate($rate);
+                    // $exchangeRate->setEffectiveFrom($effectiveFrom);
+                    // $exchangeRate->setAgency($currentAgency);
+                    // $entityManager->persist($exchangeRate);
+                }
+                // $entityManager->flush();
+            }
+
+            $this->addFlash('success', sprintf(
+                'La grille des taux quotidiens a été programmée pour prendre effet le %s à %s.',
+                $effectiveFrom->format('d/m/Y'),
+                $effectiveFrom->format('H:i')
+            ));
+
             return $this->redirectToRoute('admin_agency_currency_index');
         }
-
-        // Extraction de l'historique complet trié par ordre chronologique décroissant depuis ExchangeRate
-        $rateHistory = [
-            [
-                'date' => new \DateTime('2026-09-19 06:30:00'),
-                'value' => 615,
-                'updatedBy' => 'Daniel Lukonu',
-                'current' => true
-            ],
-            [
-                'date' => new \DateTime('2026-09-18 06:15:00'),
-                'value' => 612,
-                'updatedBy' => 'Daniel Lukonu',
-                'current' => false
-            ]
-        ];
 
         return $this->render('admin/agency/currency/rate_config.html.twig', [
             'page' => 'currency',
@@ -158,7 +170,7 @@ final class CurrencyController extends AbstractController
                 'baseCurrency' => $baseCurrencyCode,
                 'acceptedCurrencies' => ['XAF', 'USD', 'EUR']
             ],
-            'rate_history' => $rateHistory
+            'accepted_currencies' => $acceptedCurrencies
         ]);
     } //configureRate
 
