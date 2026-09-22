@@ -71,7 +71,7 @@ final class BusLayoutController extends AbstractController
         }
 
         //Rendu du formulaire de creation de buslayout
-        return $this->render('admin/platform/bus/bus_layout_creation3.html.twig', [
+        return $this->render('admin/platform/bus/bus_layout_creation.html.twig', [
             'page' => 'bus',
 
         ]);

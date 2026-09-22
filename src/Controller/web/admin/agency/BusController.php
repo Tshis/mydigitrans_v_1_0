@@ -68,31 +68,10 @@ final class BusController extends AbstractController
     public function add(Request $request): Response
     {
         $session = $request->getSession();
+
+        $layouts = $session->get('bus_layout', []);
+
         if ($request->isMethod('POST')) {
-
-            // Réception immédiate et propre de tes inputs HTML générés par la carrosserie
-            $types = $request->request->all('specialPositionType');
-            $rows = $request->request->all('specialPositionRow');
-            $cols = $request->request->all('specialPositionCol');
-
-            $aisles = $request->request->all('aisles'); // Allées du véhicule
-            $plateNumber = $request->request->get('plate_number');
-
-            $busSeatsPayload = [];
-
-            if (!empty($types)) {
-                foreach ($types as $index => $type) {
-                    $busSeatsPayload[] = [
-                        'type' => $type,
-                        'row'  => (int)($rows[$index] ?? 0),
-                        'col'  => (int)($cols[$index] ?? 0)
-                    ];
-                }
-            }
-
-            // $busSeatsPayload contient maintenant toutes tes cases cliquables ! 
-            // Ton code persist_data Doctrine s'applique de façon 100% robuste.
-
             /**
              * A SUPPRIMER : INSERTION DU DANS LA SESSION
              */
@@ -123,6 +102,8 @@ final class BusController extends AbstractController
 
 
             $layouts = $session->get('bus_layout', []);
+
+
             $newId = empty($layouts)  ? 1 : max(array_keys($layouts)) + 1;
 
             $codebus = 'bus-0' . (strlen($newId) < 2 ? "0" . $newId : $newId);
@@ -145,6 +126,8 @@ final class BusController extends AbstractController
                 'resolvedAt' => null,
             ];
 
+            dd($layouts);
+
 
             //Insertion dans la session => A SUPPRIMER UNE FOIS LA BD Mise en place
             // ajout du nouveau layout
@@ -153,16 +136,33 @@ final class BusController extends AbstractController
             // sauvegarde en session
             $session->set('bus_layout', $layouts);
             //==============================================================//
-
-            $this->addFlash('success', sprintf('Le bus immatriculé %s a été configuré et inséré.', $plateNumber));
             return $this->redirectToRoute('admin_agency_bus_show', ['code' =>  $codebus]);
         }
 
         return $this->render('admin/agency/bus/add.html.twig', [
             'page' => 'bus',
-            'branches_list' => [['code' => 'SUC-KIN-01', 'name' => 'Victoire']]
+            'layouts' => $layouts
+
         ]);
     } //add
+
+
+    #[Route('/admin/agency/bus/preview-layout/{id}')]
+    public function seatmap_render(Request $request, int $id, BusLayoutGridBuilder $busLayoutGridBuilder): Response
+    {
+        $session = $request->getSession();
+
+        $layouts = $session->get('bus_layout', []);
+
+        $seatmapData = $layouts[$id];
+
+        // dd($seatmapData);
+
+        // RENDU EXCLUSIF DU FRAGMENT : Symfony ne compile que le morceau HTML du partial !
+        return $this->render('system/seatmap.html.twig', [
+            'seatmap' =>  $busLayoutGridBuilder->build($seatmapData)
+        ]);
+    } //seatmap_render
 
 
 
