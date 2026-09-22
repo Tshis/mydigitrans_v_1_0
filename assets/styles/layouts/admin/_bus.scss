@@ -307,6 +307,13 @@
                 padding: 16px;
             }
         }
+
+        .seatmap-card .seatmap-matrix .seat-radio:disabled+label{
+            background: lighten($color: $success, $amount: 25%);
+            color: $dark;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
     }
 }
 
@@ -325,7 +332,7 @@
     .header-refined .agency-back-action {
         background: $dm-bg-surface;
         color: $white;
-        border-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba($white, 0.1);
         
         &:hover {
             border-color: $primary;
@@ -335,8 +342,8 @@
 
     .agency-bus-add-card,
     .seatmap-section .seatmap-zone {
-        background: $dm-bg-surface;
-        border-color: rgba(255, 255, 255, 0.08);
+        background: $dm-bg;
+        border-color: rgba($white, 0.08);
     }
 
     .agency-bus-add-form-layout {
@@ -344,32 +351,45 @@
         .agency-bus-add-form-select {
             background: $dm-bg-main;
             color: $white;
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba($white, 0.1);
             option {background: $dm-bg-surface;color: $white;
             }
         }
     }
 
     seatmap-card {
-        background: rgba(0, 0, 0, 0.2);
-        border-color: rgba(255, 255, 255, 0.08);
+        background: rgba($dark, 0.2);
+        border-color: rgba($white, 0.08);
         
         .bus-head {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba($white, 0.08);
+            border: 1px solid rgba($white, 0.1);
+        }
+
+        .seatmap-card .seatmap-matrix .seat-radio:disabled+label{
+            background: lighten($color: $success, $amount: 5%);
+            color: $white;
         }
     }
     
     .seatmap-matrix .cell-unit {
-        background: $dm-bg-main;&[data-type="aisle"] {
-        background: transparent;
-        border-color: rgba(255, 255, 255, 0.15);
+        background: $dm-bg-main;
+        &[data-type="aisle"] {
+        background: $gray !important;
+        border-color: rgba($white, 0.15);
+        }
+        &[data-type="driver"] ,
+        &[data-type="door"],
+        &[data-type="wc"],
+        &[data-type="porter"]{
+            background: $primary !important;
+            border-color: rgba($white, 0.15) !important;
         }
     }
     
     .seatmap-section .seatmap-section-header,
-    .seatmap-legend-bar {border-top-color: rgba(255, 255, 255, 0.08);
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+    .seatmap-legend-bar {border-top-color: rgba($white, 0.08);
+    border-bottom-color: rgba($white, 0.08);
 }}
 
 
