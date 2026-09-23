@@ -10,6 +10,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class BusLayoutController extends AbstractController
 {
+
+    #[Route('/admin/platform/bus-layouts', name: 'admin_platform_bus_layout_index')]
+    public function index() {}
+
+
     #[Route('/admin/platform/bus-layout/add', name: 'admin_platform_bus_layout_add')]
     public function add(Request $request): Response
     {

@@ -1,0 +1,174 @@
+{# templates/admin/platform/dashboard.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div class="admin-platform-dashboard-scope container">
+
+    {# --- EN-TÊTE DE LA CONSOLE DE SUPERVISION --- #}
+    <header class="header mb-25">
+        <div class="header-main-info">
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Supervision Réseau SaaS</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">Console d'Exploitation</span>
+                </div>
+                <h1 class="mt-5">Dashboard Plateforme</h1>
+            </div>
+        </div>
+    </header>
+
+    {# --- BLOC 1 : LES BLOCS D'INDICATEURS SUR-MESURE (KPI) --- #}
+    <div class="reports-center-grid-layout mb-25">
+        <div class="main-modules-panel">
+
+            {# AGENCES TOTALES #}
+            <div class="card control-card kpi-card">
+                <div class="kpi-icon-wrapper text-primary-mode">
+                    <i class="fa-solid fa-building-shield"></i>
+                </div>
+                <div class="kpi-data">
+                    <label class="admin-bus-layout-add-label">Total Agences</label>
+                    <span class="kpi-value">{{ stats.total_companies }}</span>
+                </div>
+            </div>
+
+            {# AGENCES EN RÈGLE #}
+            <div class="card control-card kpi-card kpi-success">
+                <div class="kpi-icon-wrapper text-success-mode">
+                    <i class="fa-solid fa-building-circle-check"></i>
+                </div>
+                <div class="kpi-data">
+                    <label class="admin-bus-layout-add-label">Agences Actives</label>
+                    <span class="kpi-value">{{ stats.active_companies }}</span>
+                </div>
+            </div>
+
+            {# AGENCES EXPIRÉES #}
+            <div class="card control-card kpi-card kpi-danger">
+                <div class="kpi-icon-wrapper">
+                    <i class="fa-solid fa-building-circle-xmark"></i>
+                </div>
+                <div class="kpi-data">
+                    <label class="admin-bus-layout-add-label">Agences Inactives</label>
+                    <span class="kpi-value">{{ stats.inactive_companies }}</span>
+                </div>
+            </div>
+
+            {# AGENCES EN ALERTE #}
+            <div class="card control-card kpi-card kpi-primary">
+                <div class="kpi-icon-wrapper">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="kpi-data">
+                    <label class="admin-bus-layout-add-label">Agences En Alerte</label>
+                    <span class="kpi-value">{{ stats.alert_companies }}</span>
+                </div>
+            </div>
+
+            {# TICKETS VENDUS DU JOUR #}
+            <div class="card control-card kpi-card kpi-success">
+                <div class="kpi-icon-wrapper text-primary-mode">
+                    <i class="fa-solid fa-ticket"></i>
+                </div>
+                <div class="kpi-data">
+                    <label class="admin-bus-layout-add-label">Tickets Vendus (Jour)</label>
+                    <span class="kpi-value">{{ stats.tickets_today|number_format(0, ',', ' ') }}</span>
+                </div>
+            </div>
+
+            {# PARTENAIRES #}
+            <div class="card control-card kpi-card kpi-primary">
+                <div class="kpi-icon-wrapper text-primary-mode">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div class="kpi-data">
+                    <label class="admin-bus-layout-add-label">Partenaires</label>
+                    <span class="kpi-value">{{ stats.partners }}</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# --- LAYOUT DOUBLE COLONNE COMPOSANT --- #}
+    <div class="settings-form-layout">
+        <div class="settings-container-grid">
+
+            {# COLONNE GAUCHE : SUIVI CHRONOLOGIQUE DES COMPAGNIES (ABONNEMENTS / PROMO) #}
+            <div class="main-form-panel">
+                <div class="table-responsive-wrapper">
+                    <h2 class="card-title-fix text-size-14 py-10">
+                        <i class="fa-solid fa-clipboard-list text-primary"></i>
+                        Journal des Transactions & Activités Licences des Agences
+                    </h2>
+                    <table class="table table-scrollable table-striped">
+                        <thead>
+                            <tr>
+                                <th>Agence / Compagnie</th>
+                                <th>Type d'Événement</th>
+                                <th>Détails de l'Action Réseau</th>
+                                <th>Date d'effet</th>
+                                <th class="text-right">Impact Chiffre ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_activities %}
+                            <tr>
+                                <td>
+                                    <strong>{{ log.company_name }}</strong>
+                                </td>
+                                <td>
+                                    <span
+                                        class="pill-report-audit {{ log.event_type == 'Abonnement' ? 'closed' : 'open' }}"
+                                        style="font-size: 10px;">
+                                        {{ log.event_type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-gray">{{ log.details }}</span>
+                                </td>
+                                <td class="monospace text-size-12">{{ log.created_at|date('d/m/Y H:i') }}</td>
+                                <td class="text-right font-bold monospace text-primary-mode">
+                                    {{ log.revenue > 0 ? '+' ~ log.revenue|number_format(2, ',', ' ') ~ ' $' : '0,00 $'
+                                    }}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-gray italic padding-20">Aucun mouvement de
+                                    licence enregistré aujourd'hui.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# COLONNE DROITE : LE CATALOGUE DES DEVISES CONSERVÉ #}
+            <aside class="sidebar-action-panel">
+                <div class="card sticky-aside-card">
+                    <h2 class="card-title-fix">
+                        <i class="fa-solid fa-earth-africa text-primary"></i>
+                        Catalogue Devises Système
+                    </h2>
+                    <div class="currency-mini-list">
+                        {% for currency in system_currencies %}
+                        <div class="currency-item-row">
+                            <span class="monospace">
+                                <strong>{{ currency.code }}</strong>
+                                -
+                                {{ currency.name }}</span>
+                            <span class="pill-report-audit closed"
+                                style="font-size: 9px; padding: 2px 6px;">Système</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

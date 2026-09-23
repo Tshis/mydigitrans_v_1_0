@@ -31,19 +31,24 @@ final class FinancialController extends AbstractController
                         'amount' => 1450000,
                         'currency' => 'CDF',
                     ],
-                    [
-                        'amount' => 2000,
-                        'currency' => 'USD',
-                    ],
                 ],
                 'cargoRevenue' =>  [
                     [
-                        'amount' => 450000,
+                        'amount' => 45000,
                         'currency' => 'CDF',
                     ],
+
+                ],
+                'expenseRevenue' =>  [
                     [
-                        'amount' => 250,
-                        'currency' => 'USD',
+                        'amount' => 45000,
+                        'currency' => 'CDF',
+                    ],
+                ],
+                'margeRevenue' =>  [
+                    [
+                        'amount' => 100000,
+                        'currency' => 'CDF',
                     ],
                 ],
                 'auditStatus' => 'verified',
@@ -58,19 +63,24 @@ final class FinancialController extends AbstractController
                         'amount' => 980000,
                         'currency' => 'CDF',
                     ],
-                    [
-                        'amount' => 300,
-                        'currency' => 'USD',
-                    ],
+
                 ],
                 'cargoRevenue' =>  [
                     [
                         'amount' => 120000,
                         'currency' => 'CDF',
                     ],
+                ],
+                'expenseRevenue' =>  [
                     [
-                        'amount' => 2800,
-                        'currency' => 'USD',
+                        'amount' => 45000,
+                        'currency' => 'CDF',
+                    ],
+                ],
+                'margeRevenue' =>  [
+                    [
+                        'amount' => 100000,
+                        'currency' => 'CDF',
                     ],
                 ],
                 'auditStatus' => 'verified',

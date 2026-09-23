@@ -1,0 +1,96 @@
+{# 1. SUPERVISION ET MACRO #}
+<a href="{{ path('admin_platform_dashboard') }}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Vue globale de la plateforme">
+	<span class="icon">
+		<i class="fa-solid fa-chart-line"></i>
+	</span>
+	<span class="text">Dashboard Système</span>
+</a>
+
+{# 2. PARTENAIRES ET AGENCES COMPAGNIES #}
+<a href="" class="menu-link {{ page is same as('company') ? 'active' : '' }}" data-tooltip="Gestion des Compagnies & Agences Partenaires">
+	<span class="icon">
+		<i class="fa-solid fa-building-shield"></i>
+	</span>
+	<span class="text">Compagnies / Agences</span>
+</a>
+
+<a href="" class="menu-link {{ page is same as('subscription') ? 'active' : '' }}" data-tooltip="Suivi des abonnements SaaS et Licences">
+	<span class="icon">
+		<i class="fa-solid fa-credit-card"></i>
+	</span>
+	<span class="text">Abonnements & Licences</span>
+</a>
+
+{# 3. RÉFÉRENTIELS USINE (FLOTTE GLOBALE) #}
+<a href="{{ path('admin_platform_bus_layout_index') }}" class="menu-link {{ page is same as('bus_layout') ? 'active' : '' }}" data-tooltip="Modèles d'usines / Gabarits de bus réutilisables">
+	<span class="icon">
+		<i class="fa-solid fa-compass-drafting"></i>
+	</span>
+	<span class="text">Modèles de Gabarits</span>
+</a>
+
+{# 4. CONTRÔLE GLOBAUX & MONÉTAIRE #}
+<a href="" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises [MCD 15]">
+	<span class="icon">
+		<i class="fa-solid fa-earth-africa"></i>
+	</span>
+	<span class="text">Catalogue Devises</span>
+</a>
+
+<a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
+	<span class="icon">
+		<i class="fa-solid fa-users"></i>
+	</span>
+	<span class="text">Utilisateurs</span>
+</a>
+
+<a href="{{path('admin_agency_role_index')}}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
+	<span class="icon">
+		<i class="fa-solid fa-id-card-clip"></i>
+	</span>
+	<span class="text">Fonctions du Personnel</span>
+</a>
+
+<a href="" class="menu-link {{ page is same as('partner') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
+	<span class="icon">
+		<i class="fa-solid fa-user-tie"></i>
+	</span>
+	<span class="text">Partenaires</span>
+</a>
+
+<a href="" class="menu-link {{ page is same as('audit') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
+	<span class="icon">
+		<i class="fa-solid fa-shield-halved"></i>
+	</span>
+	<span class="text">Logs & Audit Sécurité</span>
+</a>
+
+{# 5. PILOTAGE #}
+<a href="{{path('admin_agency_report_index')}}" class="menu-link {{ page is same as('report') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
+	<span class="icon">
+		<i class="fa-solid fa-newspaper"></i>
+	</span>
+	<span class="text">Rapports</span>
+</a>
+
+{# 5. COMPTES & ACCÈS PLATFORME #}
+<a href="" class="menu-link {{ page is same as('platform_user') ? 'active' : '' }}" data-tooltip="Gestion des Administrateurs Système">
+	<span class="icon">
+		<i class="fa-solid fa-user-gear"></i>
+	</span>
+	<span class="text">Admin Système</span>
+</a>
+
+<a href="" class="menu-link {{ page is same as('settings') ? 'active' : '' }}" data-tooltip="Paramètres généraux de la plateforme">
+	<span class="icon">
+		<i class="fa-solid fa-sliders"></i>
+	</span>
+	<span class="text">Configuration SaaS</span>
+</a>
+
+<a href="{{path('admin_password_change')}}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
+	<span class="icon">
+		<i class="fa-solid fa-gear"></i>
+	</span>
+	<span class="text">Paramètres</span>
+</a>

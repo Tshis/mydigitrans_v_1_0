@@ -12,7 +12,15 @@
 	<!--header-->
 
 	<nav class="menu">
-		{% include "admin/partials/menu/_agency.html.twig" %}
+		{% set user_type = 'agency' %}
+		{% if user_type is same as('agency') %}
+			{% include "admin/partials/menu/_agency.html.twig" %}
+		{% elseif user_type is same as('platform') %}
+			{% include "admin/partials/menu/_platform.html.twig" %}
+		{% elseif user_type is same as('partner') %}
+			{% include "admin/partials/menu/_partner.html.twig" %}
+		{% endif %}
+
 	</nav>
 	<!--menu-->
 

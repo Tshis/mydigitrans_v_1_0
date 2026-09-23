@@ -2,148 +2,165 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/datatable.js" defer></script>
-<script src="/js/admin/csv_export.js" defer></script>
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+	<script src="/js/admin/csv_export.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-agency-report-scope container">
-	{# --- HEADER DE LA CONSOLE COMPTABLE --- #}
-	<header class="header mb-25">
-		<div class="header-main-info">
-			<a href="{{ path('admin_agency_report_index') }}" class="agency-back-action">
-				<i class="fa-solid fa-arrow-left"></i>
-			</a>
-			<div class="title">
-				<div class="sub-header-flex">
-					<span class="text-gray text-size-13">Finance & Logistique</span>
-					<span class="arrow-divider">•</span>
-					<span class="text-primary text-size-13 text-highlight">Registre Comptable</span>
+	<div
+		class="admin-agency-report-scope container">
+		{# --- HEADER DE LA CONSOLE COMPTABLE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_report_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Finance & Logistique</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Registre Comptable</span>
+					</div>
+					<h1 class="mt-5">Rapport Financier Consolidé</h1>
 				</div>
-				<h1 class="mt-5">Rapport Financier Consolidé</h1>
 			</div>
-		</div>
-		<div class="header-actions">
-			<button type="button" class="btn-refined btn-primary-gradient"
-				onclick="executeAdvancedExport('Registre Comptable');">
-				<i class="fa-solid fa-file-excel"></i>
-				<span>Exporter le rapport</span>
-			</button>
-		</div>
-	</header>
-
-	{# --- COMMENCEMENT DE LA ZONE DE FILTRES ALIGNÉS PAR LE BAS --- #}
-	<div class="trip-filters-card mb-20">
-		<form action="#" method="GET" class="field-group">
-			<div class="field">
-				<label class="admin-bus-layout-add-label">Période du</label>
-				<input type="date" name="date_from" class="admin-bus-layout-add-input" value="{{ date_from }}">
-			</div>
-			<div class="field">
-				<label class="admin-bus-layout-add-label">Au</label>
-				<input type="date" name="date_to" class="admin-bus-layout-add-input" value="{{ date_to }}">
-			</div>
-			<div class="field">
-				<label class="admin-bus-layout-add-label">Filtrer par Succursale</label>
-				<select name="branch_code" class="admin-bus-layout-add-select">
-					<option value="">-- Toutes les succursales --</option>
-					{% for branch in branches_list %}
-					<option value="{{ branch.code }}" {% if current_branch==branch.code %} selected {% endif %}>{{
-						branch.name }}</option>
-					{% endfor %}
-				</select>
-			</div>
-			<div class="field-actions">
-				<button type="submit" class="btn-refined btn-success-gradient">
-					<i class="fa-solid fa-chart-line"></i>
-					Filtrer les flux
+			<div class="header-actions">
+				<button type="button" class="btn-refined btn-primary-gradient" onclick="executeAdvancedExport('Registre Comptable');">
+					<i class="fa-solid fa-file-excel"></i>
+					<span>Exporter le rapport</span>
 				</button>
 			</div>
-		</form>
+		</header>
+
+		{# --- COMMENCEMENT DE LA ZONE DE FILTRES ALIGNÉS PAR LE BAS --- #}
+		<div class="trip-filters-card mb-20">
+			<form action="#" method="GET" class="field-group">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Période du</label>
+					<input type="date" name="date_from" class="admin-bus-layout-add-input" value="{{ date_from }}">
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Au</label>
+					<input type="date" name="date_to" class="admin-bus-layout-add-input" value="{{ date_to }}">
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Filtrer par Succursale</label>
+					<select name="branch_code" class="admin-bus-layout-add-select">
+						<option value="">-- Toutes les succursales --</option>
+						{% for branch in branches_list %}
+							<option value="{{ branch.code }}" {% if current_branch==branch.code %} selected {% endif %}>{{
+						branch.name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="field-actions">
+					<button type="submit" class="btn-refined btn-success-gradient">
+						<i class="fa-solid fa-chart-line"></i>
+						Filtrer les flux
+					</button>
+				</div>
+			</form>
+		</div>
+
+		{# --- TA STRUCTURE DE TABLEAU INTERNE STRICTEMENT PRÉSERVÉE --- #}
+		<div class="table-responsive-wrapper">
+			<h2 class="card-title-fix text-size-16 py-10">
+				<i class="fa-solid fa-money-bill-transfer text-primary"></i>
+				Ventilation Financière par Segment et par Point d'Émission
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable js-datatable-export">
+				<thead>
+					<tr>
+						<th>Date comptable</th>
+						<th>Succursale Émettrice</th>
+						<th class="text-right">Recettes Billetterie</th>
+						<th class="text-right">Recettes Fret / Colis</th>
+						<th class="text-right">Chiffre d'Affaires Brut</th>
+						<th class="text-right">Dépenses effectuées</th>
+						<th class="text-right">Marge Total (en devise de base)</th>
+						<th class="text-center">Vérification Audit</th>
+						<th class="text-center">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for row in report_matrix %}
+						<tr>
+							<td>
+								<strong>{{ row.date|date('d/m/Y') }}</strong>
+							</td>
+							<td>
+
+								{{ row.branchName }}
+							</td>
+							<td class="text-right font-bold">
+								{% for ticketRev in row.ticketRevenue %}
+									<div class="amount-revenue">
+										{{ ticketRev.amount|number_format(0, ',', ' ') }}
+										<small>{{ ticketRev.currency }}</small>
+									</div>
+								{% endfor %}
+							</td>
+							<td class="text-right font-bold text-success-mode">
+								{% for cargoRev in row.cargoRevenue %}
+									<div class="amount-revenue">
+										{{ cargoRev.amount|number_format(0, ',', ' ') }}
+										<small>{{ cargoRev.currency }}</small>
+									</div>
+								{% endfor %}
+							</td>
+							<td class="text-right font-bold text-primary-mode">
+								{% for cargoRev in row.cargoRevenue %}
+									{% for ticketRev in row.ticketRevenue %}
+										{% if cargoRev.currency|upper == ticketRev.currency|upper %}
+											<div class="amount-revenue">
+
+												{{ (ticketRev.amount + cargoRev.amount)|number_format(0, ',', ' ') }}
+												<small>{{ ticketRev.currency }}</small>
+
+											</div>
+										{% endif %}
+									{% endfor %}
+								{% endfor %}
+							</td>
+							<td class="text-right font-bold">
+								{% for expenseRev in row.expenseRevenue %}
+									<div class="amount-revenue">
+										{{ expenseRev.amount|number_format(0, ',', ' ') }}
+										<small>{{ expenseRev.currency }}</small>
+									</div>
+								{% endfor %}
+							</td>
+							<td class="text-right font-bold">
+								{% for margeRev in row.margeRevenue %}
+									<div class="amount-revenue">
+										{{ margeRev.amount|number_format(0, ',', ' ') }}
+										<small>{{ margeRev.currency }}</small>
+									</div>
+								{% endfor %}
+							</td>
+							<td class="text-center">
+								<span class="pill-report-audit {{ row.auditStatus }}">
+									{{ row.auditStatusLabel }}
+								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									<a href="{{ path('admin_agency_report_financial_show', {date: row.date|date('Y-m-d'), branch_code: row.branchCode}) }}" class="action-link edit" title="Voir le détail de cette journée">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="6" class="text-center text-gray italic padding-20">
+								Aucun flux de caisse répertorié pour la période et la succursale sélectionnées.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 	</div>
-
-	{# --- TA STRUCTURE DE TABLEAU INTERNE STRICTEMENT PRÉSERVÉE --- #}
-	<div class="table-responsive-wrapper">
-		<h2 class="card-title-fix text-size-16 py-10">
-			<i class="fa-solid fa-money-bill-transfer text-primary"></i>
-			Ventilation Financière par Segment et par Point d'Émission
-		</h2>
-		<table class="table table-scrollable table-striped js-datatable js-datatable-export">
-			<thead>
-				<tr>
-					<th>Date comptable</th>
-					<th>Succursale Émettrice</th>
-					<th class="text-right">Recettes Billetterie</th>
-					<th class="text-right">Recettes Fret / Colis</th>
-					<th class="text-right">Chiffre d'Affaires Brut</th>
-					<th class="text-center">Vérification Audit</th>
-					<th class="text-center">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for row in report_matrix %}
-				<tr>
-					<td>
-						<strong>{{ row.date|date('d/m/Y') }}</strong>
-					</td>
-					<td>
-
-						{{ row.branchName }}
-					</td>
-					<td class="text-right font-bold">
-						{% for ticketRev in row.ticketRevenue %}
-						<div class="amount-revenue">
-							{{ ticketRev.amount|number_format(0, ',', ' ') }}
-							<small>{{ ticketRev.currency }}</small>
-						</div>
-						{% endfor %}
-					</td>
-					<td class="text-right font-bold text-success-mode">
-						{% for cargoRev in row.cargoRevenue %}
-						<div class="amount-revenue">
-							{{ cargoRev.amount|number_format(0, ',', ' ') }}
-							<small>{{ cargoRev.currency }}</small>
-						</div>
-						{% endfor %}
-					</td>
-					<td class="text-right font-bold text-primary-mode">
-						{% for cargoRev in row.cargoRevenue %}
-						{% for ticketRev in row.ticketRevenue %}
-						{% if cargoRev.currency|upper == ticketRev.currency|upper %}
-						<div class="amount-revenue">
-
-							{{ (ticketRev.amount + cargoRev.amount)|number_format(0, ',', ' ') }}
-							<small>{{ ticketRev.currency }}</small>
-
-						</div>
-						{% endif %}
-						{% endfor %}
-						{% endfor %}
-					</td>
-					<td class="text-center">
-						<span class="pill-report-audit {{ row.auditStatus }}">
-							{{ row.auditStatusLabel }}
-						</span>
-					</td>
-					<td class="text-right">
-						<div class="action-group-refined">
-							<a href="{{ path('admin_agency_report_financial_show', {date: row.date|date('Y-m-d'), branch_code: row.branchCode}) }}"
-								class="action-link edit" title="Voir le détail de cette journée">
-								<i class="fa-solid fa-eye"></i>
-							</a>
-						</div>
-					</td>
-				</tr>
-				{% else %}
-				<tr>
-					<td colspan="6" class="text-center text-gray italic padding-20">
-						Aucun flux de caisse répertorié pour la période et la succursale sélectionnées.
-					</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
-</div>
 {% endblock %}

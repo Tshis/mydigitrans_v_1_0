@@ -1,0 +1,218 @@
+/* assets/styles/modules/_platform-dashboard.scss */
+@use '../../abstract/variables' as *;
+
+.admin-platform-dashboard-scope {
+    padding-block: 2rem;
+
+    // --- HEADER STANDARD ---
+    .header {
+        margin-top: 1rem; 
+        display: flex; 
+        justify-content: space-between; 
+        gap: 2rem; 
+        align-items: center; 
+        flex-wrap: wrap;
+        
+        .header-main-info h1 { 
+            font-size: 2.3rem; 
+            font-weight: 800; 
+            color: $dark; 
+            margin: 0; 
+        }
+    }
+
+
+    .main-modules-panel{
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+        gap: 1.5rem; width: 100%;
+    }
+
+    // --- CONFIGURATION DU COMPOSANT CARDE DE CONTRÔLE ---
+    .control-card { 
+        padding: 1.5rem; 
+        background: $white; 
+        border-radius: $radius-card; 
+        border: 1px solid $mute; 
+    }
+    
+    .card-title-fix { 
+        font-size: 13px; 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        color: $dark; 
+        margin-bottom: 1.5rem; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+
+    // --- DESIGN DES CARD KPI DU PORTAIL SAAS ---
+    .kpi-card {
+        display: flex; 
+        align-items: center; 
+        gap: 1.25rem; 
+        border-top: 4px solid $dark;
+        
+        .kpi-icon-wrapper { 
+            width: 45px; 
+            height: 42px; 
+            background: rgba($mute, 0.35); 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.4rem; 
+        }
+        
+        .kpi-data { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px; 
+            
+            .admin-bus-layout-add-label { 
+                font-size: 10px; 
+                font-weight: 800; 
+                color: $gray; 
+                text-transform: uppercase; 
+            } 
+        }
+        
+        .kpi-value { 
+            font-size: 1.6rem; 
+            font-weight: 900; 
+            color: $dark; 
+            font-family: monospace; 
+        }
+
+        &.kpi-success { 
+            border-top-color: $success; 
+            .kpi-icon-wrapper{
+                background: rgba($color: $success, $alpha: .20);
+                i{color: $success;}
+            }
+        }
+        &.kpi-primary { 
+            border-top-color: $primary; 
+            .kpi-icon-wrapper{
+                background: rgba($color: $primary, $alpha: .20);
+                i{color: $primary;}
+            }
+        }
+        &.kpi-danger { 
+            border-top-color: $danger;
+            .kpi-icon-wrapper{
+                background: rgba($color: $danger, $alpha: .20);
+                i{color: $danger;}
+            } 
+        }
+    }
+
+    // --- STRUCTURE DE LA GRILLE DOUBLE COLONNE ---
+    .settings-form-layout {
+        width: 100%;
+        
+        .settings-container-grid { 
+            display: flex; 
+            gap: 1.5rem; 
+            align-items: flex-start; 
+            width: 100%; 
+            
+            @media (max-width: 1100px) { 
+                flex-direction: column; 
+            } 
+        }
+        
+        .main-form-panel { 
+            flex: 1; 
+            min-width: 0; 
+            width: 100%; 
+        }
+        
+        .sidebar-action-panel {
+            flex: 0 0 320px; 
+            width: 320px;
+            
+            @media (max-width: 1100px) { 
+                flex: 1 1 100%; 
+                width: 100%; 
+            }
+            
+            .sticky-aside-card { 
+                position: sticky; 
+                top: 130px; 
+                z-index: 10; 
+                background: $white; 
+                padding: 1.5rem; 
+                border: 1px solid $mute; 
+                border-radius: $radius-card; 
+                border-top: 4px solid $primary; 
+            }
+        }
+    }
+
+    // --- STYLISATION DES ENREGISTREMENTS TABLEAUX ---
+    .table-responsive-wrapper { 
+        background: $white; 
+        border: 1px solid $mute; 
+        border-radius: $radius-card; 
+        padding: 1.5rem; 
+    }
+    
+    .table {
+        width: 100%; 
+        border-collapse: collapse;
+        
+        th { 
+            background: rgba($gray, 0.04); 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            color: $gray; 
+            padding: 12px 15px; 
+            border-bottom: 2px solid $mute; 
+            text-align: left; 
+        }
+        
+        td { 
+            padding: 14px 15px; 
+            border-bottom: 1px solid rgba($mute, 0.5); 
+            vertical-align: middle; 
+            font-size: 13px; 
+            color: $dark; 
+        }
+    }
+
+    .currency-item-row {
+        display: flex; 
+        justify-content: space-between; 
+        padding-block: 8px; 
+        border-bottom: 1px dashed rgba(0,0,0,0.05);
+    }
+
+    .pill-report-audit { 
+        padding: 4px 8px; 
+        border-radius: 4px; 
+        font-size: 10px; 
+        font-weight: 800; 
+        
+        &.closed { 
+            background: #e6f4ea; 
+            color: #1e7e34; 
+        } 
+        
+        &.open { 
+            background: #e8f0fe; 
+            color: #1a73e8; 
+        } 
+    }
+    
+    .monospace { font-family: monospace; }
+}
+
+// --- THÈME SOMBRE COMPLET (DARK MODE) ---
+.dark .admin-platform-dashboard-scope {
+    header h1, .card-title-fix, .table td, .table td strong, .kpi-card .kpi-value, .currency-mini-list span { color: $white; }
+    .control-card, .table-responsive-wrapper, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
+    .table td, .currency-item-row { border-bottom-color: rgba(255,255,255,0.05) !important; }
+}
