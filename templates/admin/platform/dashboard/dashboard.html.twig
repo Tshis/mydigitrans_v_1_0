@@ -105,11 +105,11 @@
                     <table class="table table-scrollable table-striped">
                         <thead>
                             <tr>
-                                <th>Agence / Compagnie</th>
+                                <th class="w-250">Agences</th>
                                 <th>Type d'Événement</th>
-                                <th>Détails de l'Action Réseau</th>
+                                <th class="description">Détails de l'Action Réseau</th>
                                 <th>Date d'effet</th>
-                                <th class="text-right">Impact Chiffre ($)</th>
+                                <th class="text-right w-250">Impact Chiffré (USD)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -120,13 +120,13 @@
                                 </td>
                                 <td>
                                     <span
-                                        class="pill-report-audit {{ log.event_type == 'Abonnement' ? 'closed' : 'open' }}"
+                                        class="text-center pill-report-audit {{ log.event_type == 'Expiration' ? 'expired' : 'closed' }}"
                                         style="font-size: 10px;">
                                         {{ log.event_type }}
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="text-gray">{{ log.details }}</span>
+                                    <span class="text-gray description">{{ log.details }}</span>
                                 </td>
                                 <td class="monospace text-size-12">{{ log.created_at|date('d/m/Y H:i') }}</td>
                                 <td class="text-right font-bold monospace text-primary-mode">

@@ -171,6 +171,7 @@
             padding: 12px 15px; 
             border-bottom: 2px solid $mute; 
             text-align: left; 
+           
         }
         
         td { 
@@ -179,6 +180,11 @@
             vertical-align: middle; 
             font-size: 13px; 
             color: $dark; 
+        }
+
+        th,td{
+            &.w-250{min-width: 250px !important;}
+            &.description{ min-width: 350px !important;}
         }
     }
 
@@ -194,16 +200,21 @@
         border-radius: 4px; 
         font-size: 10px; 
         font-weight: 800; 
+        background: rgba($color: $success, $alpha: .20); 
+        color: $success; 
         
-        &.closed { 
-            background: #e6f4ea; 
-            color: #1e7e34; 
-        } 
         
         &.open { 
-            background: #e8f0fe; 
-            color: #1a73e8; 
+            background: rgba($color: $dark, $alpha: .20); 
+            color: $dark; 
         } 
+
+        &.expired { 
+            background: rgba($color: $danger, $alpha: .20); 
+            color: $danger; 
+        } 
+
+        
     }
     
     .monospace { font-family: monospace; }

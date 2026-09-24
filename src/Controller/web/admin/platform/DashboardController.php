@@ -26,29 +26,49 @@ final class DashboardController extends AbstractController
 
 
         // 2. Flux d'activité ciblé sur les actions inter-agences vis-à-vis du SaaS
+        // src/Controller/Admin/Platform/PlatformDashboardController.php
+
+        // ... (Dans ta méthode index())
+
+        // CIRCONCRIPTION STRICTE : Uniquement les flux d'abonnements, créations d'agences et expirations de licences
         $recentActivities = [
             [
                 'company_name' => 'TransKin Express (RDC)',
+                'event_type'   => 'Création',
+                'details'      => 'Ouverture du compte et validation juridique de la nouvelle agence sur la plateforme',
+                'created_at'   => new \DateTime('2026-09-24 08:12:00'), // Aujourd'hui matin
+                'revenue'      => 0.00
+            ],
+            [
+                'company_name' => 'Océan du Gabon (Gabon)',
                 'event_type'   => 'Abonnement',
-                'details'      => 'Renouvellement de la licence mensuelle - Formule Premium Multi-Tenant',
-                'created_at'   => new \DateTime('now'),
+                'details'      => 'Paiement de la licence mensuelle récurrente - Formule Premium (Multi-Tenant)',
+                'created_at'   => new \DateTime('2026-09-23 14:45:00'), // Hier après-midi
                 'revenue'      => 250.00
             ],
             [
-                'company_name' => 'Ocean du Gabon (Gabon)',
-                'event_type'   => 'Promotion',
-                'details'      => 'Application du code réduction "MOMBONGO20" sur l\'extension du module Fret',
-                'created_at'   => new \DateTime('-2 hours'),
+                'company_name' => 'TransFleuve (Congo-B)',
+                'event_type'   => 'Expiration',
+                'details'      => 'Abonnement mensuel arrivé à échéance sans renouvellement. Compte basculé automatiquement en restriction d\'accès',
+                'created_at'   => new \DateTime('2026-09-23 00:01:00'), // Hier minuit
                 'revenue'      => 0.00
             ],
             [
                 'company_name' => 'Congolaise des Voies (Congo-B)',
                 'event_type'   => 'Abonnement',
-                'details'      => 'Achat de licence pour 3 nouveaux guichets de gares additionnels',
-                'created_at'   => new \DateTime('-1 day'),
-                'revenue'      => 75.00
+                'details'      => 'Achat d\'une extension de licence pour l\'activation de 5 guichets de gare supplémentaires',
+                'created_at'   => new \DateTime('2026-09-22 10:30:00'),
+                'revenue'      => 125.00
             ],
+            [
+                'company_name' => 'Kivu Horizons (RDC)',
+                'event_type'   => 'Création',
+                'details'      => 'Enregistrement de la compagnie sur le réseau (Période d\'essai technique de 14 jours activée)',
+                'created_at'   => new \DateTime('2026-09-21 16:20:00'),
+                'revenue'      => 0.00
+            ]
         ];
+
 
         // 3. Référentiel global de l'entité 15. Currency
         $systemCurrencies = [
