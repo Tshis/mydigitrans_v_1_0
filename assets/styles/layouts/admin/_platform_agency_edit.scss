@@ -1,0 +1,72 @@
+/* assets/styles/modules/_platform-agency-edit.scss */
+@use '../../abstract/variables' as *;
+
+.admin-platform-agency-edit-scope {
+    padding-block: 2rem;
+
+    // --- HEADER ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info {
+            display: flex; align-items: center; gap: 1rem;
+            h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+            .agency-back-action { border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; background: $white; color: $dark; border: 1px solid $mute; text-decoration: none; }
+        }
+    }
+
+    // --- MISE EN PAGE DU LAYOUT DOUBLE COLONNE ---
+    .settings-form-layout {
+        width: 100%;
+        .settings-container-grid { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
+        .main-form-panel { flex: 1; min-width: 0; width: 100%; }
+        .sidebar-action-panel {
+            flex: 0 0 320px; width: 320px;
+            @media (max-width: 1100px) { flex: 1 1 100%; width: 100%; }
+            .sticky-aside-card { border-top-color: $danger; position: sticky; top: 130px; z-index: 10; background: $white; padding: 1.5rem; border: 1px solid $mute; border-radius: $radius-card; border-top: 4px solid $danger; }
+        }
+    }
+
+    .control-card { padding: 1.5rem; background: $white; border-radius: $radius-card; border: 1px solid $mute; border-top: 4px solid $primary; }
+    .card-title-fix { color: $danger; font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    .direct-pricing-row {
+        display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-end; width: 100%;
+        .field {
+            flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px;
+            label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
+        }
+    }
+
+    .admin-bus-layout-add-input, .admin-bus-layout-add-select {
+        width: 100%; height: 40px; padding-inline: 12px; border: 1px solid $mute; border-radius: 8px;
+        font-weight: 700; color: $dark; background: $white; box-sizing: border-box;
+    }
+
+    .notice-box-info {        
+        
+        &.info-warning{
+            background: rgba($danger, 0.04); border-color: rgba($danger, 0.15); 
+            color: $danger; font-size: 11.5px; padding: 12px; border-radius: 8px; border: 1px solid;
+
+        }
+    }
+
+    // --- COCHAGE DES STATUTS ---
+    .currency-checkbox-group { display: flex; flex-direction: column; gap: 12px; justify-items: center; }
+    .checkbox-container {
+        display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-weight: 700; color: $dark; cursor: pointer;
+        input { display: none; }
+        .checkmark { width: 18px; height: 18px; border: 2px solid $mute; border-radius: 4px; display: inline-block; position: relative; }
+        input:checked + .checkmark { background: $success; border-color: $success; &::after { content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: $white; font-size: 0.7rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); } }
+    }
+
+    .admin-bus-layout-add-action-zone { margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba($mute, 0.5); text-align: right; }
+    .monospace { font-family: monospace; }
+}
+
+// --- THÈME SOMBRE NATIF (DARK MODE) ---
+.dark .admin-platform-agency-edit-scope {
+    header h1, .card-title-fix, .direct-pricing-row .field label, .checkbox-container { color: $white; }
+    .control-card, .sidebar-action-panel .sticky-aside-card { background: $dm-bg-surface; border-color: rgba($white,0.1); }
+    .admin-bus-layout-add-input, .admin-bus-layout-add-select { background: $dm-bg-main; color: $white; border-color: rgba($white,0.1); }
+}

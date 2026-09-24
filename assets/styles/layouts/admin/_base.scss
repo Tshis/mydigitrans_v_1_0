@@ -380,6 +380,11 @@ body#admin{
     }
 }
 
+
+.card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    
+
 // --- BADGES APPLICATIFS MULTI-STATUTS ---
 .pill-report-audit { 
     padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase;

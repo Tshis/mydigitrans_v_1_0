@@ -1,0 +1,121 @@
+{# templates/admin/platform/agency/add.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div class="admin-platform-agency-add-scope container py-20">
+	{# --- EN-TÊTE --- #}
+	<header class="header-refined mb-25">
+		<div class="header-main-info">
+			<a href="{{ path('admin_platform_agency_index') }}" class="agency-back-action">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Supervision Réseau</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-primary text-size-13 text-highlight">Nouvelle Agence</span>
+				</div>
+				<h1 class="mt-5">Enregistrer une Agence Partenaire</h1>
+			</div>
+		</div>
+	</header>
+
+	{# --- LAYOUT DOUBLE COLONNE --- #}
+	<form action="#">
+
+		<div class="main-form-panel">
+			<div class="card control-card mb-20">
+				<h2 class="card-title-fix">
+					<i class="fa-solid fa-file-invoice text-primary"></i>
+					1. Identité de la Compagnie
+				</h2>
+
+				<div class="field-group mb-20">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Raison Sociale / Nom commercial *</label>
+						<input type="text" name="name" class="admin-bus-layout-add-input"
+							placeholder="Ex: TransKin Express" required>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Adresse email de contact (Admin) *</label>
+						<input type="email" name="email" class="admin-bus-layout-add-input"
+							placeholder="Ex: contact@transkin.com" required>
+					</div>
+				</div>
+
+				<div class="field-group mb-20">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Numéro de Téléphone Officiel *</label>
+						<input type="tel" name="phone" class="admin-bus-layout-add-input" placeholder="Ex: +243 81..."
+							required>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Adresse Physique du Siège Social *</label>
+						<input type="text" name="address" class="admin-bus-layout-add-input"
+							placeholder="Ex: Croisement Bd Lumumba / Ndolo, Kinshasa" required>
+					</div>
+				</div>
+
+				<h2 class="card-title-fix pt-10">
+					<i class="fa-solid fa-earth-africa text-primary"></i>
+					2. Localisation & Paramètres Monétaires Base
+				</h2>
+
+				<div class="field-group mb-20">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Pays d'Exploitation Principal *</label>
+						<select name="country" class="admin-bus-layout-add-select" required>
+							<option value="" disabled selected>-- Choisir le pays d'ancrage --</option>
+							<option value="RD Congo">RD Congo (RDC)</option>
+							<option value="Gabon">Gabon</option>
+							<option value="Congo-Brazzaville">Congo-Brazzaville</option>
+							<option value="Côte d'Ivoire">Côte d'Ivoire</option>
+						</select>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Devise de Base Comptable (isBase = true) *</label>
+						<select name="base_currency" class="admin-bus-layout-add-select" required>
+							<option value="" disabled selected>-- Monnaie de consolidation --</option>
+							<option value="CDF">CDF - Franc Congolais</option>
+							<option value="XAF">XAF - Franc CFA (BEAC)</option>
+							<option value="XOF">XOF - Franc CFA (BCEAO)</option>
+							<option value="USD">USD - Dollar Américain</option>
+						</select>
+					</div>
+				</div>
+
+				<h2 class="card-title-fix pt-10">
+					<i class="fa-solid fa-id-card-clip text-primary"></i>
+					3. Offre de Licence & Validité Contrat
+				</h2>
+
+				<div class="field-group mb-20">
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Formule Forfait SaaS *</label>
+						<select name="plan_name" class="admin-bus-layout-add-select" required>
+							<option value="Basique Standard">Basique Standard (Gares unitaires)</option>
+							<option value="Premium Multitenant" selected>Premium Multitenant (Réseau expansif)
+							</option>
+							<option value="VIP Corporation">VIP Corporation (Flotte lourde + API)</option>
+						</select>
+					</div>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Date de fin de validité initiale *</label>
+						<input type="date" name="expired_at" class="admin-bus-layout-add-input" value="{{ "
+							now"|date_modify("+30 days")|date("Y-m-d") }}" required>
+					</div>
+				</div>
+
+				<div class="field-button-right">
+					<a href="{{ path('admin_platform_agency_index') }}"
+						class="btn-refined btn-gray-gradient mr-10">Annuler</a>
+					<button type="submit" class="btn-refined btn-success-gradient">
+						<i class="fa-solid fa-cloud-arrow-up"></i>
+						Déployer et activer le compte
+					</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+{% endblock %}

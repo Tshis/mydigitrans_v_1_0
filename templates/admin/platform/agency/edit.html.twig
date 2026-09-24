@@ -1,0 +1,137 @@
+{# templates/admin/platform/agency/edit.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-platform-agency-edit-scope container">
+		{# --- EN-TÊTE DE LA FICHE CLIENT --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_agency_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Supervision Réseau</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Fiche Modification :
+							{{ agency.code }}</span>
+					</div>
+					<h1 class="mt-5">Éditer l'Agence :
+						{{ agency.name }}</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- LAYOUT DOUBLE COLONNE COMPOSANT --- #}
+		<form action="#" method="POST" class="settings-form-layout">
+			<div
+				class="settings-container-grid">
+
+				{# COLONNE GAUCHE : FORMULAIRE DE MISE À JOUR ADMINISTRATIVE #}
+				<div class="main-form-panel">
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-file-invoice text-primary"></i>
+							1. Informations Administratives & Légales</h2>
+
+						<div class="direct-pricing-row mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Raison Sociale / Nom commercial *</label>
+								<input type="text" name="name" class="admin-bus-layout-add-input" value="{{ agency.name }}" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Adresse email de contact (Admin) *</label>
+								<input type="email" name="email" class="admin-bus-layout-add-input" value="{{ agency.email }}" required>
+							</div>
+						</div>
+
+						<div class="direct-pricing-row mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Numéro de Téléphone Officiel *</label>
+								<input type="tel" name="phone" class="admin-bus-layout-add-input" value="{{ agency.phone }}" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Adresse Physique du Siège Social *</label>
+								<input type="text" name="address" class="admin-bus-layout-add-input" value="{{ agency.address }}" required>
+							</div>
+						</div>
+
+						<div class="direct-pricing-row mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Numéro de Registre de Commerce (Registration Number)</label>
+								<input type="text" name="registration_number" class="admin-bus-layout-add-input" value="{{ agency.registrationNumber }}" placeholder="Ex: RCCM-KIN-...">
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Numéro d'Identification Fiscale (Tax Number)</label>
+								<input type="text" name="tax_number" class="admin-bus-layout-add-input" value="{{ agency.taxNumber }}" placeholder="Ex: ID-NAT-...">
+							</div>
+						</div>
+
+						<h2 class="card-title-fix pt-10">
+							<i class="fa-solid fa-id-card-clip text-primary"></i>
+							2. Suivi de l'Abonnement & Forfait SaaS</h2>
+
+						<div class="direct-pricing-row mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Formule Forfait Active *</label>
+								<select name="plan_name" class="admin-bus-layout-add-select" required>
+									<option value="Basique Standard" {% if agency.plan_name == 'Basique Standard' %} selected {% endif %}>Basique Standard (Gares unitaires)</option>
+									<option value="Premium Multitenant" {% if agency.plan_name == 'Premium Multitenant' %} selected {% endif %}>Premium Multitenant (Réseau expansif)</option>
+									<option value="VIP Corporation" {% if agency.plan_name == 'VIP Corporation' %} selected {% endif %}>VIP Corporation (Flotte lourde + API)</option>
+								</select>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Date d'Échéance du Contrat *</label>
+								<input type="date" name="expired_at" class="admin-bus-layout-add-input" value="{{ agency.expired_at|date('Y-m-d') }}" required>
+							</div>
+						</div>
+
+						<div class="admin-bus-layout-add-action-zone">
+							<a href="{{ path('admin_platform_agency_index') }}" class="btn-refined btn-gray-gradient">Annuler</a>
+							<button type="submit" class="btn-refined btn-success-gradient">
+								<i class="fa-solid fa-floppy-disk"></i>
+								Enregistrer les modifications
+							</button>
+						</div>
+					</div>
+				</div>
+
+				{# COLONNE DROITE : CONTRÔLE DES VERROUS ET SÉCURITÉ CONTRACTUELLE #}
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-key"></i>
+							Autorisations & Statuts</h2>
+
+						{# Gestion des Switchs / Checkboxes de tes nouveaux champs #}
+						<div class="currency-checkbox-group mb-20">
+							<label class="checkbox-container">
+								<input type="checkbox" name="is_verified" value="1" {% if agency.isVerified %} checked {% endif %}>
+								<span class="checkmark"></span>
+								Compte Agence Vérifié
+							</label>
+
+							<label class="checkbox-container mt-15" style="margin-top: 15px; display: block;">
+								<input type="checkbox" name="is_active" value="1" {% if agency.isActive %} checked {% endif %}>
+								<span class="checkmark"></span>
+								Accès Réseau Actif
+							</label>
+						</div>
+
+						<div class="notice-box-info info-warning">
+							<p>
+								<strong>
+									<i class="fa-solid fa-bolt"></i>
+									Coupure Réseau :</strong>
+								Décocher la case
+								<strong class="monospace">Acceès Réseau</strong>
+								suspendra instantanément l'accès au guichet pour tous les caissiers de cette compagnie, sans supprimer leurs données de vente historiques.</p>
+						</div>
+					</div>
+				</aside>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}

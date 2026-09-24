@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="admin-platform-company-scope container py-20">
+<div class="admin-platform-agency-scope container py-20">
 
     {# --- EN-TÊTE DE LA CONSOLE --- #}
     <header class="header-refined mb-25">
@@ -23,7 +23,7 @@
         </div>
         <div class="header-actions">
             {# Formulaire d'ajout ou action d'enregistrement #}
-            <a href="#" class="btn-refined btn-success-gradient">
+            <a href="{{path('admin_platform_agency_add')}}" class="btn-refined btn-success-gradient">
                 <i class="fa-solid fa-circle-plus"></i>
                 Enregistrer une Agence
             </a>
@@ -114,17 +114,13 @@
                     </td>
                     <td class="text-right">
                         <div class="action-group-refined">
-                            {% if company.status == 'Actif' %}
-                            <a href="#" class="action-link delete" title="Suspendre l'accès agence">
-                                <i class="fa-solid fa-ban"></i>
-                            </a>
-                            {% else %}
-                            <a href="#" class="action-link edit" title="Réactiver la licence">
-                                <i class="fa-solid fa-circle-check"></i>
-                            </a>
-                            {% endif %}
-                            <a href="#" class="action-link view-file" title="Consulter la fiche & Historique">
+                            <a href="{{ path('admin_platform_agency_show', {'code': company.code}) }}"
+                                class="action-link view-file" title="Consulter la fiche & Historique">
                                 <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <a href="{{path('admin_platform_agency_edit',{'code':'agc-001'})}}"
+                                class="action-link view-file" title="Modifier la fiche">
+                                <i class="fa-solid fa-edit"></i>
                             </a>
                         </div>
                     </td>

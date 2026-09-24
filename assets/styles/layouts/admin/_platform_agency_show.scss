@@ -1,0 +1,62 @@
+/* assets/styles/modules/_platform-agency-show.scss */
+@use '../../abstract/variables' as *;
+
+.admin-platform-agency-show-scope {
+    padding-block: 2rem;
+
+    // --- EN-TÊTE ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info {
+            display: flex; align-items: center; gap: 1rem;
+            h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+            .agency-back-action { border-radius: 50%; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; background: $white; color: $dark; border: 1px solid $mute; text-decoration: none; }
+        }
+    }
+
+    // --- STRUCTURATION DU LAYOUT ---
+    .settings-form-layout {
+        width: 100%;
+        .settings-container-grid { display: flex; gap: 1.5rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
+        .main-form-panel { flex: 1; min-width: 0; width: 100%; }
+        .sidebar-action-panel {
+            flex: 0 0 320px; width: 320px;
+            @media (max-width: 1100px) { flex: 1 1 100%; width: 100%; }
+        }
+    }
+
+    // --- CARDS ET ZONE DE DONNEES TEXTES ---
+    .control-card { padding: 1.5rem; background: $white; border-radius: $radius-card; border: 1px solid $mute; border-top: 4px solid $primary; }
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+    
+    .direct-pricing-row { display: flex; gap: 1.5rem; flex-wrap: wrap; width: 100%; .field { flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px; } }
+    .admin-bus-layout-add-label { 
+        font-size: 12px; font-weight: 900; 
+        color: $gray; text-transform: uppercase; 
+    }
+    
+    .text-data-box { width: 100%; min-height: 38px; display: flex; align-items: center; background: rgba($gray, 0.04); border: 1px solid $mute; border-radius: 6px; padding-inline: 12px; font-weight: 700; color: $dark; font-size: 13px; box-sizing: border-box; }
+
+    // --- TABLEAU DILATÉ ET AÉRÉ ---
+    .table-responsive-wrapper { 
+        background: $white; 
+        border: 1px solid $mute; 
+        border-radius: $radius-card; 
+        padding: 24px; margin-top: 20px; 
+    }
+    
+
+    .pill-report-audit { padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; &.closed { background: rgba($success,0.02); color: $success; } &.open { background: rgba($danger,0.02); color: $danger; } }
+    .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+    .mb-15 { margin-bottom: 15px; }
+}
+
+// --- THÈME SOMBRE ---
+.dark .admin-platform-agency-show-scope {
+    header h1, .card-title-fix, .direct-pricing-row .field label, .table td, .table td strong, .text-data-box, .info-block .font-bold { color: $white; }
+    .control-card, .table-responsive-wrapper { background: $dm-bg-surface; border-color: rgba($white,0.1); }
+    .text-data-box { background: $dm-bg-main; border-color: rgba($white,0.05); }
+    .table th { background: rgba($white,0.02); border-bottom-color: rgba($white,0.1); color: $mute; }
+    .table td { border-bottom-color: rgba($white,0.05); }
+}

@@ -1,0 +1,160 @@
+{# templates/admin/platform/agency/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-platform-agency-show-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_agency_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Supervision Réseau</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Profil Partenaire :
+							{{ agency.code }}</span>
+					</div>
+					<h1 class="mt-5">{{ agency.name }}</h1>
+				</div>
+			</div>
+			<div class="header-actions">
+				<a href="{{ path('admin_platform_agency_edit', {'code': agency.code}) }}" class="btn-refined btn-primary-gradient">
+					<i class="fa-solid fa-file-pen"></i>
+					Modifier la Fiche
+				</a>
+			</div>
+		</header>
+
+		{# --- GRILLE ASYMÉTRIQUE DOUBLE COLONNE --- #}
+		<div class="settings-form-layout">
+			<div
+				class="settings-container-grid">
+
+				{# COLONNE GAUCHE (LARGE) : IDENTITÉ ET SUCCURSALES DE L'AGENCE #}
+				<div
+					class="main-form-panel">
+
+					{# FICHE IDENTITÉ #}
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-id-card text-primary"></i>
+							Coordonnées & Pièces Légales</h2>
+						<div class="direct-pricing-row mb-15">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Numéro de Registre (RCCM)</label>
+								<span class="text-data-box">{{ agency.registrationNumber|default('Non renseigné') }}</span>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Identification Fiscale</label>
+								<span class="text-data-box">{{ agency.taxNumber|default('Non renseigné') }}</span>
+							</div>
+						</div>
+						<div class="direct-pricing-row">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Téléphone</label>
+								<span class="text-data-box">{{ agency.phone }}</span>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Email de contact</label>
+								<span class="text-data-box">{{ agency.email }}</span>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Siège Social</label>
+								<span class="text-data-box">{{ agency.address }}</span>
+							</div>
+						</div>
+					</div>
+
+					{# TABLEAU DES SUCCURSALES AÉRÉ ET DILATÉ #}
+					<div class="table-responsive-wrapper">
+						<h2 class="card-title-fix text-size-14 py-10">
+							<i class="fa-solid fa-folder-tree text-primary"></i>
+							Gares & Succursales Déployées sur le Réseau (Branches)
+						</h2>
+						<table class="table table-scrollable table-striped">
+							<thead>
+								<tr>
+									<th>Nom de la Succursale</th>
+									<th>Ville d'Attache</th>
+									<th>Date d'Ouverture</th>
+									<th class="text-center">Statut Gare</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for branch in branches %}
+									<tr>
+										<td>
+											<strong>Gare
+												{{ branch.name }}</strong>
+										</td>
+										<td>{{ branch.city }}</td>
+										<td class="monospace text-size-12">{{ branch.created_at|date('d/m/Y') }}</td>
+										<td class="text-center">
+											<span class="pill-report-audit closed">Opérationnelle</span>
+										</td>
+									</tr>
+								{% else %}
+									<tr>
+										<td colspan="4" class="text-center text-gray italic padding-20">Aucune succursale enregistrée pour le moment.</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+
+				</div>
+
+				{# COLONNE DROITE (ÉTROITE) : CONTRACTUEL & MONÉTAIRE #}
+				<aside
+					class="sidebar-action-panel">
+
+					{# COMPOSANT CONTRAT #}
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-signature"></i>
+							Statut du Contrat SaaS</h2>
+						<div class="info-block mb-15">
+							<label class="admin-bus-layout-add-label {{agency.expired_at > date('now') ? 'text-success' : 'text-danger' }}">
+
+								{{agency.expired_at > date('now') ? 'Formule active' : 'Formule Expirée' }}
+							</label>
+							<div class="font-bold text-size-16 mt-4 ">{{ agency.plan_name }}</div>
+						</div>
+						<div class="info-block mb-15">
+							<label class="admin-bus-layout-add-label">Échéance de Licence</label>
+							<div class="monospace font-bold mt-4">{{ agency.expired_at|date('d/m/Y') }}</div>
+						</div>
+						<div class="info-block">
+							<label class="admin-bus-layout-add-label">Vérification Compte</label>
+							<div class="mt-6">
+								<span class="pill-report-audit {{ agency.isVerified ? 'closed' : 'open' }}">
+									{{ agency.isVerified ? 'Profil Vérifié' : 'En attente' }}
+								</span>
+							</div>
+						</div>
+					</div>
+
+					{# COMPOSANT DEVISE DE BASE #}
+					<div class="card control-card">
+						<h2 class="card-title-fix text-primary">
+							<i class="fa-solid fa-money-bill-1-wave"></i>
+							Devise Pivot Globale</h2>
+						<div class="text-center padding-y-10">
+							<div class="monospace font-bold text-size-28 text-primary-mode text-size-22 text-weight-900 text-primary">
+								{{ agency.base_currency }}
+							</div>
+							<p class="text-gray text-size-11 uppercase font-bold mt-5 text-size-11">Unité de consolidation comptable</p>
+						</div>
+					</div>
+
+				</aside>
+
+			</div>
+		</div>
+
+	</div>
+{% endblock %}
