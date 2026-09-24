@@ -1,0 +1,144 @@
+{# templates/admin/platform/agency/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-platform-company-scope container">
+
+		{# --- EN-TÊTE DE LA CONSOLE --- #}
+		<header class="header-refined mb-25">
+			<div class="header-main-info">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Supervision Réseau</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Portefeuille des Agences</span>
+					</div>
+					<h1 class="mt-5">Gestion des Agences & Licences</h1>
+				</div>
+			</div>
+			<div
+				class="header-actions">
+				{# Formulaire d'ajout ou action d'enregistrement #}
+				<a href="#" class="btn-refined btn-success-gradient">
+					<i class="fa-solid fa-circle-plus"></i>
+					Enregistrer une Agence
+				</a>
+			</div>
+		</header>
+
+		{# STATS GRID #}
+		<div
+			class="stats-grid">
+
+			{# AGENCES TOTALES #}
+			<div class="card control-card kpi-card">
+				<div class="kpi-icon-wrapper text-primary-mode">
+					<i class="fa-solid fa-building-shield"></i>
+				</div>
+				<div class="kpi-data">
+					<label class="admin-bus-layout-add-label">Total Agences</label>
+					<span class="kpi-value">12</span>
+				</div>
+			</div>
+
+			{# AGENCES EN RÈGLE #}
+			<div class="card control-card kpi-card kpi-success">
+				<div class="kpi-icon-wrapper text-success-mode">
+					<i class="fa-solid fa-building-circle-check"></i>
+				</div>
+				<div class="kpi-data">
+					<label class="admin-bus-layout-add-label">Agences Actives</label>
+					<span class="kpi-value">11</span>
+				</div>
+			</div>
+
+			{# AGENCES EXPIRÉES #}
+			<div class="card control-card kpi-card kpi-danger">
+				<div class="kpi-icon-wrapper">
+					<i class="fa-solid fa-building-circle-xmark"></i>
+				</div>
+				<div class="kpi-data">
+					<label class="admin-bus-layout-add-label">Agences Inactives</label>
+					<span class="kpi-value">1</span>
+				</div>
+			</div>
+
+			{# AGENCES EN ALERTE #}
+			<div class="card control-card kpi-card kpi-primary">
+				<div class="kpi-icon-wrapper">
+					<i class="fa-solid fa-triangle-exclamation"></i>
+				</div>
+				<div class="kpi-data">
+					<label class="admin-bus-layout-add-label">Agences En Alerte</label>
+					<span class="kpi-value">0</span>
+				</div>
+			</div>
+		</div>
+
+		{# --- GRILLE INTERNATIONALE EXPANSIVE (DILATÉE & AÉRÉE) --- #}
+		<div class="table-responsive-wrapper">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Raison Sociale / Agence</th>
+						<th>Pays d'Attache</th>
+						<th>Devise de Base</th>
+						<th>Formule Forfait</th>
+						<th>Date d'Échéance</th>
+						<th class="text-center">Statut Licence</th>
+						<th class="text-right">Actions Contractuelles</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for company in companies_list %}
+						<tr>
+							<td>
+								<strong>{{ company.name }}</strong>
+							</td>
+							<td>{{ company.country }}</td>
+							<td class="monospace font-bold">{{ company.base_currency }}</td>
+							<td>
+								<span class="text-gray font-bold">{{ company.plan_name }}</span>
+							</td>
+							<td class="monospace {% if company.status == 'Expiré' %}text-danger-mode{% endif %}">
+								{{ company.expired_at|date('d/m/Y') }}
+							</td>
+							<td class="text-center">
+								<span class="pill-report-audit {% if company.status == 'Actif' %}closed{% elseif company.status == 'Expiré' %}open{% else %}suspended{% endif %}">
+									{{ company.status }}
+								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									{% if company.status == 'Actif' %}
+										<a href="#" class="action-link delete" title="Suspendre l'accès agence">
+											<i class="fa-solid fa-ban"></i>
+										</a>
+									{% else %}
+										<a href="#" class="action-link edit" title="Réactiver la licence">
+											<i class="fa-solid fa-circle-check"></i>
+										</a>
+									{% endif %}
+									<a href="#" class="action-link view-file" title="Consulter la fiche & Historique">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="7" class="text-center text-gray italic padding-20">Aucune agence partenaire enregistrée sur la plateforme.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}

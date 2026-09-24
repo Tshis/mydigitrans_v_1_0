@@ -7,7 +7,7 @@
 </a>
 
 {# 2. PARTENAIRES ET AGENCES COMPAGNIES #}
-<a href="" class="menu-link {{ page is same as('company') ? 'active' : '' }}" data-tooltip="Gestion des Compagnies & Agences Partenaires">
+<a href="{{path('admin_platform_agency_index')}}" class="menu-link {{ page is same as('agency') ? 'active' : '' }}" data-tooltip="Gestion des Compagnies & Agences Partenaires">
 	<span class="icon">
 		<i class="fa-solid fa-building-shield"></i>
 	</span>
@@ -30,6 +30,13 @@
 </a>
 
 {# 4. CONTRÔLE GLOBAUX & MONÉTAIRE #}
+<a href="" class="menu-link {{ page is same as('commision') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises [MCD 15]">
+	<span class="icon">
+		<i class="fa-solid fa-money-bill-trend-up"></i>
+	</span>
+	<span class="text">Commissions & References</span>
+</a>
+
 <a href="" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises [MCD 15]">
 	<span class="icon">
 		<i class="fa-solid fa-earth-africa"></i>

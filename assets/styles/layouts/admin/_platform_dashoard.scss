@@ -195,6 +195,9 @@
         border-bottom: 1px dashed rgba(0,0,0,0.05);
     }
 
+    
+    
+    .monospace { font-family: monospace; }
     .pill-report-audit { 
         padding: 4px 8px; 
         border-radius: 4px; 
@@ -216,8 +219,6 @@
 
         
     }
-    
-    .monospace { font-family: monospace; }
 }
 
 // --- THÈME SOMBRE COMPLET (DARK MODE) ---

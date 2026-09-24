@@ -1,0 +1,92 @@
+/* assets/styles/modules/_platform-company.scss */
+@use '../../abstract/variables' as *;
+
+.admin-platform-company-scope {
+    padding-block: 2rem;
+
+    .stats-grid{
+
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+        gap: 1.5rem; width: 100%;
+        margin-block: 2rem;
+
+        // --- DESIGN DES CARD KPI DU PORTAIL SAAS ---
+        .kpi-card {
+            display: flex; 
+            align-items: center; 
+            gap: 1.25rem; 
+            border-top: 4px solid $dark;
+            
+            .kpi-icon-wrapper { 
+                width: 45px; 
+                height: 42px; 
+                background: rgba($mute, 0.35); 
+                border-radius: 8px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                font-size: 1.4rem; 
+            }
+            
+            .kpi-data { 
+                display: flex; 
+                flex-direction: column; 
+                gap: 4px; 
+                
+                .admin-bus-layout-add-label { 
+                    font-size: 10px; 
+                    font-weight: 800; 
+                    color: $gray; 
+                    text-transform: uppercase; 
+                } 
+            }
+            
+            .kpi-value { 
+                font-size: 1.6rem; 
+                font-weight: 900; 
+                color: $dark; 
+                font-family: monospace; 
+            }
+    
+            &.kpi-success { 
+                border-top-color: $success; 
+                .kpi-icon-wrapper{
+                    background: rgba($color: $success, $alpha: .20);
+                    i{color: $success;}
+                }
+            }
+            &.kpi-primary { 
+                border-top-color: $primary; 
+                .kpi-icon-wrapper{
+                    background: rgba($color: $primary, $alpha: .20);
+                    i{color: $primary;}
+                }
+            }
+            &.kpi-danger { 
+                border-top-color: $danger;
+                .kpi-icon-wrapper{
+                    background: rgba($color: $danger, $alpha: .20);
+                    i{color: $danger;}
+                } 
+            }
+        }
+    }
+
+
+    
+    // --- BADGES APPLICATIFS MULTI-STATUTS ---
+    .pill-report-audit { 
+        padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase;
+        &.closed { background: rgba($color: $success, $alpha: .20); color: $success; } // Actif
+        &.open { background: rgba($color: $danger, $alpha: .20); color: $danger; }   // Expiré
+        &.suspended { background: rgba($color: $primary, $alpha: .20); color: $primary; } // Suspendu manuellement
+    }
+
+}
+
+// --- CONFIGURATION EN MODE SOMBRE (DARK MODE SUR-MESURE) ---
+.dark .admin-platform-company-scope {
+    header h1, .card-title-fix, .table td, .table td strong, .kpi-card .kpi-value, .currency-mini-list span { color: $white; }
+    .control-card, .table-responsive-wrapper, .sidebar-action-panel .sticky-aside-card { background: $dm-bg; border-color: rgba($white,0.1); }  
+}
