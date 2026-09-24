@@ -1,0 +1,62 @@
+{# templates/admin/platform/bus_layout/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div class="admin-platform-scope container">
+
+    <header class="header-refined my-25">
+        <div class="header-main-info">
+            <a href="{{ path('admin_platform_bus_layout_index') }}" class="agency-back-action">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Vérification Technique</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">Fiche d'Architecture</span>
+                </div>
+                <h1 class="mt-5">{{ layout.name }}</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="settings-form-layout">
+        <div class="settings-container-grid">
+
+            {# COLONNE GAUCHE : MÉTADONNÉES LOGIQUES #}
+            <div class="main-form-panel">
+                <div class="card control-card mb-20">
+                    <h2 class="card-title-fix">
+                        <i class="fa-solid fa-circle-info text-primary"></i>
+                        Registre Structurel
+                    </h2>
+                    <div class="direct-pricing-row mb-15">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Identifiant Unique</label>
+                            <div class="text-disabled font-bold technical-id-badge">ID-GAB-00{{ layout.id }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Date de Naissance Usine</label>
+                            <div class="text-disabled font-bold technical-id-badge">{{ layout.createdAt }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# COLONNE DROITE : LE DESSIN DE LA CARROSSERIE #}
+            <aside class="sidebar-action-panel specialized-seatmap-sidebar">
+                <div class="card control-card card-highlight">
+                    <h2 class="card-title-fix">
+                        <i class="fa-solid fa-bus text-success"></i>
+                        Aménagement de la Carrosserie
+                    </h2>
+
+                    {# Rendu à travers le partial de votre architecture #}
+                    {{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

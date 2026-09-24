@@ -1,0 +1,61 @@
+{# templates/admin/platform/bus_layout/edit.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div class="admin-platform-scope container">
+		<header class="header-refined my-30">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_bus_layout_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Spécifications Usine</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Édition Libellé</span>
+					</div>
+					<h1 class="mt-5">Modifier le Gabarit</h1>
+				</div>
+			</div>
+		</header>
+
+		<form action="#" method="POST" class="card control-card">
+			<h2 class="card-title-fix">
+				<i class="fa-solid fa-sliders text-primary"></i>
+				Ajustement du Nom Commercial</h2>
+
+			<div class="direct-pricing-row mb-25">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Désignation du Gabarit *</label>
+					<input type="text" name="name" class="admin-bus-layout-add-input" value="{{ layout.name }}" required>
+				</div>
+			</div>
+
+			<h2 class="card-title-fix pt-10 locked-section-title">
+				<i class="fa-solid fa-lock text-gray"></i>
+				Spécifications Géométriques Verrouillées</h2>
+
+			<div class="field-group mb-20 locked-fields-row">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Rangées d'origine</label>
+					<input type="number" class="admin-bus-layout-add-input text-disabled" value="{{ layout.rows }}" disabled>
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Colonnes d'origine</label>
+					<input type="number" class="admin-bus-layout-add-input text-disabled" value="{{ layout.columns }}" disabled>
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Nombre de Sièges Spéciaux</label>
+					<input type="text" class="admin-bus-layout-add-input text-disabled" value="{{ layout.specialPositions|length }} enregistrés" disabled>
+				</div>
+			</div>
+
+			<div class="field-button-right">
+				<a href="{{ path('admin_platform_bus_layout_index') }}" class="btn-refined btn-gray-gradient mr-10">Annuler</a>
+				<button type="submit" class="btn-refined btn-success-gradient">
+					<i class="fa-solid fa-floppy-disk"></i>
+					Mettre à jour le nom</button>
+			</div>
+		</form>
+	</div>
+{% endblock %}

@@ -383,7 +383,51 @@ body#admin{
 
 .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
 
-    
+
+///=====================
+/// PLATFORM SCSS COMMON DESIGN
+/// ================
+/* Ajouts localisés dans assets/styles/modules/_platform.scss */
+
+.admin-platform-scope {
+    // Éléments du formulaire d'édition
+    .locked-section-title {
+        opacity: 0.6;
+    }
+
+    .locked-fields-row {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    // Éléments de la fiche de consultation (Show)
+    .technical-id-badge {
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 6px;
+        font-family: monospace;
+    }
+
+    .specialized-seatmap-sidebar {
+        flex: 0 0 350px;
+        width: 350px;
+
+        @media (max-width: 1100px) {
+            flex: 1 1 100%;
+            width: 100%;
+        }
+    }
+}
+
+// Support Thème Sombre pour les nouveaux composants
+.dark .admin-platform-scope {
+    .technical-id-badge {
+        background: rgba(255, 255, 255, 0.03);
+        color: $white;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+}
+
 
 // --- BADGES APPLICATIFS MULTI-STATUTS ---
 .pill-report-audit { 
