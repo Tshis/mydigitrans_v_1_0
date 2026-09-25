@@ -1,6 +1,11 @@
 {# templates/admin/platform/bus_layout/show.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/admin/modalQuestion.js" defer></script>
+{% endblock %}
+
 {% block body %}
 <div class="admin-platform-scope container">
 
@@ -20,43 +25,67 @@
         </div>
     </header>
 
-    <div class="settings-form-layout">
-        <div class="settings-container-grid">
+    <div class="settings-container-grid">
 
-            {# COLONNE GAUCHE : MÉTADONNÉES LOGIQUES #}
-            <div class="main-form-panel">
-                <div class="card control-card mb-20">
-                    <h2 class="card-title-fix">
-                        <i class="fa-solid fa-circle-info text-primary"></i>
-                        Registre Structurel
-                    </h2>
-                    <div class="direct-pricing-row mb-15">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Identifiant Unique</label>
-                            <div class="text-disabled font-bold technical-id-badge">ID-GAB-00{{ layout.id }}</div>
-                        </div>
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Date de Naissance Usine</label>
-                            <div class="text-disabled font-bold technical-id-badge">{{ layout.createdAt }}</div>
-                        </div>
+        {# COLONNE GAUCHE : MÉTADONNÉES LOGIQUES #}
+        <div class="main-form-panel">
+
+            <div class="card control-card mb-20">
+                <h2 class="card-title-fix">
+                    <i class="fa-solid fa-circle-info text-primary"></i>
+                    Registre Structurel
+                </h2>
+                <div class="direct-pricing-row mb-15">
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Identifiant Unique</label>
+                        <div class="text-disabled font-bold technical-id-badge">ID-GAB-00{{ layout.id }}</div>
+                    </div>
+                    <div class="field">
+                        <label class="admin-bus-layout-add-label">Date de Naissance Usine</label>
+                        <div class="text-disabled font-bold technical-id-badge">{{ layout.createdAt }}</div>
                     </div>
                 </div>
             </div>
 
-            {# COLONNE DROITE : LE DESSIN DE LA CARROSSERIE #}
-            <aside class="sidebar-action-panel specialized-seatmap-sidebar">
-                <div class="card control-card card-highlight">
-                    <h2 class="card-title-fix">
-                        <i class="fa-solid fa-bus text-success"></i>
-                        Aménagement de la Carrosserie
-                    </h2>
+            <div class="card control-card mb-20">
 
-                    {# Rendu à travers le partial de votre architecture #}
-                    {{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
+                <div class="text-center">
+
+                    {% if layout.isValided %}
+                    <a data-target="{{path('admin_platform_bus_layout_toggle',{'code':layout.code})}}" id="ctaBtn"
+                        class="btn-refined btn-danger-gradient" title="Désactiver le modèle d'usine">
+                        <i class="fa-solid fa-lock"></i> Desactiver ce modèle
+                    </a>
+
+                    {% else %}
+
+                    <a data-target="{{path('admin_platform_bus_layout_toggle',{'code':layout.code})}}" id="ctaBtn"
+                        class="btn-refined btn-success-gradient" title="Activer le modèle d'usine">
+                        <i class="fa-solid fa-lock-open"></i>
+                        Réactiver le modèle
+                    </a>
+                    {% endif %}
                 </div>
-            </aside>
 
+
+            </div>
         </div>
+
+        {# COLONNE DROITE : LE DESSIN DE LA CARROSSERIE #}
+        <aside class="sidebar-action-panel specialized-seatmap-sidebar mb-25">
+            <div class="card control-card card-highlight">
+                <h2 class="card-title-fix">
+                    <i class="fa-solid fa-bus text-success"></i>
+                    Aménagement de la Carrosserie
+                </h2>
+
+                {# Rendu à travers le partial de votre architecture #}
+                {{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
+            </div>
+        </aside>
+
     </div>
 </div>
+
+{% include 'admin/partials/_modal.html.twig' %}
 {% endblock %}

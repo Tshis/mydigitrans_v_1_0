@@ -174,16 +174,21 @@ final class BusLayoutController extends AbstractController
         // 1. Simulation d'un modèle d'usine brut selon tes critères de persistance exacts
         $layout = [
             'id' => 7,
+            'code' => 777,
             'name' => 'Modèle Grand Scania (55 places)',
             'rows' => 12,
             'columns' => 4,
             'aisles' => [2], // Allée après la colonne 2
             'specialPositions' => [
                 ['type' => 'driver', 'row' => 1, 'col' => 1],
+                ['type' => 'aisle', 'row' => 1, 'col' => 2],
+                ['type' => 'aisle', 'row' => 2, 'col' => 3],
+                ['type' => 'door', 'row' => 2, 'col' => 4],
                 ['type' => 'wc', 'row' => 12, 'col' => 3],
                 ['type' => 'wc', 'row' => 12, 'col' => 4]
             ],
             'hasBackExtraSeat' => false,
+            'isValided' => false,
             'createdAt' => '2026-09-23 15:30:22'
         ];
 
@@ -197,5 +202,9 @@ final class BusLayoutController extends AbstractController
 
 
 
-
+    #[Route('/admin/platform/bus-layouts/{code}/toggle/active', name: 'admin_platform_bus_layout_toggle')]
+    public function toggle_layout(string $code): Response
+    {
+        return $this->redirectToRoute('admin_platform_bus_layout_show', ['code' => $code]);
+    }
 }

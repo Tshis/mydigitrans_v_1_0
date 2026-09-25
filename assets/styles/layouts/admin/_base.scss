@@ -417,6 +417,17 @@ body#admin{
             width: 100%;
         }
     }
+
+    .settings-container-grid{
+        display: grid;
+        grid-template-columns:350px 1fr ;
+        align-items: flex-start;
+        gap: 2rem;
+
+        .card{
+            border-top: 2px solid $dark;
+        }
+    }
 }
 
 // Support Thème Sombre pour les nouveaux composants
@@ -435,6 +446,44 @@ body#admin{
     &.closed { background: rgba($color: $success, $alpha: .20); color: $success; } // Actif
     &.open { background: rgba($color: $danger, $alpha: .20); color: $danger; }   // Expiré
     &.suspended { background: rgba($color: $primary, $alpha: .20); color: $primary; } // Suspendu manuellement
+}
+
+.question-modal{
+    position: fixed;
+    z-index: 888;
+    background: rgba($color: $dark, $alpha: .40);
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all cubic-bezier(0.39, 0.575, 0.565, 1);
+
+    .question{
+        padding: 2rem;
+        border-radius: 8px;
+        background: $white;
+        margin: auto;
+        text-align: center;
+        border: 2px solid $success;
+        border-top: 2px solid $dark ;
+        border-bottom: 2px solid $primary;
+
+        p{
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-block: 2rem;
+            i{font-size: 2rem;}
+        }
+    }
+
+    &.active{display: flex;}
+
 }
 
 /* ===============================
