@@ -403,6 +403,11 @@ body#admin{
         &:hover { color: $primary; background: rgba($primary, 0.03); }
         &.active { color: $primary; border-bottom: 3px solid $primary; margin-bottom: -4px; background: rgba($primary, 0.05); }
     }
+    
+    ///
+    /// 
+    /// 
+    
 }
 
 // Gestion de la visibilité des blocs
@@ -442,6 +447,32 @@ body#admin{
     }
 
     .plan-action-footer-zone { margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba($mute, 0.5); .plan-edit-btn { width: 100%; justify-content: center; } }
+
+    //
+    //
+    //
+    /* Ajout localisé dans assets/styles/modules/_platform-subscription.scss */
+
+    
+        .section-divider-label {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba($mute, 0.5);
+            display: block;
+        }
+
+        .metric-limits-list {
+            margin-bottom: 15px;
+            li {
+                font-size: 12px;
+                color: $gray;
+                strong { color: $dark; font-family: monospace; font-size: 13px; }
+            }
+        }
+    
+
+
+
 }
 
 // Support Dark Mode pour la grille des forfaits
@@ -452,6 +483,9 @@ body#admin{
         .plan-header-meta { border-bottom-color: rgba($white,0.08); .plan-name-title { color: $white; } }
         .features-bullet-list li { color: $white; }
         .plan-action-footer-zone { border-top-color: rgba($white,0.08); }
+    }
+    .saas-plans-grid-pricing .metric-limits-list li strong {
+        color: $primary;
     }
 }
 

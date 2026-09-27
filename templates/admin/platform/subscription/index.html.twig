@@ -43,7 +43,7 @@
         <div class="reports-center-grid-layout mb-25">
 
             <div class="button-right">
-                <a href="" class="btn-refined btn-success-gradient">
+                <a href="{{path('admin_platform_subscription_add')}}" class="btn-refined btn-success-gradient">
                     <i class="fa-regular fa-calendar-plus"></i>
                     Nouvel Abonnement
                 </a>
@@ -111,9 +111,9 @@
                         <td>
                             <span class="font-bold text-primary-mode">{{ sub.plan_name }}</span>
                         </td>
-                        <td class="monospace text-size-12">{{ sub.started_at|date('d/m/Y') }}</td>
+                        <td class="monospace text-size-12">{{ sub.start_at|date('d/m/Y') }}</td>
                         <td class="monospace font-bold {% if sub.status == 'Expiré' %}text-danger-mode{% endif %}">
-                            {{ sub.expires_at|date('d/m/Y') }}
+                            {{ sub.end_at|date('d/m/Y') }}
                         </td>
                         <td class="text-right font-bold monospace">{{ sub.price|number_format(2, ',', ' ') }}
                             $</td>
@@ -151,40 +151,49 @@
                 Nouveau plan
             </a>
         </div>
+
+
+        {# Extrait de l'onglet 2 modifié dans templates/admin/platform/subscription/index.html.twig #}
         <div class="saas-plans-grid-pricing">
-
-
             {% for plan in platform_plans %}
             <div class="card control-card pricing-plan-factory-card">
                 <div class="plan-header-meta">
                     <span class="plan-badge-type">{{ plan.level }}</span>
-                    <h3 class="plan-name-title">{{ plan.name }}</h3>
+                    <h3 class="plan-name-title">{{ plan.name|upper }}</h3>
                     <div class="plan-price-tag">
-                        <span class="amount">{{ plan.price }}
-                            $</span>
-                        <span class="period">/ mois</span>
+                        <span class="amount">{{ plan.price|number_format(0) }} {{ plan.currency }}</span>
+                        <span class="period">/ {{ plan.duration_days }} jours</span>
                     </div>
                 </div>
                 <div class="plan-features-list-wrapper">
-                    <label class="admin-bus-layout-add-label">Fonctionnalités incluses d'usine :</label>
+                    <label class="admin-bus-layout-add-label">Limitations Forfait d'Usine :</label>
+                    <ul class="features-bullet-list metric-limits-list">
+                        <li><i class="fa-solid fa-code-branch text-primary-mode"></i> Gares autorisées : <strong>{{
+                                plan.max_branches }}</strong></li>
+                        <li><i class="fa-solid fa-bus-simple text-primary-mode"></i> Flotte maximum : <strong>{{
+                                plan.max_buses }}</strong></li>
+                        <li><i class="fa-solid fa-users text-primary-mode"></i> Utilisateurs max : <strong>{{
+                                plan.max_users }}</strong></li>
+                    </ul>
+
+                    <label class="admin-bus-layout-add-label section-divider-label">Modules Applicatifs Activés
+                        :</label>
                     <ul class="features-bullet-list">
-                        {% for feature in plan.features %}
-                        <li>
-                            <i class="fa-solid fa-circle-check text-success-mode"></i>
-                            {{ feature }}
-                        </li>
+                        {% for code, name in plan.features %}
+                        <li><i class="fa-solid fa-circle-check text-success-mode"></i> {{ name }} <small
+                                class="monospace">({{ code }})</small></li>
                         {% endfor %}
                     </ul>
                 </div>
                 <div class="plan-action-footer-zone">
                     <a href="#" class="btn-refined btn-primary-gradient plan-edit-btn">
-                        <i class="fa-solid fa-sliders"></i>
-                        Ajuster le Tarif / Forfait
+                        <i class="fa-solid fa-sliders"></i> Ajuster le Forfait Système
                     </a>
                 </div>
             </div>
             {% endfor %}
         </div>
+
 
     </div>
 
