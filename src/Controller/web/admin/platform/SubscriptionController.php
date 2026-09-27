@@ -58,6 +58,21 @@ class SubscriptionController extends AbstractController
         $platformPlans = [
             [
                 'id' => 1,
+                'name' => 'trial',
+                'price' => 0.00,
+                'currency' => 'USD',
+                'duration_days' => 14, // Période d'évaluation standard de 2 semaines
+                'max_branches' => 1,
+                'max_users' => 2,
+                'max_buses' => 3,
+                'level' => 'Évaluation',
+                'features' => [
+                    'online_booking' => 'Réservation de billets basique au guichet',
+                    'advanced_reports' => 'Statistiques d\'activité journalières'
+                ]
+            ],
+            [
+                'id' => 1,
                 'name' => 'basic',
                 'price' => 75.00,
                 'currency' => 'USD',
@@ -140,9 +155,61 @@ class SubscriptionController extends AbstractController
 
         return $this->render('admin/platform/subscription/add.html.twig', [
             'page' => 'subscription',
-            'agencies' => $agencies
+            'agencies' => $agencies,
+            'is_renewal' => false // Permet de basculer l'affichage du Twig
         ]);
     } //add
+
+
+    /**
+     * SOUCHE 2 : PROLONGEMENT DÉDIÉ D'UNE LICENCE EXISTANTEVIA ROUTE [MCD 33]
+     */
+    #[Route('/admin/platform/subscriptions/{id}/renew', name: 'admin_platform_subscription_renew', methods: ['GET', 'POST'])]
+    public function renew(int $id, Request $request): Response
+    {
+        // 1. Extraction de la souscription précédente à prolonger (Simulation BDD)
+        $currentSubscription = [
+            'id' => $id,
+            'agency_id' => 1,
+            'agency_name' => 'TransKin Express',
+            'country' => 'RD Congo',
+            'endAt' => new \DateTimeImmutable('2026-10-15'), // Date d'échéance actuelle [MNS]
+            'plan_id' => 2,
+            'price' => 250.00
+        ];
+
+        if ($request->isMethod('POST')) {
+            // Reçoit les données de renouvellement
+            $nextStartAt = new \DateTimeImmutable($request->request->get('start_at'));
+            $nextEndAt = new \DateTimeImmutable($request->request->get('end_at'));
+
+            // EN INTÉGRATION ORM : On persiste la nouvelle entité subscription chaînée chronologiquement
+            $this->addFlash('success', sprintf('La licence de %s a été prolongée jusqu\'au %s.', $currentSubscription['agency_name'], $nextEndAt->format('d/m/Y')));
+            return $this->redirectToRoute('admin_platform_subscription_index');
+        }
+
+        // Calcule automatiquement la suggestion de période (+30 jours après la fin actuelle)
+        $suggestedStartAt = $currentSubscription['endAt'];
+        $suggestedEndAt = $suggestedStartAt->modify('+30 days');
+
+        // Liste des agences pour alimenter ton sélecteur
+        $agencies = [
+            ['id' => 1, 'name' => 'TransKin Express', 'country' => 'RD Congo'],
+            ['id' => 2, 'name' => 'Océan du Gabon', 'country' => 'Gabon'],
+            ['id' => 3, 'name' => 'TransFleuve', 'country' => 'Congo-Brazzaville'],
+        ];
+
+        return $this->render('admin/platform/subscription/add.html.twig', [
+            'page' => 'subscription',
+            'sub' => $currentSubscription,
+            'suggested_start' => $suggestedStartAt,
+            'suggested_end' => $suggestedEndAt,
+            'agencies' => $agencies,
+            'is_renewal' => true // Permet de basculer l'affichage du Twig
+        ]);
+    }//renew
+
+
 
 
     /**

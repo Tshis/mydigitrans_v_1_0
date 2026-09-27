@@ -524,16 +524,55 @@ body#admin{
         }
     }
 
-    .settings-container-grid{
-        display: grid;
-        grid-template-columns:350px 1fr ;
-        align-items: flex-start;
-        gap: 2rem;
+    .settings-container-grid {
+    display: grid;
+    /* 1. Sur mobile : une seule colonne qui prend tout l'espace */
+    grid-template-columns: 1fr; 
+    align-items: flex-start;
+    gap: 1.5rem; /* Écart légèrement réduit sur mobile pour gagner de la place */
 
-        .card{
-            border-top: 2px solid $dark;
-        }
+    /* 2. Sur tablette et ordinateur : on passe en 2 colonnes */
+    @media (min-width: 768px) {
+        grid-template-columns: 350px 1fr;
+        gap: 2rem;
     }
+
+    .card {
+        border-top: 2px solid $dark;
+    }
+}
+
+
+
+    .notice-box-info{
+        background: rgba(242, 153, 74, 0.04); 
+        border-color: rgba(242, 153, 74, 0.15); 
+        color: $primary; 
+        font-size: 11.5px; 
+        padding: 12px; 
+        border-radius: 8px; 
+        border: 1px solid;
+    }
+
+    .text-data-box-lock-view {
+        width: 100%;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba($gray, 0.06);
+        border: 1px solid $mute;
+        border-radius: 8px;
+        padding-inline: 12px;
+        font-weight: 800;
+        font-size: 13px;
+        box-sizing: border-box;
+        cursor: not-allowed;
+
+        i{color: $primary;}
+    }
+
+    
 }
 
 // Support Thème Sombre pour les nouveaux composants
@@ -542,6 +581,11 @@ body#admin{
         background: rgba(255, 255, 255, 0.03);
         color: $white;
         border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .text-data-box-lock-view{
+        *{color: $mute;}
+        color: $mute !important;
     }
 }
 
