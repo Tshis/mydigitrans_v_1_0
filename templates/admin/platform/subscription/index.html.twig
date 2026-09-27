@@ -120,7 +120,7 @@
 								<td class="text-right font-bold monospace">{{ sub.price|number_format(2, ',', ' ') }}
 									$</td>
 								<td class="text-center">
-									<span class="pill-report-audit {% if sub.status == 'Payé' %}closed{% elseif sub.status == 'Expiré' %}open{% else %}suspended{% endif %}">
+									<span class="pill-report-audit {% if sub.status == 'active' %}closed{% elseif sub.status == 'expired' %}expired{% else %}suspended{% endif %}">
 										{{ sub.status }}
 									</span>
 								</td>
@@ -191,7 +191,7 @@
 							</ul>
 
 							<label class="admin-bus-layout-add-label section-divider-label">Modules Applicatifs Activés
-								                        :</label>
+																																																								                        :</label>
 							<ul class="features-bullet-list">
 								{% for code, name in plan.features %}
 									<li>
