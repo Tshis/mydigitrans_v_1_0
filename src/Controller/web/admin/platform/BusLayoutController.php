@@ -206,5 +206,5 @@ final class BusLayoutController extends AbstractController
     public function toggle_layout(string $code): Response
     {
         return $this->redirectToRoute('admin_platform_bus_layout_show', ['code' => $code]);
-    }
+    } //toggle_layout
 }

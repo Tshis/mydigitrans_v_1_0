@@ -14,7 +14,8 @@
 	<span class="text">Compagnies / Agences</span>
 </a>
 
-<a href="" class="menu-link {{ page is same as('subscription') ? 'active' : '' }}" data-tooltip="Suivi des abonnements SaaS et Licences">
+{# 3. ABONNEMENT & LICENCES #}
+<a href="{{path('admin_platform_subscription_index')}}" class="menu-link {{ page is same as('subscription') ? 'active' : '' }}" data-tooltip="Suivi des abonnements SaaS et Licences">
 	<span class="icon">
 		<i class="fa-solid fa-credit-card"></i>
 	</span>

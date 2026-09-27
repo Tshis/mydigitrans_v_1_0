@@ -1,0 +1,192 @@
+{# templates/admin/platform/subscription/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+<script src="/js/admin/platform_subscription.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-platform-subscription-scope container">
+
+    {# --- EN-TÊTE --- #}
+    <header class="header-refined my-30">
+        <div class="header-main-info">
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Finance SaaS</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">Facturation & Licences</span>
+                </div>
+                <h1 class="mt-5">Suivi des Abonnements & Offres</h1>
+            </div>
+        </div>
+    </header>
+
+    {# --- SYSTÈME D'ONGLETS SÉMANTIQUES (TABS) --- #}
+    <div class="platform-tabs-navigation mb-25">
+        <button type="button" class="tab-nav-btn active" data-target="panel-registre">
+            <i class="fa-solid fa-receipt"></i>
+            Registre des Licences
+        </button>
+        <button type="button" class="tab-nav-btn" data-target="panel-forfaits">
+            <i class="fa-solid fa-tags"></i>
+            Configuration des Forfaits / Plans
+        </button>
+    </div>
+
+    {# ================================================================= #}
+    {# ONGLET 1 : LE PORTAIL DU REGISTRE DES AGENCES (ACTIF PAR DÉFAUT) #}
+    {# ================================================================= #}
+    <div class="tab-panel-content active" id="panel-registre"> {# BLOC KPI : COMPOSANTS METIERS FINANCIERS #}
+        <div class="reports-center-grid-layout mb-25">
+
+            <div class="button-right">
+                <a href="" class="btn-refined btn-success-gradient">
+                    <i class="fa-regular fa-calendar-plus"></i>
+                    Nouvel Abonnement
+                </a>
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="card control-card kpi-card">
+                    <div class="kpi-icon-wrapper text-success-mode">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div class="kpi-data">
+                        <label class="admin-bus-layout-add-label">Revenu Mensuel ({{ "now"|date("F") }})</label>
+                        <span class="kpi-value text-success-color">{{ stats.mrr|number_format(2, ',', ' ') }}
+                            $</span>
+                    </div>
+                </div>
+
+                <div class="card control-card kpi-card kpi-primary">
+                    <div class="kpi-icon-wrapper">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <div class="kpi-data">
+                        <label class="admin-bus-layout-add-label">Alertes Échéances (7j)</label>
+                        <span class="kpi-value text-warning-color">{{ stats.pending_expirations }}
+                            Agences</span>
+                    </div>
+                </div>
+
+                <div class="card control-card kpi-card kpi-success">
+                    <div class="kpi-icon-wrapper text-primary-mode">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <div class="kpi-data">
+                        <label class="admin-bus-layout-add-label">Dernier Encaissé ({{ "now"|date("F") }})</label>
+                        <span class="kpi-value">{{ stats.monthly_collected|number_format(2, ',', ' ') }}
+                            $</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        {# LE REGISTRE DES CONTRATS DILATÉ #}
+        <div class="table-responsive-wrapper">
+            <table class="table table-scrollable table-striped js-datatable">
+                <thead>
+                    <tr>
+                        <th>Agence Compte</th>
+                        <th>Forfait / Licence</th>
+                        <th>Date d'Activation</th>
+                        <th>Prochaine Échéance</th>
+                        <th class="text-right">Tarif Mensuel</th>
+                        <th class="text-center">Statut Facturation</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in subscriptions_list %}
+                    <tr>
+                        <td>
+                            <strong>{{ sub.agency_name }}</strong>
+                        </td>
+                        <td>
+                            <span class="font-bold text-primary-mode">{{ sub.plan_name }}</span>
+                        </td>
+                        <td class="monospace text-size-12">{{ sub.started_at|date('d/m/Y') }}</td>
+                        <td class="monospace font-bold {% if sub.status == 'Expiré' %}text-danger-mode{% endif %}">
+                            {{ sub.expires_at|date('d/m/Y') }}
+                        </td>
+                        <td class="text-right font-bold monospace">{{ sub.price|number_format(2, ',', ' ') }}
+                            $</td>
+                        <td class="text-center">
+                            <span
+                                class="pill-report-audit {% if sub.status == 'Payé' %}closed{% elseif sub.status == 'Expiré' %}open{% else %}suspended{% endif %}">
+                                {{ sub.status }}
+                            </span>
+                        </td>
+                        <td class="text-right">
+                            <div class="action-group-refined">
+                                <a href="#" class="action-link edit" title="Prolonger ou Renouveler">
+                                    <i class="fa-solid fa-calendar-plus"></i>
+                                </a>
+                                <a href="#" class="action-link view-file" title="Consulter les factures">
+                                    <i class="fa-solid fa-receipt"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# ================================================================= #}
+    {# ONGLET 2 : LA GRILLE DES FORFAITS DU SAAS (MASQUÉ AU DÉPART) #}
+    {# ================================================================= #}
+    <div class="tab-panel-content" id="panel-forfaits">
+
+        <div class="button-right my-25">
+            <a href="" class="btn-refined btn-primary-gradient">
+                <i class="fa-solid fa-plus"></i>
+                Nouveau plan
+            </a>
+        </div>
+        <div class="saas-plans-grid-pricing">
+
+
+            {% for plan in platform_plans %}
+            <div class="card control-card pricing-plan-factory-card">
+                <div class="plan-header-meta">
+                    <span class="plan-badge-type">{{ plan.level }}</span>
+                    <h3 class="plan-name-title">{{ plan.name }}</h3>
+                    <div class="plan-price-tag">
+                        <span class="amount">{{ plan.price }}
+                            $</span>
+                        <span class="period">/ mois</span>
+                    </div>
+                </div>
+                <div class="plan-features-list-wrapper">
+                    <label class="admin-bus-layout-add-label">Fonctionnalités incluses d'usine :</label>
+                    <ul class="features-bullet-list">
+                        {% for feature in plan.features %}
+                        <li>
+                            <i class="fa-solid fa-circle-check text-success-mode"></i>
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="plan-action-footer-zone">
+                    <a href="#" class="btn-refined btn-primary-gradient plan-edit-btn">
+                        <i class="fa-solid fa-sliders"></i>
+                        Ajuster le Tarif / Forfait
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
