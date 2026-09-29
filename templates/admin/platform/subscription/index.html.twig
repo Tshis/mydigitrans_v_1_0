@@ -5,6 +5,7 @@
 {{ parent() }}
 <script src="/js/datatable.js" defer></script>
 <script src="/js/admin/platform_subscription.js" defer></script>
+<script src="/js/admin/modalQuestion.js" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -266,12 +267,12 @@
 									<i class="fa-solid fa-edit"></i>
 								</a>
 								{% if feature.status == 'active' %}
-								<a href="{{path('admin_platform_agency_invoices',{'id':5})}}"
+								<a id="ctaBtn" data-target="{{path('admin_platform_agency_invoices',{'id':5})}}"
 									class="action-link view-file" title="Desactiver la fonctionnalité">
 									<i class="fa-solid fa-trash-can"></i>
 								</a>
 								{% else %}
-								<a href="{{path('admin_platform_agency_invoices',{'id':5})}}"
+								<a id="ctaBtn" data-target="{{path('admin_platform_agency_invoices',{'id':5})}}"
 									class="action-link view-file" title="Activer la fonctionnalité">
 									<i class="fa-solid fa-circle-check"></i>
 								</a>
@@ -289,4 +290,7 @@
 		</div>
 	</div>
 </div>
+
+
+{% include "admin/partials/_modal.html.twig" %}
 {% endblock %}
