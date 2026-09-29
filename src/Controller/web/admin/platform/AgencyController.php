@@ -178,4 +178,65 @@ class AgencyController extends AbstractController
             'branches' => $branches
         ]);
     } //show
+
+
+    /**
+     * INVOICES : HISTORIQUE CHRONOLOGIQUE ET GRAND LIVRE DE COMPTABILITÉ CLIENT [MCD 34]
+     */
+    #[Route('/admin/platform/agencies/{id}/invoices', name: 'admin_platform_agency_invoices', methods: ['GET'])]
+    public function invoices(int $id): Response
+    {
+        // 1. Extraction de la compagnie d'agence (Simulation Doctrine)
+        $agency = [
+            'id' => $id,
+            'code' => 'djhk',
+            'name' => 'TransKin Express',
+        ];
+
+        // 2. Hydratation exhaustive selon ton entité "34. Invoice" du MCD [MCD 34]
+        $invoicesList = [
+            [
+                'id' => 101,
+                'invoiceNumber' => 'INV-2026-0084',
+                'type' => 'subscription',
+                'currency' => 'USD',
+                'status' => 'paid',
+                'issuedAt' => new \DateTime('2026-09-15'),
+                'periodStart' => new \DateTime('2026-09-15'),
+                'periodEnd' => new \DateTime('2026-10-15'),
+                'total' => 250.00,
+                'balanceDue' => 0.00
+            ],
+            [
+                'id' => 102,
+                'invoiceNumber' => 'INV-2026-0092',
+                'type' => 'platformFee',
+                'currency' => 'USD',
+                'status' => 'issued',
+                'issuedAt' => new \DateTime('2026-09-25'),
+                'periodStart' => new \DateTime('2026-09-01'),
+                'periodEnd' => new \DateTime('2026-09-25'),
+                'total' => 184.50,
+                'balanceDue' => 184.50 // Reste à percevoir sur les commissions de billets !
+            ],
+            [
+                'id' => 103,
+                'invoiceNumber' => 'INV-2026-0041',
+                'type' => 'mixed',
+                'currency' => 'USD',
+                'status' => 'overdue',
+                'issuedAt' => new \DateTime('2026-08-15'),
+                'periodStart' => new \DateTime('2026-08-15'),
+                'periodEnd' => new \DateTime('2026-09-15'),
+                'total' => 325.00,
+                'balanceDue' => 325.00 // Facture impayée en retard !
+            ]
+        ];
+
+        return $this->render('admin/platform/agency/invoices.html.twig', [
+            'page' => 'agency',
+            'agency' => $agency,
+            'invoices_list' => $invoicesList
+        ]);
+    } //invoices
 }

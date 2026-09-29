@@ -1,0 +1,110 @@
+{# templates/admin/platform/agency/invoices.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-platform-invoice-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_agency_show', {'code': agency.code}) }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Supervision Réseau</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Facturation Client</span>
+					</div>
+					<h1 class="mt-5">Historique des Factures :
+						{{ agency.name }}</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- COMPOSANT TABLEAU COMPTABLE DILATÉ ET AÉRÉ --- #}
+		<div class="table-responsive-wrapper">
+			<h2 class="card-title-fix text-size-14 py-10">
+				<i class="fa-solid fa-receipt text-primary"></i>
+				Registre des Factures Émises (Entité Invoice)
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>N° Facture</th>
+						<th>Nature de la Facture</th>
+						<th>Période Couverte</th>
+						<th>Date d'Émission</th>
+						<th class="text-right">Reste à Payer (Balance)</th>
+						<th class="text-right">Montant Total</th>
+						<th class="text-center">Statut</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for invoice in invoices_list %}
+						<tr>
+							<td class="monospace font-bold">
+								<strong>{{ invoice.invoiceNumber }}</strong>
+							</td>
+							<td>
+								{# Correspondance exacte avec ton champ type [MCD 34] #}
+								<span class="invoice-nature-label">
+									{% if invoice.type == 'subscription' %}
+										<i class="fa-solid fa-calendar-check text-primary-mode"></i>
+										Abonnement Fixe
+									{% elseif invoice.type == 'platformFee' %}
+										<i class="fa-solid fa-percent text-success-mode"></i>
+										Commissions Escales
+									{% else %}
+										<i class="fa-solid fa-layer-group"></i>
+										Facture Mixte
+									{% endif %}
+								</span>
+							</td>
+							<td class="monospace text-size-12 text-gray">
+								{{ invoice.periodStart|date('d/m/y') }}
+								⇄
+								{{ invoice.periodEnd|date('d/m/y') }}
+							</td>
+							<td class="monospace text-size-12">{{ invoice.issuedAt|date('d/m/Y') }}</td>
+							<td class="text-right font-bold monospace {% if invoice.balanceDue > 0 %}text-balance-warning{% endif %}">
+								{{ invoice.balanceDue|number_format(2, ',', ' ') }}
+								{{ invoice.currency }}
+							</td>
+							<td class="text-right font-bold monospace text-total-amount">
+								{{ invoice.total|number_format(2, ',', ' ') }}
+								{{ invoice.currency }}
+							</td>
+							<td
+								class="text-center">
+								{# Gestion sémantique de tes 5 états de statuts Invoice [MCD 34] #}
+								<span class="pill-report-audit {% if invoice.status == 'paid' %}closed{% elseif invoice.status == 'overdue' %}open{% elseif invoice.status == 'cancelled' %}cancelled-status{% else %}draft{% endif %}">
+									{{ invoice.status|upper }}
+								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									<a href="#" class="action-link view-file" title="Télécharger le PDF / Reçu officiel">
+										<i class="fa-solid fa-file-pdf"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="8" class="text-center text-gray italic padding-20">Aucune facture émise pour cette agence pour le moment.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}

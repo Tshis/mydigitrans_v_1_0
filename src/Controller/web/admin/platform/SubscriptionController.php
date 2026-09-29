@@ -109,12 +109,21 @@ class SubscriptionController extends AbstractController
             ]
         ];
 
+        // 4. Extraction de tes entités réelles "30. Feature" du MCD pour nourrir ton 3ème Onglet
+        $systemFeatures = [
+            ['code' => 'online_booking', 'name' => 'Réservation en Ligne', 'description' => 'Vente de billets en temps réel avec sélection tactile sur Seatmap.', 'createdAt' => new \DateTime('2024-01-10'), 'status' => 'active'],
+            ['code' => 'shipment_module', 'name' => 'Gestion des Colis & Fret', 'description' => 'Expédition, pesée et édition des bordereaux de colisage en gare.', 'createdAt' => new \DateTime('2024-02-15'), 'status' => 'active'],
+            ['code' => 'advanced_reports', 'name' => 'Rapports & Audits Avancés', 'description' => 'Graphiques de performances financières et exportation des livres de caisses.', 'createdAt' => new \DateTime('2024-03-20'), 'status' => 'active'],
+            ['code' => 'driver_app_api', 'name' => 'Interface API Chauffeurs', 'description' => 'Synchronisation des fiches de routes sur l\'application mobile conducteurs.', 'createdAt' => new \DateTime('2025-05-12'), 'status' => 'inactive']
+        ];
+
 
         return $this->render('admin/platform/subscription/index.html.twig', [
             'page' => 'subscription',
             'stats' => $stats,
             'platform_plans' => $platformPlans, // Injection cruciale !
-            'subscriptions_list' => $subscriptionsList
+            'subscriptions_list' => $subscriptionsList,
+            'system_features' => $systemFeatures
         ]);
     }//index
 
@@ -208,8 +217,6 @@ class SubscriptionController extends AbstractController
             'is_renewal' => true // Permet de basculer l'affichage du Twig
         ]);
     }//renew
-
-
 
 
     /**

@@ -1,0 +1,86 @@
+{# templates/admin/platform/feature/form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div
+	class="admin-platform-scope container">
+
+	{# --- EN-TÊTE CONFIGURABLE --- #}
+	<header class="header-refined my-25">
+		<div class="header-main-info">
+			<a href="{{ path('admin_platform_subscription_index') }}" class="agency-back-action">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Spécifications Techniques</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-primary text-size-13 text-highlight">Catalogue des Modules</span>
+				</div>
+				<h1 class="mt-5">{{ is_edit ? 'Ajuster le Module : ' ~ feature.code : 'Déclarer une Fonctionnalité d\'Usine' }}</h1>
+            </div>
+        </div>
+    </header>
+
+    {# --- FORMULAIRE UNIQUE --- #}
+    <form action="#" method="POST" class="settings-form-layout">
+        <div class="settings-container-grid">
+
+            {# COLONNE GAUCHE : STATUT USINE DU VERROU #}
+            <aside class="sidebar-action-panel">
+                <div class="card sticky-aside-card">
+                    <h2 class="card-title-fix"><i class="fa-solid fa-toggle-on text-primary"></i> Statut Global</h2>
+                    
+                    <div class="currency-checkbox-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" name="status" value="active" {{ (not is_edit) or feature.status == 'active' ? 'checked' : '' }}>
+                            <span class="checkmark"></span>
+                            Module Actif / Déployé en Production
+                        </label>
+                    </div>
+
+                    <div class="notice-box-info info-critical-theme">
+                        <p><strong><i class="fa-solid fa-triangle-exclamation"></i> Verrou de Maintenance :</strong> Passer le statut d'une feature à <strong class="font-monospace-code">inactive</strong> va instantanément masquer et verrouiller l'accès à ce module pour l'ensemble des agences du réseau mondial, quel que soit leur plan d'abonnement actif.</p>
+                    </div>
+                </div>
+            </aside>
+            
+            {# COLONNE DROITE : PARAMÈTRES ET CONFIGURATION DE LA FEATURE #}
+            <div class="main-form-panel">
+                <div class="card control-card mb-20">
+                    <h2 class="card-title-fix"><i class="fa-solid fa-sliders text-primary"></i> 1. Propriétés de la Feature</h2>
+                    
+                    <div class="field-group mb-20">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Code Technique Unique *</label>
+                            <input type="text" name="code" class="admin-bus-layout-add-input font-monospace-code" placeholder="Ex: online_booking, advanced_reports" value="{{ is_edit ? feature.code : '' }}" {{ is_edit ? 'readonly' : '' }} required>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Nom Public du Module *</label>
+                            <input type="text" name="name" class="admin-bus-layout-add-input" placeholder="Ex: Réservation en ligne" value="{{ is_edit ? feature.name : '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="field-group mb-25">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Description du Module Applicatif *</label>
+                            <textarea name="description" class="admin-bus-layout-add-textarea" placeholder="Exliquez en quelques phrases à quoi sert ce module et son périmètre..." required>{{ is_edit ? feature.description : '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="admin-bus-layout-add-action-zone">
+                        <a href="{{ path('admin_platform_subscription_index') }}" class="btn-refined btn-gray-gradient">Annuler</a>
+                        <button type="submit" class="btn-refined btn-success-gradient">
+                            <i class="fa-solid {{ is_edit ? 'fa-floppy-disk' : 'fa-cloud-arrow-up' }}"></i> 
+                            {{ is_edit ? 'Enregistrer les Modifications' : 'Déployer la Feature Système' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+
+        </div>
+    </form>
+</div>
+{% endblock %}
