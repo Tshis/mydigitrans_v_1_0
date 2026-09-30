@@ -1,0 +1,87 @@
+{# templates/admin/platform/currency/form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-platform-scope container">
+
+		{# --- EN-TÊTE CONFIGURABLE --- #}
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_currency_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Référentiel International</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Dictionnaire Monétaire</span>
+					</div>
+					<h1 class="mt-5">{{ is_edit ? 'Ajuster la Devise : ' ~ currency.code : 'Ajouter une Devise Système' }}</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE UNIQUE --- #}
+		<form action="#" method="POST" class="settings-form-layout">
+			<div
+				class="settings-container-grid">
+
+				{# COLONNE GAUCHE : STATUT OPÉRATIONNEL #}
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-toggle-on text-primary"></i>
+							Statut Catalogue</h2>
+
+						<div class="currency-checkbox-group">
+							<label class="checkbox-container">
+								<input type="checkbox" name="isActive" value="1" {{ (not is_edit) or currency.isActive ? 'checked' : '' }}>
+								<span class="checkmark"></span>
+								Devise Activée à l'Usine
+							</label>
+						</div>
+
+						<div class="notice-box-info">
+							<p>
+								<strong>
+									<i class="fa-solid fa-circle-info"></i>
+									Comportement Réseau :</strong>
+								Déclarer une devise ici l'ajoute au catalogue mondial de MyDigitrans. Elle deviendra instantanément sélectionnable par les gares et compagnies d'Afrique Centrale pour leurs grilles de taux de change journalières.</p>
+						</div>
+					</div>
+				</aside>
+
+				{# COLONNE DROITE : SÉMANTIQUE DE LA MONNAIE #}
+				<div class="main-form-panel">
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-coins text-primary"></i>
+							1. Identité de la Devise</h2>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Code ISO International *</label>
+								<input type="text" name="code" class="admin-bus-layout-add-input font-monospace-code" placeholder="Ex: USD, CDF, XAF, XOF" maxlength="3" value="{{ is_edit ? currency.code : '' }}" {{ is_edit ? 'readonly' : '' }} required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Nom Complet de la Monnaie *</label>
+								<input type="text" name="name" class="admin-bus-layout-add-input" placeholder="Ex: Franc CFA (BEAC), Franc Congolais" value="{{ is_edit ? currency.name : '' }}" required>
+							</div>
+						</div>
+
+						<div class="admin-bus-layout-add-action-zone">
+							<a href="{{ path('admin_platform_dashboard') }}" class="btn-refined btn-gray-gradient">Annuler</a>
+							<button type="submit" class="btn-refined btn-success-gradient">
+								<i class="fa-solid {{ is_edit ? 'fa-floppy-disk' : 'fa-cloud-arrow-up' }}"></i>
+								{{ is_edit ? 'Enregistrer les Modifications' : 'Greffer la Devise au Système' }}
+							</button>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</form>
+	</div>
+{% endblock %}

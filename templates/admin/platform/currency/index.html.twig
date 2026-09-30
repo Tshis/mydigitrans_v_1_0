@@ -1,0 +1,84 @@
+{# templates/admin/platform/currency/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+<script src="/js/admin/modalQuestion.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-platform-currency-index-scope container">
+
+    {# --- EN-TÊTE --- #}
+    <header class="header-refined my-25">
+        <div class="header-main-info">
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Référentiel International</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">Dictionnaire Monétaire</span>
+                </div>
+                <h1 class="mt-5">Catalogue des Devises Système</h1>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{{ path('admin_platform_currency_add') }}" class="btn-refined btn-success-gradient">
+                <i class="fa-solid fa-square-plus"></i>
+                Ajouter une Devise Usine
+            </a>
+        </div>
+    </header>
+
+    {# --- GRILLE FINANCIÈRE EXPANSIVE, DILATÉE & AÉRÉE --- #}
+    <div class="table-responsive-wrapper">
+        <table class="table table-scrollable table-striped js-datatable">
+            <thead>
+                <tr>
+                    <th>Code ISO</th>
+                    <th>Nom de la Devise</th>
+                    <th class="text-center">Statut Usine</th>
+                    <th class="text-right">Actions Référentiel</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for currency in currencies_list %}
+                <tr>
+                    <td class="monospace font-bold text-primary-mode"><strong>{{ currency.code }}</strong></td>
+                    <td><strong>{{ currency.name }}</strong></td>
+                    <td class="text-center">
+                        <span class="pill-report-audit {{ currency.isActive ? 'closed' : 'open' }}">
+                            {{ currency.isActive ? 'Active' : 'Désactivée' }}
+                        </span>
+                    </td>
+                    <td class="text-right">
+                        <div class="action-group-refined">
+                            {# Action 1 : Modification #}
+                            <a href="{{ path('admin_platform_currency_edit', {'code': currency.code}) }}"
+                                class="action-link edit" title="Modifier les libellés">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+
+                            {# Action 2 : Activation et desactivation Sécurisée déclenchant le Modal #}
+                            <a id="ctaBtn" class="action-link"
+                                title=" {{currency.isActive ? 'Desactiver' : 'Activer'}} la devise du système d'usine"
+                                data-targert="{{ path('admin_platform_currency_toggle',{'code':currency.code })}}">
+                                <i class="fa-solid {{ currency.isActive ? 'fa-eye-slash' : 'fa-circle-check' }}"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-gray italic padding-20">Aucune devise configurée dans le
+                        système d'exploitation d'usine.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include "admin/partials/_modal.html.twig" %}
+
+{% endblock %}
