@@ -1,0 +1,115 @@
+{# templates/admin/platform/commission/payment_show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-platform-scope container">
+
+	<header class="header-refined my-25">
+		<div class="header-main-info">
+			<a href="{{ path('admin_platform_commission_index') }}" class="agency-back-action">
+				<i class="fa-solid fa-arrow-left"></i>
+			</a>
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Audit Comptable</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-primary text-size-13 text-highlight">Justificatif de Décaissement</span>
+				</div>
+				<h1 class="mt-5">Quittance de Paiement :
+					{{ payment.reference }}</h1>
+			</div>
+		</div>
+	</header>
+
+	<div class="settings-form-layout">
+		<div class="settings-container-grid">
+
+
+			{# COLONNE GAUCHE : DEVISE ET MONTANT SCELLÉ #}
+			<aside class="sidebar-action-panel">
+				<div class="card control-card text-center border-top-success">
+					<h2 class="card-title-fix text-success">
+						<i class="fa-solid fa-circle-check"></i>
+						Volume Solder
+					</h2>
+					<div class="monospace font-bold text-size-22 text-weight-900 text-success mt-10">
+						{{ payment.amount|number_format(2, ',', ' ') }}
+						{{ payment.currency }}
+					</div>
+					<p class="text-gray monospace font-bold text-size-11 text-weight-700 mt-10">Statut :
+						{{ payment.status|upper }}</p>
+				</div>
+			</aside>
+
+			{# COLONNE GAUCHE : LES METADONNEES DU VERSEMENT #}
+			<div class="main-form-panel">
+				<div class="card control-card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-receipt text-primary"></i>
+						Émargement du Trésorier
+					</h2>
+					<form action="">
+						<div class="field-group mb-15">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Agent Bénéficiaire</label>
+								<div class="text-data-box-lock-view">{{ payment.user_name }}</div>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Méthode </label>
+								<div class="text-data-box-lock-view">{{ payment.method }}
+								</div>
+							</div>
+						</div>
+
+						<div class="field mb-20">
+							<label class="admin-bus-layout-add-label">Référence</label>
+							<div class="text-data-box-lock-view">{{ payment.reference }}</div>
+						</div>
+					</form>
+				</div>
+
+				{# TABLEAU DES ITEMS AGRAFES (commissionPaymentItem) [MCD 49] #}
+				<div class="table-responsive-wrapper">
+					<h2 class="card-title-fix text-size-14 py-10">
+						<i class="fa-solid fa-paperclip text-primary"></i>
+						Détail des Lignes de Commissions Soldées par ce Règlement
+					</h2>
+					<table class="table table-scrollable table-striped js-datatable">
+						<thead>
+							<tr>
+								<th>ID Commission Base</th>
+								<th>Source Transaction</th>
+								<th class="text-center">Palier Éteint</th>
+								<th class="text-right">Quote-part Éteinte</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in items %}
+							<tr>
+								<td class="monospace font-bold">#COMM-00{{ item.commission_id }}</td>
+								<td>
+									<span class="text-gray font-bold">{{ item.sourceType }}
+										(ID:
+										{{ item.sourceId }})</span>
+								</td>
+								<td class="text-center monospace font-bold">Niv.{{ item.level }}</td>
+								<td class="text-right font-bold monospace text-primary-mode">{{
+									item.amount|number_format(2, ',', ' ') }}
+									{{ payment.currency }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+</div>
+{% endblock %}

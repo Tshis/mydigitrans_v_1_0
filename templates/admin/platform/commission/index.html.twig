@@ -1,0 +1,264 @@
+{# templates/admin/platform/commission/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+<script src="/js/admin/platform_tabs.js" defer></script>
+<script src="/js/admin/modalQuestion.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-platform-commission-scope container">
+
+    {# --- EN-TÊTE DYNAMIQUE --- #}
+    <header class="header-refined my-30">
+        <div class="header-main-info">
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Administration SaaS</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">Réseau MLM & Rémunérations</span>
+                </div>
+                <h1 class="mt-5">Commissions & Algorithmes d'Usine</h1>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{{ path('admin_platform_commission_pay') }}" class="btn-refined btn-success-gradient">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                Enregistrer un Règlement
+            </a>
+            <a href="{{ path('admin_platform_commission_rule_add') }}" class="btn-refined btn-primary-gradient">
+                <i class="fa-solid fa-plus"></i>
+                Nouvelle Règle Paliers
+            </a>
+        </div>
+    </header>
+
+    {# --- SYSTÈME D'ONGLETS REPRIS ET ENRICHI (3 TABS) --- #}
+    <div class="platform-tabs-navigation mb-25">
+        <button type="button" class="tab-nav-btn active" data-target="panel-commissions">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+            Registre Général des Commissions
+        </button>
+        <button type="button" class="tab-nav-btn" data-target="panel-rules">
+            <i class="fa-solid fa-gears"></i>
+            Règles d'Attribution par Paliers
+        </button>
+        <button type="button" class="tab-nav-btn" data-target="panel-payments">
+            <i class="fa-solid fa-receipt"></i>
+            Historique des Règlements Effectués
+        </button>
+    </div>
+
+    {# ============================================================ #}
+    {# --- ONGLET 1 : REGISTRE GÉNÉRAL (Conservé à l'identique) --- #}
+    {# ============================================================ #}
+
+    <div class="tab-panel-content active" id="panel-commissions">
+        {# --- BANDEAU D'ACTIONS COMPTABLES MACRO AVEC FILTRE TEMPOREL --- #}
+        <div class="table-macro-actions-bar mb-15">
+            <div class="actions-hint-text">
+                <i class="fa-solid fa-clock-rotate-left text-primary-mode"></i>
+                <span>Période de carence de 7 jours appliquée. Seules les commissions stables et validées sont éligibles
+                    à
+                    l'approbation globale.</span>
+            </div>
+            {# FORMULAIRE D'ACTION FINANCIÈRE AVEC FILTRE SÉCURITÉ DE 7 JOURS [MCD 47] #}
+            <form action="{{ path('admin_platform_commission_approve_global_network') }}" method="POST"
+                class="inline-action-form">
+                <button type="submit" class="btn-refined btn-success-gradient mass-global-approve-btn">
+                    <i class="fa-solid fa-shield-halved"></i> Approuver les Commissions Éligibles (+7 jours)
+                </button>
+            </form>
+        </div>
+
+        {# --- TABLEAU COMPTABLE --- #}
+        <div class="table-responsive-wrapper">
+            <table class="table table-scrollable table-striped js-datatable">
+                <thead>
+                    <tr>
+                        <th>Bénéficiaire (User)</th>
+                        <th>Source Métier</th>
+                        <th class="text-center">Palier / Level</th>
+                        <th class="text-center">Taux (%)</th>
+                        <th class="text-right">Montant Conjoint</th>
+                        <th>Date de Calcul</th>
+                        <th class="text-center">Statut</th>
+                        <th class="text-right">Éligibilité Retrait</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comm in commissions_list %}
+                    <tr>
+                        <td><strong>{{ comm.user_name }}</strong></td>
+                        <td>
+                            <span class="invoice-nature-label">
+                                {% if comm.sourceType == 'Ticket' %}
+                                <i class="fa-solid fa-ticket text-primary-mode"></i> Billet Vendu
+                                {% elseif comm.sourceType == 'Shipment' %}
+                                <i class="fa-solid fa-box text-success-mode"></i> Fret / Colis
+                                {% else %}
+                                <i class="fa-solid fa-link"></i> Enregistrement
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="text-center font-bold monospace">Niv.{{ comm.level }}</td>
+                        <td class="text-center font-bold monospace">{{ comm.percentage }}%</td>
+                        <td class="text-right font-bold monospace text-total-amount">
+                            {{ comm.amount|number_format(2, ',', ' ') }} {{ comm.currency }}
+                        </td>
+                        <td class="monospace text-size-12">{{ comm.createdAt|date('d/m/Y H:i') }}</td>
+                        <td class="text-center">
+                            <span
+                                class="pill-report-audit {% if comm.status == 'approved' %}primary{% elseif comm.status == 'pending' %}danger{% elseif comm.status == 'paid' %}closed{% endif %}">
+                                {{ comm.status }}
+                            </span>
+
+                        </td>
+                        <td class="text-right">
+                            <div class="action-group-refined">
+                                {# Indicateur visuel d'éligibilité basé sur la date courante (simulée à fin septembre
+                                2026)
+                                #}
+                                {% if comm.status == 'pending' %}
+                                {# Si la commission date de plus de 7 jours (Ex: calculée le 20/09/2026 pour aujourd'hui
+                                30/09/2026) #}
+                                {% if comm.createdAt < date('-7 days') %} <span class="pill-report-audit primary">
+                                    </span>Éligible</span>
+                                    {% else %}
+                                    <span class="pill-report-audit danger">En Carence</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="pill-report-audit success font-size-9">Validé</span>
+                                    {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    {# ============================================================== #}
+    {# --- ONGLET 2 : RÈGLES D'USINE (Conservé à l'identique) --- #}
+    {# ============================================================== #}
+    <div class="tab-panel-content" id="panel-rules">
+        <div class="table-responsive-wrapper">
+            <table class="table table-scrollable table-striped js-datatable">
+                <thead>
+                    <tr>
+                        <th>Désignation de la Règle</th>
+                        <th>Source SourceType</th>
+                        <th class="text-center">Niveau Pivot</th>
+                        <th class="text-center">Limite Palier Max</th>
+                        <th class="text-center">Pourcentage Accordé</th>
+                        <th class="text-center">État Règle</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rule in rules_list %}
+                    <tr>
+                        <td>
+                            <strong>{{ rule.name }}</strong>
+                        </td>
+                        <td class="font-bold text-primary-mode">{{ rule.sourceType }}</td>
+                        <td class="text-center monospace font-bold">{{ rule.level }}</td>
+                        <td class="text-center monospace font-bold">{{ rule.maxLevel }}</td>
+                        <td class="text-center monospace font-bold text-total-amount">{{ rule.percentage }}%</td>
+                        <td class="text-center">
+                            <span class="pill-report-audit {{ rule.isActive ? 'closed' : 'open' }}">
+                                {{ rule.isActive ? 'Active' : 'Désactivée' }}
+                            </span>
+                        </td>
+                        <td class="text-right">
+                            <div class="action-group-refined">
+                                <a href="{{ path('admin_platform_commission_rule_edit', {'id': rule.id}) }}"
+                                    class="action-link edit" title="Ajuster le pourcentage">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+
+                                <a id="ctaBtn"
+                                    data-target="{{ path('admin_platform_commission_rule_toggle', {'id': rule.id}) }}"
+                                    class="action-link btnCTA {{ rule.isActive ? 'text-danger' : 'text-success' }}"
+                                    title="{{ rule.isActive ? 'Suspendre la règle' : 'Rétablir la règle' }}">
+                                    <i class="fa-solid {{ rule.isActive ? 'fa-ban' : 'fa-circle-check' }}"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# ================================================================= #}
+    {# NOUVEAU - SCÈNE 3 : HISTORIQUE DES PAIEMENTS EFFECTUÉS [MCD 48] #}
+    {# ================================================================= #}
+    <div class="tab-panel-content" id="panel-payments">
+        <div class="table-responsive-wrapper">
+            <table class="table table-scrollable table-striped js-datatable">
+                <thead>
+                    <tr>
+                        <th>Bénéficiaire (User)</th>
+                        <th>Référence Débit</th>
+                        <th>Canal de Règlement</th>
+                        <th class="text-right">Volume Décaissé</th>
+                        <th>Date du Versement</th>
+                        <th class="text-center">Statut Transaction</th>
+                        <th class="text-right">Pièce Justificative</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments_history %}
+                    <tr>
+                        <td>
+                            <strong>{{ payment.user_name }}</strong>
+                        </td>
+                        <td class="monospace font-bold">{{ payment.reference }}</td>
+                        <td>
+                            <span class="text-gray font-bold">{{ payment.method }}</span>
+                        </td>
+                        <td class="text-right font-bold monospace text-total-amount-success">
+                            {{ payment.amount|number_format(2, ',', ' ') }}
+                            {{ payment.currency }}
+                        </td>
+                        <td class="monospace text-size-12">{{ payment.paidAt|date('d/m/Y H:i') }}</td>
+                        <td class="text-center">
+                            <span
+                                class="pill-report-audit {% if payment.status == 'success' %}closed{% elseif payment.status == 'pending' %}draft{% else %}open{% endif %}">
+                                {{ payment.status }}
+                            </span>
+                        </td>
+                        <td class="text-right">
+                            <div class="action-group-refined">
+                                {# Lien pivot chirurgical vers la facture détaillée d'audit de décaissement #}
+                                <a href="{{ path('admin_platform_commission_payment_show', {'id': payment.id}) }}"
+                                    class="action-link view-file"
+                                    title="Ouvrir le reçu d'audit détaillé (Items associés)">
+                                    <i class="fa-solid fa-receipt"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-gray italic padding-20">Aucun virement ou décaissement
+                            référencé dans les livres de comptes.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% include "admin/partials/_modal.html.twig" %}
+
+{% endblock %}

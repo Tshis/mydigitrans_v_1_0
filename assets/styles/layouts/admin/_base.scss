@@ -677,9 +677,22 @@ body#admin{
 .pill-report-audit { 
     padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase;
     &.closed { background: rgba($color: $success, $alpha: .20); color: $success; } // Actif
+    &.success { background: rgba($color: $success, $alpha: .20); color: $success; } // Actif
     &.open { background: rgba($color: $danger, $alpha: .20); color: $danger; }   // Expiré
+    &.danger { background: rgba($color: $danger, $alpha: .10); color: $danger; }   // Expiré
     &.expired { background: rgba($color: $danger, $alpha: .20); color: $danger; }   // Expiré
     &.suspended { background: rgba($color: $primary, $alpha: .20); color: $primary; } // Suspendu manuellement
+    &.primary { background: rgba($color: $primary, $alpha: .20); color: $primary; } // Suspendu manuellement
+}
+
+.actions-hint-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: $gray;
+    margin-bottom: 2rem;
 }
 
 .question-modal{

@@ -1,0 +1,90 @@
+{# templates/admin/platform/commission/rule_form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div class="admin-platform-scope container">
+
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_commission_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Spécifications MLM</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Algorithme d'Usine</span>
+					</div>
+					<h1 class="mt-5">{{ is_edit ? 'Ajuster la Règle Paliers' : 'Créer une Règle de Commission' }}</h1>
+				</div>
+			</div>
+		</header>
+
+		<form action="#" method="POST" class="settings-form-layout">
+			<div class="settings-container-grid">
+
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-toggle-on text-primary"></i>
+							Visibilité</h2>
+						<div class="currency-checkbox-group">
+							<label class="checkbox-container">
+								<input type="checkbox" name="isActive" value="1" {{ (not is_edit) or rule.isActive ? 'checked' : '' }}>
+								<span class="checkmark"></span>
+								Règle Active en Production
+							</label>
+						</div>
+					</div>
+				</aside>
+
+				<div class="main-form-panel">
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-sliders text-primary"></i>
+							Paramètres de la Règle</h2>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Intitulé de la règle *</label>
+								<input type="text" name="name" class="admin-bus-layout-add-input" placeholder="Ex: Apporteurs d'affaires directs" value="{{ is_edit ? rule.name : '' }}" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Source Métier Déclencheuse *</label>
+								<select name="sourceType" class="admin-bus-layout-add-select" required>
+									<option value="Ticket" {{ is_edit and rule.sourceType == 'Ticket' ? 'selected' : '' }}>Ticket (Billet Passager)</option>
+									<option value="Shipment" {{ is_edit and rule.sourceType == 'Shipment' ? 'selected' : '' }}>Shipment (Fret / Colis)</option>
+									<option value="subscription" {{ is_edit and rule.sourceType == 'subscription' ? 'selected' : '' }}>Subscription (Abonnement SaaS)</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Niveau Actuel Ciblé (level) *</label>
+								<input type="number" name="level" class="admin-bus-layout-add-input" min="1" max="10" value="{{ is_edit ? rule.level : '1' }}" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Limite Palier Maximum (maxLevel) *</label>
+								<input type="number" name="maxLevel" class="admin-bus-layout-add-input" min="1" max="10" value="{{ is_edit ? rule.maxLevel : '1' }}" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Pourcentage Distribué (%) *</label>
+								<input type="number" step="0.1" name="percentage" class="admin-bus-layout-add-input" placeholder="0.0" value="{{ is_edit ? rule.percentage : '0.0' }}" required>
+							</div>
+						</div>
+
+						<div class="admin-bus-layout-add-action-zone">
+							<a href="{{ path('admin_platform_commission_index') }}" class="btn-refined btn-gray-gradient">Annuler</a>
+							<button type="submit" class="btn-refined btn-success-gradient">
+								<i class="fa-solid {{ is_edit ? 'fa-floppy-disk' : 'fa-cloud-arrow-up' }}"></i>
+								{{ is_edit ? 'Sauvegarder les Taux' : 'Déployer la Règle Système' }}
+							</button>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}

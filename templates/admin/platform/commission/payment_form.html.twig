@@ -1,0 +1,65 @@
+{# templates/admin/platform/commission/payment_form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div class="admin-platform-scope container">
+
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_commission_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Finance Trésorerie</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Règlement des Comptes</span>
+					</div>
+					<h1 class="mt-5">Exécuter un Paiement de Commissions</h1>
+				</div>
+			</div>
+		</header>
+
+		<form action="#" method="POST" class="card control-card">
+			<h2 class="card-title-fix">
+				<i class="fa-solid fa-money-bill-transfer text-primary"></i>
+				Ordre de Sortie de Fonds</h2>
+
+			<div class="field-group mb-20">
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Bénéficiaire (User du Réseau MLM) *</label>
+					<select name="user_id" class="admin-bus-layout-add-select" required>
+						<option value="" disabled selected>-- Sélectionner l'agent à rémunérer --</option>
+						{% for user in users %}
+							<option value="{{ user.id }}">{{ user.name }}
+								(Solde dû :
+								{{ user.pending_balance }}
+								$)</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="field">
+					<label class="admin-bus-layout-add-label">Montant Total à Décaisser ($) *</label>
+					<input type="number" step="0.01" name="amount" class="admin-bus-layout-add-input" placeholder="0.00" required>
+				</div>
+			</div>
+
+
+			<div class="field mb-25">
+				<label class="admin-bus-layout-add-label">Canal / Méthode de Paiement *</label>
+				<select name="method" class="admin-bus-layout-add-select" required>
+					<option value="Cash">Espèces / Guichet Central</option>
+					<option value="Mobile Money">Mobile Money (M-Pesa / Orange Money)</option>
+					<option value="Bank">Virement Bancaire International</option>
+				</select>
+			</div>
+
+			<div class="field-button-right">
+				<a href="{{ path('admin_platform_commission_index') }}" class="mr-10 btn-refined btn-gray-gradient">Annuler</a>
+				<button type="submit" class="btn-refined btn-success-gradient">
+					<i class="fa-solid fa-paper-plane"></i>
+					Valider et Solder les lignes</button>
+			</div>
+		</form>
+	</div>
+{% endblock %}
