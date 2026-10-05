@@ -46,7 +46,7 @@
 	<span class="text">Catalogue Devises</span>
 </a>
 
-{# 5. CAISSE & TRESORERIE #}
+{# 5. FLUX FINANCIER #}
 <a href="{{path('admin_platform_finance_index')}}" class="menu-link {{ page is same as('finance') ? 'active' : '' }}" data-tooltip="Caisse & journal des opérations financieres">
 	<span class="icon">
 		<i class="fa-solid fa-sack-dollar"></i>
@@ -63,22 +63,24 @@
 	<span class="text">Factures</span>
 </a>
 
-
-<a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
+{# AGENT #}
+<a href="{{path('admin_platform_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
 	<span class="icon">
 		<i class="fa-solid fa-users"></i>
 	</span>
 	<span class="text">Utilisateurs</span>
 </a>
 
-<a href="{{path('admin_agency_role_index')}}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
+{# ROLE #}
+<a href="{{path('admin_platform_role_index')}}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
 	<span class="icon">
 		<i class="fa-solid fa-id-card-clip"></i>
 	</span>
 	<span class="text">Fonctions du Personnel</span>
 </a>
 
-<a href="" class="menu-link {{ page is same as('partner') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
+{# PARTNER #}
+<a href="{{path('admin_platform_partner_index')}}" class="menu-link {{ page is same as('partner') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
 	<span class="icon">
 		<i class="fa-solid fa-user-tie"></i>
 	</span>

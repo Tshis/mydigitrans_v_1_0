@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\web\admin\agency;
+namespace App\Controller\web\admin\platform;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,13 +11,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class RoleController extends AbstractController
 {
 
-    #[Route('/admin/agency/roles', name: 'admin_agency_role_index')]
+    #[Route('/admin/platform/roles', name: 'admin_platform_role_index')]
     public function index(): Response
     {
         // Simulation du registre des fiches de postes de l'agence [MCD 4]
         $roles = [
-            ['name' => 'Guichetier de Nuit', 'code' => 'ROLE_AGENCY_GUICHETIER_DE_NUIT', 'description' => 'Encaissement des billets sur la tranche de nuit.', 'scope' => 'agency', 'isActive' => true],
-            ['name' => 'Percepteur Fret / Colis', 'code' => 'ROLE_AGENCY_PERCEPTEUR_FRET', 'description' => 'Supervision de la soute et pesage messagerie.', 'scope' => 'agency', 'isActive' => false]
+            ['name' => 'Guichetier de Nuit', 'code' => 'ROLE_AGENCY_GUICHETIER_DE_NUIT', 'description' => 'Encaissement des billets sur la tranche de nuit.', 'scope' => 'platform', 'isActive' => true],
+            ['name' => 'Percepteur Fret / Colis', 'code' => 'ROLE_AGENCY_PERCEPTEUR_FRET', 'description' => 'Supervision de la soute et pesage messagerie.', 'scope' => 'platform', 'isActive' => false]
         ];
 
         return $this->render('admin/role/index.html.twig', [
@@ -26,8 +26,8 @@ final class RoleController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/role/add', name: 'admin_agency_role_add')]
-    #[Route('/admin/agency/role/{code}/edit', name: 'admin_agency_role_edit')]
+    #[Route('/admin/platform/role/add', name: 'admin_platform_role_add')]
+    #[Route('/admin/platform/role/{code}/edit', name: 'admin_platform_role_edit')]
     public function add_and_edit(Request $request, ?string $code = null): Response
     {
         $isEdit = $code !== null;
@@ -55,7 +55,7 @@ final class RoleController extends AbstractController
         if ($request->isMethod('POST')) {
             $name = $request->request->get('name');
             $this->addFlash('success', $isEdit ? sprintf('Le poste "%s" a été mis à jour.', $name) : sprintf('Le poste "%s" a été déployé.', $name));
-            return $this->redirectToRoute('admin_agency_role_index');
+            return $this->redirectToRoute('admin_platform_role_index');
         }
 
         return $this->render('admin/role/form.html.twig', [

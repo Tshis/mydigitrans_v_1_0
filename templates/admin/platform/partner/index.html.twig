@@ -1,0 +1,115 @@
+{# templates/admin/platform/partner/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+<script src="/js/admin/modalQuestion.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-platform-scope container">
+
+	{# --- EN-TÊTE --- #}
+	<header class="header-refined my-25">
+		<div class="header-main-info">
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Supervision Réseau</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-primary text-size-13 text-highlight">Apporteurs d'Affaires MLM</span>
+				</div>
+				<h1 class="mt-5">Gestion des Partenaires & Sponsors</h1>
+			</div>
+		</div>
+		<div class="header-actions">
+			<a href="#" class="btn-refined btn-primary-gradient">
+				<i class="fa-solid fa-user-plus"></i>
+				Enrôler un Apporteur Manuel
+			</a>
+		</div>
+	</header>
+
+	{# --- GRILLE DE SÉCURITÉ COMPTABLE DILATÉE ET AÉRÉE --- #}
+	<div class="table-responsive-wrapper">
+		<h2 class="card-title-fix text-size-14 py-10">
+			<i class="fa-solid fa-users-gear text-primary"></i>
+			Grand Livre des Apporteurs de Licences MyDigitrans
+		</h2>
+		<table class="table table-scrollable table-striped js-datatable">
+			<thead>
+				<tr>
+					<th>Nom du Partenaire</th>
+					<th>Code Parrainage</th>
+					<th>Sponsor Direct (Parent)</th>
+					<th class="text-center">Filleuls Actifs</th>
+					<th class="text-right">Total Commissions</th>
+					<th>Date d'Adhésion</th>
+					<th class="text-center">Statut Compte</th>
+					<th class="text-right">Actions Réseau</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for partner in partners_list %}
+				<tr>
+					<td>
+						<strong>{{ partner.name }}</strong><br><small class="text-gray">{{ partner.email }}</small>
+					</td>
+					<td>
+						<span class="pill-referral-token monospace font-bold">{{ partner.referral_token }}</span>
+					</td>
+					<td>
+						{% if partner.parent_name %}
+						<span class="font-bold text-primary-mode">
+							<i class="fa-solid fa-user-tie"></i>
+							{{ partner.parent_name }}</span>
+						{% else %}
+						<span class="text-gray italic">Aucun (Racine Système)</span>
+						{% endif %}
+					</td>
+					<td class="text-center font-bold monospace text-size-14">{{ partner.children_count }}</td>
+					<td class="text-right font-bold monospace text-total-amount">
+						{{ partner.total_gains|number_format(2, ',', ' ') }}
+						$
+					</td>
+					<td class="monospace text-size-12">{{ partner.createdAt|date('d/m/Y') }}</td>
+					<td class="text-center">
+						<span class="pill-report-audit {{ partner.isActive ? 'closed' : 'open' }}">
+							{{ partner.isActive ? 'Actif' : 'Suspendu' }}
+						</span>
+					</td>
+					<td class="text-right">
+						<div class="action-group-refined">
+							{# Action 1 : Visualisation de l'arbre / fiche #}
+							<a href="#" class="action-link view-file"
+								title="Inspecter l'arbre généalogique et l'historique des gains">
+								<i class="fa-solid fa-network-wired"></i>
+							</a>
+							{# Action 2 : Modifier #}
+							<a href="#" class="action-link edit" title="Ajuster les informations du compte">
+								<i class="fa-solid fa-user-pen"></i>
+							</a>
+							{# Action 3 : Interrupteur Commutateur de Statut #}
+							<a id="ctaBtn" type="submit" data-target=""
+								class="action-link {{ partner.isActive ? 'text-danger' : 'text-success' }}"
+								title="{{ partner.isActive ? 'Suspendre le partenaire' : 'Réactiver le partenaire' }}">
+								<i class="fa-solid {{ partner.isActive ? 'fa-user-slash' : 'fa-user-check' }}"></i>
+							</a>
+						</div>
+					</td>
+				</tr>
+				{% else %}
+				<tr>
+					<td colspan="8" class="text-center text-gray italic padding-20">Aucun apporteur d'affaires enrôlé
+						dans le réseau de parrainage.</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+</div>
+
+{% include "admin/partials/_modal.html.twig" %}
+
+{% endblock %}

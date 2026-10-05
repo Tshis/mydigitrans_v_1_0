@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\web\admin\agency;
+namespace App\Controller\web\admin\platform;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class UserController extends AbstractController
 {
 
-    #[Route('/admin/agency/agents', name: 'admin_agency_agent_index')]
+    #[Route('/admin/platform/agents', name: 'admin_platform_agent_index')]
     public function index(): Response
     {
         // Simulation des utilisateurs rattachés à l'agence courante [MCD 3, 4, 5]
@@ -21,7 +21,7 @@ final class UserController extends AbstractController
                 'lastname' => 'Lukonu',
                 'phone' => '+243 812 345 678',
                 'email' => 'd.lukonu@mydigitrans.cd',
-                'userType' => 'agency',
+                'userType' => 'platform',
                 'isActive' => true,
                 'isOnline' => true,
                 'lastLoginAt' => new \DateTime('now'),
@@ -39,7 +39,7 @@ final class UserController extends AbstractController
                 'lastname' => 'Mputu',
                 'phone' => '+243 897 112 233',
                 'email' => 'a.mputu@mydigitrans.cd',
-                'userType' => 'agency',
+                'userType' => 'platform',
                 'isActive' => true,
                 'isOnline' => false,
                 'lastLoginAt' => new \DateTime('-1 day'),
@@ -80,8 +80,8 @@ final class UserController extends AbstractController
         ]);
     } //index
 
-    #[Route('/admin/agency/agent/add', name: 'admin_agency_agent_add')]
-    #[Route('/admin/agency/agent/{code}/edit', name: 'admin_agency_agent_edit')]
+    #[Route('/admin/platform/agent/add', name: 'admin_platform_agent_add')]
+    #[Route('/admin/platform/agent/{code}/edit', name: 'admin_platform_agent_edit')]
     public function add_and_edit(Request $request, ?string $code = null): Response
     {
 
@@ -109,7 +109,7 @@ final class UserController extends AbstractController
                 'code' => $code,
                 'email' => 'a.mputu@mydigitrans.com',
                 'phone' => '+243 897 112 233',
-                'userType' => 'agency',
+                'userType' => 'platform',
                 'branchCode' => 'SUC-KIN-01',
                 'currentRoleCode' => 'ROLE_CASHIER',
                 'isActive' => true
@@ -127,7 +127,7 @@ final class UserController extends AbstractController
                     : sprintf('Le compte de l\'agent %s %s a été créé et déployé.', $firstname, $lastname)
             );
 
-            return $this->redirectToRoute('admin_agency_agent_index');
+            return $this->redirectToRoute('admin_platform_agent_index');
         }
 
 
@@ -143,7 +143,7 @@ final class UserController extends AbstractController
     } //add_and_edit
 
 
-    #[Route('/admin/agency/agent/{code}/details', name: 'admin_agency_agent_show')]
+    #[Route('/admin/platform/agent/{code}/details', name: 'admin_platform_agent_show')]
     public function show(string $code): Response
     {
         // Extraction des tables 3 et 5 de ton MCD
