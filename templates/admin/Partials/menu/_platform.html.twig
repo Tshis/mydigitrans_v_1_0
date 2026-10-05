@@ -87,7 +87,7 @@
 	<span class="text">Partenaires</span>
 </a>
 
-<a href="" class="menu-link {{ page is same as('audit') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
+<a href="{{path('admin_platform_audit_index')}}" class="menu-link {{ page is same as('audit') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
 	<span class="icon">
 		<i class="fa-solid fa-shield-halved"></i>
 	</span>
@@ -102,20 +102,6 @@
 	<span class="text">Rapports</span>
 </a>
 
-{# 5. COMPTES & ACCÈS PLATFORME #}
-<a href="" class="menu-link {{ page is same as('platform_user') ? 'active' : '' }}" data-tooltip="Gestion des Administrateurs Système">
-	<span class="icon">
-		<i class="fa-solid fa-user-gear"></i>
-	</span>
-	<span class="text">Admin Système</span>
-</a>
-
-<a href="" class="menu-link {{ page is same as('settings') ? 'active' : '' }}" data-tooltip="Paramètres généraux de la plateforme">
-	<span class="icon">
-		<i class="fa-solid fa-sliders"></i>
-	</span>
-	<span class="text">Configuration SaaS</span>
-</a>
 
 <a href="{{path('admin_password_change')}}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
 	<span class="icon">

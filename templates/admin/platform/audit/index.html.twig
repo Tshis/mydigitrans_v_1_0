@@ -1,0 +1,101 @@
+{# templates/admin/platform/audit/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-platform-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Sécurité & Traçabilité</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Grand Livre d'Audit Civil</span>
+					</div>
+					<h1 class="mt-5">Journal d'Audit & Surveillance Système</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- GRILLE COMPTABLE ET TECHNIQUE EXPANSIVE --- #}
+		<div class="table-responsive-wrapper">
+			<h2 class="card-title-fix text-size-14 py-10">
+				<i class="fa-solid fa-fingerprint text-primary"></i>
+				Registre Immuable des Activités et Opérations Critiques
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Opérateur</th>
+						<th>Action Métier</th>
+						<th>Cible (Entité)</th>
+						<th>Variations des Données</th>
+						<th>Terminal / Périphérique</th>
+						<th>Emplacement (IP)</th>
+						<th>Heure & date</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for log in logs_list %}
+						<tr>
+							<td>
+								<strong>{{ log.user_name }}</strong>
+							</td>
+							<td>
+								{# Sémantique exacte de ton champ action  #}
+								<span class="pill-action-type status-{{ log.action }}">
+									{{ log.action|upper }}
+								</span>
+							</td>
+							<td>
+								<span class="font-bold text-primary-mode">{{ log.entityName }}</span><br>
+								<small class="monospace text-gray">ID: #{{ log.entityId }}</small>
+							</td>
+							<td>
+								{# Décodage des structures JSON oldValues / newValue de ton MCD  #}
+								<div class="json-history-diff-box">
+									<span class="json-state-label text-danger-color">Avant :</span>
+									<code class="monospace">{{ log.oldValues|json_encode }}</code>
+									<br>
+									<span class="json-state-label text-success-color">Après :</span>
+									<code class="monospace">{{ log.newValue|json_encode }}</code>
+								</div>
+							</td>
+							<td>
+								{# Sémantique exacte de ton champ device_type (mobile, POS, Desktop)  #}
+								<span class="device-badge">
+									{% if log.device_type == 'POS' %}
+										<i class="fa-solid fa-cash-register"></i>
+										Terminal POS
+									{% elseif log.device_type == 'mobile' %}
+										<i class="fa-solid fa-mobile-screen-button"></i>
+										Mobile App
+									{% else %}
+										<i class="fa-solid fa-desktop"></i>
+										Bureau / Desktop
+									{% endif %}
+								</span>
+								<br>
+								<small class="text-gray user-agent-trunc" title="{{ log.user_agent }}">{{ log.user_agent }}</small>
+							</td>
+							<td class="monospace text-size-12 font-bold">{{ log.ipAddress }}</td>
+							<td class="monospace text-size-12 text-gray">{{ log.createdAt|date('d/m/Y H:i:s') }}</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="7" class="text-center text-gray italic padding-20">Aucun log d'audit répertorié dans ce registre de sécurité.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}
