@@ -65,5 +65,42 @@ final class DashboardController extends AbstractController
             'stats' => $stats,
             'recent_commissions' => $recentCommissions
         ]);
-    }
+    }//index
+
+    /**
+     * MATRICE : SUIVI ET CARTOGRAPHIE COMPLÈTE DU RÉSEAU DIRECT ET INDIRECT
+     */
+    #[Route('/admin/partner/my-network', name: 'admin_partner_network_index', methods: ['GET'])]
+    public function myNetwork(): Response
+    {
+        $affiliatesList = [
+            ['id' => 101, 'name' => 'TransKin Express', 'type' => 'agency', 'level' => 1, 'recruited_by' => null, 'createdAt' => new \DateTime('-2 months'), 'license_status' => 'active', 'total_contributed' => 50.00],
+            ['id' => 11, 'name' => 'Blaise Mvumbi', 'type' => 'partner', 'level' => 1, 'recruited_by' => null, 'createdAt' => new \DateTime('-1 month'), 'isActive' => true, 'license_status' => 'active', 'total_contributed' => 0.00],
+            ['id' => 102, 'name' => 'Océan du Gabon', 'type' => 'agency', 'level' => 2, 'recruited_by' => 'Blaise Mvumbi', 'createdAt' => new \DateTime('-2 weeks'), 'license_status' => 'active', 'total_contributed' => 12.50],
+            ['id' => 103, 'name' => 'TransFleuve', 'type' => 'agency', 'level' => 1, 'recruited_by' => null, 'createdAt' => new \DateTime('-5 days'), 'license_status' => 'expired', 'total_contributed' => 0.00],
+        ];
+
+        return $this->render('admin/partner/network.html.twig', [
+            'page' => 'network',
+            'affiliates_list' => $affiliatesList
+        ]);
+    }//myNetwork
+
+    /**
+     * WITHDRAWALS : CONSULTATION DU GRAND LIVRE DES PAIEMENTS RETIRÉS [MCD 48]
+     */
+    #[Route('/admin/partner/my-withdrawals', name: 'admin_partner_withdrawal_index', methods: ['GET'])]
+    public function myWithdrawals(): Response
+    {
+        $paymentsHistory = [
+            ['id' => 401, 'reference' => 'REM-MOBILE-20261001-A4F2', 'method' => 'Mobile Money (M-Pesa)', 'amount' => 142.50, 'currency' => 'USD', 'paidAt' => new \DateTime('-4 days'), 'status' => 'success'],
+            ['id' => 402, 'reference' => 'REM-CASH-20260915-F8B9', 'method' => 'Espèces / Caisse Gombe', 'amount' => 38.00, 'currency' => 'USD', 'paidAt' => new \DateTime('-3 weeks'), 'status' => 'success']
+        ];
+
+        return $this->render('admin/partner/withdrawal.html.twig', [
+            'page' => 'withdrawal',
+            'payments_history' => $paymentsHistory
+        ]);
+    } //myWithdrawals
+
 }

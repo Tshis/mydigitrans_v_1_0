@@ -1,0 +1,88 @@
+{# templates/partner/network/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-partner-portal-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Mon Business</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Généalogie de la Matrice</span>
+					</div>
+					<h1 class="mt-5">Mon Réseau d'Affiliés</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- REGISTRE DE L'ARBRE GÉNÉALOGIQUE --- #}
+		<div class="table-responsive-wrapper">
+			<h2 class="card-title-fix text-size-14 py-10">
+				<i class="fa-solid fa-network-wired text-primary"></i>
+				Cartographie des Agences et Apporteurs parrainés
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Nom de l'Affilié</th>
+						<th>Type de Profil</th>
+						<th class="text-center">Palier / Niveau</th>
+						<th>Date d'Enrôlement</th>
+						<th class="text-center">Statut Licence SaaS</th>
+						<th class="text-right">Mes Gains Associés</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for affiliate in affiliates_list %}
+						<tr>
+							<td>
+								<strong>{{ affiliate.name }}</strong>
+								{% if affiliate.recruited_by %}
+									<br><small class="text-gray">Recruté par :
+										{{ affiliate.recruited_by }}</small>
+								{% endif %}
+							</td>
+							<td>
+								<span class="invoice-nature-label font-bold">
+									{% if affiliate.type == 'agency' %}
+										<i class="fa-solid fa-building-flag text-primary-mode"></i>
+										Compagnie de Transport
+									{% else %}
+										<i class="fa-solid fa-user-tie text-success-mode"></i>
+										Apporteur d'Affaires
+									{% endif %}
+								</span>
+							</td>
+							<td class="text-center font-bold monospace">Gén.{{ affiliate.level }}</td>
+							<td class="monospace text-size-12">{{ affiliate.createdAt|date('d/m/Y') }}</td>
+							<td class="text-center">
+								{% if affiliate.type == 'agency' %}
+									<span class="pill-report-audit {% if affiliate.license_status == 'active' %}success{% else %}danger{% endif %}">
+										{{ affiliate.license_status == 'active' ? 'Active / À jour' : 'Expirée' }}
+									</span>
+								{% else %}
+									<span class="pill-report-audit {{ affiliate.isActive ? 'success' : 'danger' }} ">Compte
+										{{ affiliate.isActive ? 'Actif' : 'Suspendu' }}</span>
+								{% endif %}
+							</td>
+							<td class="text-right text-weight-700 text-success">
+								{{ affiliate.total_contributed|number_format(2, ',', ' ') }}
+								$
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}

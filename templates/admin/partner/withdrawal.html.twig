@@ -1,0 +1,73 @@
+{# templates/partner/withdrawal/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div
+		class="admin-partner-portal-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Mes Finances</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Grand Livre des Décaissements</span>
+					</div>
+					<h1 class="mt-5">Demandes de Retraits & Règlements</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- HISTORIQUE DES RECETTES ET QUITANCES --- #}
+		<div class="table-responsive-wrapper">
+			<h2 class="card-title-fix text-size-14 py-10">
+				<i class="fa-solid fa-receipt text-primary"></i>
+				Journal de mes Versements Perçus
+			</h2>
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Référence Bordereau</th>
+						<th>Canal / Méthode</th>
+						<th class="text-right">Montant Perçu</th>
+						<th>Date du Versement</th>
+						<th class="text-center">Statut Système</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for payment in payments_history %}
+						<tr>
+							<td class="monospace font-bold">
+								<strong>{{ payment.reference }}</strong>
+							</td>
+							<td>
+								<span class="text-gray font-bold">{{ payment.method }}</span>
+							</td>
+							<td class="text-right font-bold monospace text-success-mode-color">
+								{{ payment.amount|number_format(2, ',', ' ') }}
+								{{ payment.currency }}
+							</td>
+							<td class="monospace text-size-12">{{ payment.paidAt|date('d/m/Y H:i') }}</td>
+							<td class="text-center">
+								<span class="pill-report-audit {% if payment.status == 'success' %}closed{% elseif payment.status == 'pending' %}draft{% else %}open{% endif %}">
+									{{ payment.status }}
+								</span>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="5" class="text-center text-gray italic padding-20">Aucun virement ni paiement reçu à ce jour.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}

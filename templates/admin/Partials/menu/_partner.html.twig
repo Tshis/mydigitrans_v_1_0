@@ -7,6 +7,20 @@
 </a>
 
 
+<a href="{{path('admin_partner_network_index')}}" class="menu-link {{ page is same as('network') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
+	<span class="icon">
+		<i class="fa-solid fa-network-wired"></i>
+	</span>
+	<span class="text">Mon Réseau</span>
+</a>
+
+<a href="{{path('admin_partner_withdrawal_index')}}" class="menu-link {{ page is same as('withdrawal') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
+	<span class="icon">
+		<i class="fa-solid fa-money-bill-transfer"></i>
+	</span>
+	<span class="text">Mes Retrais</span>
+</a>
+
 <a href="{{path('admin_password_change')}}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
 	<span class="icon">
 		<i class="fa-solid fa-gear"></i>
