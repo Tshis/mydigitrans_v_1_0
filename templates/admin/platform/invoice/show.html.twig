@@ -1,0 +1,175 @@
+{# templates/admin/platform/invoice/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+<div class="admin-platform-scope container">
+
+    {# --- EN-TÊTE --- #}
+    <header class="header-refined my-25">
+        <div class="header-main-info">
+            <a href="{{ path('admin_platform_invoice_index') }}" class="agency-back-action">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <div class="sub-header-flex">
+                    <span class="text-gray text-size-13">Supervision Comptable</span>
+                    <span class="arrow-divider">•</span>
+                    <span class="text-primary text-size-13 text-highlight">Fiche Facture #{{ invoice.invoiceNumber
+                        }}</span>
+                </div>
+                <h1 class="mt-5">Facture
+                    {{ invoice.invoiceNumber }}</h1>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="#" class="btn-refined btn-primary-gradient">
+                <i class="fa-solid fa-file-pdf"></i>
+                Exporter en PDF
+            </a>
+        </div>
+    </header>
+
+    {# --- LAYOUT DOUBLE COLONNE INVERSÉ --- #}
+    <div class="settings-form-layout">
+        <div class="settings-container-grid">
+
+            {# COLONNE DROITE : VERROUS CONTRAT ET SOLDE (PLACÉE EN PREMIER DANS LE HTML) #}
+            <aside class="sidebar-action-panel">
+                <div class="card sticky-aside-card platform-invoice-sidebar-theme">
+                    <h2 class="card-title-fix">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                        État du Solde
+                    </h2>
+
+                    <div class="financial-block-summary mb-20">
+                        <label class="admin-bus-layout-add-label">Total de la Facture</label>
+                        <span class="invoice-macro-amount text-weight-700 text-success">{{
+                            invoice.total|number_format(2, ',', ' ') }}
+                            {{ invoice.currency }}</span>
+                    </div>
+
+                    <div class="financial-block-summary mb-20">
+                        <label class="admin-bus-layout-add-label">Reste à Percevoir</label>
+                        <span
+                            class="invoice-macro-amount text-weight-700 {% if invoice.balanceDue > 0 %}text-danger{% else %}text-success{% endif %}">
+                            {{ invoice.balanceDue|number_format(2, ',', ' ') }}
+                            {{ invoice.currency }}
+                        </span>
+                    </div>
+
+                    <div class="notice-box-info">
+                        <p>
+                            <strong>
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                Échéance :</strong>
+                            Cette pièce émise le
+                            {{ invoice.issuedAt|date('d/m/Y') }}
+                            doit être soldée avant le
+                            <strong class="monospace">{{ invoice.dueDate|date('d/m/Y') }}</strong>
+                            sous peine de suspension automatique du tenant agence.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+
+            {# COLONNE GAUCHE : IDENTITÉ ET VENTILATION DES PIÈCES DIRECTES (platformFee) #}
+            <div class="main-form-panel">
+
+                {# BLOC 1 : REGISTRE ADMINISTRATIVE #}
+                <div class="card control-card mb-20">
+                    <h2 class="card-title-fix">
+                        <i class="fa-solid fa-circle-info text-primary"></i>
+                        Récapitulatif Administratif
+                    </h2>
+                    <form action="">
+                        <div class="field-group mb-20">
+                            <div class="field">
+                                <label class="admin-bus-layout-add-label">Agence Débitrice</label>
+                                <div class="text-data-box-lock-view">{{ invoice.agency_name }}</div>
+                            </div>
+                            <div class="field">
+                                <label class="admin-bus-layout-add-label">Nature / Type de Facturation</label>
+                                <div class="text-data-box-lock-view">
+                                    {% if invoice.type == 'subscription' %}
+                                    Abonnement SaaS Fixe
+                                    {% elseif invoice.type == 'platformFee' %}
+                                    Commissions sur Billetterie & Colis (1$ / unité)
+                                    {% else %}
+                                    Facture Mixte Combinée
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <div class="field">
+                                <label class="admin-bus-layout-add-label">Période Couverte Comptable</label>
+                                <div class="text-data-box-lock-view monospace">
+                                    Du
+                                    {{ invoice.periodStart|date('d/m/Y') }}
+                                    au
+                                    {{ invoice.periodEnd|date('d/m/Y') }}
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="admin-bus-layout-add-label">Statut Actuel</label>
+                                <div class="text-data-box-lock-view">
+                                    <span
+                                        class="pill-report-audit {% if invoice.status == 'paid' %}closed{% elseif invoice.status == 'overdue' %}open{% else %}draft{% endif %}">
+                                        {{ invoice.status|upper }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                {# BLOC 2 : VENTILATION DES COMMISSIONS ATTACHÉES (platformFee) [MCD 36] #}
+                {% if invoice.type == 'platformFee' or invoice.type == 'mixed' %}
+                <div class="table-responsive-wrapper card control-card card-success ">
+                    <h2 class="card-title-fix py-10">
+                        <i class="fa-solid fa-chart-pie text-success-mode"></i>
+                        Ventilation Technique des Redevances de Trafic
+                    </h2>
+                    <table class="table table-scrollable table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID Mouvement</th>
+                                <th>Flux Métier</th>
+                                <th>ID Source (Billet/Colis)</th>
+                                <th>Date Émission</th>
+                                <th class="text-right">Quote-part Plateforme</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fee in fees_breakdown %}
+                            <tr>
+                                <td class="monospace font-bold">#FEE-00{{ fee.id }}</td>
+                                <td>
+                                    <span class="invoice-nature-label">
+                                        {% if fee.sourceType == 'reservation' %}
+                                        <i class="fa-solid fa-ticket text-primary-mode"></i>
+                                        Billet Vendu
+                                        {% else %}
+                                        <i class="fa-solid fa-box text-success-mode"></i>
+                                        Colis Enregistré
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td class="monospace text-size-12">#SRC-{{ fee.sourceId }}</td>
+                                <td class="monospace text-size-12">{{ fee.createdAt|date('d/m/Y H:i') }}</td>
+                                <td class="text-right font-bold monospace text-primary-mode">{{
+                                    fee.amount|number_format(2, ',', ' ') }}
+                                    $</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
