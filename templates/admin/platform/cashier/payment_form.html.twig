@@ -1,0 +1,107 @@
+{# templates/admin/platform/cash/in_form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-platform-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_cashier_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Trésorerie Centrale</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Flux Entrant</span>
+					</div>
+					<h1 class="mt-5">Enregistrer un Encaissement Cash</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE DOUBLE COLONNE --- #}
+		<form action="#" method="POST" class="settings-form-layout">
+			<div
+				class="settings-container-grid">
+
+				{# COLONNE DROITE : SÉCURITÉ COMPTABLE #}
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card flex-aside-sidebar-theme">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-shield-halved"></i>
+							Écriture Immuable</h2>
+						<div class="notice-box-info">
+							<p>
+								<strong>
+									<i class="fa-solid fa-calculator"></i>
+									Calcul du Solde en Direct :</strong>
+								Valider ce formulaire va automatiquement incrémenter la valeur
+								<strong class="monospace">live_cash_balance</strong>
+								de la session sélectionnée. Cette action est définitive et générera un log d'audit de sécurité [INDEX].</p>
+						</div>
+					</div>
+				</aside>
+
+				{# COLONNE GAUCHE : PARAMÈTRES COMPTABLES DE L'ENTRÉE #}
+				<div class="main-form-panel">
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-square-plus text-success-mode"></i>
+							Écriture de Recette</h2>
+
+						<div class="field-group mb-20">
+
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Nature de l'Origine (operationType) *</label>
+								<select name="operation_type" class="admin-bus-layout-add-select" required>
+									<option value="subscription_payment" selected>subscription_payment (Forfait SaaS)</option>
+									<option value="adjustment">adjustment (Régularisation positive de caisse)</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Facture Liée (referenceId) *</label>
+								<select name="reference_id" class="admin-bus-layout-add-select" required>
+									<option value="" disabled selected>-- Associer l'Invoice d'origine --</option>
+									{% for inv in pending_invoices %}
+										<option value="{{ inv.id }}">{{ inv.number }}
+											-
+											{{ inv.agency_name }}
+											({{ inv.amount }}
+											$)</option>
+									{% endfor %}
+								</select>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Montant Réel Encaissé ($) *</label>
+								<input type="number" step="0.01" name="amount" class="admin-bus-layout-add-input" placeholder="0.00" required>
+							</div>
+						</div>
+
+						<div class="field-group mb-25">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Libellé / Note de Caisse (Description) *</label>
+								<input type="text" name="description" class="admin-bus-layout-add-input" placeholder="Ex: Encaissement espèce licence Octobre TransKin" required>
+							</div>
+						</div>
+
+						<div class="admin-bus-layout-add-action-zone">
+							<a href="{{ path('admin_platform_cashier_index') }}" class="btn-refined btn-gray-gradient">Annuler</a>
+							<button type="submit" class="btn-refined btn-success-gradient">
+								<i class="fa-solid fa-cash-register"></i>
+								Valider l'entrée et Solder la facture
+							</button>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</form>
+	</div>
+{% endblock %}

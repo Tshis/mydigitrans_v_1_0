@@ -31,27 +31,38 @@
 </a>
 
 {# 4. CONTRÔLE GLOBAUX & MONÉTAIRE #}
-<a href="{{path('admin_platform_commission_index')}}" class="menu-link {{ page is same as('commission') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises [MCD 15]">
+<a href="{{path('admin_platform_commission_index')}}" class="menu-link {{ page is same as('commission') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises">
 	<span class="icon">
 		<i class="fa-solid fa-money-bill-trend-up"></i>
 	</span>
 	<span class="text">Commissions & References</span>
 </a>
 
+
+<a href="{{path('admin_platform_currency_index')}}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises">
+	<span class="icon">
+		<i class="fa-solid fa-earth-africa"></i>
+	</span>
+	<span class="text">Catalogue Devises</span>
+</a>
+
+{# 5. CAISSE & TRESORERIE #}
+<a href="{{path('admin_platform_cashier_index')}}" class="menu-link {{ page is same as('cashier') ? 'active' : '' }}" data-tooltip="Caisse & journal des opérations financieres">
+	<span class="icon">
+		<i class="fa-solid fa-sack-dollar"></i>
+	</span>
+	<span class="text">Caisse & flux financiers</span>
+</a>
+
+
 {# 5. FACTURATION #}
-<a href="" class="menu-link {{ page is same as('commision') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises [MCD 15]">
+<a href="" class="menu-link {{ page is same as('commision') ? 'active' : '' }}" data-tooltip="Facturation">
 	<span class="icon">
 		<i class="fa-solid fa-file-lines"></i>
 	</span>
 	<span class="text">Factures</span>
 </a>
 
-<a href="{{path('admin_platform_currency_index')}}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises [MCD 15]">
-	<span class="icon">
-		<i class="fa-solid fa-earth-africa"></i>
-	</span>
-	<span class="text">Catalogue Devises</span>
-</a>
 
 <a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
 	<span class="icon">
