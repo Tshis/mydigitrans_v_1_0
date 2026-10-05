@@ -23,7 +23,7 @@
 			</div>
 		</div>
 		<div class="header-actions">
-			<a href="#" class="btn-refined btn-primary-gradient">
+			<a href="{{ path('admin_platform_partner_add') }}" class="btn-refined btn-primary-gradient">
 				<i class="fa-solid fa-user-plus"></i>
 				Enrôler un Apporteur Manuel
 			</a>
@@ -86,11 +86,13 @@
 								<i class="fa-solid fa-network-wired"></i>
 							</a>
 							{# Action 2 : Modifier #}
-							<a href="#" class="action-link edit" title="Ajuster les informations du compte">
+							<a href="{{ path('admin_platform_partner_edit', {'id': partner.id}) }}"
+								class="action-link edit" title="Ajuster les informations du compte">
 								<i class="fa-solid fa-user-pen"></i>
 							</a>
 							{# Action 3 : Interrupteur Commutateur de Statut #}
-							<a id="ctaBtn" type="submit" data-target=""
+							<a id="ctaBtn" type="submit"
+								data-target="{{ path('admin_platform_partner_toggle', {'id': partner.id}) }}"
 								class="action-link {{ partner.isActive ? 'text-danger' : 'text-success' }}"
 								title="{{ partner.isActive ? 'Suspendre le partenaire' : 'Réactiver le partenaire' }}">
 								<i class="fa-solid {{ partner.isActive ? 'fa-user-slash' : 'fa-user-check' }}"></i>

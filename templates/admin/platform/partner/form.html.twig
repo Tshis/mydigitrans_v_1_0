@@ -1,0 +1,104 @@
+{# templates/admin/platform/partner/form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-platform-scope container">
+
+		{# --- EN-TÊTE CONFIGURABLE --- #}
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_partner_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Supervision Réseau</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Sponsorship MLM</span>
+					</div>
+					<h1 class="mt-5">{{ is_edit ? 'Ajuster le Compte Partenaire' : 'Enrôler un Nouvel Apporteur' }}</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE DOUBLE COLONNE INVERSÉ --- #}
+		<form action="#" method="POST" class="settings-form-layout">
+			<div
+				class="settings-container-grid">
+
+				{# COLONNE DROITE : CADRAGE RÉSEAU (PLACÉE EN PREMIER DANS LE GRILLE HTML) #}
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card flex-aside-sidebar-theme">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-shield-halved"></i>
+							Sécurité Généalogique</h2>
+						<div class="notice-box-info">
+							<p>
+								<strong>
+									<i class="fa-solid fa-network-wired"></i>
+									Arbre de Parrainage :</strong>
+								L'assignation du Sponsor direct fige la position de cet utilisateur dans la matrice. C'est ce lien immuable qui permettra à l'algorithme d'usine de distribuer automatiquement les redevances indirectes de 5%.</p>
+						</div>
+					</div>
+				</aside>
+
+				{# COLONNE GAUCHE : PARAMÈTRES ET VERROUS DU PARTENAIRE #}
+				<div class="main-form-panel">
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-user-gear text-primary"></i>
+							Identité de l'Apporteur d'Affaires</h2>
+
+
+						<div class="field mb-20">
+							<label class="admin-bus-layout-add-label">Sponsor Direct / Supérieur</label>
+							<select name="parent_id" class="admin-bus-layout-add-select">
+								<option value="">-- Aucun Sponsor (Racine de la Plateforme) --</option>
+								{% for sponsor in available_sponsors %}
+									{# Éviter de s'auto-parrainer en mode édition #}
+									{% if not is_edit or (is_edit and sponsor.id != partner.id) %}
+										<option value="{{ sponsor.id }}" {{ is_edit and partner.parent_id == sponsor.id ? 'selected' : '' }}>
+											{{ sponsor.name }}
+											({{ sponsor.referral_token }})
+										</option>
+									{% endif %}
+								{% endfor %}
+							</select>
+						</div>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Nom & Prénom du Partenaire *</label>
+								<input type="text" name="name" class="admin-bus-layout-add-input" placeholder="Ex: Dieudonné Ilunga [Profile]" value="{{ is_edit ? partner.name : '' }}" required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Adresse Email Officielle *</label>
+								<input type="email" name="email" class="admin-bus-layout-add-input" placeholder="Ex: contact@apporteur.com" value="{{ is_edit ? partner.email : '' }}" required>
+							</div>
+						</div>
+
+
+						{% if not is_edit %}
+							<div class="field-group mb-25">
+								<div class="field">
+									<label class="admin-bus-layout-add-label">Mot de passe initial d'accès à l'espace *</label>
+									<input type="password" name="password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
+								</div>
+							</div>
+						{% endif %}
+
+						<div class="admin-bus-layout-add-action-zone">
+							<a href="{{ path('admin_platform_partner_index') }}" class="btn-refined btn-gray-gradient">Annuler</a>
+							<button type="submit" class="btn-refined btn-primary-gradient">
+								<i class="fa-solid {{ is_edit ? 'fa-floppy-disk' : 'fa-user-plus' }}"></i>
+								{{ is_edit ? 'Sauvegarder les Verrous' : 'Enrôler le Partenaire Système' }}
+							</button>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}
