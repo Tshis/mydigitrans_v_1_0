@@ -1,0 +1,65 @@
+/* assets/styles/modules/_partner-portal.scss */
+@use '../../abstract/variables' as *;
+
+.admin-partner-portal-scope {
+    padding-block: 2rem;
+
+    // --- EN-TÊTE ET BARRE DE COPIE ---
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+        .header-actions { display: flex; align-items: center; }
+    }
+
+    .referral-share-box {
+        display: flex; align-items: center; gap: 10px; background: rgba($gray, 0.04); border: 1px solid $mute;
+        padding: 6px 12px; border-radius: 8px; box-sizing: border-box;
+        .share-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
+        .share-url-input { border: none; background: transparent; font-size: 13px; font-weight: 700; color: $primary; width: 320px; outline: none; }
+    }
+
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    // --- GRILLE DES CARTES KPI ---
+    .financial-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; width: 100%; }
+    .kpi-card {
+        display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem; background: $white; border-radius: $radius-card; border: 1px solid $mute; box-sizing: border-box;
+        .admin-bus-layout-add-label { font-size: 10px; font-weight: 800; color: $gray; text-transform: uppercase; display: block; }
+        .kpi-value { font-size: 1.6rem; font-weight: 900; color: $dark; font-family: monospace; margin-top: 4px; display: block; }
+        .kpi-icon-wrapper { width: 45px; height: 42px; background: rgba($gray, 0.04); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+        
+        &.partner-solde-card { border-top: 4px solid $success; }
+        &.partner-total-card { border-top: 4px solid $primary; }
+        &.partner-network-card { border-top: 4px solid $danger; }
+    }
+
+    .text-success-color { color: $success; }
+    .text-primary-color { color: $primary; }
+    .text-warning-color { color: $danger; }
+
+   
+
+    .invoice-nature-label { font-size: 12.5px; display: inline-flex; align-items: center; gap: 6px; }
+
+    // Badges statuts commissions
+    .pill-report-audit { 
+        padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase;
+        &.approved { background: rgba($color: $primary, $alpha: .20); color: $primary; }
+        &.paid-status { background: rgba($color: $success, $alpha: .20); color: $success; }
+    }
+
+    .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+    .text-success-mode { color: $success; }
+    .text-primary-mode { color: $primary; }
+}
+
+// --- MODE SOMBRE ETANCHE ---
+.dark .admin-partner-portal-scope {
+    header h1, .card-title-fix, .table td, .table td strong, .referral-share-box .share-label { color: $white; }
+    .control-card, .table-responsive-wrapper { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
+    .table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
+    .table td { border-bottom-color: rgba(255,255,255,0.05); }
+    .referral-share-box { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.05); }
+    .kpi-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); .kpi-value { color: white; } }
+}

@@ -1,0 +1,15 @@
+{# 1. SUPERVISION ET MACRO #}
+<a href="{{ path('admin_partner_dashboard_index') }}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Vue globale de la plateforme">
+	<span class="icon">
+		<i class="fa-solid fa-chart-line"></i>
+	</span>
+	<span class="text">Dashboard</span>
+</a>
+
+
+<a href="{{path('admin_password_change')}}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
+	<span class="icon">
+		<i class="fa-solid fa-gear"></i>
+	</span>
+	<span class="text">Paramètres</span>
+</a>
