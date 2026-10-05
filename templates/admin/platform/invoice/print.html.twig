@@ -1,0 +1,444 @@
+{# templates/admin/platform/invoice/print.html.twig #}
+{% extends "admin/base_clean.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/admin/platform_invoice_print.js" defer></script>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+	body {
+		font-family: 'Helvetica', 'Arial', sans-serif;
+		color: #0c326d;
+		font-size: 12px;
+		line-height: 1.4;
+		background: #ffffff;
+		padding: 0;
+		margin: 0;
+	}
+
+	.invoice-sheet-paper {
+		padding: 15px;
+		position: relative;
+		background: #ffffff;
+	}
+
+	/* Barre technique d'écran PC (masquée sur papier et PDF) */
+	.print-actions-top-bar {
+		width: 100%;
+		margin-bottom: 20px;
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		padding: 12px;
+		border-radius: 8px;
+		box-sizing: border-box;
+	}
+
+	/* En-tête structurelle Dompdf */
+	.dompdf-header-table-layout {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 30px;
+		border-bottom: 2px solid #0c326d;
+	}
+
+	.brand-side-td {
+		width: 50%;
+		vertical-align: top;
+		padding-bottom: 15px;
+	}
+
+	.meta-invoice-side-td {
+		width: 50%;
+		text-align: right;
+		vertical-align: top;
+		padding-bottom: 15px;
+	}
+
+	.brand-logo-text {
+		display: block;
+		margin-bottom: 6px;
+	}
+
+	.brand-sub-legal {
+		font-size: 11px;
+		font-weight: bold;
+		color: #4b5563;
+		margin: 4px 0 0 0;
+	}
+
+	.brand-address-text {
+		font-size: 11px;
+		color: #0c326d;
+		margin: 4px 0 0 0;
+	}
+
+	.invoice-main-title {
+		font-size: 26px;
+		font-weight: 900;
+		margin: 0;
+		color: #0c326d;
+	}
+
+	.invoice-number-badge {
+		background: #f1f5f9;
+		padding: 4px 12px;
+		border-radius: 4px;
+		font-weight: bold;
+		font-size: 13px;
+		margin-top: 8px;
+		display: inline-block;
+	}
+
+	.invoice-date-timeline {
+		font-size: 11px;
+		text-align: right;
+		margin-top: 10px;
+	}
+
+	.invoice-date-timeline p {
+		margin: 2px 0;
+	}
+
+	/* Blocs Tiers structurels Dompdf */
+	.dompdf-tiers-table-layout {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 25px;
+	}
+
+	.tier-box-td {
+		width: 48%;
+		padding: 15px;
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		border-radius: 6px;
+		vertical-align: top;
+	}
+
+	.table-spacer-td {
+		width: 4%;
+	}
+
+	.admin-bus-layout-add-label {
+		font-size: 9px;
+		font-weight: bold;
+		color: #4b5563;
+		text-transform: uppercase;
+		margin-bottom: 5px;
+		display: block;
+	}
+
+	.tier-name {
+		font-size: 14px;
+		font-weight: bold;
+		color: #0c326d;
+		margin: 0 0 6px 0;
+	}
+
+	.tier-box-td p {
+		font-size: 11px;
+		margin: 2px 0;
+		color: #0c326d;
+	}
+
+	/* Bannière période */
+	.invoice-period-banner-alert {
+		background: #f0fdfa;
+		border: 1px dashed #1684c5;
+		padding: 10px 12px;
+		border-radius: 6px;
+		font-size: 11px;
+		color: #0c326d;
+		margin-bottom: 25px;
+	}
+
+	/* Spécifications Tableau Principal */
+	.table-print-invoice-spec {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 25px;
+	}
+
+	.table-print-invoice-spec th {
+		background: #f8fafc;
+		border-bottom: 2px solid #e2e8f0;
+		padding: 10px 12px;
+		font-size: 10px;
+		text-transform: uppercase;
+		text-align: left;
+		color: #4b5563;
+	}
+
+	.table-print-invoice-spec td {
+		padding: 12px;
+		border-bottom: 1px solid #e2e8f0;
+		font-size: 12px;
+		color: #0c326d;
+		vertical-align: top;
+	}
+
+	/* Utilitaires alignements et styles */
+	.text-center {
+		text-align: center;
+	}
+
+	.text-right {
+		text-align: right;
+	}
+
+	.monospace {
+		font-family: monospace;
+		font-size: 12px;
+	}
+
+	.font-bold {
+		font-weight: bold;
+	}
+
+	.text-gray {
+		color: #4b5563;
+	}
+
+	.text-danger-color {
+		color: #d94516;
+	}
+
+	/* Bloc de calcul des Totaux */
+	.invoice-print-totals-layout {
+		width: 100%;
+		margin-bottom: 30px;
+	}
+
+	.sub-table-totals-calculations {
+		width: 280px;
+		float: right;
+		border-collapse: collapse;
+	}
+
+	.sub-table-totals-calculations td {
+		padding: 6px 0;
+		border-bottom: 1px dashed #e2e8f0;
+		color: #0c326d;
+		font-weight: 500;
+	}
+
+	.final-row-highlight td {
+		font-size: 13px;
+		font-weight: bold;
+		color: #1684c5;
+		border-bottom: 2px solid #1684c5;
+		padding-top: 10px;
+	}
+
+	.balance-row-highlight td {
+		font-size: 13px;
+		font-weight: bold;
+		color: #d94516;
+		border-bottom: none;
+		padding-top: 6px;
+	}
+
+	.dompdf-clear-fix {
+		clear: both;
+	}
+
+	/* Footer Légal & Tampon */
+	.invoice-print-footer-legal {
+		border-top: 1px solid #e2e8f0;
+		padding-top: 15px;
+		font-size: 9px;
+		color: #4b5563;
+		text-align: center;
+		margin-top: 30px;
+		position: relative;
+	}
+
+	.invoice-status-watermark-stamp {
+		position: absolute;
+		top: -80px;
+		right: 20px;
+		font-size: 32px;
+		font-weight: bold;
+		text-transform: uppercase;
+		transform: rotate(-15deg);
+		opacity: 0.12;
+		padding: 6px 20px;
+		border-radius: 6px;
+	}
+
+	.stamp-paid {
+		color: #1684c5;
+		border: 4px solid #1684c5;
+	}
+
+	.stamp-unpaid {
+		color: #d94516;
+		border: 4px solid #d94516;
+	}
+
+	/* Directive impression physique standard */
+	@media print {
+		.intentional-hidden-print {
+			display: none !important;
+		}
+
+		.invoice-sheet-paper {
+			padding: 0 !important;
+		}
+	}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="admin-platform-invoice-print-scope printable-document">
+
+	{# --- BARRE D'ACTIONS TECHNIQUE VIRTUELLLE (MASQUÉE À L'IMPRESSION ET DANS LE PDF) --- #}
+	{% if is_pdf_mode is not defined or not is_pdf_mode %}
+	<div class="print-actions-top-bar intentional-hidden-print">
+		<button type="button" id="js-trigger-print-cmd" class="btn-refined btn-success-gradient">
+			<i class="fa-solid fa-print"></i>
+			Lancer l'Impression de la Facture
+		</button>
+		<a href="{{ path('admin_platform_invoice_show', {'id': invoice.id}) }}" class="btn-refined btn-gray-gradient">
+			<i class="fa-solid fa-arrow-left"></i>
+			Retour à la Fiche Facture
+		</a>
+	</div>
+	{% endif %}
+
+	{# ================================================================= #}
+	{# CORPS OFFICIEL DE LA FACTURE PDF #}
+	{# ================================================================= #}
+	<div class="invoice-sheet-paper"> {# EN-TÊTE : RESTRUCTURÉ EN TABLEAU POUR DOMPDF (FLEXBOX INTERDIT) #}
+		<table class="dompdf-header-table-layout">
+			<tr>
+				<td class="brand-side-td">
+					<span class="brand-logo-text">
+						<span class="brand-logo-text">
+							{% if logo_base64 is defined and logo_base64 %}
+							<img src="{{ logo_base64 }}" alt="MYDIGITRANS SaaS" width="180">
+							{% else %}
+							<img src="/img-core/logo.png" alt="MYDIGITRANS SaaS" width="180">
+							{% endif %}
+						</span>
+					</span>
+					<p class="brand-sub-legal">La plateforme digitale du transport et du business</p>
+					<p class="brand-address-text">Rep. Dem. du Congo/Kinshasa</p>
+				</td>
+				<td class="meta-invoice-side-td">
+					<h1 class="invoice-main-title">FACTURE</h1>
+					<div class="invoice-number-badge monospace">{{ invoice.invoiceNumber }}</div>
+					<div class="invoice-date-timeline">
+						<p>Émise le :
+							<strong>{{ invoice.issuedAt|date('d/m/Y') }}</strong>
+						</p>
+						<p>Échéance :
+							<strong class="text-danger-color">{{ invoice.dueDate|date('d/m/Y') }}</strong>
+						</p>
+					</div>
+				</td>
+			</tr>
+		</table>
+
+		{# BLOC TIERS : RESTRUCTURÉ EN TABLEAU POUR DOMPDF (GRID INTERDIT) #}
+		<table class="dompdf-tiers-table-layout">
+			<tr>
+				<td class="tier-box-td billing-from">
+					<label class="admin-bus-layout-add-label">Émetteur / Créancier</label>
+					<h3 class="tier-name">MyDigitrans Platform</h3>
+					<p>Service Comptabilité & Licences</p>
+					<p>contact@mydigitrans.com</p>
+				</td>
+				<td class="table-spacer-td"></td>
+				{# Espaceur structurel #}
+				<td class="tier-box-td billing-to">
+					<label class="admin-bus-layout-add-label">Client / Débiteur</label>
+					<h3 class="tier-name">{{ invoice.agency_name }}</h3>
+					<p>Registre :
+						{{ invoice.registrationNumber|default('En attente d\'audit') }}</p>
+					<p>Impôt : {{ invoice.taxNumber|default('En attente') }}</p>
+				</td>
+			</tr>
+		</table>
+
+		{# DESCRIPTIF DE LA PÉRIODE #}
+		<div class="invoice-period-banner-alert">
+			<span>Facturation de redevances sur trafic pour la période du <strong>{{ invoice.periodStart|date('d/m/Y')
+					}}</strong> au <strong>{{ invoice.periodEnd|date('d/m/Y') }}</strong>.</span>
+		</div>
+
+		{# TABLEAU DE VENTILATION COMPTABLE FINANCIÈRE #}
+		<table class="table-print-invoice-spec">
+			<thead>
+				<tr>
+					<th>Désignation des Prestations / Modules d'Usine</th>
+					<th class="text-center">Quantité / Volume</th>
+					<th class="text-right">Prix Unitaire</th>
+					<th class="text-right">Montant Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% if invoice.type == 'subscription' or invoice.type == 'mixed' %}
+				<tr>
+					<td>
+						<strong>Abonnement Mensuel SaaS Multi-Tenant</strong><br>
+						<small class="text-gray">Formule active : {{ invoice.plan_name|default('Premium') }}</small>
+					</td>
+					<td class="text-center monospace">1</td>
+					<td class="text-right monospace">{{
+						invoice.subscription_price|default(invoice.total)|number_format(2, ',', ' ') }} $</td>
+					<td class="text-right monospace">{{
+						invoice.subscription_price|default(invoice.total)|number_format(2, ',', ' ') }} $</td>
+				</tr>
+				{% endif %}
+
+				{% if invoice.type == 'platformFee' or invoice.type == 'mixed' %}
+				<tr>
+					<td>
+						<strong>Commissions d'Escales sur Flux de Ventes [MCD 36]</strong><br>
+						<small class="text-gray">Redevances fixes sur billets passagers et colisages en gares</small>
+					</td>
+					<td class="text-center monospace">{{ invoice.total_items_count|default(184) }}</td>
+					<td class="text-right monospace">1,00 $</td>
+					<td class="text-right monospace">{{ invoice.fees_price|default(invoice.total)|number_format(2, ',',
+						' ') }} $</td>
+				</tr>
+				{% endif %}
+			</tbody>
+
+		</table>{# BLOC DE CALCUL DES TOTAUX COMPTABLES #}<div class="invoice-print-totals-layout">
+			<table class="sub-table-totals-calculations">
+				<tr>
+					<td>Sous-Total H.T :</td>
+					<td class="text-right monospace font-bold">{{
+						invoice.subtotal|default(invoice.total)|number_format(2, ',', ' ') }}
+						$</td>
+				</tr>
+				<tr>
+					<td>Réduction / Promo :</td>
+					<td class="text-right monospace text-danger-color">-{{
+						invoice.discountTotal|default(0)|number_format(2, ',', ' ') }}
+						$</td>
+				</tr>
+				<tr class="final-row-highlight">
+					<td>NET À PAYER (TTC) :</td>
+					<td class="text-right monospace">{{ invoice.total|number_format(2, ',', ' ') }}
+						{{ invoice.currency }}</td>
+				</tr>
+				<tr class="balance-row-highlight">
+					<td>Reste à liquider (Balance Due) :</td>
+					<td class="text-right monospace">{{ invoice.balanceDue|number_format(2, ',', ' ') }}
+						{{ invoice.currency }}</td>
+				</tr>
+			</table>
+			<div class="dompdf-clear-fix"></div>
+		</div>{# FOOTER LÉGAL DE SÉCURITÉ DE LA FACTURE #}<footer class="invoice-print-footer-legal">
+			<p>Facture générée automatiquement par le système d'exploitation MyDigitrans. En cas de litige, veuillez
+				contacter notre support technique muni du numéro de référence unique de cette quittance.</p>
+			<div class="invoice-status-watermark-stamp {{ invoice.status == 'paid' ? 'stamp-paid' : 'stamp-unpaid' }}">
+				{{ invoice.status|upper }}</div>
+		</footer>
+	</div>
+</div>{% endblock %}

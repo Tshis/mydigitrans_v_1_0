@@ -1,0 +1,90 @@
+/* assets/styles/modules/_platform-invoice-print.scss */
+@use '../../abstract/variables' as *;
+
+.admin-platform-invoice-print-scope {
+    padding-block: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    // Barre virtuelle supérieure (visible sur PC uniquement)
+    .print-actions-top-bar {
+        display: flex; gap: 12px; width: 100%; max-width: 800px; margin-bottom: 20px;
+        background: $mute; border: 1px solid $mute; padding: 12px; border-radius: 8px; box-sizing: border-box;
+    }
+
+    // Anatomie de la feuille de papier A4
+    .invoice-sheet-paper {
+        width: 100%; max-width: 800px; background: $white; border: 1px solid $mute;
+        border-radius: 8px; padding: 40px; box-sizing: border-box; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    // En-tête
+    .invoice-print-header {
+        display: flex; justify-content: space-between; border-bottom: 2px solid $dark; padding-bottom: 20px; margin-bottom: 30px;
+        .brand-logo-text { font-size: 1.8rem; font-weight: 900; color: $primary; letter-spacing: -0.5px; }
+        .brand-sub-legal { font-size: 11px; font-weight: 700; color: $gray; margin: 4px 0 0 0; }
+        .brand-address-text { font-size: 11px; color: $dark; margin: 4px 0 0 0; font-weight: 500; }
+        .invoice-main-title { font-size: 2.2rem; font-weight: 900; text-align: right; margin: 0; color: $dark; }
+        .invoice-number-badge { background: $mute; padding: 4px 12px; border-radius: 4px; font-weight: 800; font-size: 13px; margin-top: 8px; display: inline-block; }
+        .invoice-date-timeline { font-size: 11px; text-align: right; margin-top: 10px; p { margin: 2px 0; } }
+    }
+
+    // Grille des tiers
+    .invoice-print-tiers-grid {
+        display: flex; gap: 2rem; margin-bottom: 30px;
+        .tier-box { flex: 1; padding: 15px; background: rgba($gray, 0.03); border: 1px solid $mute; border-radius: 6px; }
+        .admin-bus-layout-add-label { font-size: 10px; font-weight: 800; color: $gray; text-transform: uppercase; }
+        .tier-name { font-size: 15px; font-weight: 800; color: $dark; margin: 6px 0; }
+        .tier-box p { font-size: 12px; margin: 2px 0; color: $dark; font-weight: 500; }
+    }
+
+    .invoice-period-banner-alert { background: rgba($primary, 0.04); border: 1px dashed rgba($primary, 0.2); padding: 12px; border-radius: 6px; font-size: 12px; color: $dark; margin-bottom: 30px; }
+
+    // Tableau de ventilation
+    .table-print-invoice-spec {
+        width: 100%; border-collapse: collapse; margin-bottom: 30px;
+        th { background: $mute; border-bottom: 2px solid $mute; padding: 12px; font-size: 11px; text-transform: uppercase; text-align: left; color: $gray; }
+        td { padding: 15px 12px; border-bottom: 1px solid rgba($mute, 0.6); font-size: 12.5px; color: $dark; line-height: 1.4; }
+    }
+
+    // Section totaux
+    .invoice-print-totals-layout {
+        display: flex; justify-content: flex-end; width: 100%; margin-bottom: 40px;
+        .sub-table-totals-calculations {
+            width: 320px; font-size: 12.5px; border-collapse: collapse;
+            td { padding: 8px 0; border-bottom: 1px dashed rgba($mute, 0.5); color: $dark; font-weight: 600; }
+            .final-row-highlight td { font-size: 15px; font-weight: 900; color: $primary; border-bottom: 2px solid $primary; padding-top: 12px; }
+            .balance-row-highlight td { font-size: 14px; font-weight: 800; color: $danger; border-bottom: none; padding-top: 8px; }
+        }
+    }
+
+    .invoice-print-footer-legal {
+        border-top: 1px solid $mute; 
+        padding-top: 15px; font-size: 10px; 
+        color: $mute; 
+        text-align: center; line-height: 1.5;
+    }
+
+    // Tampon de statut en filigrane d'usine
+    .invoice-status-watermark-stamp {
+        position: absolute; top: 40%; right: 10%; font-size: 3.5rem; font-weight: 900; text-transform: uppercase;
+        transform: rotate(-15deg); opacity: 0.15; padding: 10px 30px; border-radius: 8px;
+        &.stamp-paid { color: $success; border: 5px solid $success; }
+        &.stamp-unpaid { color: $danger; border: 5px solid $danger; }
+    }
+
+    .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+    .text-danger-color { color: $danger; }
+}
+
+// ================================================================= #
+// 🚨 DIRECTIVE D'IMPRESSION CHIRURGICALE (SANS PARASITES DU NAV)     #
+// ================================================================= #
+@media print {
+    body { background: $white !important; color: $dark !important; }
+    .intentional-hidden-print { display: none !important; } // Masque les boutons d'écrans
+    .admin-platform-invoice-print-scope { padding: 0; }
+    .invoice-sheet-paper { border: none !important; box-shadow: none !important; padding: 0 !important; max-width: 100% !important; }
+}

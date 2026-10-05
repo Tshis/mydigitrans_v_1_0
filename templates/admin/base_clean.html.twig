@@ -1,0 +1,24 @@
+{# templates/admin/base_clean.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}MyDigitrans - Impression
+        {% endblock %}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {# Chargement des icônes et de tes feuilles de styles isolées SCSS #}
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <link rel="stylesheet" href="{{ asset('build/app.css') }}">
+    {% block stylesheets %}
+    <link rel="stylesheet" href="/styles/app.css">
+    {% endblock %}
+</head>
+
+<body class="clean-print-body-layout"> {% block body %}{% endblock %}{% block javascripts %}{% endblock %}
+</body>
+
+</html>
