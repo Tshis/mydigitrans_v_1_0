@@ -1,0 +1,108 @@
+{# templates/admin/platform/cash/open_session_form.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+	<div
+		class="admin-platform-scope container">
+
+		{# --- EN-TÊTE --- #}
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_platform_finance_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Trésorerie Centrale</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Prise de Poste</span>
+					</div>
+					<h1 class="mt-5">Ouvrir une Session Caisse</h1>
+				</div>
+			</div>
+		</header>
+
+		{# --- FORMULAIRE DOUBLE COLONNE INVERSÉ --- #}
+		<form action="#" method="POST" class="settings-form-layout">
+			<div
+				class="settings-container-grid">
+
+				{# COLONNE DROITE : SÉCURITÉ COMPTABLE (PLACÉE EN PREMIER DANS LE GRILLE) #}
+				<aside class="sidebar-action-panel">
+					<div class="card sticky-aside-card flex-aside-sidebar-theme">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-shield-halved"></i>
+							Vérification Initiale</h2>
+						<div class="notice-box-info">
+							<p>
+								<strong>
+									<i class="fa-solid fa-triangle-exclamation"></i>
+									Écart d'Ouverture :</strong>
+								Si le montant physique compté dans le tiroir-caisse diffère de la valeur attendue par le système, renseignez obligatoirement une observation pour justifier le décalage. L'écart sera tracé dans la variable
+								<strong class="monospace">Ecart Solde d'ouverture</strong>
+								.</p>
+						</div>
+					</div>
+				</aside>
+
+				{# COLONNE GAUCHE : PARAMÈTRES D'OUVERTURE DE SESSION #}
+				<div class="main-form-panel">
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-cash-register text-primary"></i>
+							Initialisation de Session (platformCashSession)</h2>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Tiroir-Caisse Physique (platformCashRegister) *</label>
+								<select name="cash_register_id" class="admin-bus-layout-add-select" required>
+									<option value="" disabled selected>-- Choisir le coffre à ouvrir --</option>
+									{% for register in available_registers %}
+										<option value="{{ register.id }}">{{ register.name }}
+											({{ register.code }}
+											-
+											{{ register.currency }})</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Fonds d'Ouverture Théorique Attendu (Expected) *</label>
+								<input type="number" step="0.01" name="opening_balance_expected" class="admin-bus-layout-add-input text-disabled" value="150.00" readonly required>
+							</div>
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Fonds d'Ouverture Réel Compté (Declared) *</label>
+								<input type="number" step="0.01" name="opening_balance_declared" class="admin-bus-layout-add-input" placeholder="0.00" required>
+							</div>
+						</div>
+
+						<div class="field-group mb-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Consigne Particulière / Note d'Ouverture (openingNote)</label>
+								<input type="text" name="opening_note" class="admin-bus-layout-add-input" placeholder="Ex: Consigne : Garder de la petite monnaie pour les remboursements de l'après-midi">
+							</div>
+						</div>
+
+						<div class="field-group mb-25">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Observation en cas d'Écart de Démarrage (openingObservation)</label>
+								<input type="text" name="opening_observation" class="admin-bus-layout-add-input" placeholder="Expliquez ici la raison si le montant compté est inférieur ou supérieur à l'attendu...">
+							</div>
+						</div>
+
+						<div class="admin-bus-layout-add-action-zone">
+							<a href="{{ path('admin_platform_finance_index') }}" class="btn-refined btn-gray-gradient">Annuler</a>
+							<button type="submit" class="btn-refined btn-primary-gradient">
+								<i class="fa-solid fa-key"></i>
+								Débloquer et Ouvrir la Caisse
+							</button>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</form>
+	</div>
+{% endblock %}

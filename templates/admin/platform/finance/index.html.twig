@@ -1,0 +1,212 @@
+{# templates/admin/platform/cash/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/datatable.js" defer></script>
+<script src="/js/admin/platform_tabs.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-platform-cash-scope container">
+
+	{# --- EN-TÊTE --- #}
+	<header class="header-refined my-30">
+		<div class="header-main-info">
+			<div class="title">
+				<div class="sub-header-flex">
+					<span class="text-gray text-size-13">Trésorerie Centrale</span>
+					<span class="arrow-divider">•</span>
+					<span class="text-primary text-size-13 text-highlight">Flux Financiers Plateforme</span>
+				</div>
+				<h1 class="mt-5">Grand Livre des Caisses & Écritures</h1>
+			</div>
+		</div>
+		<div class="header-actions">
+			<a href="{{path('admin_platform_finance_deposit')}}" class="btn-refined btn-success-gradient">
+				<i class="fa-solid fa-hand-holding-dollar"></i>
+				Enregistrer un paiement
+			</a>
+			<a href="{{path('admin_platform_finance_expense')}}" class="btn-refined btn-danger-gradient">
+				<i class="fa-solid fa-money-bill-wave"></i>
+				Enregistrer une Dépense
+			</a>
+
+			{# =================================== #}
+			{# A DEVELOPPER PLUTARD #}
+
+			<a href="{{path('admin_platform_cashier_open_session')}}" class="btn-refined btn-primary-gradient">
+				<i class="fa-solid fa-cash-register"></i>
+				Ouvrir une Session Caisse
+			</a>
+
+		</div>
+	</header>
+
+	{# templates/admin/platform/cash/_kpi_cards.html.twig #}
+
+	{# --- COMPOSANT MACRO DE MONITORING FINANCIER CENTRAL --- #}
+	<div class="stats-grid mb-25">
+
+		{# CARTE 1 : ENCAISSÉ GLOBAL DU COFFRE CENTRAL (IN) #}
+		<div class="card control-card kpi-card kpi-success">
+			<div class="kpi-icon-wrapper text-success-mode">
+				<i class="fa-solid fa-vault"></i>
+			</div>
+			<div class="kpi-data">
+				<label class="admin-bus-layout-add-label">
+					Coffre Central (Disponible)
+				</label>
+				<span class="kpi-value text-success-color">{{ cash_summary.vault_total|number_format(2, ',', ' ') }}
+					$</span>
+			</div>
+		</div>
+
+		{# CARTE 2 : CUMUL DES DÉPENSES EXTINCTRICES (OUT) #}
+		<div class="card control-card kpi-card kpi-card kpi-danger">
+			<div class="kpi-icon-wrapper text-danger-mode">
+				<i class="fa-solid fa-money-bill-wave"></i>
+			</div>
+			<div class="kpi-data">
+				<label class="admin-bus-layout-add-label">Total Dépenses Centrales ({{ "now"|date('F') }}
+					)</label>
+				<span class="kpi-value text-danger-color">{{ cash_summary.expense_total|number_format(2, ',', ' ')
+					}}
+					$</span>
+			</div>
+		</div>
+	</div>
+
+
+	{# --- SYSTÈME D'ONGLETS SÉMANTIQUES (TABS) --- #}
+	<div class="platform-tabs-navigation mb-25">
+		<button type="button" class="tab-nav-btn active" data-target="panel-sessions">
+			<i class="fa-solid fa-clock-rotate-left"></i>
+			Registre des Sessions de Caisse
+		</button>
+		<button type="button" class="tab-nav-btn" data-target="panel-operations">
+			<i class="fa-solid fa-list-check"></i>
+			Journal des Mouvements (Financial Operations)
+		</button>
+	</div>
+
+	{# ================================================================= #}
+	{# ONGLET 1 : REGISTRE DES SESSIONS DE CAISSE (OUVERTURE / CLÔTURE) #}
+	{# ================================================================= #}
+	<div class="tab-panel-content active" id="panel-sessions">
+		<div class="table-responsive-wrapper">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Caisse Code</th>
+						<th>Opérateur (OpenedBy)</th>
+						<th>Ouverture / Clôture</th>
+						<th class="text-right">Balance Attendue</th>
+						<th class="text-right">Balance Déclarée</th>
+						<th class="text-right">Écart / Différence</th>
+						<th class="text-center">Statut Session</th>
+						<th class="text-right">Audit</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for session in sessions_list %}
+					<tr>
+						<td>
+							<strong>{{ session.register_code }}</strong><br><small class="text-gray">{{
+								session.branch_name }}</small>
+						</td>
+						<td>
+							<strong>{{ session.openedBy }}</strong>
+						</td>
+						<td class="monospace text-size-11 text-gray">
+							O :
+							{{ session.openedAt|date('d/m/y H:i') }}<br>
+							C :
+							{{ session.closedAt ? session.closedAt|date('d/m/y H:i') : 'En cours...' }}
+						</td>
+						<td class="text-right font-bold monospace">{{ session.closingBalanceExpected|number_format(2,
+							',', ' ') }}
+							{{ session.currency }}</td>
+						<td class="text-right font-bold monospace">{{ session.closingBalanceDeclared|number_format(2,
+							',', ' ') }}
+							{{ session.currency }}</td>
+						<td
+							class="text-right font-bold monospace {% if session.closingBalanceDifference < 0 %}text-amount-danger{% elseif session.closingBalanceDifference > 0 %}text-amount-warning{% else %}text-amount-success{% endif %}">
+							{{ session.closingBalanceDifference|number_format(2, ',', ' ') }}
+							{{ session.currency }}
+						</td>
+						<td class="text-center">
+							<span
+								class="pill-report-audit {% if session.status == 'opened' %}success{% else %}danger{% endif %}">
+								{{ session.status }}
+							</span>
+						</td>
+						<td class="text-right">
+							<div class="action-group-refined">
+								<a href="#" class="action-link view-file"
+									title="Consulter les observations et conclusions de clôture">
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</div>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{# ================================================================= #}
+	{# ONGLET 2 : GRAND LIVRE DES OPERATIONS FINANCIERES CRITIQUES #}
+	{# ================================================================= #}
+	<div class="tab-panel-content" id="panel-operations">
+		<div class="table-responsive-wrapper">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Flux Type</th>
+						<th>Nature Opération</th>
+						<th>Libellé / Description</th>
+						<th>Pièce Référence</th>
+						<th class="text-right">Volume Transigé</th>
+						<th>Date Écriture</th>
+						<th>Auteur</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for op in operations_list %}
+					<tr>
+						<td class="text-center">
+							<span
+								class="pill-operation-direction {{ op.type == 'in' ? 'direction-in' : 'direction-out' }}">
+								{{ op.type|upper }}
+							</span>
+						</td>
+						<td>
+							<span class="invoice-nature-label font-bold text-primary-mode">
+								{{ op.operationType|upper }}
+							</span>
+						</td>
+						<td>
+							<span class="text-gray text-size-13">{{ op.description }}</span>
+						</td>
+						<td class="monospace font-bold">{{ op.referenceType|upper }}
+							#{{ op.referenceId }}</td>
+						<td
+							class="text-right font-bold monospace {{ op.type == 'in' ? 'text-success-mode' : 'text-danger-mode' }}">
+							{{ op.type == 'in' ? '+' : '-' }}{{ op.amount|number_format(2, ',', ' ') }}
+							{{ op.currency }}
+						</td>
+						<td class="monospace text-size-12">{{ op.createdAt|date('d/m/Y H:i') }}</td>
+						<td>
+							<small class="font-bold">{{ op.createdBy }}</small>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+</div>
+{% endblock %}

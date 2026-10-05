@@ -16,6 +16,13 @@ class CommissionController extends AbstractController
     #[Route('/admin/platform/commissions', name: 'admin_platform_commission_index', methods: ['GET'])]
     public function index(): Response
     {
+        //0 Commission
+        $commission = [
+            'total' => 1670,
+            'paid' => 1570,
+            'toPay' => 100,
+        ];
+
         // 1. Hydratation de ton entité "47. commission" couplée à ton user bénéficiaire
         $commissionsList = [
             [
@@ -90,6 +97,7 @@ class CommissionController extends AbstractController
         return $this->render('admin/platform/commission/index.html.twig', [
             'page' => 'commission',
             'commissions_list' => $commissionsList,
+            'commission' => $commission,
             'rules_list' => $rulesList,
             'payments_history' => $paymentsHistory
         ]);
@@ -105,7 +113,7 @@ class CommissionController extends AbstractController
             'page' => 'commission',
             'is_edit' => false,
         ]);
-    }
+    }//addRule
 
 
     /**
