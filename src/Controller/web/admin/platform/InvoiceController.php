@@ -2,11 +2,12 @@
 
 namespace App\Controller\web\admin\platform;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class InvoiceController extends AbstractController
 {
@@ -60,16 +61,46 @@ final class InvoiceController extends AbstractController
             ]
         ];
 
+
+        // 4. Référentiel de ton entité "35. platformFeeRule" repris de ton MCD [MCD 35]
+        $feeRulesList = [
+            [
+                'id' => 1,
+                'sourceType' => 'reservation', // Déclencheur sur la vente de billets passagers
+                'feeType' => 'fixed',          // Prélèvement à valeur fixe d'usine
+                'value' => 1.00,               // Ta fameuse règle d'or à 1,00 $
+                'currency' => 'USD',           // Libellé monétaire d'évaluation
+                'agency_name' => null,         // Nullable = Règle générale s'appliquant à TOUT le réseau mondial
+                'isActive' => true
+            ],
+            [
+                'id' => 2,
+                'sourceType' => 'shipment',    // Déclencheur sur l'expédition de colis en gare
+                'feeType' => 'fixed',          // Prélèvement fixe d'usine
+                'value' => 1.00,               // Règle d'or à 1,00 $ sur le fret
+                'currency' => 'USD',
+                'agency_name' => null,         // Règle générale globale
+                'isActive' => true
+            ],
+            [
+                'id' => 3,
+                'sourceType' => 'reservation',
+                'feeType' => 'percent',        // Exemple d'exception d'usine : prélèvement au pourcentage
+                'value' => 2.50,               // 2.5% sur le prix du ticket
+                'currency' => null,            // Nullable pour le type pourcentage comme tu l'as prévu !
+                'agency_name' => 'TransKin Express', // Exception exclusive appliquée uniquement à ce partenaire
+                'isActive' => false            // Règle actuellement suspendue
+            ]
+        ];
+
         return $this->render('admin/platform/invoice/index.html.twig', [
             'page' => 'invoice',
-            'global_invoices_list' => $globalInvoicesList
+            'global_invoices_list' => $globalInvoicesList,
+            'fee_rules_list' => $feeRulesList // Injection de la collection pour ton 3ème Onglet !
         ]);
     } //index
 
 
-    // src/Controller/Admin/Platform/PlatformInvoiceController.php
-
-// ... (Conserve ta méthode index())
 
     /**
      * 34/36. SHOW : AUDIT ET VENTILATION DE LA FACTURE ET DE SES REDEVANCES PLATFORMFEE [MCD 34/36]
@@ -135,7 +166,7 @@ final class InvoiceController extends AbstractController
             'balanceDue' => 0.00,
             'subscription_price' => 250.00, // Quote-part forfait fixe
             'total_items_count' => 184,     // Nombre de billets vendus à 1$
-            'fees_price' => 184.00          // Quote-part commissions d'escales
+            'fees_price' => 184.00          // Quote-part facturation d'escales
         ];
 
         return $this->render('admin/platform/invoice/print.html.twig', [
@@ -207,4 +238,58 @@ final class InvoiceController extends AbstractController
             'Content-Disposition' => sprintf('attachment; filename="%s"', $filename)
         ]);
     } //generatePdf
+
+
+    /**
+     * 35. ADD FEE RULE : CRÉATION D'UN BARÈME DE PRÉLÈVEMENT SUR LE TRAFIC
+     */
+    #[Route('/admin/platform/fee-rules/add', name: 'admin_platform_fee_rule_add', methods: ['GET', 'POST'])]
+    public function addRule(Request $request): Response
+    {
+        if ($request->isMethod('POST')) {
+            $this->addFlash('success', 'La nouvelle règle de facturation sur trafic a été injectée avec succès.');
+            return $this->redirectToRoute('admin_platform_invoice_index');
+        }
+
+        $agencies = [['id' => 1, 'name' => 'TransKin Express'], ['id' => 2, 'name' => 'Océan du Gabon']];
+
+        return $this->render('admin/platform/invoice/fee_rule_form.html.twig', [
+            'page' => 'invoice',
+            'is_edit' => false,
+            'agencies' => $agencies
+        ]);
+    }//addRule
+
+    /**
+     * 35. EDIT FEE RULE : AJUSTEMENT D'UN BARÈME EXISTANT
+     */
+    #[Route('/admin/platform/fee-rules/{id}/edit', name: 'admin_platform_fee_rule_edit', methods: ['GET', 'POST'])]
+    public function editRule(int $id, Request $request): Response
+    {
+        $rule = ['id' => $id, 'sourceType' => 'reservation', 'feeType' => 'fixed', 'value' => 1.00, 'currency' => 'USD', 'agency_id' => null];
+        $agencies = [['id' => 1, 'name' => 'TransKin Express'], ['id' => 2, 'name' => 'Océan du Gabon']];
+
+        if ($request->isMethod('POST')) {
+            $this->addFlash('success', 'Le barème de redevance technique a été mis à jour.');
+            return $this->redirectToRoute('admin_platform_invoice_index');
+        }
+
+        return $this->render('admin/platform/invoice/fee_rule_form.html.twig', [
+            'page' => 'invoice',
+            'is_edit' => true,
+            'rule' => $rule,
+            'agencies' => $agencies
+        ]);
+    }//editRule
+
+    /**
+     * 35. TOGGLE FEE RULE : INTERRUPTEUR ON / OFF DE LA RÈGLE
+     */
+    #[Route('/admin/platform/fee-rules/{id}/toggle', name: 'admin_platform_fee_rule_toggle', methods: ['POST'])]
+    public function toggleRule(int $id): Response
+    {
+        $this->addFlash('success', 'La validité opérationnelle du barème a été commutée.');
+        return $this->redirectToRoute('admin_platform_invoice_index');
+    } //toggleRule
+
 }
