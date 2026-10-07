@@ -81,7 +81,7 @@ class ReservationController extends AbstractController
     /**
      * RESERVATION PDF : COMPILATION DU BON TEMPORAIRE VIA DOMPDF
      */
-    #[Route('/admin/agency/reservations/{reference}/print-pdf', name: 'admin_agency_reservation_print_pdf', methods: ['GET'])]
+    #[Route('/admin/agency/reservations/{reference}/print-pdf', name: 'admin_agency_reservation_print_voucher', methods: ['GET'])]
     public function printVoucherPdf(string $reference): Response
     {
         // 1. Modélisation et extraction de ton entité de Réservation en cours
