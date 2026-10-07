@@ -24,19 +24,16 @@ class FinanceController extends AbstractController
         // 2. Statistique multi-devises des recettes cumulées (Entrants)
         $dailyRevenues = [
             ['code' => 'CDF', 'amount' => '2 950 000'],
-            ['code' => 'USD', 'amount' => '1 450.00'],
         ];
 
         // 3. Statistique multi-devises des dépenses cumulées (Sorties)
         $dailyExpenses = [
             ['code' => 'CDF', 'amount' => '180 000'],
-            ['code' => 'USD', 'amount' => '320.00'],
         ];
 
         // 4. Calcul dynamique du solde net provisoire par tiroir monétaire
         $dailyNets = [
             ['code' => 'CDF', 'amount' => '2 770 000'],
-            ['code' => 'USD', 'amount' => '1 130.00'],
         ];
 
         // 5. Grand livre unifié des flux financiers (FinancialOperation)
