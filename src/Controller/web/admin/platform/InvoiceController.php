@@ -93,10 +93,21 @@ final class InvoiceController extends AbstractController
             ]
         ];
 
+        // src/Controller/Admin/Platform/PlatformInvoiceController.php
+
+
+        // STATISTIQUES DES VOLUMES FINANCIERS RÉSEAU PAR ÉTATS [MCD 34]
+        $invoiceStats = [
+            'paid_total' => 250.00,    // Somme des factures passées à PAID
+            'issued_total' => 184.50,  // Somme des factures en attente d'encaissement (ISSUED / DRAFT)
+            'overdue_total' => 325.00  // Somme des factures en souffrance (OVERDUE)
+        ];
+
         return $this->render('admin/platform/invoice/index.html.twig', [
             'page' => 'invoice',
+            'invoice_stats' => $invoiceStats, // Injection cruciale !
             'global_invoices_list' => $globalInvoicesList,
-            'fee_rules_list' => $feeRulesList // Injection de la collection pour ton 3ème Onglet !
+            'fee_rules_list' => $feeRulesList
         ]);
     } //index
 
