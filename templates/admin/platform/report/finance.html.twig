@@ -4,6 +4,7 @@
 {% block javascripts %}
 {{ parent() }}
 <script src="/js/datatable.js" defer></script>
+<script src="/js/admin/csv_export.js" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -16,110 +17,128 @@
                 <div class="sub-header-flex">
                     <span class="text-gray text-size-13">Analytique Plateforme</span>
                     <span class="arrow-divider">•</span>
-                    <span class="text-primary text-size-13 text-highlight">Analyse Périodique [MCD 45]</span>
+                    <span class="text-primary text-size-13 text-highlight">Analyse Périodique</span>
                 </div>
                 <h1 class="mt-5">Rapport & Cours Évolutif des Revenus</h1>
             </div>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="btn-refined btn-primary-gradient"
+                onclick="executeAdvancedExport('Registre Comptable');">
+                <i class="fa-solid fa-file-excel"></i>
+                <span>Exporter le rapport</span>
+            </button>
         </div>
     </header>
 
     {# --- LAYOUT DOUBLE COLONNE INVERSÉ --- #}
     <div class="settings-form-layout">
-        <div class="settings-container-grid">
+        <div class="settings-container-grid sidebar-action-panel">
 
-            {# COLONNE DROITE : FILTRES PAR PÉRIODE & KPI (EN PREMIER DANS LE GRILLE HTML) #}
-            <aside class="sidebar-action-panel">
 
-                {# COMPOSANT DE FILTRAGE CRUCIAL DES COMPTES #}
-                <div class="card control-card mb-20 platform-report-sidebar-theme">
-                    <h2 class="card-title-fix"><i class="fa-solid fa-calendar-days text-primary"></i> Période d'Analyse
-                    </h2>
-                    <form action="#" method="GET" class="period-filter-form">
-                        <div class="field mb-15">
+
+            {# SYNTHÈSE COMPTABLE SUR LA PÉRIODE SÉLECTIONNÉE #}
+            <div class="card control-card mb-20">
+                <h2 class="card-title-fix mb-25"><i class="fa-solid fa-calculator text-primary"></i> Synthèse Périodique
+                </h2>
+                <div class="financial-block-summary mb-25">
+                    <label class="admin-bus-layout-add-label">Total Forfaits Encaisse : </label>
+                    <span class="invoice-macro-amount font-primary text-weight-700">{{
+                        summary.total_subscriptions|number_format(2,
+                        ',', ' ') }} $</span>
+                </div>
+                <div class="financial-block-summary mb-25">
+                    <label class="admin-bus-layout-add-label">Total Redevances 1$ : </label>
+                    <span class="invoice-macro-amount text-success text-weight-700">{{
+                        summary.total_fees|number_format(2, ',',
+                        ' ') }} $</span>
+                </div>
+                <div class="financial-block-summary">
+                    <label class="admin-bus-layout-add-label">Charges / Dépenses : </label>
+                    <span class="invoice-macro-amount text-danger text-weight-700">{{
+                        summary.total_expenses|number_format(2,
+                        ',', ' ') }} $</span>
+                </div>
+            </div>
+
+            {# COMPOSANT DE FILTRAGE CRUCIAL DES COMPTES #}
+            <div class="card control-card mb-20 platform-report-sidebar-theme">
+                <h2 class="card-title-fix"><i class="fa-solid fa-calendar-days text-primary"></i> Période d'Analyse
+                </h2>
+                <form action="#" method="GET" class="period-filter-form">
+                    <div class="field-group mb-20">
+                        <div class="field">
                             <label class="admin-bus-layout-add-label">Date de Début *</label>
                             <input type="date" name="start_date" class="admin-bus-layout-add-input"
                                 value="{{ start_date|date('Y-m-d') }}" required>
                         </div>
-                        <div class="field mb-20">
+                        <div class="field">
                             <label class="admin-bus-layout-add-label">Date de Fin *</label>
                             <input type="date" name="end_date" class="admin-bus-layout-add-input"
                                 value="{{ end_date|date('Y-m-d') }}" required>
                         </div>
-                        <button type="submit" class="btn-refined btn-primary-gradient macro-full-width-btn">
-                            <i class="fa-solid fa-filter"></i> Actualiser le Cours
-                        </button>
-                    </form>
-                </div>
-
-                {# SYNTHÈSE COMPTABLE SUR LA PÉRIODE SÉLECTIONNÉE #}
-                <div class="card control-card mb-20">
-                    <h2 class="card-title-fix"><i class="fa-solid fa-calculator text-primary"></i> Synthèse Périodique
-                    </h2>
-                    <div class="financial-block-summary mb-15">
-                        <label class="admin-bus-layout-add-label">Total Forfaits Encaisse (IN)</label>
-                        <span class="invoice-macro-amount font-primary">{{ summary.total_subscriptions|number_format(2,
-                            ',', ' ') }} $</span>
                     </div>
-                    <div class="financial-block-summary mb-15">
-                        <label class="admin-bus-layout-add-label">Total Redevances 1$ (IN)</label>
-                        <span class="invoice-macro-amount text-success-mode">{{ summary.total_fees|number_format(2, ',',
-                            ' ') }} $</span>
-                    </div>
-                    <div class="financial-block-summary">
-                        <label class="admin-bus-layout-add-label">Charges / Dépenses (OUT)</label>
-                        <span class="invoice-macro-amount text-danger-mode">{{ summary.total_expenses|number_format(2,
-                            ',', ' ') }} $</span>
-                    </div>
-                </div>
-            </aside>
-
-            {# COLONNE GAUCHE : JOURNAL CHRONOLOGIQUE DES COURS DE REVENUS #}
-            <div class="main-form-panel">
-
-                {# CHRONOLOGIE PRÉCISE DES COMPTES PAR DATES #}
-                <div class="table-responsive-wrapper">
-                    <h2 class="card-title-fix py-10">
-                        <i class="fa-solid fa-timeline text-primary"></i>
-                        Journal d'Évolution Chronologique des Flux Générés
-                    </h2>
-                    <table class="table table-scrollable table-striped js-datatable">
-                        <thead>
-                            <tr>
-                                <th>Date d'Écriture</th>
-                                <th class="text-right">Abonnements SaaS</th>
-                                <th class="text-right">Commissions Trafic (1$)</th>
-                                <th class="text-right">Dépenses (OUT)</th>
-                                <th class="text-right">Net Journalier</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for record in timeline_records %}
-                            <tr>
-                                <td class="monospace font-bold"><strong>{{ record.date|date('d/m/Y') }}</strong></td>
-                                <td class="text-right monospace text-gray">{{ record.subscriptions|number_format(2, ',',
-                                    ' ') }} $</td>
-                                <td class="text-right monospace text-success-mode font-bold">+{{
-                                    record.fees|number_format(2, ',', ' ') }} $</td>
-                                <td class="text-right monospace text-danger-mode">-{{ record.expenses|number_format(2,
-                                    ',', ' ') }} $</td>
-                                <td
-                                    class="text-right monospace font-bold {% if record.net >= 0 %}text-success-mode{% else %}text-danger-mode{% endif %}">
-                                    {{ record.net|number_format(2, ',', ' ') }} $
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="5" class="text-center text-gray italic padding-20">Aucun flux financier
-                                    tracé sur la période spécifiée.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
+                    <button type="submit" class="btn-refined btn-success-gradient macro-full-width-btn">
+                        <i class="fa-solid fa-filter"></i> Actualiser le Cours
+                    </button>
+                </form>
             </div>
 
         </div>
+
+        {# COLONNE GAUCHE : JOURNAL CHRONOLOGIQUE DES COURS DE REVENUS #}
+        <div class="main-form-panel card mb-20">
+
+            {# CHRONOLOGIE PRÉCISE DES COMPTES PAR DATES #}
+            <div class="table-responsive-wrapper">
+                <h2 class="card-title-fix py-10">
+                    <i class="fa-solid fa-timeline text-primary"></i>
+                    Journal d'Évolution Chronologique des Flux Générés
+                </h2>
+                <table class="table table-scrollable table-striped js-datatable js-datatable-export">
+                    <thead>
+                        <tr>
+                            <th>Date d'Écriture</th>
+                            <th class="text-right">Abonnements SaaS</th>
+                            <th class="text-right">Commissions Trafic (1$)</th>
+                            <th class="text-right">Dépenses (OUT)</th>
+                            <th class="text-right">Net Journalier</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in timeline_records %}
+                        <tr>
+                            <td class="monospace text-weight-700"><strong>{{ record.date|date('d/m/Y') }}</strong>
+                            </td>
+                            <td class="text-right monospace text-gray">{{ record.subscriptions|number_format(2, ',',
+                                ' ') }} $</td>
+                            <td class="text-right monospace text-success text-weight-700">+{{
+                                record.fees|number_format(2, ',', ' ') }} $</td>
+                            <td class="text-right monospace text-danger">-{{ record.expenses|number_format(2,
+                                ',', ' ') }} $</td>
+                            <td
+                                class="text-right monospace text-weight-700 {% if record.net >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ record.net|number_format(2, ',', ' ') }} $
+                            </td>
+                            <td class="text-center">
+                                <strong>-</strong>
+                            </td>
+
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-gray italic padding-20">Aucun flux financier
+                                tracé sur la période spécifiée.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+
     </div>
 </div>
 {% endblock %}

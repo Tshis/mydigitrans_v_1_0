@@ -9,7 +9,8 @@
 
 {% block body %}
 	<div
-		class="admin-agency-report-scope container">
+		class="admin-agency-report-scope container"
+	>
 		{# --- HEADER DE LA CONSOLE COMPTABLE --- #}
 		<header class="header mb-25">
 			<div class="header-main-info">
@@ -49,7 +50,7 @@
 					<select name="branch_code" class="admin-bus-layout-add-select">
 						<option value="">-- Toutes les succursales --</option>
 						{% for branch in branches_list %}
-							<option value="{{ branch.code }}" {% if current_branch==branch.code %} selected {% endif %}>{{
+							<option value="{{ branch.code }}" {% if current_branch == branch.code %} selected {% endif %}>{{
 						branch.name }}</option>
 						{% endfor %}
 					</select>
