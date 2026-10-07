@@ -36,15 +36,8 @@ final class DashboardController extends AbstractController
         // 2. Hydratation dynamique des statistiques temps réel du tiroir-caisse
         $stats = [
             'revenue' => [
-                [
-                    'amount' => $isCentral ? 4850000 : 2160000,
-                    'currency' => 'CDF'
-                ],
-                [
-                    'amount' => $isCentral ? 1420.00 : 340.00,
-                    'currency' => 'USD'
-                ]
-
+                'amount' => $isCentral ? 4850000 : 2160000,
+                'currency' => 'CDF'
             ],
             'active_trips' => $isCentral ? 12 : 4,
             'booked_seats' => $isCentral ? 245 : 88,
@@ -59,6 +52,37 @@ final class DashboardController extends AbstractController
             ['time' => '15:00', 'bus' => 'Mercedes Sprinter', 'plate' => 'A-1234-BC', 'route' => 'Kinshasa ➔ Kikwit', 'seats_taken' => 15, 'capacity' => 15, 'status' => 'ready', 'statusLabel' => 'Prêt au départ']
         ];
 
+        //4. Référentiel de la configuration monétaire de l'agence connectée [MCD 15]
+        $agencyCurrencySettings = [
+            'base_currency' => 'CDF', // La monnaie pivot immuable pour les bilans consolidés
+            'accepted_currencies' => [
+                [
+                    'code' => 'USD',
+                    'name' => 'Dollar Americain',
+                    'symbol' => 'FC',
+                    'exchange_rate' => 2850.00, // Taux de change interne du jour
+                    'isActive' => true
+                ],
+                [
+                    'code' => 'XAF',
+                    'name' => 'Franc CFA (Zone CEMAC)',
+                    'symbol' => 'FCFA',
+                    'exchange_rate' => 615.50,
+                    'isActive' => true
+                ],
+                [
+                    'code' => 'EUR',
+                    'name' => 'Euro',
+                    'symbol' => '€',
+                    'exchange_rate' => 0.92,
+                    'isActive' => false // Suspendu temporairement aux guichets
+                ]
+            ]
+        ];
+
+
+
+
         return $this->render('admin/agency/dashboard/index.html.twig', [
             'page' => 'dashboard',
             'isCentral' => $isCentral,
@@ -66,7 +90,8 @@ final class DashboardController extends AbstractController
             'selected_branch' => $selectedBranch,
             'branches_list' => $branchesList,
             'stats' => $stats,
-            'upcoming_trips' => $upcomingTrips
+            'upcoming_trips' => $upcomingTrips,
+            'agency_currency_settings' => $agencyCurrencySettings
         ]);
     } //index
 }

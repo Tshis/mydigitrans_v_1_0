@@ -109,10 +109,28 @@
     .notice-box-primary-dashboard { background: rgba($primary, 0.04); border-radius: 8px; padding: 12px; font-size: 12.5px; color: darken($primary, 20%); border: 1px solid rgba($primary, 0.1); line-height: 1.4; }
     .admin-bus-layout-add-input, .admin-bus-layout-add-select { height: 40px; border: 1px solid $mute; border-radius: 8px; padding-inline: 10px; background: white; font-weight: 600; width: 100%; }
     .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; margin-bottom: 6px; display: block; }
+
+  
+
+    .notice-box-info-currency {
+        background: rgba($primary, 0.04);
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 12px;
+        line-height: 1.6;
+        border: 1px dashed rgba($primary, 0.2);
+        color: $gray;
+
+        strong {
+            color: $dark;
+        }
+    }
+
 }
 
 // --- DARK MODE ---
 .dark .admin-agency-dashboard-scope {
+
     .header .header-main-info h1, .card-title-fix, .table td, .trip-filters-card .field label, .fleet-stats-grid .stat-card .info h3, .table td strong { color: $white; }
     .table-responsive-wrapper, .trip-filters-card, .fleet-stats-grid .stat-card, .control-card { background: $dm-bg; border-color: rgba(255,255,255,0.1); }
     .table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
@@ -121,4 +139,13 @@
     .value-badge-plate { background: $dm-bg; border-color: rgba(255,255,255,0.1); color: $white; }
     .notice-box-danger-dashboard, .notice-box-primary-dashboard { background: rgba(0, 0, 0, 0.2); border-color: rgba(255,255,255,0.05); color: $mute; }
     .pill-dashboard-status { &.loading { background: rgba($primary, 0.2); color: $primary; } &.ready { background: rgba($success, 0.2); color: $success; } }
+    .notice-box-info-currency {
+        background: rgba(0, 0, 0, 0.2);
+        border-color: rgba($white, 0.08);
+        color: $mute;
+
+        strong {
+            color: $white;
+        }
+    }
 }
