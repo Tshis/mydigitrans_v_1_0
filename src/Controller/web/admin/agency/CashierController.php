@@ -261,42 +261,28 @@ class CashierController extends AbstractController
     public function session_closing_validation(Request $request): Response
     {
         // Simulation statique des lignes de la table CashSessionBalance liées à cette session
-        $sessionBalances = [
-            [
-                'currency'  => 'CDF',
-                'closingBalanceExpected'  => '1 450 000',
-                'closingBalanceDeclared'  => '1 450 000',
-                'closingBalanceDifference'       => '0',
-            ],
-            [
-                'currency'  => 'USD',
-                'closingBalanceExpected'  => '450.00',
-                'closingBalanceDeclared'  => '435.00',
-                'closingBalanceDifference' => '-15.00', // Écart négatif (Manquant de caisse)
-            ],
-            [
-                'currency'  => 'EUR',
-                'closingBalanceExpected'  => '120.00',
-                'closingBalanceDeclared'  => '125.00',
-                'closingBalanceDifference'       => '+5',
-            ],
+        $sessionBalance = [
+
+            'currency'  => 'CDF',
+            'closingBalanceExpected'  => '1 450 000',
+            'closingBalanceDeclared'  => '1 450 000',
+            'closingBalanceDifference'       => '0',
         ];
 
 
 
         return $this->render('admin/agency/cashier/session_closing_validation.html.twig', [
             'page' => 'cashier',
-            'session_balances' => $sessionBalances
+            'session_balance' => $sessionBalance
         ]);
     } //session_closing_validation
 
     #[Route('/admin/agency/cash-register/session/{code}/initialization', name: 'admin_agency_cashier_session_init')]
     public function session_init(Request $request): Response
     {
-        $currencies = ['CDF', 'USD', 'EUR'];
         return $this->render('admin/agency/cashier/session_init.html.twig', [
             'page' => 'cashier',
-            'active_currencies' => $currencies
+            'base_currency' => 'CDF'
         ]);
     } //session_init
 

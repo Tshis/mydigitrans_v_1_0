@@ -35,14 +35,12 @@
 						</h2>
 
 						<div class="field-group mb-20 grid-dynamic-closing">
-							{% for balance in vault_balances %}
+							{% if vault_balances > 0 %}
 								<div class="field">
-									<span class="section-micro-label">Total attendu en
-										{{ balance.name }}
-										({{ balance.code }})</span>
-									<p class="theoretical-value {% if balance.code == 'CDF' %}text-success-color{% else %}text-primary-color{% endif %}">
-										{{ balance.amount }}
-										{{ balance.code }}
+									<span class="section-micro-label">Total attendu</span>
+									<p class="theoretical-value text-success-color">
+										{{ vault_balances.amount }}
+										{{ vault_balances.code }}
 									</p>
 									<span class="sub-meta-text">Flux cumulés de la session</span>
 								</div>
@@ -50,7 +48,7 @@
 								<div class="field">
 									<span class="text-danger-mode font-bold">Aucune transaction enregistrée sur cette session.</span>
 								</div>
-							{% endfor %}
+							{% end %}
 						</div>
 					</div>
 
@@ -61,17 +59,14 @@
 							Déclaration Physique (Comptage Réel)
 						</h2>
 						<div class="field-group mb-15 grid-dynamic-closing">
-							{% for balance in vault_balances %}
+							
 								<div class="field">
-									<label class="session-micro-label font-bold">Montant physique recompté en
-										{{ balance.code }}
-										*</label>
+									<label class="session-micro-label font-bold">Montant physique recompté *</label>
 									<div class="input-currency-wrapper">
-										<input type="number" name="physical_balances[{{ balance.code }}]" placeholder="0.00" step="0.01" min="0" required>
-										<span class="currency-badge-suffix">{{ balance.code }}</span>
+										<input type="number" name="physical_balances[{{ vault_balances.code }}]" placeholder="0.00" step="0.01" min="0" required>
+										<span class="currency-badge-suffix">{{ vault_balances.code }}</span>
 									</div>
 								</div>
-							{% endfor %}
 						</div>
 
 						<div class="field mb-15">
