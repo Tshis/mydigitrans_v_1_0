@@ -92,9 +92,26 @@ final class DashboardController extends AbstractController
     #[Route('/admin/partner/my-withdrawals', name: 'admin_partner_withdrawal_index', methods: ['GET'])]
     public function myWithdrawals(): Response
     {
+
         $paymentsHistory = [
-            ['id' => 401, 'reference' => 'REM-MOBILE-20261001-A4F2', 'method' => 'Mobile Money (M-Pesa)', 'amount' => 142.50, 'currency' => 'USD', 'paidAt' => new \DateTime('-4 days'), 'status' => 'success'],
-            ['id' => 402, 'reference' => 'REM-CASH-20260915-F8B9', 'method' => 'Espèces / Caisse Gombe', 'amount' => 38.00, 'currency' => 'USD', 'paidAt' => new \DateTime('-3 weeks'), 'status' => 'success']
+            [
+                'id' => 401,
+                'reference' => 'REM-MOBILE-20261001-A4F2',
+                'method' => 'Mobile Money (M-Pesa)',
+                'amount' => 142.50,
+                'currency' => 'USD',
+                'paidAt' => new \DateTime('-4 days'),
+                'status' => 'success'
+            ],
+            [
+                'id' => 402,
+                'reference' => 'REM-CASH-20261006-F8B9',
+                'method' => 'Mobile Money (Orange Money)',
+                'amount' => 50.00,
+                'currency' => 'USD',
+                'paidAt' => null,
+                'status' => 'transferred' // En attente de signature !
+            ]
         ];
 
         return $this->render('admin/partner/withdrawal.html.twig', [
@@ -103,4 +120,23 @@ final class DashboardController extends AbstractController
         ]);
     } //myWithdrawals
 
+
+    /**
+     * 48. ACKNOWLEDGE : ACCUSÉ DE RÉCEPTION ÉLECTRONIQUE PAR LE PARTENAIRE [MCD 48]
+     */
+    #[Route('/partner/my-withdrawals/{id}/acknowledge', name: 'partner_withdrawal_acknowledge', methods: ['POST'])]
+    public function acknowledgePayment(int $id): Response
+    {
+        // EN LOGIQUE ORM DE PRODUCTION :
+        // $payment = $em->find(CommissionPayment::class, $id);
+        // // Sécurité : On vérifie que le paiement appartient bien au partenaire connecté
+        // if ($payment->getUser() !== $this->getUser()) { throw $this->createAccessDeniedException(); }
+        // 
+        // $payment->setStatus('success'); // Éteint définitivement la dette
+        // $payment->setPaidAt(new \DateTimeImmutable()); // Fixation de l'horodatage de réception réel
+        // $em->flush();
+
+        $this->addFlash('success', 'Votre accusé de réception a été scellé. La transaction est officiellement clôturée.');
+        return $this->redirectToRoute('partner_withdrawal_index');
+    }
 }

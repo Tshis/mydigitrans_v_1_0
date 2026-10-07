@@ -4,11 +4,13 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/datatable.js" defer></script>
+	<script src="/js/admin/modalQuestion.js" defer></script>
 {% endblock %}
 
 {% block body %}
 	<div
-		class="admin-partner-portal-scope container">
+		class="admin-partner-portal-scope container"
+	>
 
 		{# --- EN-TÊTE --- #}
 		<header class="header mb-25">
@@ -17,7 +19,7 @@
 					<div class="sub-header-flex">
 						<span class="text-gray text-size-13">Mes Finances</span>
 						<span class="arrow-divider">•</span>
-						<span class="text-primary text-size-13 text-highlight">Grand Livre des Décaissements</span>
+						<span class="text-primary text-size-13 text-highlight">Décharges Électroniques</span>
 					</div>
 					<h1 class="mt-5">Demandes de Retraits & Règlements</h1>
 				</div>
@@ -28,7 +30,7 @@
 		<div class="table-responsive-wrapper">
 			<h2 class="card-title-fix text-size-14 py-10">
 				<i class="fa-solid fa-receipt text-primary"></i>
-				Journal de mes Versements Perçus
+				Journal de mes Versements Perçus (commissionPayment)
 			</h2>
 			<table class="table table-scrollable table-striped js-datatable">
 				<thead>
@@ -38,31 +40,51 @@
 						<th class="text-right">Montant Perçu</th>
 						<th>Date du Versement</th>
 						<th class="text-center">Statut Système</th>
+						<th class="text-right">Accusé de Réception</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for payment in payments_history %}
 						<tr>
-							<td class="monospace font-bold">
+							<td class="monospace text-weight-900">
 								<strong>{{ payment.reference }}</strong>
 							</td>
 							<td>
-								<span class="text-gray font-bold">{{ payment.method }}</span>
+								<span class="text-gray text-weight-900">{{ payment.method }}</span>
 							</td>
-							<td class="text-right font-bold monospace text-success-mode-color">
+							<td class="text-right text-weight-900 monospace text-success-color">
 								{{ payment.amount|number_format(2, ',', ' ') }}
 								{{ payment.currency }}
 							</td>
-							<td class="monospace text-size-12">{{ payment.paidAt|date('d/m/Y H:i') }}</td>
+							<td class="monospace text-size-12">{{ payment.paidAt ? payment.paidAt|date('d/m/Y H:i') : '--' }}</td>
 							<td class="text-center">
-								<span class="pill-report-audit {% if payment.status == 'success' %}closed{% elseif payment.status == 'pending' %}draft{% else %}open{% endif %}">
+								<span class="pill-report-audit {% if payment.status == 'success' %}success{% elseif payment.status == 'transferred' %}primary{% else %}open{% endif %}">
 									{{ payment.status }}
 								</span>
+							</td>
+							<td class="">
+								<div
+									class="action-group-refined"
+								>
+									{# SI LE VIREMENT EST REÇU MAIS NON ENCORE SIGNALÉ PAR L'APPORTEUR #}
+									{% if payment.status == 'transferred' %}
+
+										<a id="ctaBtn" data-target="{{ path('partner_withdrawal_acknowledge', {'id': payment.id}) }}" class="btn-refined btn-success-gradient text-size-11 text-center p-5" title="Confirmer que l'argent est bien arrivé sur mon compte">
+											<i class="fa-solid fa-file-signature"></i>
+											Émarger Réception
+										</a>
+
+									{% else %}
+										<span class="text-gray text-size-12 italic text-weight-700">
+											<i class="fa-solid fa-circle-check text-success"></i>
+											Émargé</span>
+									{% endif %}
+								</div>
 							</td>
 						</tr>
 					{% else %}
 						<tr>
-							<td colspan="5" class="text-center text-gray italic padding-20">Aucun virement ni paiement reçu à ce jour.</td>
+							<td colspan="6" class="text-center text-gray italic padding-20">Aucun virement ni paiement reçu à ce jour.</td>
 						</tr>
 					{% endfor %}
 				</tbody>
@@ -70,4 +92,8 @@
 		</div>
 
 	</div>
+
+
+	{% include "admin/partials/_modal.html.twig" %}
+
 {% endblock %}

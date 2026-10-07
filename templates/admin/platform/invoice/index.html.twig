@@ -25,6 +25,54 @@
 		</div>
 	</header>
 
+	{# --- COMPOSANT MACRO DE MONITORING FINANCIER CENTRAL --- #}
+	<div class="stats-grid mb-25">
+
+		{# CARTE 1 : FACTURE GENEREE (du mois) #}
+		<div class="card control-card kpi-card kpi-success">
+			<div class="kpi-icon-wrapper text-success-mode">
+				<i class="fa-solid fa-vault"></i>
+			</div>
+			<div class="kpi-data">
+				<label class="admin-bus-layout-add-label">
+					Coffre Central (Disponible)
+				</label>
+				<span class="kpi-value text-success-color">{{ cash_summary.vault_total|number_format(2, ',', ' ') }}
+					$</span>
+			</div>
+		</div>
+
+		{# CARTE 2 : FACTURE PAYEE (du mois) #}
+		<div class="card control-card kpi-card kpi-card kpi-danger">
+			<div class="kpi-icon-wrapper text-danger-mode">
+				<i class="fa-solid fa-money-bill-wave"></i>
+			</div>
+			<div class="kpi-data">
+				<label class="admin-bus-layout-add-label">Total Dépenses Centrales ({{ "now"|date('F') }}
+					)</label>
+				<span class="kpi-value text-danger-color">{{ cash_summary.expense_total|number_format(2, ',', ' ')
+					}}
+					$</span>
+			</div>
+		</div>
+
+		{# CARTE 2 : FACTURE NON PAYEE (du mois) #}
+		<div class="card control-card kpi-card kpi-card kpi-danger">
+			<div class="kpi-icon-wrapper text-danger-mode">
+				<i class="fa-solid fa-money-bill-wave"></i>
+			</div>
+			<div class="kpi-data">
+				<label class="admin-bus-layout-add-label">Total Dépenses Centrales ({{ "now"|date('F') }}
+					)</label>
+				<span class="kpi-value text-danger-color">{{ cash_summary.expense_total|number_format(2, ',', ' ')
+					}}
+					$</span>
+			</div>
+		</div>
+
+
+	</div>
+
 	{# 1. Mise à jour de la barre de navigation des onglets #}
 	<div class="platform-tabs-navigation mb-25">
 		<button type="button" class="tab-nav-btn active" data-target="panel-invoices">
