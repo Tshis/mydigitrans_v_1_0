@@ -9,7 +9,8 @@
 
 {% block body %}
 	<div
-		class="admin-agency-report-scope container">
+		class="admin-agency-report-scope container"
+	>
 		{# --- HEADER --- #}
 		<header class="header mb-25">
 			<div class="header-main-info">
@@ -95,12 +96,12 @@
 							</td>
 							<td class="monospace">{{ doc.referenceNumber|default('Non spécifié') }}</td>
 							<td>{{ doc.issuedAt|date('d/m/Y') }}</td>
-							<td class="font-bold {{date(doc.expiredAt) > date(" now") ? 'text-success' : 'text-danger' }}">
+							<td class="font-bold {{ date(doc.expiredAt) > date(" now") ? 'text-success' : 'text-danger' }}">
 								{{ doc.expiredAt|date('d/m/Y') }}
 							</td>
 
 							<td class="text-center">
-								<span class="pill-report-audit {% if date(doc.expiredAt) > date(" now") %}opened{% else %}closed{% endif %}">
+								<span class="pill-report-audit {% if date(doc.expiredAt) > date(" now") %}success{% else %}danger{% endif %}">
 									{{ date(doc.expiredAt) > date(" now") ? 'VALIDE' : 'EXPIRE' }}
 								</span>
 							</td>

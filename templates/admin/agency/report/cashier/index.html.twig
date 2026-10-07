@@ -47,7 +47,7 @@
 					<select name="cashier_code" class="admin-bus-layout-add-select">
 						<option value="">-- Tous les Caissiers --</option>
 						{% for cashier in cashier_matrix %}
-							<option value="{{ cashier.code }}" {% if current_cashier==cashier.code %} selected {% endif %}>{{
+							<option value="{{ cashier.code }}" {% if current_cashier == cashier.code %} selected {% endif %}>{{
 						cashier.cashierName }}</option>
 						{% endfor %}
 					</select>
@@ -67,7 +67,8 @@
 					<tr>
 						<th>Agent Guichetier</th>
 						<th>Succursale</th>
-						<th class="text-right">Total Billets Émis</th>
+						<th class="text-center">Total Billets Émis</th>
+						<th class="text-center">Total Colis enregistrés</th>
 						<th class="text-right">Volume Encaissé</th>
 						<th class="text-center">Statut Session</th>
 						<th class="text-center">Actions</th>
@@ -80,7 +81,8 @@
 								<strong>{{ row.cashierName }}</strong>
 							</td>
 							<td>{{ row.cashierName }}</td>
-							<td class="text-right">{{ row.ticketsCount }}</td>
+							<td class="text-center">{{ row.ticketsCount }}</td>
+							<td class="text-center">{{ row.shipmentsCount }}</td>
 							<td class="text-right font-bold text-success-mode">
 								{% for total in row.total_amount %}
 									<div class="amount-revenue">
@@ -97,7 +99,7 @@
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									<a href="{{path('admin_agency_report_cashier_show',{'code':row.cashierCode, 'from':date_from,'to':date_to})}}" class="action-link edit" title="Voir le détail de cette journée">
+									<a href="{{ path('admin_agency_report_cashier_show', {'code': row.cashierCode, 'from': date_from, 'to': date_to}) }}" class="action-link edit" title="Voir le détail de cette journée">
 										<i class="fa-solid fa-eye"></i>
 									</a>
 								</div>

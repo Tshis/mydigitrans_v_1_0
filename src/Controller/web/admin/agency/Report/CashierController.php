@@ -21,9 +21,9 @@ final class CashierController extends AbstractController
                 'cashierCode' => 'csh-001-dggdj',
                 'branchName' => 'Victoire',
                 'ticketsCount' => 48,
+                'shipmentsCount' => 12,
                 'total_amount' => [
                     ['amount' => 2160000, 'currency' => 'CDF'],
-                    ['amount' => 140.00, 'currency' => 'USD'],
                 ],
                 'sessionStatus' => 'closed'
             ],
@@ -32,7 +32,8 @@ final class CashierController extends AbstractController
                 'cashierName' => 'Jean Mukendi',
                 'cashierCode' => 'csh-002-dsho',
                 'branchName' => 'Matadi',
-                'ticketsCount' => 12,
+                'ticketsCount' => 70,
+                'shipmentsCount' => 12,
                 'total_amount' => [
                     ['amount' => 5400000, 'currency' => 'CDF'],
                 ],
