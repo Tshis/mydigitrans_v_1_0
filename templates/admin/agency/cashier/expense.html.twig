@@ -3,7 +3,7 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	<script src="/js/cashier-expense.js" defer></script>
+	<script src="/js/admin/modalQuestion.js" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -98,7 +98,7 @@
 									<span class="cash-badge badge-pending">{{ expense.status }}</span>
 								</td>
 								<td class="text-right table-action-buttons">
-									<button class="btn-disburse-trigger js-btn-disburse" data-ref="{{ expense.reference }}" data-amount="{{ expense.amount_raw }}" data-currency="{{ expense.currency }}">
+									<button id="ctaBtn" class="btn-disburse-trigger js-btn-disburse" data-target="{{ path('admin_agency_cashier_expense_exec', {'reference':expense.reference}) }}" ">
 										<i class="fa-solid fa-money-bill-wave"></i>
 										Décaisser le cash
 									</button>
@@ -115,4 +115,7 @@
 		</div>
 
 	</div>
+
+	{% include "admin/partials/_modal.html.twig" %}
+
 {% endblock %}

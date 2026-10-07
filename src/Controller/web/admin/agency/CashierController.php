@@ -25,7 +25,7 @@ class CashierController extends AbstractController
 
         //======Redirection to the dashboard
 
-        $user_role = "admin";
+        $user_role = "cashier";
 
         if ($user_role === "admin") {
             return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
@@ -62,25 +62,15 @@ class CashierController extends AbstractController
     public function session_opening(Request $request): Response
     {
         // Simulation des montants alloués au terminal par le gérant
-        $activeCurrencies = [
-            [
-                'code' => 'CDF',
-                'expected_amount' => '50000',
-            ],
-            [
-                'code' => 'USD',
-                'expected_amount' => '100',
-            ],
-            [
-                'code' => 'EUR',
-                'expected_amount' => '0',
-            ],
+        $active_currency = [
+            'code' => 'CDF',
+            'expected_amount' => '50000',
         ];
 
         //return $this->render('admin/agency/cashier/dashboard.html.twig', [
         return $this->render('admin/agency/cashier/session_open.html.twig', [
             'page' => 'cashier',
-            'active_currencies' => $activeCurrencies
+            'active_currency' => $active_currency
         ]);
     } //session_opening
 
@@ -184,6 +174,49 @@ class CashierController extends AbstractController
             'pending_expenses' => $pendingExpenses,
         ]);
     } //expense
+
+    #[Route('/admin/agency/cash-register/execute/expense/{reference}', name: 'admin_agency_cashier_expense_exec')]
+    public function expense_exec(Request $request, string $refence): Response
+    {
+
+        //traiter le decaissement ici
+
+
+        // 2. Fiches de dépenses validées par la direction en attente d'exécution de cash
+        $pendingExpenses = [
+            [
+                'reference'       => 'EXP-2026-0401',
+                'date_ordered'    => 'Aujourd\'hui, 08h30',
+                'authorizer'      => 'Alphonse Kalonji',
+                'authorizer_role' => 'Gérant de Succursale',
+                'beneficiary'     => 'Chauffeur : Jean Mukendi',
+                'motif'           => 'Achat Carburant Bus #01 (Station Engen Limete)',
+                'amount'          => '250.00',
+                'amount_raw'      => '250',
+                'currency'        => 'USD',
+                'status'          => 'PENDING (Approuvé)'
+            ],
+            [
+                'reference'       => 'EXP-2026-0402',
+                'date_ordered'    => 'Aujourd\'hui, 10h12',
+                'authorizer'      => 'Alphonse Kalonji',
+                'authorizer_role' => 'Gérant de Succursale',
+                'beneficiary'     => 'Secrétariat de Gare',
+                'motif'           => 'Achat rames de papiers et encre pour tickets',
+                'amount'          => '60 000',
+                'amount_raw'      => '60000',
+                'currency'        => 'CDF',
+                'status'          => 'PENDING (Approuvé)'
+            ]
+        ];
+
+
+        return $this->render('admin/agency/cashier/expense.html.twig', [
+            'page' => 'cashier',
+            'pending_count'    => count($pendingExpenses),
+            'pending_expenses' => $pendingExpenses,
+        ]);
+    } //expense_exec
 
     #[Route('/admin/agency/cash-register/payment/code-de-paiement', name: 'admin_agency_cashier_show_payment')]
     public function show_payment(Request $request): Response
