@@ -8,7 +8,8 @@
 
 {% block body %}
 	<div
-		class="admin-agency-report-scope container">
+		class="admin-agency-report-scope container"
+	>
 		{# --- HEADER --- #}
 		<header class="header mb-25">
 			<div class="header-main-info">
@@ -93,7 +94,8 @@
 
 		{# --- LE TABLEAU COMPOSANT --- #}
 		<div
-			class="admin-agency-fleet-document-scope">
+			class="admin-agency-fleet-document-scope"
+		>
 
 			{# --- LE TABLEAU DOCUMENTAIRE --- #}
 			<table class="table table-scrollable table-striped js-datatable">
@@ -124,7 +126,7 @@
 								{{ doc.expiredAt|date('d/m/Y') }}
 							</td>
 							<td class="text-center">
-								<span class="pill-report-audit {% if date(doc.expiredAt) > date(" now") %}opened{% else %}closed{% endif %}">
+								<span class="pill-report-audit {% if date(doc.expiredAt) > date(" now") %}success{% else %}danger{% endif %}">
 									{{ date(doc.expiredAt) > date(" now") ? 'VALIDE' : 'EXPIRE' }}
 								</span>
 							</td>
@@ -132,20 +134,20 @@
 								<div class="action-group-refined">
 
 									{% if doc.url %}
-										<a href="{{path('admin_agency_bus_document_download_file',{'code':doc.code}) }}" target="_blank" class="action-link view-file" title="Télécharger le scan">
+										<a href="{{ path('admin_agency_bus_document_download_file', {'code': doc.code}) }}" target="_blank" class="action-link view-file" title="Télécharger le scan">
 											<i class="fa-solid fa-download"></i>
 										</a>
-										<a href="{{path('admin_agency_bus_document_open_file',{'code':doc.code}) }}" target="_blank" class="action-link view-file" title="Ouvrir le scan">
+										<a href="{{ path('admin_agency_bus_document_open_file', {'code': doc.code}) }}" target="_blank" class="action-link view-file" title="Ouvrir le scan">
 											<i class="fa-solid fa-eye"></i>
 										</a>
 									{% endif %}
 
 									{% if doc.status === 'expired' %}
-										<a href="{{path('admin_agency_bus_document_renew',{'bus_code':'bus-001','doc_code':'dx-001'})}}" class="action-link" title="Renouveller">
+										<a href="{{ path('admin_agency_bus_document_renew', {'bus_code': 'bus-001', 'doc_code': 'dx-001'}) }}" class="action-link" title="Renouveller">
 											<i class="fa-solid fa-arrows-rotate"></i>
 										</a>
 									{% else %}
-										<a href="{{path('admin_agency_bus_document_edit',{'bus_code':'bus-001','doc_code':'dx-001'})}}" class="action-link" title="Modifier">
+										<a href="{{ path('admin_agency_bus_document_edit', {'bus_code': 'bus-001', 'doc_code': 'dx-001'}) }}" class="action-link" title="Modifier">
 											<i class="fa-solid fa-file-pen"></i>
 										</a>
 									{% endif %}
