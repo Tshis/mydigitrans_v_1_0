@@ -8,7 +8,8 @@
 
 {% block body %}
 	<div
-		class="admin-cashier-expense-scope container">
+		class="admin-cashier-expense-scope container"
+	>
 
 		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header-refined my-30">
@@ -16,7 +17,7 @@
 				<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" title="Retour au tableau de bord">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
-				<div class="info">
+				<div class="title">
 					<h1>
 						<i class="fa-solid fa-money-bill-transfer"></i>
 						Bons de Décaissement à Payer
@@ -40,20 +41,19 @@
 			</div>
 
 			{# Boucle dynamique sur l'état réel des tiroirs monétaires [MCD 19] #}
-			{% for balance in vault_balances %}
-				<div class="stat-card">
-					<div class="stat-icon {% if balance.code == 'CDF' %}stat-icon--success{% else %}stat-icon--primary{% endif %}">
-						<i class="fa-solid fa-wallet"></i>
-					</div>
-					<div class="stat-details">
-						<span class="stat-label">Espèces Dispo ({{ balance.code }})</span>
-						<strong class="stat-value {% if balance.code == 'CDF' %}text-success{% else %}text-primary{% endif %}">
-							{{ balance.amount }}
-							{{ balance.code }}
-						</strong>
-					</div>
+			
+			<div class="stat-card">
+				<div class="stat-icon {% if vault_balances.code == 'CDF' %}stat-icon--success{% else %}stat-icon--primary{% endif %}">
+					<i class="fa-solid fa-wallet"></i>
 				</div>
-			{% endfor %}
+				<div class="stat-details">
+					<span class="stat-label">Espèces Dispo ({{ vault_balances.code }})</span>
+					<strong class="stat-value text-success">
+						{{ vault_balances.amount }}
+						{{ vault_balances.code }}
+					</strong>
+				</div>
+			</div>
 		</div>
 
 		{# --- LISTE DES BONS DE DÉCAISSEMENT EN ATTENTE (DATATABLE) --- #}

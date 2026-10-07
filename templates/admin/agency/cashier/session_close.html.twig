@@ -2,103 +2,108 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-	<div
-		class="admin-cashier-session-closing-scope container">
+<div class="admin-cashier-session-closing-scope container">
 
-		{# --- EN-TÊTE --- #}
-		<header class="header mb-25">
+	{# --- EN-TÊTE --- #}
+	<header class="header-refined mb-25">
+		<div class="header-main-info">
 			<a href="{{ path('admin_agency_cashier_dashboard') }}" class="agency-back-action" title="Retour">
 				<i class="fa-solid fa-arrow-left"></i>
 			</a>
 			<div class="title">
-				<h2>Clôture de Session & Arrêt de Caisse</h2>
-				<p>Session active :
+				<h1>Clôture de Session & Arrêt de Caisse</h1>
+				<p class="subtitle">Session active :
 					<strong>CS-2026-0712</strong>
-					| Veuillez compter vos billets et déclarer l'encaisse physique.</p>
+					| Veuillez compter vos billets et déclarer l'encaisse physique.
+				</p>
 			</div>
-		</header>
+		</div>
+	</header>
 
-		{# --- LE TUNNEL DE VÉRIFICATION DES ÉCARTS --- #}
-		<form action="#" method="POST" class="reservation-form" onsubmit="return confirm('Confirmer la clôture définitive de la caisse ? Cette action est irréversible.');">
-			<div
-				class="reservation-container">
+	{# --- LE TUNNEL DE VÉRIFICATION DES ÉCARTS --- #}
+	<form action="#" method="POST" class="reservation-form"
+		onsubmit="return confirm('Confirmer la clôture définitive de la caisse ? Cette action est irréversible.');">
+		<div class="reservation-container">
 
-				{# GAUCHE : MULTI-DEVISES DYNAMIQUES --- #}
-				<div
-					class="layout-main-panel">
+			{# GAUCHE : MULTI-DEVISES DYNAMIQUES --- #}
+			<div class="layout-main-panel">
 
-					{# SOLDES THÉORIQUES ISSUS DE L'ENTITÉ CASHSESSIONBALANCE #}
-					<div class="card mb-20">
-						<h2>
-							<i class="fa-solid fa-calculator"></i>
-							Soldes Théoriques du Système (Calculés)
-						</h2>
+				{# SOLDES THÉORIQUES ISSUS DE L'ENTITÉ CASHSESSIONBALANCE #}
+				<div class="card mb-20">
+					<h2>
+						<i class="fa-solid fa-calculator"></i>
+						Soldes Théoriques du Système (Calculés)
+					</h2>
 
-						<div class="field-group mb-20 grid-dynamic-closing">
-							{% if vault_balances > 0 %}
-								<div class="field">
-									<span class="section-micro-label">Total attendu</span>
-									<p class="theoretical-value text-success-color">
-										{{ vault_balances.amount }}
-										{{ vault_balances.code }}
-									</p>
-									<span class="sub-meta-text">Flux cumulés de la session</span>
-								</div>
-							{% else %}
-								<div class="field">
-									<span class="text-danger-mode font-bold">Aucune transaction enregistrée sur cette session.</span>
-								</div>
-							{% end %}
+					<div class="field-group mb-20 grid-dynamic-closing">
+						{% if vault_balances.amount > 0 %}
+						<div class="field">
+							<span class="section-micro-label">Total attendu</span>
+							<p class="theoretical-value text-success-color	text-weight-900 text-size-20">
+								{{ vault_balances.amount }}
+								{{ vault_balances.code }}
+							</p>
+							<span class="sub-meta-text">Flux cumulés de la session</span>
 						</div>
-					</div>
-
-					{# DÉCLARATION PHYSIQUE DES ESPÈCES PAR LE GUICHETIER #}
-					<div class="card">
-						<h2>
-							<i class="fa-solid fa-hand-holding-hand"></i>
-							Déclaration Physique (Comptage Réel)
-						</h2>
-						<div class="field-group mb-15 grid-dynamic-closing">
-							
-								<div class="field">
-									<label class="session-micro-label font-bold">Montant physique recompté *</label>
-									<div class="input-currency-wrapper">
-										<input type="number" name="physical_balances[{{ vault_balances.code }}]" placeholder="0.00" step="0.01" min="0" required>
-										<span class="currency-badge-suffix">{{ vault_balances.code }}</span>
-									</div>
-								</div>
+						{% else %}
+						<div class="field">
+							<span class="text-danger-mode font-bold">Aucune transaction enregistrée sur cette
+								session.</span>
 						</div>
-
-						<div class="field mb-15">
-							<label class="session-micro-label">Rapport de passation / Notes de clôture</label>
-							<textarea name="closing_note" class="input-session-field text-area-fixed" placeholder="Mentionnez les incidents de paiement, les billets suspects refusés ou les détails des décaissements effectués..."></textarea>
-						</div>
+						{% endif %}
 					</div>
 				</div>
 
-				{# DROITE : VALIDATION ET EXPIRATION --- #}
-				<aside class="summary">
-					<div class="card summary-sticky-card">
-						<h2>Fermeture Définitive</h2>
+				{# DÉCLARATION PHYSIQUE DES ESPÈCES PAR LE GUICHETIER #}
+				<div class="card">
+					<h2>
+						<i class="fa-solid fa-hand-holding-hand"></i>
+						Déclaration Physique (Comptage Réel)
+					</h2>
+					<div class="field-group mb-15 grid-dynamic-closing">
 
-						<div class="reservation-notice-zone">
-							<p class="notice-title">
-								<i class="fa-solid fa-lock"></i>
-								Action Irréversible
-							</p>
-							<p class="notice-text">Après confirmation, votre guichet sera verrouillé. Un rapport d'arrêt de caisse sera envoyé au gérant pour validation des écarts.</p>
+						<div class="field">
+							<label class="session-micro-label font-bold">Montant physique recompté *</label>
+							<div class="input-currency-wrapper">
+								<input type="number" name="physical_balances[{{ vault_balances.code }}]"
+									placeholder="0.00" step="0.01" min="0" required>
+								<span class="currency-badge-suffix">{{ vault_balances.code }}</span>
+							</div>
 						</div>
-
-						<hr class="summary-divider mb-15">
-
-						<button type="submit" class="btn-submit-closing">
-							<i class="fa-solid fa-circle-check"></i>
-							Clôturer & Verrouiller la Caisse
-						</button>
 					</div>
-				</aside>
 
+					<div class="field mb-15">
+						<label class="session-micro-label">Rapport de passation / Notes de clôture</label>
+						<textarea name="closing_note" class="input-session-field text-area-fixed"
+							placeholder="Mentionnez les incidents de paiement, les billets suspects refusés ou les détails des décaissements effectués..."></textarea>
+					</div>
+				</div>
 			</div>
-		</form>
-	</div>
+
+			{# DROITE : VALIDATION ET EXPIRATION --- #}
+			<aside class="summary">
+				<div class="card summary-sticky-card">
+					<h2>Fermeture Définitive</h2>
+
+					<div class="reservation-notice-zone">
+						<p class="notice-title">
+							<i class="fa-solid fa-lock"></i>
+							Action Irréversible
+						</p>
+						<p class="notice-text">Après confirmation, votre guichet sera verrouillé. Un rapport d'arrêt de
+							caisse sera envoyé au gérant pour validation des écarts.</p>
+					</div>
+
+					<hr class="summary-divider mb-15">
+
+					<button type="submit" class="btn-refined btn-danger-gradient btn-full">
+						<i class="fa-solid fa-circle-check"></i>
+						Clôturer & Verrouiller la Caisse
+					</button>
+				</div>
+			</aside>
+
+		</div>
+	</form>
+</div>
 {% endblock %}

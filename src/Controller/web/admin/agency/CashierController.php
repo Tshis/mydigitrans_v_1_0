@@ -88,7 +88,7 @@ class CashierController extends AbstractController
     public function dashboard(Request $request): Response
     {
 
-        $user_role = "cashierss";
+        $user_role = "cashiers";
 
         if ($user_role === "cashier") {
             return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
@@ -97,36 +97,26 @@ class CashierController extends AbstractController
 
         // 1. Simulation des fonds réels actuellement présents dans le tiroir physique
         $vaultBalances = [
-            [
-                'code'   => 'CDF',
-                'amount' => '1 425 000',
-            ],
-            [
-                'code'   => 'USD',
-                'amount' => '450.00',
-            ],
-            [
-                'code'   => 'EUR',
-                'amount' => '120.00',
-            ],
+            'code'   => 'CDF',
+            'amount' => '1 425 000',
         ];
 
         // 2. Simulation du cumul des fiches de décaissement (sorties de caisse approuvées)
         $dailyExpenses = [
-            [
-                'code'   => 'CDF',
-                'amount' => '85 000',
-            ],
-            [
-                'code'   => 'USD',
-                'amount' => '30.00',
-            ],
+            'code'   => 'CDF',
+            'amount' => '85 000',
+        ];
+
+        $currency_base = [
+            'code' => 'CDF',
+            'name' => 'Franc Congolais'
         ];
 
         return $this->render('admin/agency/cashier/dashboard.html.twig', [
             'page' => 'cashier',
             'vault_balances' => $vaultBalances,
             'daily_expenses' => $dailyExpenses,
+            'currency_base' => $currency_base
         ]);
     } //dashboard
 
@@ -153,9 +143,10 @@ class CashierController extends AbstractController
 
         // 1. Solde en temps réel des tiroirs physiques de l'agent
         $vaultBalances = [
-            ['code' => 'CDF', 'amount' => '1 425 000'],
-            ['code' => 'USD', 'amount' => '450.00'],
+            'code'   => 'CDF',
+            'amount' => '1 425 000',
         ];
+
 
         // 2. Fiches de dépenses validées par la direction en attente d'exécution de cash
         $pendingExpenses = [
@@ -232,21 +223,9 @@ class CashierController extends AbstractController
 
         // Simulation des soldes cumulés calculés par le système pour la session active [MCD 19]
         $vaultBalances = [
-            [
-                'code'   => 'CDF',
-                'name'   => 'Franc Congolais',
-                'amount' => '625 000',
-            ],
-            [
-                'code'   => 'USD',
-                'name'   => 'Dollar Américain',
-                'amount' => '120.00',
-            ],
-            [
-                'code'   => 'EUR',
-                'name'   => 'Euro',
-                'amount' => '0.00',
-            ],
+            'code'   => 'CDF',
+            'name'   => 'Franc Congolais',
+            'amount' => '625 000',
         ];
 
 

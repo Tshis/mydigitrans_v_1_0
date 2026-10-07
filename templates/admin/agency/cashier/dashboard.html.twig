@@ -44,22 +44,22 @@
 		{# --- LES SOLDES DU TIROIR-CAISSE DYNAMIQUE (PAR DEVISE ACTIVE) --- #}
 		<div class="stats-overview-grid mb-25">
 			{# Boucle dynamique sur les soldes réels présents dans le tiroir #}
-			{% for balance in vault_balances %}
+			{% if vault_balances %}
 				<div class="stat-card">
 					<div class="stat-icon stat-icon--success">
 						<i class="fa-solid fa-money-bill-wave"></i>
 					</div>
 					<div class="stat-details">
 						<p class="stat-label">Solde Tiroir
-							<span class="text-primary">{{ balance.code }}</span>
+							<span class="text-primary">{{ vault_balances.code }}</span>
 						</p>
 						<strong class="stat-value text-success">
-							{{ balance.amount }}
-							<small>{{ balance.code }}</small>
+							{{ vault_balances.amount }}
+							<small>{{ vault_balances.code }}</small>
 						</strong>
 					</div>
 				</div>
-			{% endfor %}
+			{% endif %}
 
 			{# Carte consolidée des dépenses de la journée multi-devises #}
 			<div class="stat-card">
