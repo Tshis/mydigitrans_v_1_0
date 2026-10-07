@@ -2,117 +2,129 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script src="/js/admin/reservation_add.js" defer></script>
+{{ parent() }}
+<script src="/js/admin/reservation_add.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div class="admin-booking-creation-scope container">
+<div class="admin-booking-creation-scope container">
 
-		<header class="header mb-25">
-			<a href="{{ path('admin_agency_reservation_index') }}" class="agency-back-action" title="Retour au backoffice">
+	<header class="header-refined mb-25">
+		<div class="header-main-info">
+			<a href="{{ path('admin_agency_reservation_index') }}" class="agency-back-action"
+				title="Retour au backoffice">
 				<i class="fa-solid fa-arrow-left"></i>
 			</a>
 			<div class="title">
-				<h2>Guichet d'Enregistrement & Réservations</h2>
-				<p>Voyage sélectionné :
+				<h1>Guichet d'Enregistrement & Réservations</h1>
+				<p class="subtitle">Voyage sélectionné :
 					<strong class="text-primary">{{ trip_code }}</strong>
 				</p>
 			</div>
-		</header>
 
-		{# --- INJECTION DES DONNÉES DU CONTRÔLEUR DANS LES ATTRIBUTS DATA --- #}
-		<form action="#" method="POST" class="reservation-form" id="dynamic-booking-form" data-pricing="{{ pricing_matrix|json_encode }}" data-fares="{{ fare_categories|json_encode }}" data-currency-code="{{ currency_code }}">
+		</div>
+	</header>
 
-			<input type="hidden" name="trip_code" value="{{ trip_code }}">
+	{# --- INJECTION DES DONNÉES DU CONTRÔLEUR DANS LES ATTRIBUTS DATA --- #}
+	<form action="#" method="POST" class="reservation-form" id="dynamic-booking-form"
+		data-pricing="{{ pricing_matrix|json_encode }}" data-fares="{{ fare_categories|json_encode }}"
+		data-currency-code="{{ currency_code }}">
 
-			<div class="reservation-container">
+		<input type="hidden" name="trip_code" value="{{ trip_code }}">
 
-				<div
-					class="layout-main-panel">
-					{# Étape 1 : Sélection des arrêts #}
-					<div class="card mb-20">
-						<h2>Arrêts & Segment de voyage</h2>
-						<div class="field-group">
-							<div class="field">
-								<label>Arrêt de Montée (Départ)</label>
-								<select name="departure_stop_id" id="departure-stop" required>
-									<option value="1">Kinshasa (Gare Centrale)</option>
-									<option value="2">Kenge (Arrêt Principal)</option>
-								</select>
-							</div>
-							<div class="field">
-								<label>Arrêt de Descente (Arrivée)</label>
-								<select name="arrival_stop_id" id="arrival-stop" required>
-									<option value="3">Kikwit (Terminus)</option>
-									<option value="2">Kenge (Arrêt Principal)</option>
-								</select>
-							</div>
+		<div class="reservation-container">
+
+			<div class="layout-main-panel">
+				{# Étape 1 : Sélection des arrêts #}
+				<div class="card mb-20">
+					<h2>Arrêts & Segment de voyage</h2>
+					<div class="field-group">
+						<div class="field">
+							<label>Arrêt de Montée (Départ)</label>
+							<select name="departure_stop_id" id="departure-stop" required>
+								<option value="1">Kinshasa (Gare Centrale)</option>
+								<option value="2">Kenge (Arrêt Principal)</option>
+							</select>
 						</div>
-					</div>
-
-					{# Étape 2 : Plan des sièges #}
-					<div class="card id-seatmap-section">
-						<h2>Choix du siège</h2>
-						{{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
-						<input type="hidden" name="seat_number" id="selected-seat-input-backoffice" required>
+						<div class="field">
+							<label>Arrêt de Descente (Arrivée)</label>
+							<select name="arrival_stop_id" id="arrival-stop" required>
+								<option value="3">Kikwit (Terminus)</option>
+								<option value="2">Kenge (Arrêt Principal)</option>
+							</select>
+						</div>
 					</div>
 				</div>
 
-				{# COLONNE DROITE #}
-				<aside class="summary">
-					<div class="card mb-20">
-						<h2>Informations du passager</h2>
-						<div class="field-group">
-							<div class="field">
-								<label>Nom complet</label>
-								<input type="text" name="passenger_name" placeholder="Ex : Jean Mukendi" required autocomplete="off">
-							</div>
-							<div class="field">
-								<label>Téléphone</label>
-								<input type="tel" name="passenger_phone" placeholder="+243..." required autocomplete="off">
-							</div>
+				{# Étape 2 : Plan des sièges #}
+				<div class="card id-seatmap-section">
+					<h2>Choix du siège</h2>
+					{{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
+					<input type="hidden" name="seat_number" id="selected-seat-input-backoffice" required>
+				</div>
+			</div>
+
+			{# COLONNE DROITE #}
+			<aside class="summary">
+				<div class="card mb-20">
+					<h2>Informations du passager</h2>
+					<div class="field-group">
+						<div class="field">
+							<label>Nom complet</label>
+							<input type="text" name="passenger_name" placeholder="Ex : Jean Mukendi" required
+								autocomplete="off">
+						</div>
+						<div class="field">
+							<label>Téléphone</label>
+							<input type="tel" name="passenger_phone" placeholder="+243..." required autocomplete="off">
 						</div>
 					</div>
+				</div>
 
-					<div class="card summary-sticky-card">
-						<h2>Bon de Réservation</h2>
-						<div class="reservation-notice-zone mb-20">
-							<p class="notice-title">
-								<i class="fa-solid fa-clock-history"></i>
-								Délai de paiement</p>
-							<p class="notice-text">Ce document temporaire expirera automatiquement
-								<strong>2 heures</strong>
-								avant le départ.</p>
-						</div>
-						<hr class="summary-divider mb-15">
-						<ul class="billing-details-list">
-							<li>
-								<strong>Voyage :</strong>
-								<span>{{ trip_code }}</span>
-							</li>
-							<li>
-								<strong>Siège réservé :</strong>
-								<span id="summary-seat-number">Aucun</span>
-							</li>
-							<li>
-								<strong>Catégorie :</strong>
-								<span id="summary-fare-type">Standard</span>
-							</li>
-						</ul>
-						<div class="total">
-							Tarif indicatif :
-							<strong id="summary-total-price">0
-								{{ currency_code }}</strong>
-						</div>
-						<button class="btn btn-primary btn-full mt-20 py-12">
+				<div class="card summary-sticky-card">
+					<h2>Bon de Réservation</h2>
+					<div class="reservation-notice-zone mb-20">
+						<p class="notice-title">
+							<i class="fa-solid fa-clock-history"></i>
+							Délai de paiement
+						</p>
+						<p class="notice-text">Ce document temporaire expirera automatiquement
+							<strong>2 heures</strong>
+							avant le départ.
+						</p>
+					</div>
+					<hr class="summary-divider mb-15">
+					<ul class="billing-details-list">
+						<li>
+							<strong>Voyage :</strong>
+							<span>{{ trip_code }}</span>
+						</li>
+						<li>
+							<strong>Siège réservé :</strong>
+							<span id="summary-seat-number">Aucun</span>
+						</li>
+						<li>
+							<strong>Catégorie :</strong>
+							<span id="summary-fare-type">Standard</span>
+						</li>
+					</ul>
+					<div class="total">
+						Tarif indicatif :
+						<strong id="summary-total-price">
+							0
+							{{ currency_code }}</strong>
+					</div>
+
+					<div class="text-center">
+						<button class="btn-refined btn-primary-gradient">
 							<i class="fa-solid fa-file-invoice"></i>
 							Générer le Bon de Réservation
 						</button>
 					</div>
-				</aside>
+				</div>
+			</aside>
 
-			</div>
-		</form>
-	</div>
+		</div>
+	</form>
+</div>
 {% endblock %}

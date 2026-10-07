@@ -8,7 +8,8 @@
 
 {% block body %}
 	<div
-		class="admin-trip-wrapper container">
+		class="admin-trip-wrapper container"
+	>
 
 		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header-refined my-30">
@@ -68,9 +69,10 @@
 
 		{# --- ZONE DE RECHERCHE ET DE FILTRE AVANCÉ (3 CHAMPS CORRIGÉ) --- #}
 		<div class="trip-filters-card mb-20">
-			<form action="{{path('admin_agency_trip_search')}}">
+			<form action="{{ path('admin_agency_trip_search') }}">
 				<div
-					class="field-group">
+					class="field-group"
+				>
 					{# Champ 1 : Date #}
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Rechercher par date exacte</label>
@@ -100,7 +102,7 @@
 					</div>
 				</div>
 				<div class="field-button-right mt-10">
-					<button type="submit" class="btn btn-dark">
+					<button type="submit" class="btn-refined btn-dark-gradient">
 						<i class="fa-solid fa-magnifying-glass"></i>
 						Rechercher...
 					</button>
