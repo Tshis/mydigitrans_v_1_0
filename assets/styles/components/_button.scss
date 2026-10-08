@@ -78,5 +78,10 @@
         color: $white; box-shadow: 0 4px 15px rgba($gray, 0.3);
         &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($gray, 0.4); }
     }
+    &.btn-white-gradient {
+        background: linear-gradient(135deg, $white 0%, darken($white, 15%) 100%);
+        color: $dark; box-shadow: 0 4px 15px rgba($white, 0.3);
+        &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba($white, 0.4); }
+    }
     &.btn-full { width: 100%; justify-content: center; }
 }
