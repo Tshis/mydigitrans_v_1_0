@@ -99,13 +99,15 @@ final class LinesController extends AbstractController
 
         if ($request->isMethod('post')) {
 
-            //enregistrement de la reservation avec le status pending
+            //enregistrement de la reservation avec le status pending & imprimer
 
 
             $reservation = [
                 'reference' => 'RSV-001-2026',
                 //.......
             ];
+
+
 
             //redirection vers la 2e etape Lorsque le paiement en ligne sera dispo
             // return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reservation['reference']]);
