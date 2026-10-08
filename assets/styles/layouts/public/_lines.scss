@@ -80,130 +80,90 @@
 }//lines
 
 
-.results{
+.public-search-results-scope {
+    padding-block: 2.5rem;
 
-    .results-info{
-        margin-top:10px;
-        color:$white;
-    }//results-info
-    
-    .filters{
-        max-width: 650px;
-        margin-top:20px;
-        margin-inline: auto;
-        padding: 2rem;
-        box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
-    }//filters
-   
-    
-    .results-container {
-        padding-block: 4.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    
-        .result-card {
-            background: $white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-    
-            .company {
-                display: flex;
-                flex-direction: column;
-                
-                
-                h3 {
-                    margin-bottom: 1rem;
-                }//h3
-                
-                .badge {
-                    font-size: 12px;
-                    padding: 4px 10px;
-                    border-radius: 20px;
-                    font-weight: 600;
-                    display: block;
-                    width: max-content;
-    
-                    &.available {
-                        background: rgba($color: $success, $alpha: .225);
-                        color: $success;
-                    }//&.availanle
-    
-                    &.danger {
-                        background: rgba($color: $danger, $alpha: .225);
-                        color: $danger;
-                    }//danger
+    .page-header {
+        margin-bottom: 2rem;
+        h1 { font-size: 2.4rem; font-weight: 900; color: $dark; }
+        .search-summary { font-size: 14px; color: $gray; margin-top: 6px; }
+    }
 
-                    &.full {
-                        background: rgba($color: $gray, $alpha: .225);
-                        color: $gray;
-                    }//full
-    
-                }//badge
+    // --- GRILLE DOUBLE COLONNE RESPONSIVE ---
+    .results-layout-grid {
+        display: flex; gap: 2rem; width: 100%;
+        @media (max-width: 992px) { flex-direction: column; }
+    }
 
-                .info-bus{
-                    display: block;
-                    margin-top: 1rem;
-                }//info-bus
-    
-    
-            }//company
-    
-    
-            .details {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 2.5rem;
-                text-align: center;
-            }//details
-    
-    
-    
-        }//result-card
-    
-    }//results-container
+    .filters-sidebar {
+        flex: 0 0 280px; width: 200px;
+        @media (max-width: 992px) { flex: 1 1 100%; width: 100%; }
+        
+        .sticky-filter-box { position: sticky; top: 100px; z-index: 10; background: $white; padding: 20px; border: 1px solid $mute; border-radius: $radius-card; }
+    }
 
+    .results-main-panel { flex: 1; min-width: 0; width: 100%; }
 
+    .filter-title-fix { font-size: 12px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+    .filter-micro-label { font-size: 10px; font-weight: 800; color: $gray; text-transform: uppercase; display: block; margin-bottom: 8px; letter-spacing: 0.5px; }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
+    // Custom checkboxes
+    .checkbox-item-row { margin-bottom: 10px; }
+    .custom-checkbox {
+        display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: $dark; cursor: pointer;
+        input { display: none; }
+        .checkmark { width: 16px; height: 16px; border: 2px solid $mute; border-radius: 4px; display: inline-block; position: relative; }
+        input:checked + .checkmark { background: $primary; border-color: $primary; &::after { content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: $white; font-size: 0.65rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); } }
+    }
 
-    .results-container{
+    // --- CARTES DE TRAJETS (TRIP CARD) ---
+    .trip-result-card {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 24px; box-sizing: border-box; transition: box-shadow 0.2s ease;
+        &:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+    }
 
-        .company{
-            align-items: center;
-            justify-content: center;
+    .trip-card-body-layout {
+        display: flex; justify-content: space-between; align-items: center; gap: 2rem;
+        @media (max-width: 768px) { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+    }
+
+    // Bloc marque
+    .agency-brand-block {
+        flex: 0 0 180px;
+        .agency-name-title { font-size: 16px; font-weight: 800; color: $dark; margin: 0; }
+        .bus-badge-type { background: rgba($gray, 0.05); color: $gray; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; }
+    }
+
+    // Ligne temporelle
+    .route-timeline-block {
+        flex: 1; display: flex; align-items: center; gap: 1.5rem; width: 100%;
+        .time-node {
+            display: flex; flex-direction: column;
+            .time { font-size: 18px; color: $dark; }
+            .station-name { font-size: 12px; color: $gray; margin-top: 4px; }
         }
+        .route-duration-line {
+            flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            .duration-text { font-size: 11px; }
+            .visual-line { width: 100%; height: 2px; background: $mute; position: relative; &::after { content: ""; width: 6px; height: 6px; background: $primary; border-radius: 50%; position: absolute; top: -2px; right: 0; } }
+        }
+    }
 
-        .result-card {
-            flex-direction: column;
-            gap: 2.5rem;
-            text-align: center;
-        }//result-card
-    
-        .details {
-            grid-template-columns: repeat(2, 1fr);
-        }//details
+    // Tarification et Clic action
+    .pricing-booking-block {
+        flex: 0 0 160px; width: 100%;
+        @media (max-width: 768px) { text-align: left; }
+        .seat-left-alert { font-size: 11px; color: $primary; }
+        .trip-price-tag {
+            .price { font-size: 24px; color: $primary; }
+            .currency { font-size: 14px; color: $primary; margin-left: 2px; }
+        }
+    }
 
-    }//results-container
-
-}//max-width: 900px
-
-
-
-
-
-
-
-}//results
-
-
-
-
+    .w-100-percent { width: 100%; box-sizing: border-box; justify-content: center; }
+    .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+}//public-search-results-scope
 
 
 //booking
@@ -366,64 +326,9 @@
 
 //===========
 
-.seat-page{
-padding:60px 0;
-text-align:center;
-}
-
-.trip-info{
-margin-top:10px;
-color:#666;
-}
-
-/* BUS */
-.bus{
-margin-top:40px;
-display:flex;
-flex-direction:column;
-align-items:center;
-background:#f0f3f9;
-padding:30px;
-border-radius:20px;
-}
-
-/* DRIVER */
-.driver{
-margin-bottom:20px;
-font-weight:bold;
-}
-
-/* SEATS GRID */
-.seats{
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-
-.row{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-/* SEAT */
-.seat{
-width:40px;
-height:40px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:6px;
-cursor:pointer;
-font-size:12px;
-}
 
 
 
-/* AISLE */
-.aisle{
-width:20px;
-}
 
 
 

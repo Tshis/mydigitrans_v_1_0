@@ -1,167 +1,152 @@
+{# templates/public/lines/results.html.twig #}
 {% extends "public/base.html.twig" %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/js/public/booking_selection.js" defer></script>
+{% endblock %}
 
 {% block body %}
+    <div class="results">
+        <header class="page-header text-center mb-25">
+            <h1>Trajets disponibles</h1>
+            <p class="search-summary">
+                <i class="fa-solid fa-location-dot text-primary"></i> 
+                <strong>{{ search_query.departure }}</strong> ➔ <strong>{{ search_query.destination }}</strong> 
+                le <span class="monospace">{{ search_query.date|date('d/m/Y') }}</span> 
+            
+                <p>
+                    <i class="fa-solid fa-user"></i> : {{ search_query.passengers }} {{ search_query.passengers > 1 ? ' passagers' : 'passager' }} 
+                </p>
+            </p>
 
-<div class="results">
+            <p>
+                <small>
+                    {{ trips_results|length }} {{ trips_results|length > 1 ? 'résultats' : 'résultat' }}
+                </small>
+            </p>
+        </header>
+        <div class="public-search-results-scope container">
+    
+            {# --- EN-TÊTE RÉCAPITULATIF DE LA RECHERCHE --- #}
 
-    <div class="page-header text-center container">
-        <h1>Trajets disponibles</h1>
+            {# --- LAYOUT DOUBLE COLONNE ASYMÉTRIQUE --- #}
+            <div class="results-layout-grid">
+            
+                {% if trips_results|length > 0 %}
+                    {# COLONNE COMPACTE : FILTRES DE RAFFINEMENT DES COMPAGNIES #}
+                    <aside class="filters-sidebar">
+                        <div class="card filter-card sticky-filter-box">
+                            <h2 class="filter-title-fix"><i class="fa-solid fa-sliders text-primary"></i> Filtrer les résultats</h2>
+                
+                            <form action="#" method="GET" class="filter-action-form">
 
-        <p class="results-info">
-            Kinshasa → Matadi • 12 Juin 2026 • 3 résultats
-        </p>
+                                <div class="filter-group-section mb-20">
+                                    <label class="filter-micro-label">Compagnies Partenaires</label>
+                               
+                                    {% for trip in trips_results %}
+                                
+                                        <div class="checkbox-item-row">
+                                            <label class="custom-checkbox">
+                                                <input type="checkbox" name="agencies[]" value="{{ trip.id }}" checked>
+                                                <span class="checkmark"></span> {{ trip.agency_name|capitalize }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+
+                                
+                                </div>
+
+                                <div class="filter-group-section mb-25">
+                                    <label class="filter-micro-label">Confort / Classe</label>
+                                    <div class="checkbox-item-row">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" name="classes[]" value="VIP">
+                                            <span class="checkmark"></span> Classe VIP (Climatisation)
+                                        </label>
+                                    </div>
+                                    <div class="checkbox-item-row">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" name="classes[]" value="Standard" checked>
+                                            <span class="checkmark"></span> Standard
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-refined btn-primary-gradient w-100-percent">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Affiner la recherche
+                                </button>
+                            </form>
+                        </div>
+                    </aside>
+                {% endif %}
+            
+
+                {# COLONNE PRINCIPALE : CARTES DES VOYAGES DISPONIBLES #}
+                <main class="results-main-panel">
+                    {% for trip in trips_results %}
+                        <div class="card trip-result-card mb-20">
+                            <div class="trip-card-body-layout">
+                        
+                                {# 1. Identité Compagnie #}
+                                <div class="agency-brand-block">
+                                    <h3 class="agency-name-title">{{ trip.agency_name }}</h3>
+                                    <span class="bus-badge-type"><i class="fa-solid fa-bus"></i> {{ trip.bus_model }}</span>
+                                </div>
+
+                                {# 2. Chronologie et Itinéraire #}
+                                <div class="route-timeline-block">
+                                    <div class="time-node">
+                                        <span class="time font-bold monospace">{{ trip.departure_time }}</span>
+                                        <span class="station-name">{{ trip.departure_station }}</span>
+                                    </div>
+                                    <div class="route-duration-line">
+                                        <span class="duration-text text-gray monospace">{{ trip.duration }}</span>
+                                        <div class="visual-line"></div>
+                                    </div>
+                                    <div class="time-node">
+                                        <span class="time font-bold monospace">{{ trip.arrival_time }}</span>
+                                        <span class="station-name">{{ trip.arrival_station }}</span>
+                                    </div>
+                                </div>
+
+                                {# 3. Tarification & Réservation #}
+                                <div class="pricing-booking-block text-right">
+                                    <div class="seat-left-alert mb-10">
+                                        <i class="fa-solid fa-chair text-warning"></i> 
+                                        <span class="font-bold text-size-12">{{ trip.seats_available }} places dispos</span>
+                                    </div>
+                                    <div class="trip-price-tag mb-15">
+                                        <span class="price font-bold monospace">{{ trip.price|number_format(2, ',', ' ') }}</span>
+                                        <span class="currency font-bold">{{ trip.currency_code }}</span>
+                                    </div>
+                            
+                                    {# Formulaire de soumission vers le tunnel d'achat #}
+                                    <form action="{{ path('public_lines_booking', {'slug': trip.slug}) }}" method="POST">
+                                        <input type="hidden" name="passengers_count" value="{{ search_query.passengers }}">
+                                        <button type="submit" class="btn-refined btn-success-gradient w-100-percent">
+                                            <i class="fa-solid fa-ticket"></i> Réserver ma place
+                                        </button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card control-card no-results-box text-center padding-40">
+                            <div class="no-results-icon-wrap text-gray mb-15">
+                                <i class="fa-solid fa-bus-slash fa-3x"></i>
+                            </div>
+                            <h3>Aucun bus disponible pour cette date</h3>
+                            <p class="text-gray mt-5 text-size-12 text-weight-500">Essayez de modifier vos critères de recherche ou explorez les suggestions de trajets populaires en bas de page.</p>
+                            <a href="{{ path('public_lines_index') }}" class="btn-refined btn-dark-gradient mt-15">
+                                <i class="fa-solid fa-arrow-left"></i> Modifier la recherche
+                            </a>
+                        </div>
+                    {% endfor %}
+                </main>
+
+            </div>
+        </div>
     </div>
-    <!--page-header-->
-
-
-
-    <!-- FILTRES -->
-    <div class="filters">
-
-        <form action="">
-
-            <div class="field-group">
-                <div class="field">
-                    <select>
-                        <option>Trier par prix</option>
-                        <option>Heure de départ</option>
-                    </select>
-                </div>
-                <!--tri heure-prix-->
-
-                <div class="field">
-                    <select>
-                        <option>Tous les bus</option>
-                        <option>VIP</option>
-                        <option>Standard</option>
-                    </select>
-                </div>
-            </div>
-        </form>
-
-
-
-    </div>
-    <!--filters-->
-
-    <section class="results-container container">
-
-        <div class="result-card">
-
-            <div class="company">
-                <h3>Trans RDC</h3>
-                <span class="badge danger">3 places restante</span>
-                <span class="info-bus">Bus VIP • Climatisé</span>
-            </div>
-            <!--company-->
-
-            <div class="details">
-                <div>
-                    <strong>Départ</strong><br>
-                    06:30
-                </div>
-                <div>
-                    <strong>Arrivée</strong><br>
-                    13:00
-                </div>
-                <div>
-                    <strong>Places</strong><br>
-                    12
-                </div>
-                <div>
-                    <strong>Prix</strong><br>
-                    25 $
-                </div>
-            </div>
-            <!--details-->
-
-            <a href="{{path('public_lines_booking',{slug:'kin-matadi-trans-david-01'})}}"
-                class="btn btn-primary">Réserver</a>
-        </div>
-        <!--result-card voyage disponible-->
-
-        <div class="result-card">
-            <div class="company">
-                <h3>Express Congo</h3>
-                <span class="badge full">Complet</span>
-                <span class="info-bus">Bus standard</span>
-            </div>
-
-            <div class="details">
-                <div>
-                    <strong>Départ</strong><br>
-                    08:00
-                </div>
-                <div>
-                    <strong>Arrivée</strong><br>
-                    14:30
-                </div>
-                <div>
-                    <strong>Places</strong><br>
-                    0
-                </div>
-                <div>
-                    <strong>Prix</strong><br>
-                    30 $
-                </div>
-            </div>
-
-            <button class="btn-disabled" disabled>Indisponible</button>
-        </div>
-        <!--result-card voyage complet (places full)-->
-
-        <div class="result-card">
-
-            <div class="alert alert-danger">
-
-                Aucun voyage disponible trouvé.
-
-            </div>
-            <!--message-->
-
-            <a href="{{path('home_index')}}" class="btn btn-primary">Retour à la page d'accueil</a>
-
-        </div>
-        <!--Aucun voyage disponible-->
-
-
-        <div class="result-card">
-            <div class="company">
-                <h3>MB Transport</h3>
-
-                <span class="badge available">12 places restantes</span>
-
-                <span class="info-bus">Bus VIP • Climatisé</span>
-            </div>
-
-            <div class="details">
-                <div>
-                    <strong>Départ</strong><br>
-                    10:00
-                </div>
-                <div>
-                    <strong>Arrivée</strong><br>
-                    17:00
-                </div>
-                <div>
-                    <strong>Places</strong><br>
-                    5
-                </div>
-                <div>
-                    <strong>Prix</strong><br>
-                    22 $
-                </div>
-            </div>
-
-            <a href="{{path('public_lines_booking',{slug: 'kin-matadi-trans-david-01'})}}"
-                class="btn btn-primary">Réserver</a>
-        </div>
-
-    </section>
-    <!--results-container-->
-</div>
-<!--results-->
-
-
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "public/base.html.twig" %}
 
 {% block javascripts %}
-	{{parent()}}
+	{{ parent() }}
 	<script src="/js/public/lines.js" defer></script>
 {% endblock %}
 
@@ -17,7 +17,7 @@
 		<!--page-header-->
 
 		<div class="form-card">
-			<form class="search-form" action="{{path('public_lines_results')}}" method="post">
+			<form class="search-form" action="{{ path('public_lines_results') }}" method="post">
 
 				<div class="field-group">
 
@@ -47,8 +47,8 @@
 					</div>
 
 					<div class="field">
-						<button class="btn btn-primary">
-							<i class="fa-brands fa-sistrix"></i>
+						<button class="btn-refined btn-primary-gradient">
+							<i class="fa-solid fa-magnifying-glass-location"></i>
 							Rechercher
 						</button>
 					</div>
