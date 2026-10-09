@@ -42,70 +42,65 @@
 
 
 /* RESULTS */
-.public-package-result-container {
-    padding-block: 60px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    max-width: 900px;
-    margin: auto;
-    
-    .result-card {
-        background: $white;
-        border-radius: 14px;
-        padding: 25px;
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+.public-package-results-scope {
+    padding-bottom: 3rem;
 
-         .result-info{
-            h3{
-                margin-bottom: 10px;
-                color: $success;
-            }//h3
-               
-            p {
-                margin-bottom: 6px;
-                font-size: 14px;
-            }//p
-            
-        } //result-info
+    // Double colonne asymétrique inversée
+    .settings-form-layout {
+        width: 100%;
+        .settings-container-grid { display: flex; gap: 2rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
+        .main-form-panel { flex: 1; min-width: 0; width: 100%; }
+        .sidebar-action-panel {
+            flex: 0 0 300px; width: 300px;
+            @media (max-width: 1100px) { flex: 1 1 100%; width: 100%; }
+            .sticky-aside-card { position: sticky; top: 120px; z-index: 10; background: $white; padding: 24px; border: 1px solid $mute; border-radius: 8px; border-top: 4px solid $primary; }
+        }
+    }
 
-        .agency-contact {
-            background: $white;
-            padding: 15px;
-            border-radius: 10px;
-            min-width: 260px;
+    .control-card { padding: 24px; background: $white; border-radius: 8px; border: 1px solid $mute; box-sizing: border-box; }
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
 
-            h4 {
-                margin-bottom: 8px;
-                color: $primary;
-            }//h4
+    // Structure interne des lignes de bus
+    .trip-card-body-layout {
+        display: flex; justify-content: space-between; align-items: center; gap: 2rem;
+        @media (max-width: 768px) { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+    }
 
-            p {
-                font-size: 14px;
-                margin-bottom: 4px;
-            }//p
+    .agency-brand-block {
+        flex: 0 0 180px;
+        .agency-name-title { font-size: 16px; font-weight: 800; color: $dark; margin: 0; }
+        .bus-badge-type { background: $mute; color: $dark; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; }
+    }
 
-        }//agency-contact
+    .route-timeline-block {
+        flex: 1; display: flex; align-items: center; gap: 1.5rem; width: 100%;
+        .time-node {
+            display: flex; flex-direction: column;
+            .time { font-size: 18px; color: $dark; }
+            .station-name { font-size: 12px; color: $gray; margin-top: 4px; }
+        }
+        .route-duration-line {
+            flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            .duration-text { font-size: 11px; color: $gray; }
+            .visual-line { width: 100%; height: 2px; background: $mute; position: relative; &::after { content: ""; width: 6px; height: 6px; background: $primary; border-radius: 50%; position: absolute; top: -2px; right: 0; } }
+        }
+    }
 
-       
+    .pricing-booking-block {
+        flex: 0 0 160px; width: 100%;
+        .seat-left-alert { font-size: 11px; color: $success; }
+        .trip-price-tag { .price { font-size: 16px; color: $primary; } .currency { font-size: 14px; color: $primary; margin-left: 2px; } }
+    }
 
-    }//result-card
-    
-    
-    
-    /* FOOTER */
-    .package-footer {
-        padding: 20px;
-        font-size: 1.5rem;
-        color: $gray;
-        font-weight: 500;
-        text-align: center;
-    }//package-footer
+    .notice-box-info { background: rgba($success, 0.04); border-radius: 6px; padding: 12px 14px; font-size: 11.5px; border: 1px dashed rgba($success, 0.2); color: $gray; }
+    .notice-box-info-currency { background: rgba($primary, 0.04); border-radius: 6px; padding: 12px 14px; border: 1px dashed rgba($primary, 0.2); font-size: 11.5px; color: $gray; }
+    .w-100-percent { width: 100%; box-sizing: border-box; justify-content: center; }
+    .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+}//public-package-results-scope
 
-}//public-package-result-container
+
+
 
 /* RESPONSIVE */
 @media (max-width: 768px) {

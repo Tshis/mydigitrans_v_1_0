@@ -1,0 +1,113 @@
+{# templates/public/package/results.html.twig #}
+{% extends "public/base.html.twig" %}
+
+{% block body %}
+    <div class="public-package-results-scope">
+    
+        {# --- HEADER SANS CONTAINER (PLEINE LARGEUR VISUELLE) --- #}
+        <header class="page-header mb-25">
+            <div class="header-main-info container">
+                <div class="title">
+                    <div class="sub-header-flex">
+                        <span class="text-size-13">Expéditions & Fret</span>
+                        <span class="arrow-divider">•</span>
+                        <span class="text-primary text-size-13 text-highlight">Lignes Dispo</span>
+                    </div>
+                    <h1 class="mt-5">Départs Disponibles pour votre Colis</h1>
+                    <p class="search-summary mt-5">
+                        <i class="fa-solid fa-box text-primary"></i> 
+                        Axe : <strong>{{ search_query.departure }}</strong> ➔ <strong>{{ search_query.destination }}</strong> 
+                        • Date : <span class="monospace font-bold">{{ search_query.date|date('d/m/Y') }}</span>
+                        • Estimation : <span class="monospace font-bold">{{ search_query.weight }}</span>
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        {# --- LAYOUT DOUBLE COLONNE INVERSÉ --- #}
+        <div class="settings-form-layout container">
+            <div class="settings-container-grid">
+
+                {# COLONNE DROITE : RAPPEL DES RÈGLES DE PRISE EN CHARGE (EN PREMIER DANS LE HTML) #}
+                <aside class="sidebar-action-panel">
+                    <div class="card sticky-aside-card public-invoice-sidebar-theme">
+                        <h2 class="card-title-fix">
+                            <i class="fa-solid fa-shield-halved"></i> Guide Expédition
+                        </h2>
+                        <div class="notice-box-info mb-15">
+                            <p><strong><i class="fa-solid fa-circle-info"></i> Dépôt obligatoire :</strong> Le colis doit être déposé au guichet fret de la gare de départ au minimum <strong>1 heure</strong> avant le départ du bus choisi.</p>
+                        </div>
+                        <div class="notice-box-info-currency">
+                            <p><strong><i class="fa-solid fa-calculator"></i> Redevance :</strong> Conformément aux règles d'usine, la plateforme MyDigitrans prélève une commission fixe de <strong>1,00 $</strong> sur ce transfert pour la sécurité du traçage.</p>
+                        </div>
+                    </div>
+                </aside>
+
+                {# COLONNE GAUCHE : LISTE DES BUS AVEC PLACE EN SOUTE #}
+                <main class="main-form-panel">
+                    {% for trip in available_trips %}
+                        <div class="card control-card mb-20 package-trip-card">
+                            <div class="trip-card-body-layout">
+                            
+                                {# 1. Compagnie & Bus #}
+                                <div class="agency-brand-block">
+                                    <h3 class="agency-name-title">{{ trip.agency_name }}</h3>
+                                    <span class="bus-badge-type"><i class="fa-solid fa-bus"></i> {{ trip.bus_model }}</span>
+                                </div>
+
+                                {# 2. Horaires du Voyage #}
+                                <div class="route-timeline-block">
+                                    <div class="time-node">
+                                        <span class="time font-bold monospace">{{ trip.departure_time }}</span>
+                                        <span class="station-name">{{ trip.departure_station }}</span>
+                                    </div>
+                                    <div class="route-duration-line">
+                                        <span class="duration-text text-gray monospace">Transit : {{ trip.duration }}</span>
+                                        <div class="visual-line"></div>
+                                    </div>
+                                    <div class="time-node">
+                                        <span class="time font-bold monospace">{{ trip.arrival_time }}</span>
+                                        <span class="station-name">{{ trip.arrival_station }}</span>
+                                    </div>
+                                </div>
+
+                                {# 3. Tarification Fret & Action #}
+                                <div class="pricing-booking-block text-right">
+                                    <div class="seat-left-alert mb-10">
+                                        <i class="fa-solid fa-weight-hanging text-success-mode"></i> 
+                                        <span class="font-bold text-size-12">Espace Soute OK</span>
+                                    </div>
+                                    <div class="trip-price-tag mb-15">
+                                        <span class="price font-bold monospace">
+                                            Min : {{ trip.estimated_fare.min|number_format(2, ',', ' ') }}
+                                            <br>
+                                            Max : {{ trip.estimated_fare.max|number_format(2, ',', ' ') }}
+                                        </span>
+                                        <span class="currency font-bold">USD</span>
+                                    </div>
+                                
+                                    {# Action d'enclenchement de la quittance colis #}
+                                    <form action="{{ path('public_package_book') }}" method="POST">
+                                        <input type="hidden" name="trip_id" value="{{ trip.id }}">
+                                        <input type="hidden" name="weight" value="{{ search_query.weight }}">
+                                        <button type="submit" class="btn-refined btn-primary-gradient w-100-percent">
+                                            <i class="fa-solid fa-box-open"></i> Choisir ce départ
+                                        </button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card control-card text-center padding-40">
+                            <i class="fa-solid fa-box-tissue text-gray mb-15" style="font-size: 3rem;"></i>
+                            <h3>Aucune soute disponible pour cette date</h3>
+                            <p class="text-gray mt-5">Toutes les capacités de fret sont saturées ou aucun bus ne circule sur cet axe pour le moment.</p>
+                        </div>
+                    {% endfor %}
+                </main>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
