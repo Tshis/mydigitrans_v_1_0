@@ -164,6 +164,54 @@
 
 
 
+//=========
+/* assets/styles/modules/_public-become-partner.scss */
+
+.public-become-partner-scope {
+    padding-bottom: 3.5rem;
+
+
+    .form-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    // Centrage de la carte d'inscription
+    .form-card {
+        width: 100%;
+        max-width: 620px;
+        background: $white;
+        border: 1px solid $mute;
+        border-radius: 8px;
+        padding: 35px;
+        box-sizing: border-box;
+    }
+
+    .card-title-fix { font-size: 16px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.75rem; }
+    
+    .field-group { display: flex; gap: 1.5rem; flex-wrap: wrap; width: 100%; .field { flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px; } }
+    .field { display: flex; flex-direction: column; gap: 6px; width: 100%; box-sizing: border-box; }
+    
+    .admin-bus-layout-add-label { font-size: 11px; font-weight: 800; color: $gray; text-transform: uppercase; }
+    .admin-bus-layout-add-input { width: 100%; height: 40px; padding-inline: 12px; border: 1px solid $mute; border-radius: 6px; font-weight: 700; color: $dark; box-sizing: border-box; background: $white; }
+    .admin-bus-layout-add-input { width: 100%; height: 40px; padding-inline: 12px; border: 1px solid $mute; border-radius: 6px; font-weight: 700; color: $dark; box-sizing: border-box; background: $white;
+        &[readonly] { background: rgba($dark, 0.03); color: $gray; cursor: not-allowed; }
+    }
+
+    .font-monospace-code { font-family: monospace; font-weight: 900; text-transform: uppercase; color:$primary; letter-spacing: 0.5px; }
+    .w-100-percent { width: 100%; box-sizing: border-box; justify-content: center; }
+    .pb-30 { padding-bottom: 30px; }
+    .mt-25 { margin-top: 25px; }
+    
+    .text-success-mode-link { color: $success; text-decoration: none; &:hover { text-decoration: underline; } }
+    .account-toggle-text { color: $gray; font-size: 13px; }
+}
+
+
+
+
+
 
 
 

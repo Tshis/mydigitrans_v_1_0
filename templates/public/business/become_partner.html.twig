@@ -1,0 +1,93 @@
+{# templates/public/partner/register.html.twig #}
+{% extends "public/base.html.twig" %}
+
+{% block body %}
+    <div class="public-become-partner-scope">
+
+        {# --- HEADER PLEINE LARGEUR SANS CONTAINER --- #}
+        <header class="page-header mb-25">
+            <div class="header-main-info container text-center">
+                <h1>Commencez à gagner dès aujourd’hui</h1>
+                <p class="search-summary mt-5">Inscrivez-vous gratuitement et commencez à générer des commissions récurrentes avec MyDigitrans.</p>
+            </div>
+        </header>
+
+        <div class="form-container container">
+            <div class="form-card card control-card">
+
+                <h2 class="pb-30 text-center card-title-fix">
+                    <i class="fa-solid fa-user-plus text-primary"></i> Inscription Programme Partenaire
+                </h2>
+
+                <form action="{{ path('public_partner_register_process') }}" method="POST">
+
+                    <div class="field-group mb-20">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Nom *</label>
+                            <input type="text" name="lastname" class="admin-bus-layout-add-input" placeholder="Ex: Ilunga" required>
+                        </div>
+
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Prénom *</label>
+                            <input type="text" name="firstname" class="admin-bus-layout-add-input" placeholder="Ex: Christian" required>
+                        </div>
+                    </div>
+
+                    <div class="field-group mb-20">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Numéro de Téléphone *</label>
+                            <input type="tel" name="phone" class="admin-bus-layout-add-input" placeholder="Ex: +243 812 345 678" required>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Adresse Email *</label>
+                            <input type="email" name="email" class="admin-bus-layout-add-input" placeholder="Ex: christian.ilunga@mail.com" required>
+                        </div>
+                    </div>
+
+                    {# CHAMP SPONSOR ASSIGNÉ DYNAMIQUEMENT PAR TA DOUBLE ROUTE SYMFONY #}
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Code de Parrainage / Sponsor Accroché</label>
+                        <input
+                            type="text"
+                            name="sponsor_token"
+                            class="admin-bus-layout-add-input font-monospace-code"
+                            placeholder="Aucun (Racine Système)"
+                            value="{{ requested_sponsor }}"
+                            {{ requested_sponsor ? 'readonly' : '' }}
+                        >
+                        <small class="text-gray mt-5">
+                            {% if requested_sponsor %}
+                                <i class="fa-solid fa-link text-success-mode"></i> Lien d'affiliation détecté et sécurisé.
+                            {% else %}
+                                Laissez vide si vous n'avez pas de parrain direct.
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    <div class="field-group mb-25">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Mot de passe *</label>
+                            <input type="password" name="password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
+                        </div>
+
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Confirmer le mot de passe *</label>
+                            <input type="password" name="confirm_password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">
+                        <i class="fa-solid fa-square-check"></i> Créer mon compte partenaire
+                    </button>
+
+                </form>
+
+                <p class="mt-25 text-weight-500 text-center account-toggle-text">
+                    Déjà un compte ? 
+                    <a class="text-success-mode-link font-bold" href="#">Se connecter</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
