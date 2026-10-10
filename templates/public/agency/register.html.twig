@@ -2,29 +2,27 @@
 {% extends "public/base.html.twig" %}
 
 {% block body %}
-    <div class="public-become-partner-scope">
+    <div class="public-become-partner-scope public-agency-register-v1-scope">
 
         {# --- HEADER SANS CONTAINER (PLEINE LARGEUR VISUELLE) --- #}
         <header class="page-header mb-25">
-            <div class="header-main-info container text-center">
+            <div class="header-main-info container">
                 <h1>Connectez votre Compagnie de Transport</h1>
-                <p class="search-summary mt-5">Déployez vos guichets numériques, gérez votre flotte et boostez vos ventes de billets avec MyDigitrans.</p>
+                <p class="search-summary mt-5">Créez votre compte entreprise et configurez l'accès de l'administrateur souverain du réseau.</p>
             </div>
         </header>
 
-        
-
-        {# --- FORMULAIRE CENTRÉ DILATÉ --- #}
-        <div class="form-container container">
+        {# --- FORMULAIRE D'INSCRIPTION CENTRÉ --- #}
+        <section class="form-container mb-25 container">
             <div class="form-card card control-card">
-
-                <h2 class="pb-30 text-center card-title-fix">
-                    <i class="fa-solid fa-building-shield text-primary"></i> Création du Compte Compagnie
-                </h2>
 
                 <form action="{{ path('public_agency_register_process') }}" method="POST">
 
-                    {# BLOC 1 : IDENTITÉ DE L'ENTREPRISE #}
+                    {# --- SECTION 1 : INFORMATIONS AGENCE --- #}
+                    <h3 class="card-section-title-fix mb-20">
+                        <i class="fa-solid fa-hotel text-primary"></i> Informations agence
+                    </h3>
+
                     <div class="field mb-20">
                         <label class="admin-bus-layout-add-label">Nom Commercial de la Compagnie *</label>
                         <input type="text" name="agency_name" class="admin-bus-layout-add-input" placeholder="Ex: TransKin Express" required autocomplete="off">
@@ -32,71 +30,119 @@
 
                     <div class="field-group mb-20">
                         <div class="field">
-                            <label class="admin-bus-layout-add-label">Numéro de Registre du Commerce (RCCM) *</label>
-                            <input type="text" name="registration_number" class="admin-bus-layout-add-input monospace" placeholder="Ex: RCCM-KIN-..." required>
+                            <label class="admin-bus-layout-add-label">Numéro RCCM </label>
+                            <input type="text" name="registration_number" class="admin-bus-layout-add-input monospace" placeholder="RCCM-KIN-...">
                         </div>
                         <div class="field">
-                            <label class="admin-bus-layout-add-label">Numéro d'Identification Fiscale (NIF) *</label>
-                            <input type="text" name="tax_number" class="admin-bus-layout-add-input monospace" placeholder="Ex: NIF-..." required>
+                            <label class="admin-bus-layout-add-label">Numéro d'Identification Fiscale (NIF) </label>
+                            <input type="text" name="tax_number" class="admin-bus-layout-add-input monospace" placeholder="NIF-...">
                         </div>
                     </div>
 
-                    {# BLOC 2 : COORDONNÉES DU COMPTE ADMINISTRATEUR SOUVERAIN #}
-                    <div class="field-group mb-20">
+                    <div class="field-group mb-25">
+
                         <div class="field">
-                            <label class="admin-bus-layout-add-label">Adresse Email de l'Agence *</label>
-                            <input type="email" name="email" class="admin-bus-layout-add-input" placeholder="Ex: direction@transkin.com" required autocomplete="email">
+                            <label class="admin-bus-layout-add-label">Téléphone agence</label>
+                            <input type="tel" class="admin-bus-layout-add-input monospace" placeholder="+24381........" required>
+                        </div>
+
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Email</label>
+                            <input type="text" class="admin-bus-layout-add-input monospace" placeholder="agency@exemple.com" required>
+                        </div>
+                    </div>
+                    <!--field-group-->
+
+                    {# --- SECTION 2 : ANTENNE PRINCIPALE (SIÈGE) --- #}
+                    <div class="field-group mb-25">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Ville principale *</label>
+                            <input type="text" name="main_city" class="admin-bus-layout-add-input" placeholder="Ex: Kinshasa" required>
                         </div>
                         <div class="field">
-                            <label class="admin-bus-layout-add-label">Téléphone du Siège Central *</label>
-                            <input type="tel" name="phone" class="admin-bus-layout-add-input" placeholder="Ex: +243 812 345 678" required>
+                            <label class="admin-bus-layout-add-label">Pays *</label>
+                            <input type="text" name="country" class="admin-bus-layout-add-input" placeholder="Ex: RDC" required>
                         </div>
                     </div>
 
-                    {# CODE SPONSOR : CAPTURÉ DEPUIS LA DOUBLE ROUTE SYMFONY POUR SÉCURISER LES COMMISSIONS MLM [Profile] #}
-                    <div class="field mb-20">
-                        <label class="admin-bus-layout-add-label">Code d'Affiliation Partenaire / Sponsor Token</label>
+                    <div class="field mb-25">
+                        <label class="admin-bus-layout-add-label">Adresse *</label>
+                        <input type="text" name="address" class="admin-bus-layout-add-input" placeholder="Ex: N°45, Boulevard du 30 Juin, Gombe" required>
+                    </div>
+
+                    {# --- 🚨 NOUVEAU - SECTION 3 : PARRAINAGE & AFFILIATION [MNS] --- #}
+                    <h3 class="card-section-title-fix my-20">
+                        <i class="fa-solid fa-code-branch text-primary"></i> Programme d'Affiliation
+                    </h3>
+
+                    <div class="field mb-25">
+                        <label class="admin-bus-layout-add-label">Code d'Affiliation Apporteur / Sponsor Token</label>
                         <input
                             type="text"
                             name="sponsor_token"
                             class="admin-bus-layout-add-input font-monospace-code"
-                            placeholder="Aucun (Racine Système - Enrôlement direct)"
+                            placeholder="Ex : MDTDAN718 (Laissez vide si enrôlement direct)"
                             value="{{ requested_sponsor }}"
                             {{ requested_sponsor ? 'readonly' : '' }}
                         >
                         <small class="text-gray mt-5">
                             {% if requested_sponsor %}
-                                <i class="fa-solid fa-link text-success-mode"></i> Code Apporteur détecté et rattaché avec succès.
+                                <i class="fa-solid fa-link text-success-mode"></i> Ce code d'apporteur d'affaires est sécurisé par le lien d'invitation [MNS].
                             {% else %}
-                                Saisissez le code MDT de votre apporteur d'affaires pour activer vos avantages de parrainage [MNS].
+                                Saisissez manuellement le code MDT du partenaire qui vous a parrainé pour activer vos bonus de réseau.
                             {% endif %}
                         </small>
                     </div>
 
-                    {# BLOC 3 : SÉCURITÉ ACCÈS #}
+                    {# --- SECTION 4 : RESPONSABLE --- #}
+                    <h3 class="card-section-title-fix my-20">
+                        <i class="fa-solid fa-user text-primary"></i> Responsable (Manager Général)
+                    </h3>
+
                     <div class="field-group mb-25">
                         <div class="field">
-                            <label class="admin-bus-layout-add-label">Mot de passe de la Console *</label>
+                            <label class="admin-bus-layout-add-label">Nom *</label>
+                            <input type="text" name="owner_lastname" class="admin-bus-layout-add-input" placeholder="Ex: Lukonu" required autocomplete="off">
+                        </div>
+
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Prénom *</label>
+                            <input type="text" name="owner_firstname" class="admin-bus-layout-add-input" placeholder="Ex: Daniel" required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="field mb-25">
+                        <label class="admin-bus-layout-add-label">Téléphone *</label>
+                        <input type="tel" name="owner_phone" class="admin-bus-layout-add-input" placeholder="Ex: +243..." required>
+                    </div>
+
+                    <div class="field mb-25">
+                        <label class="admin-bus-layout-add-label">Email *</label>
+                        <input type="email" name="owner_email" class="admin-bus-layout-add-input" placeholder="Ex: admin@agence.com" required autocomplete="email">
+                    </div>
+
+                    <div class="field-group mb-25">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Mot de passe de sécurité *</label>
                             <input type="password" name="password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
                         </div>
+
                         <div class="field">
                             <label class="admin-bus-layout-add-label">Confirmer le mot de passe *</label>
                             <input type="password" name="confirm_password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">
-                        <i class="fa-solid fa-rocket"></i> Initialiser la Compagnie & Choisir mon Forfait
-                    </button>
+                    <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">Créer mon compte agence</button>
 
                 </form>
 
                 <p class="mt-25 text-weight-500 text-center account-toggle-text">
-                    Votre compagnie est déjà inscrite ? 
-                    <a class="text-success-mode-link font-bold" href="{{ path('security_login_index') }}">Se connecter à la Console</a>
+                    Déjà un compte ? 
+                    <a class="text-success-mode-link font-bold" href="{{ path('security_login_index') }}">Se connecter</a>
                 </p>
 
             </div>
-        </div>
+        </section>
     </div>
 {% endblock %}

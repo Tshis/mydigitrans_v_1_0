@@ -13,7 +13,7 @@ final class AgencyController extends AbstractController
     #[Route('/public/agency/create', name: 'public_agency_add')]
     public function add(): Response
     {
-        return $this->render('public/agency/add.html.twig', [
+        return $this->render('public/agency/add1.html.twig', [
             'page' => 'agency',
         ]);
     } //add
@@ -35,7 +35,7 @@ final class AgencyController extends AbstractController
     }//showRegisterForm
 
     /**
-     * PROCESSEUR DE SÉCURITÉ : TRAITEMENT ET INSCRIPTION COMPAGNIE
+     * PROCESSEUR ÉTAPE 1 : INTERCEPTION ET REDIRECTION VERS LE CATALOGUE SAAS [INDEX]
      */
     #[Route('/register-agency/process', name: 'public_agency_register_process', methods: ['POST'])]
     public function processRegister(Request $request): Response
@@ -46,6 +46,32 @@ final class AgencyController extends AbstractController
         // 3. Redirection vers la sélection immédiate du forfait (31. subscriptionPlan) [INDEX]
 
         $this->addFlash('success', 'Votre structure a été configurée avec succès. Choisissez votre formule SaaS.');
-        return $this->redirectToRoute('public_login');
+        return $this->redirectToRoute('public_agency_choose_plan');
     } //processRegister
+
+
+    /**
+     * ÉTAPE 2 : EXPOSITION DES MODULES ET GRILLES SUBSCRIPTIONPLAN [MCD 31]
+     */
+    #[Route('/agency/choose-plan', name: 'public_agency_choose_plan')]
+    public function choosePlan(): Response
+    {
+        // Hydratation de ton entité "31. subscriptionPlan" [INDEX]
+        $availablePlans = [
+            ['id' => 1, 'code' => 'basic', 'name' => 'Formule Standard', 'price' => 75.00, 'max_branches' => 2, 'max_pos' => 5, 'description' => 'Parfait pour les petites compagnies locales.'],
+            ['id' => 2, 'code' => 'pro', 'name' => 'Formule Premium', 'price' => 250.00, 'max_branches' => 999, 'max_pos' => 999, 'description' => 'Déploiement complet pour réseaux interprovinciaux.']
+        ];
+
+        return $this->render('public/agency/choose_plan.html.twig', [
+            'page' => 'agency',
+            'available_plans' => $availablePlans
+        ]);
+    } //choosePlan
+
+    #[Route('/register-agency/subscribe/finalize', name: 'public_agency_subscribe_finalize', methods: ['POST'])]
+    public function finalizeSubscription(): Response
+    {
+        $this->addFlash('success', 'Votre licence d\'exploitation a été provisionnée. Connectez-vous à présent.');
+        return $this->redirectToRoute('public_login');
+    } //finalizeSubscription
 }

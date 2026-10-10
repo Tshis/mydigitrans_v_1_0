@@ -34,7 +34,7 @@
                         type="text"
                         id="js-agency-link-input"
                         class="intentional-hidden-input-url"
-                        value="https://mydigitrans.com{{ partner_token }}"
+                        value="{{ path('public_agency_register_sponsored', {'referal_token': partner_token}) }}"
                         readonly
                     >
                     <button type="button" class="btn-refined btn-primary-gradient js-dual-copy-trigger" data-target="js-agency-link-input">
@@ -48,7 +48,7 @@
                         type="text"
                         id="js-partner-link-input"
                         class="intentional-hidden-input-url"
-                        value="https://mydigitrans.com{{ partner_token }}"
+                        value="{{ path('business_become_partner_sponsored', {'referal_token': partner_token}) }}"
                         readonly
                     >
                     <button type="button" class="btn-refined btn-success-gradient js-dual-copy-trigger" data-target="js-partner-link-input">

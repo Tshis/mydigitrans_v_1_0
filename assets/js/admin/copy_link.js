@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 linkInput.select();
                 linkInput.setSelectionRange(0, 99999); // Sécurité Mobile
 
-                navigator.clipboard.writeText(linkInput.value).then(() => {
+                navigator.clipboard.writeText(linkInput.href).then(() => {
                     const originalContent = button.innerHTML;
                     
                     // Animation visuelle de confirmation
