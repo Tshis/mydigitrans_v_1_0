@@ -63,6 +63,25 @@
     /* assets/styles/modules/_partner-portal.scss */
 
 
+    .partner-dual-share-links-wrapper {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .referral-share-box-item {
+        display: inline-block;
+        
+        // On masque l'input URL pour ne laisser visible que les boutons refined
+        .intentional-hidden-input-url {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+        }
+    }
+
+
 
    
 

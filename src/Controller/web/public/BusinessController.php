@@ -18,23 +18,16 @@ final class BusinessController extends AbstractController
         ]);
     } //index
 
-    #[Route('/business/parter-onboarding', name: 'business_onboarding')]
-    public function onboarding(): Response
-    {
-        return $this->render('public/business/onboarding.html.twig', [
-            'page' => 'business',
-        ]);
-    } //onboarding
 
     /**
      * VUE PUBLIQUE : ACCÈS ET REPRÉGULATION DU FORMULAIRE D'INSCRIPTION PARTENAIRE [Profile]
      */
-    #[Route('/business/devenir-partenaire/{code}', name: 'business_become_partner_sponsored')]
     #[Route('/business/devenir-partenaire', name: 'business_become_partner')]
-    public function become_partner(?string $code = null, Request $request): Response
+    #[Route('/business/devenir-partenaire/{referal_token}', name: 'business_become_partner_sponsored')]
+    public function become_partner(?string $referal_token = null, Request $request): Response
     {
         // Capture du jeton de parrainage s'il est présent dans l'URL (?ref=MOMBONGO85) [Profile]
-        $requestedSponsor = $code;
+        $requestedSponsor = $referal_token;
 
         return $this->render('public/business/become_partner.html.twig', [
             'page' => 'business',

@@ -35,7 +35,10 @@ final class PackageController extends AbstractController
         $availableTrips = [
             [
                 'id' => 801,
-                'agency_name' => 'TransKin Express',
+                'agency' => [
+                    'name' => 'TransKin Express',
+                    'main_currency' => 'USD'
+                ],
                 'bus_model' => 'Marcopolo Cargo G7',
                 'departure_time' => '07h30',
                 'departure_station' => 'Gare Centrale (Gombe)',
@@ -51,17 +54,20 @@ final class PackageController extends AbstractController
             ],
             [
                 'id' => 802,
-                'agency_name' => 'Océan du Congo',
+                'agency' => [
+                    'name' => 'Océan du Congo',
+                    'main_currency' => 'CDF'
+                ],
                 'bus_model' => 'Scania Streamline',
                 'departure_time' => '09h00',
                 'departure_station' => 'Poste de Kingabwa',
                 'duration' => '7h 00m',
                 'arrival_time' => '16h00',
                 'arrival_station' => 'Gare du Port (Matadi)',
-                'price_per_kg' => 1.15,
+                'price_per_kg' => 3000,
                 'estimated_fare' => [
-                    'min' => 5 * 1.2,
-                    'max' => 15 * 1.2
+                    'min' => 5 * 3000,
+                    'max' => 15 * 3000
 
                 ] // Estimation selon la grille de poids
             ]

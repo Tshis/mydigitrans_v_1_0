@@ -17,9 +17,11 @@ final class PasswordController extends AbstractController
         ]);
     } //forgot
 
-    #[Route('/password/reset', name: 'security_password_reset')]
-    public function reset(): Response
+    #[Route('/password/reset/{code}', name: 'security_password_reset')]
+    public function reset(string $code): Response
     {
+        $user = $code;
+
         return $this->render('public/security/password/reset.html.twig', [
             'page' => 'login',
             'error' => []

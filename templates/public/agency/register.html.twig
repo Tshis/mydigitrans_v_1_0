@@ -1,0 +1,102 @@
+{# templates/public/agency/register.html.twig #}
+{% extends "public/base.html.twig" %}
+
+{% block body %}
+    <div class="public-become-partner-scope">
+
+        {# --- HEADER SANS CONTAINER (PLEINE LARGEUR VISUELLE) --- #}
+        <header class="page-header mb-25">
+            <div class="header-main-info container text-center">
+                <h1>Connectez votre Compagnie de Transport</h1>
+                <p class="search-summary mt-5">Déployez vos guichets numériques, gérez votre flotte et boostez vos ventes de billets avec MyDigitrans.</p>
+            </div>
+        </header>
+
+        
+
+        {# --- FORMULAIRE CENTRÉ DILATÉ --- #}
+        <div class="form-container container">
+            <div class="form-card card control-card">
+
+                <h2 class="pb-30 text-center card-title-fix">
+                    <i class="fa-solid fa-building-shield text-primary"></i> Création du Compte Compagnie
+                </h2>
+
+                <form action="{{ path('public_agency_register_process') }}" method="POST">
+
+                    {# BLOC 1 : IDENTITÉ DE L'ENTREPRISE #}
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Nom Commercial de la Compagnie *</label>
+                        <input type="text" name="agency_name" class="admin-bus-layout-add-input" placeholder="Ex: TransKin Express" required autocomplete="off">
+                    </div>
+
+                    <div class="field-group mb-20">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Numéro de Registre du Commerce (RCCM) *</label>
+                            <input type="text" name="registration_number" class="admin-bus-layout-add-input monospace" placeholder="Ex: RCCM-KIN-..." required>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Numéro d'Identification Fiscale (NIF) *</label>
+                            <input type="text" name="tax_number" class="admin-bus-layout-add-input monospace" placeholder="Ex: NIF-..." required>
+                        </div>
+                    </div>
+
+                    {# BLOC 2 : COORDONNÉES DU COMPTE ADMINISTRATEUR SOUVERAIN #}
+                    <div class="field-group mb-20">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Adresse Email de l'Agence *</label>
+                            <input type="email" name="email" class="admin-bus-layout-add-input" placeholder="Ex: direction@transkin.com" required autocomplete="email">
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Téléphone du Siège Central *</label>
+                            <input type="tel" name="phone" class="admin-bus-layout-add-input" placeholder="Ex: +243 812 345 678" required>
+                        </div>
+                    </div>
+
+                    {# CODE SPONSOR : CAPTURÉ DEPUIS LA DOUBLE ROUTE SYMFONY POUR SÉCURISER LES COMMISSIONS MLM [Profile] #}
+                    <div class="field mb-20">
+                        <label class="admin-bus-layout-add-label">Code d'Affiliation Partenaire / Sponsor Token</label>
+                        <input
+                            type="text"
+                            name="sponsor_token"
+                            class="admin-bus-layout-add-input font-monospace-code"
+                            placeholder="Aucun (Racine Système - Enrôlement direct)"
+                            value="{{ requested_sponsor }}"
+                            {{ requested_sponsor ? 'readonly' : '' }}
+                        >
+                        <small class="text-gray mt-5">
+                            {% if requested_sponsor %}
+                                <i class="fa-solid fa-link text-success-mode"></i> Code Apporteur détecté et rattaché avec succès.
+                            {% else %}
+                                Saisissez le code MDT de votre apporteur d'affaires pour activer vos avantages de parrainage [MNS].
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    {# BLOC 3 : SÉCURITÉ ACCÈS #}
+                    <div class="field-group mb-25">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Mot de passe de la Console *</label>
+                            <input type="password" name="password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Confirmer le mot de passe *</label>
+                            <input type="password" name="confirm_password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">
+                        <i class="fa-solid fa-rocket"></i> Initialiser la Compagnie & Choisir mon Forfait
+                    </button>
+
+                </form>
+
+                <p class="mt-25 text-weight-500 text-center account-toggle-text">
+                    Votre compagnie est déjà inscrite ? 
+                    <a class="text-success-mode-link font-bold" href="{{ path('security_login_index') }}">Se connecter à la Console</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

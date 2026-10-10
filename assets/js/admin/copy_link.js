@@ -1,24 +1,28 @@
 // public/js/partner/copy_link.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    const copyBtn = document.querySelector('#js-copy-link-btn');
-    const linkInput = document.querySelector('#js-referral-link-input');
+    const copyButtons = document.querySelectorAll('.js-dual-copy-trigger');
 
-    if (copyBtn && linkInput) {
-        copyBtn.addEventListener('click', () => {
-            linkInput.select();
-            linkInput.setSelectionRange(0, 99999); // Pour mobiles
+    copyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.getAttribute('data-target');
+            const linkInput = document.getElementById(targetId);
 
-            navigator.clipboard.writeText(linkInput.value).then(() => {
-                const originalContent = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Copié !';
-                copyBtn.classList.replace('btn-primary-gradient', 'btn-success-gradient');
+            if (linkInput) {
+                linkInput.select();
+                linkInput.setSelectionRange(0, 99999); // Sécurité Mobile
 
-                setTimeout(() => {
-                    copyBtn.innerHTML = originalContent;
-                    copyBtn.classList.replace('btn-success-gradient', 'btn-primary-gradient');
-                }, 2000);
-            });
+                navigator.clipboard.writeText(linkInput.value).then(() => {
+                    const originalContent = button.innerHTML;
+                    
+                    // Animation visuelle de confirmation
+                    button.innerHTML = '<i class="fa-solid fa-circle-check"></i> Lien Copié !';
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalContent;
+                    }, 2000);
+                });
+            }
         });
-    }
+    });
 });

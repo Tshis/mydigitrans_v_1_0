@@ -51,7 +51,7 @@
                             
                                 {# 1. Compagnie & Bus #}
                                 <div class="agency-brand-block">
-                                    <h3 class="agency-name-title">{{ trip.agency_name }}</h3>
+                                    <h3 class="agency-name-title">{{ trip.agency.name }}</h3>
                                     <span class="bus-badge-type"><i class="fa-solid fa-bus"></i> {{ trip.bus_model }}</span>
                                 </div>
 
@@ -78,12 +78,13 @@
                                         <span class="font-bold text-size-12">Espace Soute OK</span>
                                     </div>
                                     <div class="trip-price-tag mb-15">
-                                        <span class="price font-bold monospace">
+                                        <span class="price font-bold monospace text-size-14">
                                             Min : {{ trip.estimated_fare.min|number_format(2, ',', ' ') }}
+                                            <span class="currency font-bold text-size-11">{{ trip.agency.main_currency }}</span>
                                             <br>
                                             Max : {{ trip.estimated_fare.max|number_format(2, ',', ' ') }}
+                                            <span class="currency font-bold text-size-11">{{ trip.agency.main_currency }}</span>
                                         </span>
-                                        <span class="currency font-bold">USD</span>
                                     </div>
                                 
                                     {# Action d'enclenchement de la quittance colis #}

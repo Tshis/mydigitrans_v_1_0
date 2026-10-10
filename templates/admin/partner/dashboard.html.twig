@@ -2,140 +2,163 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/datatable.js" defer></script>
-<script src="/js/admin/copy_link.js" defer></script>
+    {{ parent() }}
+    <script src="/js/datatable.js" defer></script>
+    <script src="/js/admin/copy_link.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-partner-portal-scope container">
+    <div class="admin-partner-portal-scope container">
 
-    {# --- EN-TÊTE D'ACCUEIL --- #}
-    <header class="header mb-25">
-        <div class="header-main-info">
-            <div class="title">
-                <div class="sub-header-flex">
-                    <span class="text-gray text-size-13">Espace Partenaire</span>
-                    <span class="arrow-divider">•</span>
-                    <span class="text-primary text-size-13 text-highlight">Tableau de Bord Réseau</span>
+        {# --- EN-TÊTE D'ACCUEIL --- #}
+        {# templates/partner/dashboard.html.twig #}
+
+        <header class="header mb-25">
+            <div class="header-main-info">
+                <div class="title">
+                    <div class="sub-header-flex">
+                        <span class="text-gray text-size-13">Espace Apporteur d'Affaires</span>
+                        <span class="arrow-divider">•</span>
+                        <span class="text-primary text-size-13 text-highlight">Mon Code : {{ partner_token }}</span>
+                    </div>
+                    <h1 class="mt-5">Bienvenue, {{ app.user.name|default('Cher Apporteur') }}</h1>
                 </div>
-                <h1 class="mt-5">Bienvenue,
-                    {{ app.user.name|default('Cher Apporteur') }}</h1>
+            </div>
+
+            {# --- LES DEUX BOUTONS DE PARRAINAGE CIBLÉS --- #}
+            <div class="header-actions partner-dual-share-links-wrapper">
+        
+                {# LIEN CIBLE 1 : INVITATION COMPAGNIE DE TRANSPORT #}
+                <div class="referral-share-box-item">
+                    <input
+                        type="text"
+                        id="js-agency-link-input"
+                        class="intentional-hidden-input-url"
+                        value="https://mydigitrans.com{{ partner_token }}"
+                        readonly
+                    >
+                    <button type="button" class="btn-refined btn-primary-gradient js-dual-copy-trigger" data-target="js-agency-link-input">
+                        <i class="fa-solid fa-building-flag"></i> Inviter une Agence
+                    </button>
+                </div>
+
+                {# LIEN CIBLE 2 : RECRUTEMENT SOUS-APPORTEUR #}
+                <div class="referral-share-box-item">
+                    <input
+                        type="text"
+                        id="js-partner-link-input"
+                        class="intentional-hidden-input-url"
+                        value="https://mydigitrans.com{{ partner_token }}"
+                        readonly
+                    >
+                    <button type="button" class="btn-refined btn-success-gradient js-dual-copy-trigger" data-target="js-partner-link-input">
+                        <i class="fa-solid fa-user-plus"></i> Recruter un Partenaire
+                    </button>
+                </div>
+
+            </div>
+        </header>
+
+
+        {# --- BLOC MONITORING : COMPTEURS ET FINANCES DE L'APPORTEUR --- #}
+        <div class="reports-center-grid-layout mb-25">
+            <div class="main-modules-panel financial-kpi-grid">
+
+                {# KPI 1 : SOLDE ACTUEL DU (DISPONIBLE AU RETRAIT) #}
+                <div class="card control-card kpi-card partner-solde-card">
+                    <div class="kpi-icon-wrapper text-success-mode">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <div class="kpi-data">
+                        <label class="admin-bus-layout-add-label">Solde Disponible (Dû Actuel)</label>
+                        <span class="kpi-value text-success-color">{{ stats.pending_balance|number_format(2, ',', ' ') }}
+                            $</span>
+                    </div>
+                </div>
+
+                {# KPI 2 : TOTAL DES GAINS HISTORIQUES (A VIE) #}
+                <div class="card control-card kpi-card partner-total-card">
+                    <div class="kpi-icon-wrapper text-primary-mode">
+                        <i class="fa-solid fa-money-bill-trend-up"></i>
+                    </div>
+                    <div class="kpi-data">
+                        <label class="admin-bus-layout-add-label">Total Gains Cumulés (À Vie)</label>
+                        <span class="kpi-value text-primary-color">{{ stats.total_earned|number_format(2, ',', ' ') }}
+                            $</span>
+                    </div>
+                </div>
+
+                {# KPI 3 : NOMBRE DE FILLEULS ENRÔLÉS #}
+                <div class="card control-card kpi-card partner-network-card">
+                    <div class="kpi-icon-wrapper text-warning-mode">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="kpi-data">
+                        <label class="admin-bus-layout-add-label">Mon Réseau (Filleuls Directs)</label>
+                        <span class="kpi-value text-warning-color">{{ stats.filleuls_count }}
+                            Affiliés</span>
+                    </div>
+                </div>
+
             </div>
         </div>
-        <div class="header-actions">
-            {# ZONE DE COPIE DU LIEN DE PARRAINAGE UNIQUE #}
-            <div class="referral-share-box">
-                <span class="share-label">Mon Lien de Parrainage :</span>
-                <input type="text" id="js-referral-link-input" class="share-url-input monospace"
-                    value="https://mydigitrans.com{{ partner_token }}" readonly>
-                <button type="button" id="js-copy-link-btn" class="btn-refined btn-primary-gradient"
-                    title="Copier le lien dans le presse-papier">
-                    <i class="fa-solid fa-copy"></i>
-                    Copier
-                </button>
-            </div>
+
+        {# --- TABLEAU DILATÉ : LES DERNIÈRES COMMISSIONS PERÇUES --- #}
+        <div class="table-responsive-wrapper">
+            <h2 class="card-title-fix text-size-14 py-10">
+                <i class="fa-solid fa-timeline text-primary"></i>
+                Historique Récent de mes Commissions Générées
+            </h2>
+            <table class="table table-scrollable table-striped js-datatable">
+                <thead>
+                    <tr>
+                        <th>Source Déclencheuse</th>
+                        <th>Palier Réseau</th>
+                        <th class="text-center">Taux Appliqué</th>
+                        <th class="">Montant Perçu</th>
+                        <th>Date du Calcul</th>
+                        <th class="text-center">Statut Comptable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comm in recent_commissions %}
+                        <tr>
+                            <td>
+                                <strong>{{ comm.agency_name }}</strong><br>
+                                <small class="text-gray monospace">Facture #{{ comm.invoice_number }}</small>
+                            </td>
+                            <td>
+                                <span class="invoice-nature-label font-bold">
+                                    {% if comm.level == 1 %}
+                                        <i class="fa-solid fa-user-check text-primary-mode"></i>
+                                        Niveau 1 (Apport Direct)
+                                    {% else %}
+                                        <i class="fa-solid fa-users text-success-mode"></i>
+                                        Niveau 2 (Parrainage Indirect)
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="text-center font-bold monospace">{{ comm.percentage }}%</td>
+                            <td class="text-success text-weight-700 ">+{{ comm.amount|number_format(2, ',', ' ') }}
+                                USD</td>
+                            <td class="monospace text-size-12">{{ comm.createdAt|date('d/m/Y H:i') }}</td>
+                            <td class="text-center">
+                                <span
+                                    class="pill-report-audit {% if comm.status == 'paid' %}paid-status{% elseif comm.status == 'approved' %}approved{% else %}danger{% endif %}"
+                                >
+                                    {{ comm.status|upper }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-gray italic padding-20">Aucune commission enregistrée pour
+                                le moment. Partagez votre lien pour activer vos premiers gains !</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </header>
 
-    {# --- BLOC MONITORING : COMPTEURS ET FINANCES DE L'APPORTEUR --- #}
-    <div class="reports-center-grid-layout mb-25">
-        <div class="main-modules-panel financial-kpi-grid">
-
-            {# KPI 1 : SOLDE ACTUEL DU (DISPONIBLE AU RETRAIT) #}
-            <div class="card control-card kpi-card partner-solde-card">
-                <div class="kpi-icon-wrapper text-success-mode">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
-                <div class="kpi-data">
-                    <label class="admin-bus-layout-add-label">Solde Disponible (Dû Actuel)</label>
-                    <span class="kpi-value text-success-color">{{ stats.pending_balance|number_format(2, ',', ' ') }}
-                        $</span>
-                </div>
-            </div>
-
-            {# KPI 2 : TOTAL DES GAINS HISTORIQUES (A VIE) #}
-            <div class="card control-card kpi-card partner-total-card">
-                <div class="kpi-icon-wrapper text-primary-mode">
-                    <i class="fa-solid fa-money-bill-trend-up"></i>
-                </div>
-                <div class="kpi-data">
-                    <label class="admin-bus-layout-add-label">Total Gains Cumulés (À Vie)</label>
-                    <span class="kpi-value text-primary-color">{{ stats.total_earned|number_format(2, ',', ' ') }}
-                        $</span>
-                </div>
-            </div>
-
-            {# KPI 3 : NOMBRE DE FILLEULS ENRÔLÉS #}
-            <div class="card control-card kpi-card partner-network-card">
-                <div class="kpi-icon-wrapper text-warning-mode">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-                <div class="kpi-data">
-                    <label class="admin-bus-layout-add-label">Mon Réseau (Filleuls Directs)</label>
-                    <span class="kpi-value text-warning-color">{{ stats.filleuls_count }}
-                        Affiliés</span>
-                </div>
-            </div>
-
-        </div>
     </div>
-
-    {# --- TABLEAU DILATÉ : LES DERNIÈRES COMMISSIONS PERÇUES --- #}
-    <div class="table-responsive-wrapper">
-        <h2 class="card-title-fix text-size-14 py-10">
-            <i class="fa-solid fa-timeline text-primary"></i>
-            Historique Récent de mes Commissions Générées
-        </h2>
-        <table class="table table-scrollable table-striped js-datatable">
-            <thead>
-                <tr>
-                    <th>Source Déclencheuse</th>
-                    <th>Palier Réseau</th>
-                    <th class="text-center">Taux Appliqué</th>
-                    <th class="">Montant Perçu</th>
-                    <th>Date du Calcul</th>
-                    <th class="text-center">Statut Comptable</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for comm in recent_commissions %}
-                <tr>
-                    <td>
-                        <strong>{{ comm.agency_name }}</strong><br>
-                        <small class="text-gray monospace">Facture #{{ comm.invoice_number }}</small>
-                    </td>
-                    <td>
-                        <span class="invoice-nature-label font-bold">
-                            {% if comm.level == 1 %}
-                            <i class="fa-solid fa-user-check text-primary-mode"></i>
-                            Niveau 1 (Apport Direct)
-                            {% else %}
-                            <i class="fa-solid fa-users text-success-mode"></i>
-                            Niveau 2 (Parrainage Indirect)
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td class="text-center font-bold monospace">{{ comm.percentage }}%</td>
-                    <td class="text-success text-weight-700 ">+{{ comm.amount|number_format(2, ',', ' ') }}
-                        USD</td>
-                    <td class="monospace text-size-12">{{ comm.createdAt|date('d/m/Y H:i') }}</td>
-                    <td class="text-center">
-                        <span
-                            class="pill-report-audit {% if comm.status == 'paid' %}paid-status{% elseif comm.status == 'approved' %}approved{% else %}danger{% endif %}">
-                            {{ comm.status|upper }}
-                        </span>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6" class="text-center text-gray italic padding-20">Aucune commission enregistrée pour
-                        le moment. Partagez votre lien pour activer vos premiers gains !</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-</div>
 {% endblock %}
