@@ -81,33 +81,18 @@
         }
     }
 
+    
 
-
-    .field-group.mb-20-bordered {
-        display: flex; gap: 1.5rem; flex-wrap: wrap; width: 100%; margin-bottom: 20px;
-        padding-vertical: 15px; border-vertical: 1px dashed $mute;
-    }
-
-    // Layout des cartes de prix
-    .pricing-plans-scope {
-        .plan-cards-flex-layout { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; width: 100%; }
-        .pricing-box-item { flex: 1 1 310px; max-width: 360px; padding: 30px; box-sizing: border-box; background: #ffffff; border: 1px solid $mute; border-radius: 8px;
-            &.featured-plan-border { border-top: 5px solid $primary; }
-        }
-        .plan-name { font-size: 16px; font-weight: 900; color: $dark; margin: 0; }
-        .plan-price-tag { .price { font-size: 32px; color: $primary; } .currency { font-size: 14px; color: $primary; } }
-        
-        .plan-spec-table-clean .table { width: 100%; margin: 0; border: none; td { padding: 10px 0; border-bottom: 1px solid rgba(226, 232, 240, 0.5); font-size: 12.5px; color: #333333; } }
-    }   
+ 
 
 }
 
 // --- MODE SOMBRE ETANCHE ---
 .dark .admin-partner-portal-scope {
     header h1, .card-title-fix, .table td, .table td strong, .referral-share-box .share-label { color: $white; }
-    .control-card, .table-responsive-wrapper { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); }
-    .table th { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.1); color: $mute; }
-    .table td { border-bottom-color: rgba(255,255,255,0.05); }
-    .referral-share-box { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.05); }
-    .kpi-card { background: $dm-bg-surface; border-color: rgba(255,255,255,0.1); .kpi-value { color: white; } }
+    .control-card, .table-responsive-wrapper { background: $dm-bg-surface; border-color: rgba($white,0.1); }
+    .table th { background: rgba($white,0.02); border-bottom-color: rgba($white,0.1); color: $mute; }
+    .table td { border-bottom-color: rgba($white,0.05); }
+    .referral-share-box { background: rgba($dark,0.2); border-color: rgba($white,0.05); }
+    .kpi-card { background: $dm-bg-surface; border-color: rgba($white,0.1); .kpi-value { color: $white; } }
 }

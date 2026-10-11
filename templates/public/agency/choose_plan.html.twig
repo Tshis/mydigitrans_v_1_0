@@ -2,57 +2,77 @@
 {% extends "public/base.html.twig" %}
 
 {% block body %}
-    <div class="public-become-partner-scope pricing-plans-scope">
+    <div class="mb-40">
 
-        <header class="page-header mb-25">
+        {# --- HEADER SANS CONTAINER (PLEINE LARGEUR VISUELLE) --- #}
+        <header class="page-header mb-45">
             <div class="header-main-info container text-center">
                 <h1>Sélectionnez votre Plan d'Abonnement</h1>
-                <p class="search-summary mt-5">Activez la formule d'infrastructure SaaS adaptée à la taille de votre réseau de gares.</p>
+                <p class="search-summary mt-5">Activez la formule d'infrastructure SaaS adaptée à la taille de votre réseau de gares routières.</p>
             </div>
         </header>
 
-        <div class="container plan-cards-flex-layout mb-25">
-            {% for plan in available_plans %}
-                <div class="card control-card pricing-box-item {% if plan.code == 'pro' %}featured-plan-border{% endif %}">
-                    <div class="plan-header-title text-center">
-                        <h3 class="plan-name">{{ plan.name|upper }}</h3>
-                        <div class="plan-price-tag my-15">
-                            <span class="price font-bold monospace">{{ plan.price|number_format(0, ',', ' ') }}</span>
-                            <span class="currency font-bold">USD / Mois</span>
+        {# --- GRILLE DES CARTES DE TARIFS --- #}
+        <div class="pricing-plans-scope container">
+            {% for plan in platform_plans %}
+                <div class="pricing-plan-factory-card {{ plan.name == 'pro' ? 'pro' : '' }}">
+                    <div class="plan-header-meta">
+                        <span class="plan-badge-type">{{ plan.level }}</span>
+                        <h3 class="plan-name-title">{{ plan.name|upper }}</h3>
+                        <div class="plan-price-tag">
+                            <span class="amount">{{ plan.price|number_format(0) }}
+                                {{ plan.currency }}</span>
+                            <span class="period">/
+                                {{ plan.duration_days }}
+                                jours</span>
                         </div>
-                        <p class="text-gray text-size-12">{{ plan.description }}</p>
                     </div>
+                    <div class="plan-features-list-wrapper">
+                        <label class="admin-bus-layout-add-label">Limitations Forfait d'Usine :</label>
+                        <ul class="features-bullet-list metric-limits-list">
+                            <li>
+                                <i class="fa-solid fa-code-branch text-primary-mode"></i>
+                                Gares autorisées :
+                                <strong>{{
+								plan.max_branches }}</strong>
+                            </li>
+                            <li>
+                                <i class="fa-solid fa-bus-simple text-primary-mode"></i>
+                                Flotte maximum :
+                                <strong>{{
+								plan.max_buses }}</strong>
+                            </li>
+                            <li>
+                                <i class="fa-solid fa-users text-primary-mode"></i>
+                                Utilisateurs max :
+                                <strong>{{
+								plan.max_users }}</strong>
+                            </li>
+                        </ul>
 
-                    <hr class="summary-divider my-15">
-
-                    {# INJECTION OBLIGATOIRE D'UN TABLEAU MARKDOWN POUR LA MULTI-SPÉCIFICATION #}
-                    <div class="table-responsive-wrapper plan-spec-table-clean">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td><i class="fa-solid fa-building-flag text-success-mode"></i> Branches (Gares)</td>
-                                    <td class="text-right font-bold">{{ plan.max_branches == 999 ? 'Illimitées' : plan.max_branches }}</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fa-solid fa-cash-register text-success-mode"></i> Terminaux POS</td>
-                                    <td class="text-right font-bold">{{ plan.max_pos == 999 ? 'Illimités' : plan.max_pos }}</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fa-solid fa-percent text-success-mode"></i> Prélèvement Ticket</td>
-                                    <td class="text-right font-bold text-primary-mode">1,00 $ / unité</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <label class="admin-bus-layout-add-label section-divider-label">Modules Applicatifs Activés
+                            :</label>
+                        <ul class="features-bullet-list">
+                            {% for code, name in plan.features %}
+                                <li>
+                                    <i class="fa-solid fa-circle-check text-success-mode"></i>
+                                    {{ name }}
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
-
-                    <form action="{{ path('public_agency_subscribe_finalize') }}" method="POST" class="mt-20">
-                        <input type="hidden" name="plan_id" value="{{ plan.id }}">
-                        <button type="submit" class="btn-refined {% if plan.code == 'pro' %}btn-primary-gradient{% else %}btn-gray-gradient{% endif %} w-100-percent">
-                            <i class="fa-solid fa-circle-check"></i> Activer la formule {{ plan.name }}
-                        </button>
-                    </form>
+                    <div class="plan-action-footer-zone">
+                        {# Soumission finale du contrat d'agence #}
+                        <form action="{{ path('public_agency_subscribe_finalize') }}" method="POST" class="mt-20">
+                            <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                            <button type="submit" class="btn-refined {% if plan.name == 'pro' %}btn-primary-gradient{% else %}btn-dark-gradient{% endif %} w-100-percent btn-full">
+                                <i class="fa-solid fa-circle-check"></i> Activer le plan {{ plan.name }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             {% endfor %}
         </div>
+
     </div>
 {% endblock %}

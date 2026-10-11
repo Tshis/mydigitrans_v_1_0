@@ -1,0 +1,106 @@
+@use '../../abstract/variables' as *;
+
+.pricing-plans-scope{
+     
+
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        width: 100%;
+        gap: 1.5rem;
+
+        
+        .pricing-plan-factory-card{
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 400px;
+            border-top: 4px solid $dark;
+            border-bottom: 4px solid $mute;
+            background: $white !important;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+            transform: scale(0.9);
+            &.pro{
+                transform: scale(1.05);
+                border-top: 4px solid $primary;
+            }
+           
+            .plan-header-meta {
+                text-align: center;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px dashed rgba($mute, 0.6);
+
+                .plan-badge-type {
+                    color: $gray;
+                    font-size: 10px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    background: rgba($gray, 0.08);
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                }
+
+                .plan-name-title {
+                    font-size: 1.4rem;
+                    font-weight: 800;
+                    color: $dark;
+                    margin: 10px 0;
+                }
+
+                .plan-price-tag{
+                    .amount {
+                        font-size: 2.2rem;
+                        font-weight: 900;
+                        color: $primary;
+                        font-family: monospace;
+                    }
+
+                    .period {
+                        font-size: 12px;
+                        color: $gray;
+                        font-weight: 700;
+                    }
+                }
+
+            }
+
+            .section-divider-label {
+                margin-top: 20px;
+                padding-top: 10px;
+                border-top: 1px dashed rgba($mute, .5);
+                display: block;
+            }
+           
+            .features-bullet-list {
+                font-size: 12px;
+                display: flex;
+                flex-direction: column;
+                list-style: none;
+                padding: 0px;
+                margin: 10px 0px 0px;
+                gap: 12px;
+                background: $white;
+
+                li {
+                    font-size: 12.5px;
+                    color: $dark;
+                    font-weight: 700;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+            }
+
+            .plan-action-footer-zone {
+                margin-top: 25px;
+                padding-top: 15px;
+                border-top: 1px solid rgba($mute, 0.5);
+            }
+        }//plan
+}
+
+
+

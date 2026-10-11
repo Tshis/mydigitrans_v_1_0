@@ -50,21 +50,69 @@ final class AgencyController extends AbstractController
     } //processRegister
 
 
+   // src/Controller/Public/PublicAgencyRegistrationController.php
+
     /**
-     * ÉTAPE 2 : EXPOSITION DES MODULES ET GRILLES SUBSCRIPTIONPLAN [MCD 31]
+     * ÉTAPE 2 : EXPOSITION DES MODULES ET GRILLES DE RECRUTEMENT SUBSCRIPTIONPLAN [INDEX]
      */
-    #[Route('/agency/choose-plan', name: 'public_agency_choose_plan')]
+    #[Route('/agency/choose-plan', name: 'public_agency_choose_plan', methods: ['GET'])]
     public function choosePlan(): Response
     {
-        // Hydratation de ton entité "31. subscriptionPlan" [INDEX]
-        $availablePlans = [
-            ['id' => 1, 'code' => 'basic', 'name' => 'Formule Standard', 'price' => 75.00, 'max_branches' => 2, 'max_pos' => 5, 'description' => 'Parfait pour les petites compagnies locales.'],
-            ['id' => 2, 'code' => 'pro', 'name' => 'Formule Premium', 'price' => 250.00, 'max_branches' => 999, 'max_pos' => 999, 'description' => 'Déploiement complet pour réseaux interprovinciaux.']
+        // 3. Référentiel d'usine des forfaits commerciaux du SaaS
+        $platformPlans = [
+            [
+                'id' => 1,
+                'name' => 'trial',
+                'price' => 0.00,
+                'currency' => 'USD',
+                'duration_days' => 14, // Période d'évaluation standard de 2 semaines
+                'max_branches' => 1,
+                'max_users' => 2,
+                'max_buses' => 3,
+                'level' => 'Évaluation',
+                'features' => [
+                    'online_booking' => 'Réservation de billets basique au guichet',
+                    'advanced_reports' => 'Statistiques d\'activité journalières'
+                ]
+            ],
+            [
+                'id' => 2,
+                'name' => 'pro',
+                'price' => 250.00,
+                'currency' => 'USD',
+                'duration_days' => 30,
+                'max_branches' => 99,
+                'max_users' => 99,
+                'max_buses' => 99,
+                'level' => 'Recommandé',
+                'features' => ['online_booking' => 'Réservation en ligne synchrone', 'advanced_reports' => 'Statistiques avancées', 'shipment_module' => 'Gestion complète des colis & fret']
+            ],
+            [
+                'id' => 1,
+                'name' => 'basic',
+                'price' => 75.00,
+                'currency' => 'USD',
+                'duration_days' => 30,
+                'max_branches' => 1,
+                'max_users' => 5,
+                'max_buses' => 5,
+                'level' => 'Starter',
+                'features' => ['online_booking' => 'Réservation de billets basique', 'advanced_reports' => 'Rapports locaux limités']
+            ],
+        ];
+
+        // 4. Extraction de tes entités réelles "30. Feature" du MCD pour nourrir ton 3ème Onglet
+        $systemFeatures = [
+            ['code' => 'online_booking', 'name' => 'Réservation en Ligne', 'description' => 'Vente de billets en temps réel avec sélection tactile sur Seatmap.', 'createdAt' => new \DateTime('2024-01-10'), 'status' => 'active'],
+            ['code' => 'shipment_module', 'name' => 'Gestion des Colis & Fret', 'description' => 'Expédition, pesée et édition des bordereaux de colisage en gare.', 'createdAt' => new \DateTime('2024-02-15'), 'status' => 'active'],
+            ['code' => 'advanced_reports', 'name' => 'Rapports & Audits Avancés', 'description' => 'Graphiques de performances financières et exportation des livres de caisses.', 'createdAt' => new \DateTime('2024-03-20'), 'status' => 'active'],
+            ['code' => 'driver_app_api', 'name' => 'Interface API Chauffeurs', 'description' => 'Synchronisation des fiches de routes sur l\'application mobile conducteurs.', 'createdAt' => new \DateTime('2025-05-12'), 'status' => 'inactive']
         ];
 
         return $this->render('public/agency/choose_plan.html.twig', [
             'page' => 'agency',
-            'available_plans' => $availablePlans
+            'system_features' => $systemFeatures,
+            'platform_plans' => $platformPlans, // Injection cruciale !
         ]);
     } //choosePlan
 

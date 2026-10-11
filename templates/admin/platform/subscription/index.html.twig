@@ -2,295 +2,316 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/datatable.js" defer></script>
-<script src="/js/admin/platform_tabs.js" defer></script>
-<script src="/js/admin/modalQuestion.js" defer></script>
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+	<script src="/js/admin/platform_tabs.js" defer></script>
+	<script src="/js/admin/modalQuestion.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-platform-subscription-scope container">
+	<div class="admin-platform-subscription-scope container">
 
-	{# --- EN-TÊTE --- #}
-	<header class="header-refined my-30">
-		<div class="header-main-info">
-			<div class="title">
-				<div class="sub-header-flex">
-					<span class="text-gray text-size-13">Finance SaaS</span>
-					<span class="arrow-divider">•</span>
-					<span class="text-primary text-size-13 text-highlight">Facturation & Licences</span>
+		{# --- EN-TÊTE --- #}
+		<header class="header-refined my-30">
+			<div class="header-main-info">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Finance SaaS</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Facturation & Licences</span>
+					</div>
+					<h1 class="mt-5">Suivi des Abonnements & Offres</h1>
 				</div>
-				<h1 class="mt-5">Suivi des Abonnements & Offres</h1>
+			</div>
+		</header>
+
+		{# --- SYSTÈME D'ONGLETS SÉMANTIQUES (TABS) --- #}
+		<div class="platform-tabs-navigation mb-25">
+			<button type="button" class="tab-nav-btn active" data-target="panel-registre">
+				<i class="fa-solid fa-receipt"></i>
+				Registre des Licences
+			</button>
+			<button type="button" class="tab-nav-btn" data-target="panel-forfaits">
+				<i class="fa-solid fa-tags"></i>
+				Configuration des Forfaits / Plans
+			</button>
+			<button type="button" class="tab-nav-btn" data-target="panel-features">
+				<i class="fa-solid fa-cubes"></i>
+				Catalogue des Fonctionnalités
+			</button>
+		</div>
+
+		{# ================================================================= #}
+		{# ONGLET 1 : LE PORTAIL DU REGISTRE DES AGENCES (ACTIF PAR DÉFAUT) #}
+		{# ================================================================= #}
+		<div class="tab-panel-content active" id="panel-registre"> {# BLOC KPI : COMPOSANTS METIERS FINANCIERS #}
+			<div class="reports-center-grid-layout mb-25">
+
+				<div class="button-right">
+					<a href="{{ path('admin_platform_subscription_add') }}" class="btn-refined btn-success-gradient">
+						<i class="fa-regular fa-calendar-plus"></i>
+						Nouvel Abonnement
+					</a>
+				</div>
+
+				<div class="stats-grid">
+
+					<div class="card control-card kpi-card">
+						<div class="kpi-icon-wrapper text-success-mode">
+							<i class="fa-solid fa-chart-line"></i>
+						</div>
+						<div class="kpi-data">
+							<label class="admin-bus-layout-add-label">Revenu Mensuel ({{ "now"|date("F") }})</label>
+							<span class="kpi-value text-success-color">{{ stats.mrr|number_format(2, ',', ' ') }}
+								$</span>
+						</div>
+					</div>
+
+					<div class="card control-card kpi-card kpi-primary">
+						<div class="kpi-icon-wrapper">
+							<i class="fa-solid fa-hourglass-half"></i>
+						</div>
+						<div class="kpi-data">
+							<label class="admin-bus-layout-add-label">Alertes Échéances (7j)</label>
+							<span class="kpi-value text-warning-color">{{ stats.pending_expirations }}
+								Agences</span>
+						</div>
+					</div>
+
+					<div class="card control-card kpi-card kpi-success">
+						<div class="kpi-icon-wrapper text-primary-mode">
+							<i class="fa-solid fa-file-invoice-dollar"></i>
+						</div>
+						<div class="kpi-data">
+							<label class="admin-bus-layout-add-label">Dernier Encaissé ({{ "now"|date("F") }})</label>
+							<span class="kpi-value">{{ stats.monthly_collected|number_format(2, ',', ' ') }}
+								$</span>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+			{# LE REGISTRE DES CONTRATS DILATÉ #}
+			<div class="table-responsive-wrapper">
+				<table class="table table-scrollable table-striped js-datatable">
+					<thead>
+						<tr>
+							<th>Agence Compte</th>
+							<th>Forfait / Licence</th>
+							<th>Date d'Activation</th>
+							<th>Prochaine Échéance</th>
+							<th class="text-right">Tarif Mensuel</th>
+							<th class="text-center">Statut Facturation</th>
+							<th class="text-right">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for sub in subscriptions_list %}
+							<tr>
+								<td>
+									<strong>{{ sub.agency_name }}</strong>
+								</td>
+								<td>
+									<span class="font-bold text-primary-mode">{{ sub.plan_name }}</span>
+								</td>
+								<td class="monospace text-size-12">{{ sub.start_at|date('d/m/Y') }}</td>
+								<td class="monospace font-bold {% if sub.status == 'Expiré' %}text-danger-mode{% endif %}">
+									{{ sub.end_at|date('d/m/Y') }}
+								</td>
+								<td class="text-right font-bold monospace">{{ sub.price|number_format(2, ',', ' ') }}
+									$</td>
+								<td class="text-center">
+									<span
+										class="pill-report-audit {% if sub.status == 'active' %}closed{% elseif sub.status == 'expired' %}expired{% else %}suspended{% endif %}"
+									>
+										{{ sub.status }}
+									</span>
+								</td>
+								<td class="text-right">
+									<div class="action-group-refined">
+										<a
+											href="{{ path('admin_platform_subscription_renew', {'id': sub.id}) }}"
+											class="action-link edit"
+											title="Prolonger ou Renouveler"
+										>
+											<i class="fa-solid fa-calendar-plus"></i>
+										</a>
+										<a
+											href="{{ path('admin_platform_agency_invoices', {'id': sub.id}) }}"
+											class="action-link view-file"
+											title="Consulter les factures"
+										>
+											<i class="fa-solid fa-receipt"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
 			</div>
 		</div>
-	</header>
 
-	{# --- SYSTÈME D'ONGLETS SÉMANTIQUES (TABS) --- #}
-	<div class="platform-tabs-navigation mb-25">
-		<button type="button" class="tab-nav-btn active" data-target="panel-registre">
-			<i class="fa-solid fa-receipt"></i>
-			Registre des Licences
-		</button>
-		<button type="button" class="tab-nav-btn" data-target="panel-forfaits">
-			<i class="fa-solid fa-tags"></i>
-			Configuration des Forfaits / Plans
-		</button>
-		<button type="button" class="tab-nav-btn" data-target="panel-features">
-			<i class="fa-solid fa-cubes"></i>
-			Catalogue des Fonctionnalités
-		</button>
-	</div>
-
-	{# ================================================================= #}
-	{# ONGLET 1 : LE PORTAIL DU REGISTRE DES AGENCES (ACTIF PAR DÉFAUT) #}
-	{# ================================================================= #}
-	<div class="tab-panel-content active" id="panel-registre"> {# BLOC KPI : COMPOSANTS METIERS FINANCIERS #}
-		<div class="reports-center-grid-layout mb-25">
-
-			<div class="button-right">
-				<a href="{{path('admin_platform_subscription_add')}}" class="btn-refined btn-success-gradient">
-					<i class="fa-regular fa-calendar-plus"></i>
-					Nouvel Abonnement
+		{# ================================================================= #}
+		{# ONGLET 2 : LA GRILLE DES FORFAITS DU SAAS (MASQUÉ AU DÉPART) #}
+		{# ================================================================= #}
+		<div class="tab-panel-content" id="panel-forfaits">
+			<div class="button-right my-25">
+				<a href="{{ path('admin_platform_plan_add') }}" class="btn-refined btn-primary-gradient">
+					<i class="fa-solid fa-plus"></i>
+					Nouveau plan
 				</a>
 			</div>
 
-			<div class="stats-grid">
 
-				<div class="card control-card kpi-card">
-					<div class="kpi-icon-wrapper text-success-mode">
-						<i class="fa-solid fa-chart-line"></i>
-					</div>
-					<div class="kpi-data">
-						<label class="admin-bus-layout-add-label">Revenu Mensuel ({{ "now"|date("F") }})</label>
-						<span class="kpi-value text-success-color">{{ stats.mrr|number_format(2, ',', ' ') }}
-							$</span>
-					</div>
-				</div>
-
-				<div class="card control-card kpi-card kpi-primary">
-					<div class="kpi-icon-wrapper">
-						<i class="fa-solid fa-hourglass-half"></i>
-					</div>
-					<div class="kpi-data">
-						<label class="admin-bus-layout-add-label">Alertes Échéances (7j)</label>
-						<span class="kpi-value text-warning-color">{{ stats.pending_expirations }}
-							Agences</span>
-					</div>
-				</div>
-
-				<div class="card control-card kpi-card kpi-success">
-					<div class="kpi-icon-wrapper text-primary-mode">
-						<i class="fa-solid fa-file-invoice-dollar"></i>
-					</div>
-					<div class="kpi-data">
-						<label class="admin-bus-layout-add-label">Dernier Encaissé ({{ "now"|date("F") }})</label>
-						<span class="kpi-value">{{ stats.monthly_collected|number_format(2, ',', ' ') }}
-							$</span>
-					</div>
-				</div>
-
-			</div>
-
-		</div>
-
-		{# LE REGISTRE DES CONTRATS DILATÉ #}
-		<div class="table-responsive-wrapper">
-			<table class="table table-scrollable table-striped js-datatable">
-				<thead>
-					<tr>
-						<th>Agence Compte</th>
-						<th>Forfait / Licence</th>
-						<th>Date d'Activation</th>
-						<th>Prochaine Échéance</th>
-						<th class="text-right">Tarif Mensuel</th>
-						<th class="text-center">Statut Facturation</th>
-						<th class="text-right">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for sub in subscriptions_list %}
-					<tr>
-						<td>
-							<strong>{{ sub.agency_name }}</strong>
-						</td>
-						<td>
-							<span class="font-bold text-primary-mode">{{ sub.plan_name }}</span>
-						</td>
-						<td class="monospace text-size-12">{{ sub.start_at|date('d/m/Y') }}</td>
-						<td class="monospace font-bold {% if sub.status == 'Expiré' %}text-danger-mode{% endif %}">
-							{{ sub.end_at|date('d/m/Y') }}
-						</td>
-						<td class="text-right font-bold monospace">{{ sub.price|number_format(2, ',', ' ') }}
-							$</td>
-						<td class="text-center">
-							<span
-								class="pill-report-audit {% if sub.status == 'active' %}closed{% elseif sub.status == 'expired' %}expired{% else %}suspended{% endif %}">
-								{{ sub.status }}
-							</span>
-						</td>
-						<td class="text-right">
-							<div class="action-group-refined">
-								<a href="{{path('admin_platform_subscription_renew',{'id':sub.id})}}"
-									class="action-link edit" title="Prolonger ou Renouveler">
-									<i class="fa-solid fa-calendar-plus"></i>
-								</a>
-								<a href="{{path('admin_platform_agency_invoices',{'id':sub.id})}}"
-									class="action-link view-file" title="Consulter les factures">
-									<i class="fa-solid fa-receipt"></i>
-								</a>
+			{# Extrait de l'onglet 2 modifié dans templates/admin/platform/subscription/index.html.twig #}
+			<div class="saas-plans-grid-pricing">
+				{% for plan in platform_plans %}
+					<div class="card control-card pricing-plan-factory-card">
+						<div class="plan-header-meta">
+							<span class="plan-badge-type">{{ plan.level }}</span>
+							<h3 class="plan-name-title">{{ plan.name|upper }}</h3>
+							<div class="plan-price-tag">
+								<span class="amount">{{ plan.price|number_format(0) }}
+									{{ plan.currency }}</span>
+								<span class="period">/
+									{{ plan.duration_days }}
+									jours</span>
 							</div>
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-	{# ================================================================= #}
-	{# ONGLET 2 : LA GRILLE DES FORFAITS DU SAAS (MASQUÉ AU DÉPART) #}
-	{# ================================================================= #}
-	<div class="tab-panel-content" id="panel-forfaits">
-		<div class="button-right my-25">
-			<a href="{{ path('admin_platform_plan_add') }}" class="btn-refined btn-primary-gradient">
-				<i class="fa-solid fa-plus"></i>
-				Nouveau plan
-			</a>
-		</div>
-
-
-		{# Extrait de l'onglet 2 modifié dans templates/admin/platform/subscription/index.html.twig #}
-		<div class="saas-plans-grid-pricing">
-			{% for plan in platform_plans %}
-			<div class="card control-card pricing-plan-factory-card">
-				<div class="plan-header-meta">
-					<span class="plan-badge-type">{{ plan.level }}</span>
-					<h3 class="plan-name-title">{{ plan.name|upper }}</h3>
-					<div class="plan-price-tag">
-						<span class="amount">{{ plan.price|number_format(0) }}
-							{{ plan.currency }}</span>
-						<span class="period">/
-							{{ plan.duration_days }}
-							jours</span>
-					</div>
-				</div>
-				<div class="plan-features-list-wrapper">
-					<label class="admin-bus-layout-add-label">Limitations Forfait d'Usine :</label>
-					<ul class="features-bullet-list metric-limits-list">
-						<li>
-							<i class="fa-solid fa-code-branch text-primary-mode"></i>
-							Gares autorisées :
-							<strong>{{
+						</div>
+						<div class="plan-features-list-wrapper">
+							<label class="admin-bus-layout-add-label">Limitations Forfait d'Usine :</label>
+							<ul class="features-bullet-list metric-limits-list">
+								<li>
+									<i class="fa-solid fa-code-branch text-primary-mode"></i>
+									Gares autorisées :
+									<strong>{{
 								plan.max_branches }}</strong>
-						</li>
-						<li>
-							<i class="fa-solid fa-bus-simple text-primary-mode"></i>
-							Flotte maximum :
-							<strong>{{
+								</li>
+								<li>
+									<i class="fa-solid fa-bus-simple text-primary-mode"></i>
+									Flotte maximum :
+									<strong>{{
 								plan.max_buses }}</strong>
-						</li>
-						<li>
-							<i class="fa-solid fa-users text-primary-mode"></i>
-							Utilisateurs max :
-							<strong>{{
+								</li>
+								<li>
+									<i class="fa-solid fa-users text-primary-mode"></i>
+									Utilisateurs max :
+									<strong>{{
 								plan.max_users }}</strong>
-						</li>
-					</ul>
+								</li>
+							</ul>
 
-					<label class="admin-bus-layout-add-label section-divider-label">Modules Applicatifs Activés
-						:</label>
-					<ul class="features-bullet-list">
-						{% for code, name in plan.features %}
-						<li>
-							<i class="fa-solid fa-circle-check text-success-mode"></i>
-							{{ name }}
-							<small class="monospace">({{ code }})</small>
-						</li>
-						{% endfor %}
-					</ul>
-				</div>
-				<div class="plan-action-footer-zone">
-					<a href="{{ path('admin_platform_plan_edit', {'id': plan.id}) }}"
-						class="btn-refined btn-primary-gradient plan-edit-btn">
-						<i class="fa-solid fa-sliders"></i>
-						Ajuster le Forfait Système
-					</a>
-				</div>
+							<label class="admin-bus-layout-add-label section-divider-label">Modules Applicatifs Activés
+								:</label>
+							<ul class="features-bullet-list">
+								{% for code, name in plan.features %}
+									<li>
+										<i class="fa-solid fa-circle-check text-success-mode"></i>
+										{{ name }}
+										<small class="monospace">({{ code }})</small>
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+						<div class="plan-action-footer-zone">
+							<a
+								href="{{ path('admin_platform_plan_edit', {'id': plan.id}) }}"
+								class="btn-refined btn-primary-gradient plan-edit-btn"
+							>
+								<i class="fa-solid fa-sliders"></i>
+								Ajuster le Forfait Système
+							</a>
+						</div>
+					</div>
+				{% endfor %}
 			</div>
-			{% endfor %}
+
+
 		</div>
 
+		{# ================================================================= #}
+		{# NOUVEAU - ONGLET 3 : LE CATALOGUE DES FONCTIONNALITÉS [MCD 30] #}
+		{# ================================================================= #}
+		<div class="tab-panel-content" id="panel-features">
 
+			<div class="button-right my-25">
+				<a href="{{ path('admin_platform_feature_add') }}" class="btn-refined btn-primary-gradient">
+					<i class="fa-solid fa-list-check"></i>
+					Nouvelle Fonctionnalités
+				</a>
+			</div>
+
+			<div class="table-responsive-wrapper">
+				<table class="table table-scrollable table-striped js-datatable">
+					<thead>
+						<tr>
+							<th>Code Technique</th>
+							<th>Nom du Module</th>
+							<th>Description de la Feature</th>
+							<th>Date de création</th>
+							<th class="text-center">Statut Usine</th>
+							<th class="text-center">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for feature in system_features %}
+							<tr>
+								<td class="monospace font-bold text-primary-mode">{{ feature.code }}</td>
+								<td><strong>{{ feature.name }}</strong></td>
+								<td><span class="text-gray text-size-13">{{ feature.description }}</span></td>
+								<td class="monospace text-size-12">{{ feature.createdAt|date('d/m/Y') }}</td>
+								<td class="text-center">
+									<span
+										class="pill-report-audit {% if feature.status == 'active' %}closed{% else %}open{% endif %}"
+									>
+										{{ feature.status }}
+									</span>
+								</td>
+								<td class="text-right">
+									<div class="action-group-refined">
+										<a
+											href="{{ path('admin_platform_feature_edit', {'code': 'dhdh'}) }}"
+											class="action-link edit"
+											title="Modifier la fonctionnalité"
+										>
+											<i class="fa-solid fa-edit"></i>
+										</a>
+										{% if feature.status == 'active' %}
+											<a
+												id="ctaBtn"
+												data-target="{{ path('admin_platform_agency_invoices', {'id': 5}) }}"
+												class="action-link view-file"
+												title="Desactiver la fonctionnalité"
+											>
+												<i class="fa-solid fa-trash-can"></i>
+											</a>
+										{% else %}
+											<a
+												id="ctaBtn"
+												data-target="{{ path('admin_platform_agency_invoices', {'id': 5}) }}"
+												class="action-link view-file"
+												title="Activer la fonctionnalité"
+											>
+												<i class="fa-solid fa-circle-check"></i>
+											</a>
+
+										{% endif %}
+
+
+
+									</div>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 
-	{# ================================================================= #}
-	{# NOUVEAU - ONGLET 3 : LE CATALOGUE DES FONCTIONNALITÉS [MCD 30] #}
-	{# ================================================================= #}
-	<div class="tab-panel-content" id="panel-features">
 
-		<div class="button-right my-25">
-			<a href="{{ path('admin_platform_feature_add') }}" class="btn-refined btn-primary-gradient">
-				<i class="fa-solid fa-list-check"></i>
-				Nouvelle Fonctionnalités
-			</a>
-		</div>
-
-		<div class="table-responsive-wrapper">
-			<table class="table table-scrollable table-striped js-datatable">
-				<thead>
-					<tr>
-						<th>Code Technique</th>
-						<th>Nom du Module</th>
-						<th>Description de la Feature</th>
-						<th>Date de création</th>
-						<th class="text-center">Statut Usine</th>
-						<th class="text-center">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for feature in system_features %}
-					<tr>
-						<td class="monospace font-bold text-primary-mode">{{ feature.code }}</td>
-						<td><strong>{{ feature.name }}</strong></td>
-						<td><span class="text-gray text-size-13">{{ feature.description }}</span></td>
-						<td class="monospace text-size-12">{{ feature.createdAt|date('d/m/Y') }}</td>
-						<td class="text-center">
-							<span
-								class="pill-report-audit {% if feature.status == 'active' %}closed{% else %}open{% endif %}">
-								{{ feature.status }}
-							</span>
-						</td>
-						<td class="text-right">
-							<div class="action-group-refined">
-								<a href="{{path('admin_platform_feature_edit',{'code':'dhdh'})}}"
-									class="action-link edit" title="Modifier la fonctionnalité">
-									<i class="fa-solid fa-edit"></i>
-								</a>
-								{% if feature.status == 'active' %}
-								<a id="ctaBtn" data-target="{{path('admin_platform_agency_invoices',{'id':5})}}"
-									class="action-link view-file" title="Desactiver la fonctionnalité">
-									<i class="fa-solid fa-trash-can"></i>
-								</a>
-								{% else %}
-								<a id="ctaBtn" data-target="{{path('admin_platform_agency_invoices',{'id':5})}}"
-									class="action-link view-file" title="Activer la fonctionnalité">
-									<i class="fa-solid fa-circle-check"></i>
-								</a>
-
-								{% endif %}
-
-
-
-							</div>
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
-
-
-{% include "admin/partials/_modal.html.twig" %}
+	{% include "admin/partials/_modal.html.twig" %}
 {% endblock %}
