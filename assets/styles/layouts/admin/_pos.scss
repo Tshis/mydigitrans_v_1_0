@@ -1,0 +1,73 @@
+/* assets/styles/modules/_guichet-pos.scss */
+@use '../../abstract/variables' as *;
+
+.admin-pos-portal-scope {
+    padding-block: 2rem;
+
+    .header {
+        margin-top: 1rem; display: flex; justify-content: space-between; gap: 2rem; align-items: center; flex-wrap: wrap;
+        .header-main-info h1 { font-size: 2.3rem; font-weight: 800; color: $dark; margin: 0; }
+    }
+
+    // Bandeau d'en-tête technique
+    .pos-terminal-meta-status {
+        display: flex; align-items: center; background: rgba(12, 50, 109, 0.04); border: 1px solid $mute; padding: 8px 16px; border-radius: 8px;
+        .meta-item { font-size: 13px; color: $gray; .value { color: $dark; } }
+    }
+
+    .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+
+    // --- CONFIGURATION DU WORKSPACE ASYMÉTRIQUE ---
+    .settings-form-layout {
+        width: 100%;
+        .settings-container-grid { display: flex; gap: 2rem; align-items: flex-start; width: 100%; @media (max-width: 1100px) { flex-direction: column; } }
+        .main-form-panel { flex: 1; min-width: 0; width: 100%; }
+        .sidebar-action-panel {
+            flex: 0 0 310px; width: 310px;
+            @media (max-width: 1100px) { flex: 1 1 100%; width: 100%; }
+        }
+    }
+
+    .control-card { padding: 24px; background: $white; border: 1px solid $mute; border-radius: 8px; box-sizing: border-box;
+        &.pos-sidebar-theme-vault { border-top: 4px solid $success; }
+    }
+
+    .invoice-macro-amount { font-size: 1.8rem; font-weight: 900; &.text-success-color { color: $success; } }
+    .admin-bus-layout-add-label { font-size: 10px; font-weight: 800; color: $gray; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .notice-box-info-currency { background: rgba(12, 50, 109, 0.02); border-radius: 6px; padding: 10px 14px; border: 1px dashed $mute; }
+
+    .min-currency-table {
+        width: 100%; border: none; margin: 0; border-collapse: collapse;
+        td { padding: 4px 0; border: none; font-size: 11.5px; color: $gray; }
+    }
+
+    // --- GRILLE TACTILE DES BUS (DESIGN COMMERCE) ---
+    .table-responsive-wrapper { background: $white; border: 1px solid $mute; border-radius: 8px; padding: 24px; }
+    .pos-trips-tactile-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+    
+    .pos-trip-tactile-card {
+        display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 16px 20px; background: $white; border: 1px solid $mute; border-radius: 8px; transition: transform 0.2s;
+        @media (max-width: 768px) { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        
+        &.active-embark { border-left: 5px solid $primary; background: rgba(239, 110, 23, 0.02); }
+
+        .trip-time-badge { background: $dark; color: $white; padding: 6px 12px; border-radius: 4px; font-size: 15px; }
+        .trip-meta-info-layout { flex: 1; .route-title { font-size: 15px; font-weight: 800; color: $dark; margin: 0; } .bus-plate { font-size: 12px; margin: 4px 0 0 0; } }
+        .trip-seats-fill-progress { text-align: center; display: flex; flex-direction: column; .seats-count { font-size: 16px; color: $dark; } .label { font-size: 10.5px; text-transform: uppercase; margin-top: 2px; } }
+        .trip-action-button-zone { @media (max-width: 768px) { width: 100%; } }
+    }
+
+    .w-100-percent { width: 100%; box-sizing: border-box; justify-content: center; }
+    .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+    .text-primary-mode { color: $primary; }
+    .ml-15 { margin-left: 15px; }
+}
+
+// --- CONFIGURATION THEME SOMBRE (DARK MODE) ---
+.dark .admin-pos-portal-scope {
+    .header h1, .pos-terminal-meta-status .meta-item, .pos-terminal-meta-status .meta-item .value, .card-title-fix, .pos-trip-tactile-card .trip-meta-info-layout .route-title, .pos-trip-tactile-card .trip-seats-fill-progress .seats-count, .table td, .min-currency-table td, .pos-cashier-badge p { color: $white; }
+    .pos-terminal-meta-status, .control-card, .table-responsive-wrapper, .pos-trip-tactile-card { background: #0f172a; border-color: rgba(255,255,255,0.1); }
+    .pos-trip-tactile-card.active-embark { background: rgba(239, 110, 23, 0.04); }
+    .notice-box-info-currency { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.05); }
+}

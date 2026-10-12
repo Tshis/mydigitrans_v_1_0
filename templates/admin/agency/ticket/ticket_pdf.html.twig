@@ -1,0 +1,235 @@
+{# templates/admin/agency/trip/ticket_pdf.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Billet {{ ticket.number }}</title>
+    
+        <style>
+            @import url("https://cloudflare.com");
+
+            /* LE FIX COMPTABILITÉ GARE : Marges nulles et dimensions fixes */
+            @page {
+                margin: 0mm;
+                size: 80mm 260mm;
+            }
+
+            body {
+                font-family: "Helvetica", "Arial", sans-serif;
+                color: #000000;
+                font-size: 9px;
+                line-height: 1.3;
+                background: #ffffff;
+                padding: 0;
+                margin: 20px 0;
+            }
+
+            /* 🚨 DOUBLE BLINDAGE : Largeur bridée à 250px pour correspondre aux 80mm d'impression brute */
+            .ticket-thermal-container {
+                width: 250px;
+                max-width: 250px;
+                padding: 8px;
+                padding-top: 15px;
+                border: 1px solid #afd3e7;
+                border-radius: 6px;
+                box-sizing: border-box;
+                background: #ffffff;
+                margin: 0 auto;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .agency-title {
+                font-size: 13px;
+                font-weight: 900;
+                color: #ef6e17;
+                margin: 0;
+                text-transform: uppercase;
+            }
+            .agency-subtitle {
+                font-size: 7.5px;
+                color: #4b5563;
+                margin: 2px 0 8px 0;
+                font-weight: bold;
+                border-bottom: 2px solid #0c326d;
+                padding-bottom: 4px;
+            }
+
+            .ticket-title {
+                font-size: 11px;
+                font-weight: 900;
+                color: #0c326d;
+                margin: 4px 0;
+                text-transform: uppercase;
+            }
+            .ticket-number {
+                font-family: monospace;
+                font-size: 10px;
+                font-weight: bold;
+                background: #afd3e7;
+                color: #0c326d;
+                padding: 2px 5px;
+                border-radius: 3px;
+                display: inline-block;
+                margin-bottom: 8px;
+            }
+
+            /* Verrou de répartition des colonnes */
+            .table-ticket-details {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 8px;
+                table-layout: fixed;
+            }
+            .table-ticket-details td {
+                padding: 4px 0;
+                vertical-align: middle;
+                border-bottom: 1px dashed rgba(175, 211, 231, 0.4);
+                font-size: 9px;
+                word-wrap: break-word;
+                overflow: hidden;
+            }
+            .table-ticket-details td.col-label {
+                width: 45%;
+                text-align: left;
+                color: #4b5563;
+                font-weight: bold;
+            }
+            .table-ticket-details td.col-value {
+                width: 55%;
+                text-align: right;
+                color: #0c326d;
+                font-weight: bold;
+            }
+
+            .seat-flash-box {
+                background: rgba(22, 132, 197, 0.08);
+                border: 1px solid #1684c5;
+                border-radius: 5px;
+                padding: 6px;
+                margin-vertical: 6px;
+                text-align: center;
+            }
+            .seat-number-massive {
+                font-size: 16px;
+                font-weight: 900;
+                color: #ef6e17;
+                font-family: monospace;
+            }
+            .seat-label-sub {
+                font-size: 8px;
+                text-transform: uppercase;
+                color: #1684c5;
+                font-weight: bold;
+                display: block;
+                margin-top: 1px;
+            }
+
+            .price-total-box {
+                border: 1px solid #1684c5;
+                background: #0c326d;
+                color: #ffffff;
+                padding: 5px;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: 900;
+                margin-bottom: 8px;
+                text-align: center;
+            }
+            .monospace {
+                font-family: monospace;
+            }
+
+            .qr-code-zone {
+                margin: 8px 0;
+                text-align: center;
+                width: 100%;
+            }
+            .qr-image-frame {
+                width: 75px;
+                height: 75px;
+                display: inline-block;
+            }
+
+            .barcode-placeholder {
+                border-top: 1px dashed #afd3e7;
+                padding-top: 6px;
+                margin-top: 4px;
+                font-size: 7px;
+                color: #4b5563;
+                line-height: 1.2;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="ticket-thermal-container text-center">
+    
+            <h2 class="agency-title"><i class="fa-solid fa-bus"></i> {{ agency_name }}</h2>
+            <div class="agency-subtitle">BILLET D'EMBARQUEMENT OFFICIEL</div>
+
+            <div class="ticket-title">Ticket Passager</div>
+            <div class="ticket-number">{{ ticket.number }}</div>
+
+            <table class="table-ticket-details">
+                <tbody>
+                    <tr>
+                        <td class="col-label">Passager :</td>
+                        <td class="col-value">{{ ticket.passenger_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label">Téléphone :</td>
+                        <td class="col-value monospace">{{ ticket.passenger_phone }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label">Ligne :</td>
+                        <td class="col-value">{{ ticket.route }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label"><i class="fa-solid fa-up-long" style="color: #1684c5;"></i> Montée :</td>
+                        <td class="col-value" style="color: #1684c5;">{{ ticket.departure_stop }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label"><i class="fa-solid fa-down-long" style="color: #d94516;"></i> Descente :</td>
+                        <td class="col-value" style="color: #d94516;">{{ ticket.arrival_stop }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label">Date / Heure :</td>
+                        <td class="col-value monospace">{{ ticket.departure_date|date('d/m/Y') }} - {{ ticket.departure_time }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label">Bus / Plaque :</td>
+                        <td class="col-value monospace">{{ ticket.bus_plate }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="seat-flash-box">
+                <span class="seat-number-massive">{{ ticket.seat_number }}</span>
+                <span class="seat-label-sub"><i class="fa-solid fa-chair"></i> Place N° {{ ticket.seat_number }} ({{ ticket.fare_category }})</span>
+            </div>
+
+            <div class="price-total-box">
+                NET ENCAISSÉ : <span class="monospace">{{ ticket.amount|number_format(2, ',', ' ') }} {{ ticket.currency_code }}</span>
+            </div>
+
+            {# Dans ton fichier templates/admin/agency/trip/ticket_pdf.html.twig #}
+            <div class="qr-code-zone">
+                <img src="{{ qr_base64 }}" width="90" height="90" alt="QR Code Validation" style="display: block; margin: 0 auto;">
+            </div>
+
+
+            <div class="barcode-placeholder">
+                <p class="monospace" style="font-size: 8px; font-weight: bold; margin: 0 0 3px 0;">* {{ ticket.security_hash }} *</p>
+                <p style="margin: 0;">Billet officiel MyDigitrans. Scannez ce QR code à l'embarquement. Bon voyage !</p>
+            </div>
+
+        </div>
+
+    </body>
+</html>

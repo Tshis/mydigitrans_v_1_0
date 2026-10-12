@@ -1,0 +1,140 @@
+{# templates/admin/agency/trip/direct_purchase.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="/js/admin/direct_purchase_seatmap.js" defer></script>
+{% endblock %}
+
+{% block body %}
+<div class="admin-booking-creation-scope container">
+
+    {# --- HEADER DE L'ENCAISSÉ IMMÉDIAT --- #}
+    <header class="header-refined mb-25">
+        <div class="header-main-info">
+            <a href="{{ path('admin_agency_trip_show', {'code': trip.code}) }}" class="agency-back-action"
+                title="Retour au voyage">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="title">
+                <h1>Émission Billet & Encaissé Direct</h1>
+                <p class="subtitle">Feuille d'embarquement : <strong class="text-primary">{{ trip.code }}</strong></p>
+            </div>
+        </div>
+    </header>
+
+    {# --- FORMULAIRE DOUBLE COLONNE INVERSÉ --- #}
+    <form action="{{ path('admin_agency_trip_direct_purchase_process', {'code': trip.code}) }}" method="POST"
+        class="reservation-form" id="js-direct-purchase-form">
+
+        <div class="reservation-container">
+
+            {# COLONNE GAUCHE : COORDONNÉES, DEVISES ET INCLUSION DE TON SEATMAP #}
+            <div class="layout-main-panel">
+
+                {# BLOC 1 : IDENTIFICATION LE VOYAGEUR #}
+                <div class="card mb-20">
+                    <h2><i class="fa-solid fa-user-tag text-primary"></i> 1. Identité du Passager</h2>
+                    <div class="field-group">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Nom complet du passager *</label>
+                            <input type="text" name="passenger_name" class="admin-bus-layout-add-input"
+                                placeholder="Ex : Jean Mukendi" required autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">N° de téléphone (Pour suivi) *</label>
+                            <input type="tel" name="passenger_phone" class="admin-bus-layout-add-input"
+                                placeholder="Ex : +243..." required autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+
+                {# BLOC 2 : IDENTIFICATION ARRETS #}
+                <div class="card mb-20">
+                    <h2><i class="fa-solid fa-route text-primary"></i> 2. Informations Itinéraire</h2>
+                    <div class="field-group">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Arret de départ *</label>
+                            <input type="text" name="passenger_name" class="admin-bus-layout-add-input"
+                                placeholder="Kinshasa" required autocomplete="off">
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Arret d'arrivée *</label>
+                            <input type="tel" name="passenger_phone" class="admin-bus-layout-add-input"
+                                placeholder="Lubumbashi" required autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+
+                {# BLOC 3 : MODE DE REGLEMENT EN CAISSE DE GARE #}
+                <div class="card mb-20">
+                    <h2><i class="fa-solid fa-money-bill-wave text-primary"></i> 3. Modalités d'Encaissement</h2>
+                    <div class="field-group">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Devise Physique Perçue au Comptoir *</label>
+                            <select name="received_currency" id="js-pos-currency-selector"
+                                class="admin-bus-layout-add-select" required>
+                                <option value="USD">Dollars Américains (USD)</option>
+                                <option value="CDF">Francs Congolais (CDF)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Somme totale remise par le client *</label>
+                            <input type="number" step="0.01" name="amount_tendered" id="js-amount-tendered"
+                                class="admin-bus-layout-add-input" placeholder="0.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                {# BLOC 3 : INCLUSION DE TON VRAI SEATMAP UNIFIÉ #}
+                <div class="card id-seatmap-section-wrappe">
+                    <h2><i class="fa-solid fa-chair text-primary"></i> 4. Attribution Graphique de la Place</h2>
+                    <p class="text-gray text-size-12 mb-20">Sélectionnez une cellule libre directement sur le plan de
+                        pont.</p>
+
+                    {# Injection sécurisée de ton fichier centralisé d'usine #}
+                    {{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
+                </div>
+            </div>
+
+            {# COLONNE DROITE : QUITTANCE EN PREMIER DANS LA STRUCTURE HTML POUR LE FLUX MOBILE #}
+            <aside class="summary">
+                <div class="card summary-sticky-card">
+                    <h2>Quittance d'Encaissé Cash</h2>
+                    <div class="reservation-notice-zone mb-20 success-accent-bg">
+                        <p class="notice-title text-success-mode">
+                            <i class="fa-solid fa-circle-check"></i> Paiement Comptant
+                        </p>
+                        <p class="notice-text">Le siège choisi sera vendu définitivement et la recette sera
+                            immédiatement imputée au coffre de la gare.</p>
+                    </div>
+
+                    <ul class="billing-details-list">
+                        <li><strong>Ligne :</strong> <span>{{ trip.route }}</span></li>
+                        <li><strong>Siège sélectionné :</strong> <span id="summary-seat-number"
+                                class="font-bold text-danger-color">Aucun choisi</span></li>
+                        <li><strong>Classe de tarif :</strong> <span id="summary-fare-type" class="font-bold">{{
+                                fare_category }}</span></li>
+                        <li><strong>Devise pivot :</strong> <span class="monospace font-bold">{{ currency_code }}</span>
+                        </li>
+                    </ul>
+
+                    <hr class="summary-divider mb-15">
+
+                    <div class="total">
+                        Montant à Percevoir :
+                        <strong id="summary-total-price">0,00 {{ currency_code }}</strong>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn-refined btn-success-gradient btn-full w-100-percent">
+                            <i class="fa-solid fa-print"></i> Encaisser & Imprimer le Billet
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </form>
+</div>
+{% endblock %}
