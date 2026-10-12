@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class TripController extends AbstractController
+final class TripController extends AbstractController
 {
 
     #[Route('/admin/agency/trips', name: 'admin_agency_trip_index')]
@@ -208,8 +208,6 @@ class TripController extends AbstractController
     } //processDirectPurchase
 
 
-
-
     /**
      * IMPRESSION TICKET : SORTIE THERMIQUE DU TICKET D'ACCÈS AU BUS VIA DOMPDF
      */
@@ -278,5 +276,5 @@ class TripController extends AbstractController
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="Ticket.pdf"'
         ]);
-    }
+    } //printTicketPdf
 }

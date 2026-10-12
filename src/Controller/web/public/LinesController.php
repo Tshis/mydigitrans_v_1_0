@@ -3,6 +3,8 @@
 namespace App\Controller\web\public;
 
 use App\Service\BusLayoutGridBuilder;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -169,7 +171,7 @@ final class LinesController extends AbstractController
         if ($method === 'station_cash') {
             $this->addFlash('warning', 'Votre réservation au guichet a été enregistrée. Veuillez la régler sous 2 heures.');
             // Route Symfony d'impression Dompdf du bon de réservation que nous avons codé ensemble
-            return $this->redirectToRoute('admin_agency_reservation_print_pdf', ['id' => 42]);
+            return $this->redirectToRoute('public_reservation_print_voucher', ['reference' => 'RSV-2026-001']);
         }
 
         // Sinon : Routage vers l'API de l'opérateur Mobile Money sélectionné
@@ -178,4 +180,65 @@ final class LinesController extends AbstractController
     } //finalize
 
 
+    /**
+     * STEP 4 : PRINTING VOUCHER OR TICKET IF PAYMENT DONE
+     */
+
+
+    /**
+     * RESERVATION PDF 4.1 : COMPILATION DU BON TEMPORAIRE VIA DOMPDF
+     */
+    #[Route('/lines/reservations/{reference}/print-voucher', name: 'public_reservation_print_voucher', methods: ['GET'])]
+    public function printVoucherPdf(string $reference): Response
+    {
+        // 1. Modélisation et extraction de ton entité de Réservation en cours
+        $reservation = [
+            'id' => 1,
+            'reference' => $reference,
+            'code' => 'BKG-2026-0914-A8X',
+            'trip_code' => 'TRP-2026-0042',
+            'route_label' => 'Kinshasa - Kikwit via Kenge',
+            'departure_stop' => 'Kinshasa (Gare Centrale)',
+            'arrival_stop' => 'Kikwit (Terminus)',
+            'passenger_name' => 'Kabila Dieudonné',
+            'passenger_phone' => '+243 812 345 678',
+            'seat_number' => '01',
+            'fare_category' => 'VIP',
+            'amount' => 45.00,
+            'currency_code' => 'USD'
+        ];
+
+        // 2. Configuration stricte des options d'usine Dompdf
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->set('isHtml5ParserEnabled', true);
+        $pdfOptions->set('isRemoteEnabled', true); // Autorise impérativement le chargement de FontAwesome !
+
+        $dompdf = new Dompdf($pdfOptions);
+
+        // 3. Rendu du code HTML Twig en mémoire morte
+        $html = $this->renderView('public/lines/print_pdf.html.twig', [
+            'agency_name' => 'TransKin Express', // Lié au context de l'utilisateur connecté
+            'reservation' => $reservation,
+            'is_pdf_mode' => true
+        ]);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // 4. Capture du flux binaire binaire et retour via Symfony Response
+        $pdfOutput = $dompdf->output();
+        $filename = sprintf('Bon_Reservation_%s.pdf', $reservation['code']);
+
+        return new Response($pdfOutput, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $filename)
+        ]);
+    } //printVoucherPdf
+
+
+    /**
+     * RESERVATION PDF 4.2 : COMPILATION DU TICKER VIA DOMPDF
+     */
 }

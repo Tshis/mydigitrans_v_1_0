@@ -1,0 +1,264 @@
+{# templates/admin/agency/reservation/print_pdf.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Bon de Réservation {{ reservation.code }}</title>
+    
+        <style>
+            /* CHARGEMENT CLANDESTIN DE FONTAWESOME POUR LES ICÔNES DU PDF */
+            @import url("https://cloudflare.com");
+
+            /* CHARTE GRAPHIQUE STRICTEMENT VERROUILLÉE */
+            body {
+                font-family: "Helvetica", "Arial", sans-serif;
+                color: #000000;
+                font-size: 11px;
+                line-height: 1.4;
+                background: #ffffff;
+                padding: 0;
+                margin: 0;
+            }
+            .booking-voucher-paper {
+                padding: 10px;
+                position: relative;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            /* En-tête */
+            .table-layout-header {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #0c326d;
+                padding-bottom: 12px;
+            }
+            .agency-logo-text {
+                font-size: 18px;
+                font-weight: 900;
+                color: #ef6e17;
+                letter-spacing: -0.5px;
+                margin: 0;
+                text-transform: uppercase;
+            }
+            .agency-sub-legal {
+                font-size: 9px;
+                font-weight: bold;
+                color: #4b5563;
+                margin: 2px 0 0 0;
+            }
+            .voucher-main-title {
+                font-size: 18px;
+                font-weight: 900;
+                text-align: right;
+                margin: 0;
+                color: #0c326d;
+            }
+            .voucher-number-badge {
+                background: #afd3e7;
+                color: #0c326d;
+                padding: 3px 10px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 11px;
+                margin-top: 5px;
+                display: inline-block;
+                font-family: monospace;
+            }
+
+            /* Bloc des Tiers / Détails Passager */
+            .table-layout-details {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            .details-box-td {
+                width: 48%;
+                padding: 12px;
+                background: #ffffff;
+                border: 1px solid #afd3e7;
+                border-radius: 6px;
+                vertical-align: top;
+            }
+            .table-spacer-td {
+                width: 4%;
+            }
+            .section-micro-label {
+                font-size: 8.5px;
+                font-weight: bold;
+                color: #ef6e17;
+                text-transform: uppercase;
+                margin-bottom: 5px;
+                display: block;
+                letter-spacing: 0.5px;
+            }
+            .info-text {
+                font-size: 11px;
+                margin: 3px 0;
+                color: #000000;
+            }
+            .info-text strong {
+                color: #0c326d;
+            }
+
+            /* Notice d'expiration critique */
+            .voucher-notice-expiration-zone {
+                background: rgba(219, 69, 22, 0.06);
+                border: 1px dashed #d94516;
+                padding: 10px 14px;
+                border-radius: 6px;
+                font-size: 11px;
+                color: #000000;
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
+            .notice-title {
+                font-weight: bold;
+                color: #d94516;
+                margin: 0 0 4px 0;
+                text-transform: uppercase;
+                font-size: 10px;
+            }
+            .notice-text {
+                margin: 0;
+                color: #4b5563;
+            }
+
+            /* Spécifications Financières */
+            .table-print-voucher-spec {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            .table-print-voucher-spec th {
+                background: rgba(12, 50, 109, 0.05);
+                border-bottom: 2px solid #0c326d;
+                padding: 10px 12px;
+                font-size: 9.5px;
+                text-transform: uppercase;
+                text-align: left;
+                color: #0c326d;
+                font-weight: bold;
+            }
+            .table-print-voucher-spec td {
+                padding: 12px;
+                border-bottom: 1px solid #afd3e7;
+                font-size: 11.5px;
+                color: #000000;
+                vertical-align: middle;
+            }
+
+            /* Alignements & Totaux */
+            .text-center {
+                text-align: center;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .monospace {
+                font-family: monospace;
+                font-size: 11px;
+            }
+            .font-bold {
+                font-weight: bold;
+            }
+            .total-highlight-row {
+                background: rgba(22, 132, 197, 0.05);
+                font-size: 13px;
+                font-weight: 900;
+                color: #1684c5;
+            }
+
+            /* Footer */
+            .voucher-print-footer-legal {
+                border-top: 1px solid #afd3e7;
+                padding-top: 12px;
+                font-size: 9px;
+                color: #4b5563;
+                text-align: center;
+                margin-top: 25px;
+                line-height: 1.4;
+            }
+            .clear-fix {
+                clear: both;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="booking-voucher-paper">
+    
+            {# 1. EN-TÊTE COMPAGNIE ET VOYAGE #}
+            <table class="table-layout-header">
+                <tr>
+                    <td style="width: 50%; vertical-align: top;">
+                        <h2 class="agency-logo-text"><i class="fa-solid fa-bus"></i> {{ agency_name|default('Compagnie Partenaire') }}</h2>
+                        <p class="agency-sub-legal">Guichet d'Enregistrement Automatique MyDigitrans</p>
+                    </td>
+                    <td style="width: 50%; text-align: right; vertical-align: top;">
+                        <h1 class="voucher-main-title">BON DE RÉSERVATION</h1>
+                        <div class="voucher-number-badge">{{ reservation.code }}</div>
+                    </td>
+                </tr>
+            </table>
+
+            {# 2. ALERTE DE CANCELLATION CRITIQUE DU BON (2 HEURES) #}
+            <div class="voucher-notice-expiration-zone">
+                <p class="notice-title"><i class="fa-solid fa-clock-history"></i> Délai de paiement de rigueur</p>
+                <p class="notice-text">Ce document temporaire expirera automatiquement <strong>2 heures</strong> avant le départ si aucun paiement n'est validé au guichet.</p>
+            </div>
+
+            {# 3. DETAILS CROISÉS DU PASSAGER ET LOGISTIQUE #}
+            <table class="table-layout-details">
+                <tr>
+                    <td class="details-box-td">
+                        <span class="section-micro-label"><i class="fa-solid fa-user"></i> Informations Passager</span>
+                        <p class="info-text"><strong>Nom :</strong> {{ reservation.passenger_name }}</p>
+                        <p class="info-text"><strong>Téléphone :</strong> <span class="monospace">{{ reservation.passenger_phone }}</span></p>
+                        <p class="info-text"><strong>Date d'émission :</strong> {{ "now"|date('d/m/Y H:i') }}</p>
+                    </td>
+                    <td class="table-spacer-td"></td>
+                    <td class="details-box-td">
+                        <span class="section-micro-label"><i class="fa-solid fa-circle-info"></i> Détails d'Exploitation</span>
+                        <p class="info-text"><strong>Code Voyage :</strong> <span class="monospace font-bold">{{ reservation.trip_code }}</span></p>
+                        <p class="info-text"><strong>Itinéraire :</strong> {{ reservation.route_label }}</p>
+                        <p class="info-text"><strong>Siège choisi :</strong> <span class="font-bold text-primary">N° {{ reservation.seat_number }}</span></p>
+                    </td>
+                </tr>
+            </table>
+
+            {# 4. GRILLE TARIFAIRE INDICATIVE #}
+            <table class="table-print-voucher-spec">
+                <thead>
+                    <tr>
+                        <th>Prestation Spécifiée</th>
+                        <th class="text-center" style="width: 20%;">Classe</th>
+                        <th class="text-right" style="width: 30%;">Tarif Indicatif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Billet Passager Interurbain</strong><br>
+                            <span style="font-size: 10px; color: #4b5563;">Segment : {{ reservation.departure_stop }} ➔ {{ reservation.arrival_stop }}</span>
+                        </td>
+                        <td class="text-center font-bold">{{ reservation.fare_category }}</td>
+                        <td class="text-right font-bold monospace">{{ reservation.amount|number_format(2, ',', ' ') }} {{ reservation.currency_code }}</td>
+                    </tr>
+                    <tr class="total-highlight-row">
+                        <td colspan="2" class="font-bold">TOTAL À SOLDER AU GUICHET :</td>
+                        <td class="text-right font-bold monospace">{{ reservation.amount|number_format(2, ',', ' ') }} {{ reservation.currency_code }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {# 5. PIED DE PAGE LÉGAL #}
+            <footer class="voucher-print-footer-legal">
+                <p>Ce bon ne donne pas accès à bord du véhicule. Présentez ce reçu à n'importe quel guichet physique muni de votre référence pour effectuer le règlement et obtenir votre billet d'embarquement officiel.</p>
+            </footer>
+
+        </div>
+
+    </body>
+</html>
