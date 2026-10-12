@@ -193,7 +193,7 @@ final class TripController extends AbstractController
     /**
      * TRAITEMENT DE L'ENCAISSÉ : PERSISTANCE DU BILLET DIRECT ET IMPRESSION DU TICKET
      */
-    #[Route('/admin/agency/trips/{code}/direct-purchase/process', name: 'admin_agency_trip_direct_purchase_process', methods: ['POST'])]
+    #[Route('/admin/agency/trips/{code}/direct-purchase/process', name: 'admin_agency_trip_direct_purchase_process')]
     public function processDirectPurchase(string $code, \Symfony\Component\HttpFoundation\Request $request): Response
     {
         // EN PRODUCTION ORM :
@@ -211,7 +211,7 @@ final class TripController extends AbstractController
     /**
      * IMPRESSION TICKET : SORTIE THERMIQUE DU TICKET D'ACCÈS AU BUS VIA DOMPDF
      */
-    #[Route('/admin/agency/trips/ticket/{id}/print', name: 'admin_agency_trip_ticket_print', methods: ['GET'])]
+    #[Route('/admin/agency/trips/ticket/{id}/print', name: 'admin_agency_trip_ticket_print')]
     public function printTicketPdf(int $id): Response
     {
         $ticket = [

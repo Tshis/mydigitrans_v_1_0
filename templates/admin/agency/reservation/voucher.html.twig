@@ -1,0 +1,249 @@
+{# templates/guichet/reservation/ticket_voucher_pdf.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Bon Réserve {{ voucher.code }}</title>
+    
+        <style>
+            @import url("https://cloudflare.com");
+
+            /* 🚨 CALIBRATION STRICTE CONTRE LA TRONCATURE ET LES COUPURES */
+            @page {
+                margin: 0mm;
+                size: 80mm 260mm;
+            }
+
+            body {
+                font-family: "Helvetica", "Arial", sans-serif;
+                color: #000000;
+                font-size: 8.5px;
+                line-height: 1.3;
+                background: #ffffff;
+                padding: 6px;
+                margin: 20px 0;
+            }
+
+            /* Conteneur bridé en pixels pour l'extrémité droite */
+            .ticket-thermal-container {
+                width: 250px;
+                max-width: 250px;
+                border: 1px dashed #d94516; /* Bordure d'alerte orange danger pour le statut temporaire */
+                padding: 15px 8px 8px 8px;
+                border-radius: 6px;
+                box-sizing: border-box;
+                background: #ffffff;
+                margin: 0 auto;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+            .monospace {
+                font-family: monospace;
+            }
+            .font-bold {
+                font-weight: bold;
+            }
+
+            .agency-title {
+                font-size: 13px;
+                font-weight: 900;
+                color: #0c326d;
+                margin: 0;
+                text-transform: uppercase;
+            }
+            .agency-subtitle {
+                font-size: 7.5px;
+                color: #d94516;
+                margin: 2px 0 8px 0;
+                font-weight: bold;
+                border-bottom: 2px solid #d94516;
+                padding-bottom: 4px;
+            }
+
+            .voucher-title {
+                font-size: 11px;
+                font-weight: 900;
+                color: #0c326d;
+                margin: 4px 0;
+                text-transform: uppercase;
+            }
+            .voucher-number {
+                font-family: monospace;
+                font-size: 10px;
+                font-weight: bold;
+                background: #afd3e7;
+                color: #0c326d;
+                padding: 2px 5px;
+                border-radius: 3px;
+                display: inline-block;
+                margin-bottom: 8px;
+            }
+
+            /* Alerte Expiration Imprimée */
+            .expiration-notice-box {
+                background: rgba(217, 69, 22, 0.06);
+                border: 1px dashed #d94516;
+                border-radius: 4px;
+                padding: 6px;
+                margin-bottom: 8px;
+                text-align: center;
+                color: #d94516;
+                font-weight: bold;
+            }
+
+            /* Grille Technique bloquée à droite */
+            .table-ticket-details {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 8px;
+                table-layout: fixed;
+            }
+            .table-ticket-details td {
+                padding: 4px 0;
+                vertical-align: middle;
+                border-bottom: 1px dashed rgba(175, 211, 231, 0.4);
+                font-size: 9px;
+                word-wrap: break-word;
+                overflow: hidden;
+            }
+            .table-ticket-details td.col-label {
+                width: 45%;
+                text-align: left;
+                color: #4b5563;
+                font-weight: bold;
+            }
+            .table-ticket-details td.col-value {
+                width: 55%;
+                text-align: right;
+                color: #0c326d;
+                font-weight: bold;
+            }
+
+            .seat-flash-box {
+                background: rgba(239, 110, 23, 0.06);
+                border: 1px solid #ef6e17;
+                border-radius: 5px;
+                padding: 6px;
+                margin-vertical: 6px;
+                text-align: center;
+            }
+            .seat-number-massive {
+                font-size: 16px;
+                font-weight: 900;
+                color: #ef6e17;
+                font-family: monospace;
+            }
+            .seat-label-sub {
+                font-size: 8px;
+                text-transform: uppercase;
+                color: #ef6e17;
+                font-weight: bold;
+                display: block;
+                margin-top: 1px;
+            }
+
+            .price-total-box {
+                border: 1px solid #1684c5;
+                background: #ffffff;
+                color: #1684c5;
+                padding: 5px;
+                border-radius: 4px;
+                font-size: 10px;
+                font-weight: 900;
+                margin-bottom: 8px;
+                text-align: center;
+            }
+
+            .qr-code-zone {
+                margin: 8px 0;
+                text-align: center;
+                width: 100%;
+            }
+            .qr-image-frame {
+                width: 75px;
+                height: 75px;
+                display: inline-block;
+            }
+
+            .barcode-placeholder {
+                border-top: 1px dashed #afd3e7;
+                padding-top: 6px;
+                margin-top: 4px;
+                font-size: 7px;
+                color: #4b5563;
+                line-height: 1.2;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="ticket-thermal-container text-center">
+    
+            <h2 class="agency-title">{{ agency_name }}</h2>
+            <div class="agency-subtitle">BON DE RÉSERVATION TEMPORAIRE</div>
+
+            {# ALERTE DE VALIDITÉ #}
+            <div class="expiration-notice-box">
+                <i class="fa-solid fa-triangle-exclamation"></i> PAR REGLÈMENT : EXPIRE À H-2 DU DÉPART
+            </div>
+
+            <div class="voucher-title">Référence Dossier</div>
+            <div class="voucher-number">{{ voucher.code }}</div>
+
+            <table class="table-ticket-details">
+                <tbody>
+                    <tr>
+                        <td class="col-label">Dossier au Nom :</td>
+                        <td class="col-value">{{ voucher.passenger_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label">Téléphone :</td>
+                        <td class="col-value monospace">{{ voucher.passenger_phone }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label">Feuille de Route :</td>
+                        <td class="col-value">{{ voucher.trip_code }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label"><i class="fa-solid fa-up-long" style="color: #1684c5;"></i> Arrêt Embarque :</td>
+                        <td class="col-value" style="color: #1684c5;">{{ voucher.departure_stop }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label"><i class="fa-solid fa-down-long" style="color: #d94516;"></i> Arrêt Débarque :</td>
+                        <td class="col-value" style="color: #d94516;">{{ voucher.arrival_stop }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-label">Date du Voyage :</td>
+                        <td class="col-value monospace">{{ voucher.departure_date|date('d/m/Y') }} à {{ voucher.departure_time }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="seat-flash-box">
+                <span class="seat-number-massive">{{ voucher.seat_number }}</span>
+                <span class="seat-label-sub"><i class="fa-solid fa-chair"></i> Siège Pré-bloqué ({{ voucher.fare_category }})</span>
+            </div>
+
+            <div class="price-total-box">
+                TARIF À SOLDER : <span class="monospace">{{ voucher.amount|number_format(2, ',', ' ') }} {{ voucher.currency_code }}</span>
+            </div>
+
+            {# QR CODE LOCAL INDÉTRONCABLE #}
+            {% if qr_base64 %}
+                <div class="qr-code-zone">
+                    <img class="qr-image-frame" src="{{ qr_base64 }}" alt="QR Code Validation">
+                </div>
+            {% endif %}
+
+            <div class="barcode-placeholder">
+                <p class="monospace" style="font-size: 8px; font-weight: bold; margin: 0 0 3px 0;">* {{ voucher.code }} *</p>
+                <p style="margin: 0;">Présentez ce bon au guichet pour encaisser votre billet définitif d'accès à bord.</p>
+            </div>
+
+        </div>
+
+    </body>
+</html>

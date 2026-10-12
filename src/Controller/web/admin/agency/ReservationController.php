@@ -6,6 +6,10 @@ use App\Service\BusLayoutGridBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -81,52 +85,72 @@ class ReservationController extends AbstractController
     /**
      * RESERVATION PDF : COMPILATION DU BON TEMPORAIRE VIA DOMPDF
      */
-    #[Route('/admin/agency/reservations/{reference}/print-pdf', name: 'admin_agency_reservation_print_voucher', methods: ['GET'])]
+    #[Route('/admin/agency/reservations/{reference}/print-voucher', name: 'admin_agency_reservation_print_voucher', methods: ['GET'])]
     public function printVoucherPdf(string $reference): Response
     {
-        // 1. Modélisation et extraction de ton entité de Réservation en cours
-        $reservation = [
-            'id' => 1,
+
+        $voucher = [
+            'id' => 812,
+            'code' => 'RSV-202610-A97F',
             'reference' => $reference,
-            'code' => 'BKG-2026-0914-A8X',
             'trip_code' => 'TRP-2026-0042',
-            'route_label' => 'Kinshasa - Kikwit via Kenge',
-            'departure_stop' => 'Kinshasa (Gare Centrale)',
-            'arrival_stop' => 'Kikwit (Terminus)',
-            'passenger_name' => 'Kabila Dieudonné',
+            'passenger_name' => 'Jean Mukendi',
             'passenger_phone' => '+243 812 345 678',
-            'seat_number' => '01',
-            'fare_category' => 'VIP',
+            'departure_stop' => 'Kinshasa (Gare Gombe)',
+            'arrival_stop' => 'Kikwit (Terminus)',
+            'departure_date' => new \DateTime('+1 day'),
+            'departure_time' => '14h30',
+            'seat_number' => '05',
+            'fare_category' => 'Standard',
             'amount' => 45.00,
             'currency_code' => 'USD'
         ];
 
-        // 2. Configuration stricte des options d'usine Dompdf
+        // src/Controller/Guichet/GuichetPosController.php
+
+        // 🚨 LE SEUL ET UNIQUE COMPORTEMENT V5 IMMUABLE VALIDE [Profile]
+        // On injecte absolument tout dans le constructeur natif
+        $qrCode = new QrCode(
+            data: $voucher['code'],
+            encoding: new Encoding('UTF-8'),
+            size: 150,
+            margin: 0
+        );
+
+        $writer = new PngWriter();
+        $qrBase64 = null;
+
+        try {
+            // Rendu direct sans aucun paramètre nommé conflictuel
+            $result = $writer->write($qrCode);
+            $qrBase64 = $result->getDataUri();
+        } catch (\Exception $e) {
+            $qrBase64 = null;
+        }
+
+
+        // Configuration Dompdf pour le massicot
         $pdfOptions = new Options();
         $pdfOptions->set('defaultFont', 'Arial');
         $pdfOptions->set('isHtml5ParserEnabled', true);
-        $pdfOptions->set('isRemoteEnabled', true); // Autorise impérativement le chargement de FontAwesome !
 
         $dompdf = new Dompdf($pdfOptions);
 
-        // 3. Rendu du code HTML Twig en mémoire morte
-        $html = $this->renderView('admin/agency/reservation/print_bon.html.twig', [
-            'agency_name' => 'TransKin Express', // Lié au context de l'utilisateur connecté
-            'reservation' => $reservation,
-            'is_pdf_mode' => true
+        $html = $this->renderView('admin/agency/reservation/voucher.html.twig', [
+            'agency_name' => 'TransKin Express',
+            'voucher' => $voucher,
+            'qr_base64' => $qrBase64
         ]);
 
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
+
+        // Figeage du papier thermique 80mm x 260mm (en points PostScript)
+        $dompdf->setPaper([0, 0, 250.00, 737.00], 'portrait');
         $dompdf->render();
 
-        // 4. Capture du flux binaire binaire et retour via Symfony Response
-        $pdfOutput = $dompdf->output();
-        $filename = sprintf('Bon_Reservation_%s.pdf', $reservation['code']);
-
-        return new Response($pdfOutput, 200, [
+        return new Response($dompdf->output(), 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => sprintf('attachment; filename="%s"', $filename)
+            'Content-Disposition' => 'inline; filename="Bon_Gare.pdf"'
         ]);
     } //printVoucherPdf
 }
