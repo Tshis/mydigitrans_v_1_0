@@ -1,0 +1,59 @@
+{# templates/public/legal/cgu.html.twig #}
+{% extends "public/base.html.twig" %}
+
+{% block body %}
+    <div class="public-legal-scope">
+    
+        {# --- HEADER PLEINE LARGEUR HORS CONTAINER --- #}
+        <header class="page-header mb-25">
+            <div class="header-main-info container">
+                <h1>Conditions Générales d'Utilisation</h1>
+                <p class="subtitle mt-5">Contrat d'accès et règles d'exploitation de la plateforme MyDigitrans.</p>
+            </div>
+        </header>
+
+        {# --- CONTENU TEXTUEL SEMANTIQUE --- #}
+        <div class="container legal-container">
+            <article class="card control-card legal-card">
+                <p class="legal-date">En vigueur au 13 octobre 2026 • Version 1.0</p>
+
+                <section class="legal-section">
+                    <h3>Article 1 : Objet du service</h3>
+                    <p>La plateforme MyDigitrans est un progiciel de gestion intégré en mode SaaS destiné à informatiser l'exploitation des compagnies de transport interurbain. Elle fournit des outils de billetterie synchrone, de colisage au poids, de gestion de flotte et un programme d'affiliation d'apporteurs d'affaires. MyDigitrans agit exclusivement en qualité d'intermédiaire technique et ne saurait être assimilée à une compagnie de transport routier.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Article 2 : Inscription et certification des comptes</h3>
+                    <p><strong>Compagnies de transport :</strong> L'ouverture d'un compte entreprise requiert la fourniture obligatoire du numéro de Registre du Commerce et du Crédit Mobilier (RCCM) ainsi que du Numéro d'Identification Fiscale (NIF). Le propriétaire du compte est désigné comme l'administrateur souverain de sa console.</p>
+                    <p><strong>Partenaires apporteurs d'affaires :</strong> L'accès au réseau d'affiliation est gratuit. Chaque membre reçoit un code sponsor unique et immuable après validation de son identité.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Article 3 : Circuit financier et commissions</h3>
+                    <p>Les tarifs d'abonnements mensuels dus par les agences sont facturés à terme échu. Concernant l'activité réseau, les commissions issues du parrainage à double niveau (10 % au premier niveau et 5 % au second niveau) sont calculées automatiquement sur la base des redevances d'infrastructure de un dollar américain prélevées par ticket. Tout partenaire recevant un versement de commissions s'engage à émarger électroniquement un accusé de réception sur son portail pour éteindre définitivement la dette comptable de la plateforme.</p>
+                    <p>MyDigitrans se réserve le droit souverain de modifier à tout moment les taux de commission, les barèmes de redevance ainsi que les structures tarifaires de ses forfaits, après notification préalable aux membres du réseau. Tout partenaire ne respectant pas les présentes règles d'éthique, de validation ou de transparence financière s'expose à une exclusion immédiate et définitive de la plateforme, entraînant la perte totale et irrévocable de tous ses droits aux avantages, commissions accumulées et bonus MyDigitrans.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Article 4 : Annulation et pénalités de carence</h3>
+                    <p>Les bons de réservation de billets ou de colis émis sans règlement immédiat au comptoir ou par Mobile Money constituent des titres temporaires. Conformément aux règles d'exploitation d'usine, ces documents expirent de plein droit et de manière automatique deux heures avant le départ programmé du véhicule. Le siège ou l'espace en soute est alors immédiatement remis en vente sans préavis.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Article 5 : Obligations des agences et suspension d'accès</h3>
+                    <p>Les compagnies de transport partenaires ont l'obligation stricte de s'acquitter des frais d'abonnement SaaS et des redevances d'infrastructure dans les délais impartis. En cas de défaut de paiement ou de facture basculant au statut en retard, MyDigitrans s'autorise le droit de suspendre immédiatement et intégralement l'accès de l'agence à sa console d'exploitation. Cette mesure de blocage technique empêchera l'agence de consulter ses données opérationnelles, son journal de caisse, sa flotte ainsi que ses registres de réservation jusqu'au solde complet de la dette.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Article 6 : Responsabilité et sécurité des comptes utilisateurs</h3>
+                    <p>Il est du devoir absolu de chaque utilisateur (administrateur d'agence, guichetier, apporteur d'affaires) de maintenir la confidentialité stricte de ses identifiants de connexion, de son e-mail et de son mot de passe secret. MyDigitrans décline toute responsabilité en cas de fuite de données, de détournement de fonds de tiroir-caisse, de modification de taux de change interne ou d'accès frauduleux consécutifs à la perte, au partage, au vol ou à la négligence d'un utilisateur dans la garde de ses codes d'accès.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Article 7 : Évolution du logiciel et mises à jour (Updates)</h3>
+                    <p>La plateforme MyDigitrans est un service SaaS évolutif qui bénéficie de mises à jour régulières visant à améliorer ses performances, sa sécurité et à y ajouter de nouvelles fonctionnalités (nouvelles carrosseries de bus, intégrations d'API supplémentaires, outils analytiques avancés). MyDigitrans se réserve le droit d'apporter ces modifications et optimisations à tout moment. L'installation de ces évolutions se fait de manière transparente et centralisée en arrière-plan sur les serveurs, sans nécessiter d'intervention technique de la part des agences, et s'applique d'office à l'ensemble des terminaux et des portails connectés au réseau.</p>
+                </section>
+            </article>
+        </div>
+    </div>
+{% endblock %}

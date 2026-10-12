@@ -1,0 +1,38 @@
+/* assets/styles/modules/_public-legal.scss */
+@use '../../abstract/variables' as *;
+
+.public-legal-scope {
+    padding-bottom: 4rem;
+
+    .legal-container {
+        display: flex; justify-content: center; width: 100%;
+    }
+
+    .legal-card {
+        width: 100%; max-width: 820px; background: $white; border: 1px solid $mute;
+        border-radius: 8px; padding: 40px; box-sizing: border-box;
+    }
+
+    .legal-date { font-size: 12px; color: $primary; font-weight: 700; margin-bottom: 2rem; text-transform: uppercase; }
+
+    .legal-section {
+        margin-bottom: 2rem;
+        h3 { font-size: 15px; font-weight: 900; color: $dark; margin-bottom: 10px; text-transform: uppercase; border-left: 3px solid $primary; padding-left: 10px; }
+        p { font-size: 13.5px; color: darken($color: $gray, $amount: 30); line-height: 1.6; text-align: justify; margin-bottom: 12px; }
+        strong { color: $dark; }
+    }
+
+    /* Tableau de spécifications des données */
+    .legal-table-spec {
+        border: 1px solid $mute; border-radius: 6px; overflow: hidden; margin-top: 15px;
+        .table {
+            width: 100%; border-collapse: collapse; margin: 0;
+            th { background: rgba(12, 50, 109, 0.03); color: $dark; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 12px 15px; border-bottom: 2px solid $dark; text-align: left; }
+            td { padding: 12px 15px; border-bottom: 1px solid rgba($mute, 0.3); font-size: 12.5px; color: darken($color: $gray, $amount: 30); }
+            th:nth-child(1), td:nth-child(1) { width: 35%; font-weight: bold; color: $dark; }
+            th:nth-child(2), td:nth-child(2) { width: 65%; }
+        }
+    }
+}
+
+

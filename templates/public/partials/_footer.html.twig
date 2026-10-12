@@ -8,9 +8,11 @@
 		</div>
 
 		<div class="footer-links">
-			<a class="menu-link {{ page is same as('accueil') ? 'active' : '' }} " href="{{path('home_index')}}">Accueil</a>
+			<a class="menu-link {{ page is same as('accueil') ? 'active' : '' }} " href="{{ path('home_index') }}">Accueil</a>
 			{% include "public/partials/_menu.html.twig" %}
-			<a class="menu-link {{ page is same as('login') ? 'active' : '' }}" href="">Connexion</a>
+			<a class="menu-link {{ page is same as('login') ? 'active' : '' }}" href="{{ path('security_login_index') }}">Connexion</a>
+			<a class="menu-link {{ page is same as('cgu') ? 'active' : '' }}" href="{{ path('public_legal_cgu') }}">Cgu</a>
+			<a class="menu-link {{ page is same as('privacy') ? 'active' : '' }}" href="{{ path('public_legal_privacy') }}">Privacy</a>
 		</div>
 
 		<div class="footer-contact">

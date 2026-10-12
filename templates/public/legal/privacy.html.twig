@@ -1,0 +1,71 @@
+{# templates/public/legal/privacy.html.twig #}
+{% extends "public/base.html.twig" %}
+
+{% block body %}
+    <div class="public-legal-scope">
+    
+        {# --- HEADER PLEINE LARGEUR HORS CONTAINER --- #}
+        <header class="page-header mb-25">
+            <div class="header-main-info container">
+                <h1>Politique de Confidentialité</h1>
+                <p class="subtitles mt-5">Règles de protection et traitement des données personnelles sur MyDigitrans.</p>
+            </div>
+        </header>
+
+        {# --- CONTENU TEXTUEL SEMANTIQUE --- #}
+        <div class="container legal-container">
+            <article class="card control-card legal-card">
+                <p class="legal-date">Dernière mise à jour : 13 octobre 2026</p>
+
+                <section class="legal-section">
+                    <h3>Section 1 : Collecte des données</h3>
+                    <p>MyDigitrans collecte les données strictement nécessaires à l'exécution du contrat de transport et à la traçabilité des flux financiers. Ces informations comprennent le nom, le prénom, l'adresse email, le numéro de téléphone (notamment pour les transactions Mobile Money), le numéro de siège attribué, ainsi que la masse exacte des colis enregistrés.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Section 2 : Traitement et finalités</h3>
+                    <p>Les données recueillies font l'objet d'un traitement informatique destiné à :</p>
+                    <div class="table-responsive-wrapper legal-table-spec mb-15">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Donnée Collectée</th>
+                                    <th>Finalité du Traitement</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Nom, Prénom & Téléphone</td>
+                                    <td>Émission des billets d'embarquement nominatifs et suivi SMS voyageurs.</td>
+                                </tr>
+                                <tr>
+                                    <td>Données de Facturation Agences</td>
+                                    <td>Envoi des alertes administratives de relance et gestion des suspensions d'accès.</td>
+                                </tr>
+                                <tr>
+                                    <td>Masse Fret (Kg)</td>
+                                    <td>Calcul transparent des prix de colisage et optimisation des capacités de soute.</td>
+                                </tr>
+                                <tr>
+                                    <td>Tokens d'Affiliation (MDT...)</td>
+                                    <td>Calcul automatisé et distribution des commissions de parrainage multi-niveaux.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Section 3 : Conservation et étanchéité multi-tenant</h3>
+                    <p>L'architecture de l'application garantit une étanchéité absolue des données entre les différentes compagnies de transport connectées. Les informations relatives aux passagers et à la trésorerie d'une agence ne sont jamais accessibles aux autres agences du réseau. Les données de facturation souffrantes sont conservées sans limitation de durée dans l'historique comptable tant que la créance n'est pas intégralement soldée.</p>
+                </section>
+
+                <section class="legal-section">
+                    <h3>Section 4 : Sécurité des transactions et responsabilité partagée</h3>
+                    <p>Toutes les requêtes de paiement déclenchées par l'API de passerelle Mobile Money font l'objet d'un chiffrement sécurisé. MyDigitrans ne stocke aucun code PIN secret USSD sur ses serveurs, la validation s'effectuent exclusivement sur le terminal physique de l'utilisateur.</p>
+                    <p>La sécurité des données dépend également de la vigilance des utilisateurs. La plateforme ne saurait être tenue pour responsable des intrusions ou des fuites d'informations commerciales confidentielles provoquées par une faille de sécurité sur le terminal personnel d'un agent ou par un mot de passe trop faible ou compromis. Chaque entité multi-tenant est responsable des habilitations et des accès qu'elle délègue à ses propres collaborateurs.</p>
+                </section>
+            </article>
+        </div>
+    </div>
+{% endblock %}
