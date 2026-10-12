@@ -219,9 +219,12 @@
             </div>
 
             {# Dans ton fichier templates/admin/agency/trip/ticket_pdf.html.twig #}
-            <div class="qr-code-zone">
-                <img src="{{ qr_base64 }}" width="90" height="90" alt="QR Code Validation" style="display: block; margin: 0 auto;">
-            </div>
+            {% if qr_base64 %}
+                <div class="qr-code-zone">
+                    <img src="{{ qr_base64 }}" width="90" height="90" alt="QR Code Validation" style="display: block; margin: 0 auto;">
+                </div>
+            {% endif %}
+
 
 
             <div class="barcode-placeholder">

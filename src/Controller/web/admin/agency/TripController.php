@@ -5,6 +5,8 @@ namespace App\Controller\web\admin\agency;
 use App\Service\BusLayoutGridBuilder;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Endroid\QrCode\QrCode; // Utilisation de l'objet natif direct
+use Endroid\QrCode\Writer\PngWriter; // Utilisation du Writer standard
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -211,8 +213,6 @@ class TripController extends AbstractController
     /**
      * IMPRESSION TICKET : SORTIE THERMIQUE DU TICKET D'ACCÈS AU BUS VIA DOMPDF
      */
-    // src/Controller/Admin/Agency/AgencyTripController.php
-
     #[Route('/admin/agency/trips/ticket/{id}/print', name: 'admin_agency_trip_ticket_print', methods: ['GET'])]
     public function printTicketPdf(int $id): Response
     {
@@ -231,38 +231,34 @@ class TripController extends AbstractController
             'fare_category' => 'Standard',
             'amount' => 45.00,
             'currency_code' => 'USD',
-            'security_hash' => 'MDT-TKT-202610-0084-SECURE'
+            'security_hash' => 'MDT-TKT-202610-0888-SECURE'
         ];
 
-        // 🚨 SÉCURISATION CURL DE REMPLACEMENT POUR S'AFFRANCHIR DE allow_url_fopen COMBATTANT LES BLOCAGES LOCAUX
-        $qrUrl = "https://googleapis.com" . urlencode($ticket['security_hash']) . "&choe=UTF-8";
+        // 🚨 NETTOYAGE : Configuration moderne sans setters obsolètes
+        // On passe les paramètres directement à l'instanciation pour effacer les lignes soulignées
+        $qrCode = new QrCode(
+            data: $ticket['security_hash'],
+            encoding: new \Endroid\QrCode\Encoding\Encoding('UTF-8'),
+            size: 150,
+            margin: 0
+        );
 
+        $writer = new PngWriter();
         $qrBase64 = null;
 
-        if (function_exists('curl_init')) {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $qrUrl);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Évite les blocages de certificats SSL locaux sur XAMPP
-            $qrData = curl_exec($ch);
-            curl_close($ch);
-
-            if ($qrData !== false && !empty($qrData)) {
-                $qrBase64 = 'data:image/png;base64,' . str_replace(["\r", "\n"], '', base64_encode($qrData));
-            }
+        try {
+            // Syntaxe moderne pour extraire le Base64 propre pour Dompdf
+            $result = $writer->write($qrCode);
+            $qrBase64 = $result->getDataUri();
+        } catch (\Exception $e) {
+            $qrBase64 = null;
         }
 
-        // Si CURL a échoué ou n'est pas dispo, on génère un QR de secours factice local pour ne jamais bloquer le ticket
-        if (!$qrBase64) {
-            // C'est un pixel PNG transparent transparent de secours pour éviter que Twig ne crash
-            $qrBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-        }
 
+        // Configuration du moteur Dompdf
         $pdfOptions = new Options();
         $pdfOptions->set('defaultFont', 'Arial');
         $pdfOptions->set('isHtml5ParserEnabled', true);
-        $pdfOptions->set('isRemoteEnabled', true); // Autorise la lecture des flux d'images
 
         $dompdf = new Dompdf($pdfOptions);
 
@@ -273,6 +269,8 @@ class TripController extends AbstractController
         ]);
 
         $dompdf->loadHtml($html);
+
+        // Figeage de la carrosserie thermique 80mm x 260mm (en points PostScript)
         $dompdf->setPaper([0, 0, 250.00, 737.00], 'portrait');
         $dompdf->render();
 
