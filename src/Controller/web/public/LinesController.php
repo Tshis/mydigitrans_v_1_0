@@ -195,7 +195,7 @@ final class LinesController extends AbstractController
         $reservation = [
             'id' => 1,
             'reference' => $reference,
-            'code' => 'BKG-2026-0914-A8X',
+            'code' => $reference,
             'trip_code' => 'TRP-2026-0042',
             'route_label' => 'Kinshasa - Kikwit via Kenge',
             'departure_stop' => 'Kinshasa (Gare Centrale)',
@@ -217,7 +217,7 @@ final class LinesController extends AbstractController
         $dompdf = new Dompdf($pdfOptions);
 
         // 3. Rendu du code HTML Twig en mémoire morte
-        $html = $this->renderView('public/lines/print_pdf.html.twig', [
+        $html = $this->renderView('public/lines/voucher.html.twig', [
             'agency_name' => 'TransKin Express', // Lié au context de l'utilisateur connecté
             'reservation' => $reservation,
             'is_pdf_mode' => true
