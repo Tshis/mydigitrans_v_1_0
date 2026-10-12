@@ -5,6 +5,10 @@ namespace App\Controller\web\public;
 use App\Service\BusLayoutGridBuilder;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -176,7 +180,7 @@ final class LinesController extends AbstractController
 
         // Sinon : Routage vers l'API de l'opérateur Mobile Money sélectionné
         $this->addFlash('success', 'Billet électronique payé et validé avec succès.');
-        return $this->redirectToRoute('public_lines_index');
+        return $this->redirectToRoute('public_lines_ticket_download', ['reference' => 'RSV-2026-001']);
     } //finalize
 
 
@@ -241,4 +245,76 @@ final class LinesController extends AbstractController
     /**
      * RESERVATION PDF 4.2 : COMPILATION DU TICKER VIA DOMPDF
      */
+
+
+    /**
+     * BILLET COMPTANT PUBLIC : GÉNÉRATION ET TÉLÉCHARGEMENT DU BILLET SÉCURISÉ A4 [Profile]
+     */
+    #[Route('/lines/ticket/{reference}/telecharger', name: 'public_lines_ticket_download')]
+    public function downloadPublicTicket(string $reference): Response
+    {
+        // 1. Extraction de la réservation payée de ton entité [Profile]
+        $ticket = [
+            'id' => 212,
+            'number' => $reference,
+            'passenger_name' => 'Jean Mukendi',
+            'passenger_phone' => '+243 812 345 678',
+            'paid_at' => new \DateTime('now'),
+            'route' => 'Kinshasa ➔ Kikwit via Kenge',
+            'departure_stop' => 'Kinshasa (Gare Centrale)',
+            'arrival_stop' => 'Kikwit (Terminus)',
+            'departure_date' => new \DateTime('+2 days'),
+            'departure_time' => '14h30',
+            'bus_plate' => '2432AB01 (Mercedes Marcopolo VIP)',
+            'seat_number' => '01',
+            'fare_category' => 'VIP',
+            'amount' => 45.00,
+            'currency_code' => 'USD',
+            'security_hash' => 'MDT-SECURE-WEB-7491-KABILA'
+        ];
+
+        // 2. Génération locale et immuable du Code QR v5 [Profile]
+        $qrCode = new QrCode(
+            data: $ticket['security_hash'],
+            encoding: new Encoding('UTF-8'),
+            size: 150,
+            margin: 0
+        );
+
+        $writer = new PngWriter();
+        $qrBase64 = null;
+        try {
+            $result = $writer->write($qrCode);
+            $qrBase64 = $result->getDataUri();
+        } catch (\Exception $e) {
+            $qrBase64 = null;
+        }
+
+        // 3. Initialisation et configuration de Dompdf
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->set('isHtml5ParserEnabled', true);
+
+        $dompdf = new Dompdf($pdfOptions);
+
+        $html = $this->renderView('public/lines/ticket.html.twig', [
+            'agency_name' => 'TransKin Express',
+            'ticket' => $ticket,
+            'qr_base64' => $qrBase64
+        ]);
+
+        $dompdf->loadHtml($html);
+
+        // 🚨 CONFIGURATION FORMAT DU PAPIER : Vrai A4 Standard International en mode Portrait
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $pdfOutput = $dompdf->output();
+        $filename = sprintf('Billet_MyDigitrans_%s.pdf', $ticket['number']);
+
+        return new Response($pdfOutput, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => sprintf('attachment; filename="%s"', $filename) // 'attachment' force le téléchargement direct sur le smartphone du client
+        ]);
+    } //downloadPublicTickets
 }

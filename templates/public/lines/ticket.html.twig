@@ -1,0 +1,287 @@
+{# templates/public/booking/ticket_print_pdf.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Mon Billet Électronique {{ ticket.number }}</title>
+    
+        <style>
+            /* CHARGEMENT DE FONTAWESOME POUR LES ICÔNES DU PDF */
+            @import url("https://cloudflare.com");
+
+            /* CONFIGURATION FORMAT A4 PROPRE GRAND PUBLIC */
+            @page {
+                margin: 15mm;
+                size: a4 portrait;
+            }
+
+            body {
+                font-family: "Helvetica", "Arial", sans-serif;
+                color: #000000;
+                font-size: 11px;
+                line-height: 1.4;
+                background: #ffffff;
+                padding: 0;
+                margin: 0;
+            }
+
+            /* En-tête du Billet */
+            .table-layout-header {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 25px;
+                border-bottom: 2px solid #0c326d;
+                padding-bottom: 15px;
+            }
+            .agency-logo-text {
+                font-size: 22px;
+                font-weight: 900;
+                color: #ef6e17;
+                letter-spacing: -0.5px;
+                margin: 0;
+                text-transform: uppercase;
+            }
+            .agency-sub-legal {
+                font-size: 10px;
+                font-weight: bold;
+                color: #4b5563;
+                margin: 2px 0 0 0;
+            }
+            .ticket-main-title {
+                font-size: 22px;
+                font-weight: 900;
+                text-align: right;
+                margin: 0;
+                color: #0c326d;
+            }
+            .ticket-number-badge {
+                background: #afd3e7;
+                color: #0c326d;
+                padding: 4px 12px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 12px;
+                margin-top: 6px;
+                display: inline-block;
+                font-family: monospace;
+            }
+
+            /* Grille informative double colonne */
+            .table-layout-grid {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 25px;
+            }
+            .info-box-td {
+                width: 48%;
+                padding: 15px;
+                background: #ffffff;
+                border: 1px solid #afd3e7;
+                border-radius: 6px;
+                vertical-align: top;
+            }
+            .table-spacer-td {
+                width: 4%;
+            }
+            .section-micro-label {
+                font-size: 9px;
+                font-weight: bold;
+                color: #ef6e17;
+                text-transform: uppercase;
+                margin-bottom: 8px;
+                display: block;
+                letter-spacing: 0.5px;
+            }
+            .info-text {
+                font-size: 11.5px;
+                margin: 4px 0;
+                color: #000000;
+            }
+            .info-text strong {
+                color: #0c326d;
+            }
+
+            /* Rappel Flash du Siège Attribué */
+            .seat-flash-banner {
+                background: rgba(22, 132, 197, 0.06);
+                border: 1px solid #1684c5;
+                border-radius: 6px;
+                padding: 12px;
+                text-align: center;
+                margin-bottom: 25px;
+            }
+            .seat-number-massive {
+                font-size: 24px;
+                font-weight: 900;
+                color: #ef6e17;
+                font-family: monospace;
+            }
+            .seat-label-sub {
+                font-size: 10px;
+                text-transform: uppercase;
+                color: #1684c5;
+                font-weight: bold;
+                display: block;
+                margin-top: 3px;
+            }
+
+            /* Reçu et Règlement Financier */
+            .table-financial-spec {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 25px;
+            }
+            .table-financial-spec th {
+                background: rgba(12, 50, 109, 0.05);
+                border-bottom: 2px solid #0c326d;
+                padding: 10px 12px;
+                font-size: 10px;
+                text-transform: uppercase;
+                text-align: left;
+                color: #0c326d;
+                font-weight: bold;
+            }
+            .table-financial-spec td {
+                padding: 12px;
+                border-bottom: 1px solid #afd3e7;
+                font-size: 12px;
+                color: #000000;
+                vertical-align: middle;
+            }
+            .total-highlight-row {
+                background: rgba(12, 50, 109, 0.03);
+                font-size: 14px;
+                font-weight: 900;
+                color: #0c326d;
+            }
+
+            /* Zone de validation de sécurité par Code QR */
+            .table-security-validation {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 30px;
+                border-top: 1px dashed #afd3e7;
+                padding-top: 20px;
+            }
+            .qr-frame-td {
+                width: 25%;
+                text-align: left;
+                vertical-align: top;
+                padding-top: 15px;
+            }
+            .legal-notice-td {
+                width: 75%;
+                text-align: left;
+                vertical-align: middle;
+                font-size: 9.5px;
+                color: #4b5563;
+                line-height: 1.4;
+                padding-left: 20px;
+                padding-top: 15px;
+            }
+            .qr-image-frame {
+                width: 110px;
+                height: 110px;
+                display: block;
+                border: 1px solid #afd3e7;
+                padding: 4px;
+                border-radius: 4px;
+            }
+
+            .monospace {
+                font-family: monospace;
+            }
+            .font-bold {
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="public-ticket-paper-sheet">
+    
+            {# 1. EN-TÊTE DU BILLET ÉLECTRONIQUE #}
+            <table class="table-layout-header">
+                <tr>
+                    <td style="width: 55%; vertical-align: top;">
+                        <h2 class="agency-logo-text"><i class="fa-solid fa-bus"></i> {{ agency_name }}</h2>
+                        <p class="agency-sub-legal">Réseau National Interurbain • Partenaire Officiel MyDigitrans</p>
+                    </td>
+                    <td style="width: 45%; text-align: right; vertical-align: top;">
+                        <h1 class="ticket-main-title">BILLET ÉLECTRONIQUE</h1>
+                        <div class="ticket-number-badge">{{ ticket.number }}</div>
+                    </td>
+                </tr>
+            </table>
+
+            {# 2. RAPPEL DU SIÈGE DU PASSAGER EN SÉLECTION TACTILE #}
+            <div class="seat-flash-banner">
+                <span class="seat-number-massive">{{ ticket.seat_number }}</span>
+                <span class="seat-label-sub"><i class="fa-solid fa-chair"></i> PLACE SÉCURISÉE & NUMÉROTÉE ({{ ticket.fare_category }})</span>
+            </div>
+
+            {# 3. DOUBLE COLONNE : IDENTITÉ DU VOYAGEUR ET LOGISTIQUE DE BORD #}
+            <table class="table-layout-grid">
+                <tr>
+                    <td class="info-box-td">
+                        <span class="section-micro-label"><i class="fa-solid fa-user"></i> Informations Passager</span>
+                        <p class="info-text"><strong>Nom complet :</strong> {{ ticket.passenger_name }}</p>
+                        <p class="info-text"><strong>Téléphone :</strong> <span class="monospace">{{ ticket.passenger_phone }}</span></p>
+                        <p class="info-text"><strong>Date d'achat :</strong> {{ ticket.paid_at|date('d/m/Y à H:i') }}</p>
+                        <p class="info-text"><strong>Canal de vente :</strong> En ligne (Site Internet)</p>
+                    </td>
+                    <td class="table-spacer-td"></td>
+                    <td class="info-box-td">
+                        <span class="section-micro-label"><i class="fa-solid fa-circle-info"></i> Logistique & Itinéraire</span>
+                        <p class="info-text"><strong>Ligne générale :</strong> {{ ticket.route }}</p>
+                        <p class="info-text"><strong>Gare de montée :</strong> <span class="font-bold" style="color: #1684c5;">{{ ticket.departure_stop }}</span></p>
+                        <p class="info-text"><strong>Gare de descente :</strong> <span class="font-bold" style="color: #d94516;">{{ ticket.arrival_stop }}</span></p>
+                        <p class="info-text"><strong>Départ du Bus :</strong> <span class="monospace font-bold">{{ ticket.departure_date|date('d/m/Y') }} à {{ ticket.departure_time }}</span></p>
+                    </td>
+                </tr>
+            </table>
+
+            {# 4. REÇU FINANCIER DE VALIDATION API #}
+            <table class="table-financial-spec">
+                <thead>
+                    <tr>
+                        <th>Désignation de la Prestation</th>
+                        <th style="width: 20%; text-align: center;">Classe</th>
+                        <th style="width: 30%; text-align: right;">Montant Payé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Billet de Transport Voyageur Nominatif</strong><br>
+                            <span style="font-size: 10px; color: #4b5563;">Transport interurbain par autocar de ligne. Transit direct sécurisé.</span>
+                        </td>
+                        <td style="text-align: center;" class="font-bold">{{ ticket.fare_category }}</td>
+                        <td style="text-align: right;" class="font-bold monospace">{{ ticket.amount|number_format(2, ',', ' ') }} {{ ticket.currency_code }}</td>
+                    </tr>
+                    <tr class="total-highlight-row">
+                        <td colspan="2" class="font-bold">TOTAL NET DÉBITÉ VIA MOBILE MONEY :</td>
+                        <td style="text-align: right;" class="font-bold monospace" style="color: #1684c5;">{{ ticket.amount|number_format(2, ',', ' ') }} {{ ticket.currency_code }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {# 5. ZONE DE VALIDATION DE SÉCURITÉ COMPAGNIE #}
+            <table class="table-security-validation">
+                <tr>
+                    {% if qr_base64 %}
+                        <td class="qr-frame-td">
+                            <img class="qr-image-frame" src="{{ qr_base64 }}" alt="QR Code d'embarquement">
+                        </td>
+                    {% endif %}
+                    <td class="legal-notice-td">
+                        <p class="monospace" style="font-size: 10px; font-weight: bold; margin: 0 0 5px 0; color: #0c326d;">* Signature Électronique : {{ ticket.security_hash }} *</p>
+                        <p style="margin: 0;"><strong>Instructions d'Embarquement :</strong> Ce document officiel fait foi de titre de transport valide pour la ligne spécifiée. Veuillez vous présenter à la gare muni de ce billet (imprimé ou sur l'écran de votre smartphone) au minimum 30 minutes avant l'heure du départ pour l'enregistrement de vos bagages en soute. Le code QR sera scanné par le chef d'escale lors du contrôle d'accès au véhicule.</p>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+
+    </body>
+</html>
