@@ -1,186 +1,215 @@
+/* assets/styles/modules/_seatmap-core.scss */
 @use '../abstract/variables' as *;
 
-.seatmap-card{
+// 🚨 NOUVELLE SURCHAPE DE SÉCURITÉ RESPONSIVE : À placer autour du include pour isoler le scroll
+.id-seatmap-section-wrapper, .id-seatmap-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;      // Centre mathématiquement le bus au milieu de ta box blanche (.control-card)
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;         // Déclenche le défilement élastique sur les téléphones de moins de 360px
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    padding-bottom: 10px;
+}
 
-	width: max-content;
-	min-width: 300px;
-	background: $white;
-	padding-inline: 2rem;
-	padding-bottom: 2rem;
-	padding-top: .5px;
-	margin: auto;
-	border-top-left-radius:20px ;
-	border-top-right-radius:20px ;
+.seatmap-card {
+    width: 100%;
+    max-width: 340px;         // Fige la carrosserie pour garder une silhouette d'autocar élégante [1.1]
+    background: $white;
+    padding-inline: 1.5rem;
+    padding-bottom: 2rem;
+    padding-top: 1px;
+    margin: 0 auto;           // Force le centrage gauche/droite absolu
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-	display: flex;
-	flex-direction: column;
-	align-items: center; // Centre verticalement et horizontalement tout le bloc du bus
-	width: 100%;
-	overflow-x: auto; // Déclenche un scroll horizontal invisible si l'écran est plus petit que le bus
-	-webkit-overflow-scrolling: touch; // Rend le défilement tactile ultra-fluide sur iPhone/Android
-   
+    .bus-head {
+        color: $success;
+        font-weight: 700;
+        background: $mute;
+        padding: 0.8rem;
+        width: 100%;
+        margin: 1.5rem auto;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        text-align: center;
+        box-sizing: border-box;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+    }
 
-	.bus-head{
-		color: $success;
-		font-weight: 700;
-		background: $mute;
-		padding: 1rem;
-		width: 100%;
-		margin: 2rem auto;
-		border-top-left-radius:20px ;
-		border-top-right-radius:20px ;
-		text-align: center;
-	}//bus-head
+    .seatmap-matrix {
+        display: grid;
+        grid-template-columns: repeat(var(--grid-cols), 40px);
+        gap: 8px;
+        justify-content: center; // Alignement des rangées au centre exact de la grille [1.1]
+        align-content: center;
+        width: max-content;       // Permet à la grille de s'adapter au nombre de colonnes (3-2 ou 2-2)
+        box-sizing: border-box;
 
-	.seatmap-matrix {
-		display: grid;
-		grid-template-columns: repeat(var(--grid-cols), 40px);
-		gap: 8px;
-		justify-content: center;
-		align-content: center;
+        // ---- CONTROLE TECHNIQUE DES INPUTS RADIOS DE TON TWIG ----
+        .seat-radio {
+            display: none; // Masque le bouton radio natif
+        }
+    
+        /* État sélectionné : On cible la classe .cell-unit qui sert de label */
+        .seat-radio:checked + .cell-unit {
+            outline: 3px solid $success !important;
+            background: $success !important;
+            color: $white !important;
+            transform: scale(1.05);
+            z-index: 2;
+        }
+    
+        /* État occupé (Disabled) */
+        .seat-radio:disabled + .cell-unit {
+            background: #cbd5e1 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        // --- CELLULE UNITAIRE (SIÈGE CLASSIQUE) ---
+        .cell-unit {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1px solid rgba(0,0,0,0.1);
+            user-select: none;
+            transition: all 0.15s ease;
+            box-sizing: border-box;
+            cursor: pointer;
+	
+            /* CORRECTIF DES ETATS DE SURVOLS CONTRE LES CONFLITS */
+            &.is-selected {
+                background: $success !important;
+                color: $white !important;
+            }
+	
+            &.is-booked {
+                background: rgba($danger, 0.15); 
+                color: $danger;
+                pointer-events: none;
+                cursor: not-allowed;
+            }
+        }
+    
+        /* APPLICATION DES VARIATIONS DE CLASSES D'USINE [MNS] */
+        .cell-unit[data-type="seat"] { 
+            background: rgba($success, 0.15); 
+            color: $success; 
+        }
+        
+        .cell-unit[data-type="vip"] { 
+            background: linear-gradient(135deg, $success 0%, $dark 100%); 
+            color: $white; 
+        }
+        
+        .cell-unit[data-type="driver"] { 
+            background: rgba($danger, 0.15); 
+            color: $danger; 
+            cursor: default;
+        }
+        
+        .cell-unit[data-type="wc"] { 
+            background: $dark; 
+            color: $white; 
+            cursor: default;
+        }
+        
+        .cell-unit[data-type="door"] { 
+            background: $primary; 
+            color: $white; 
+            cursor: default;
+        }
+        
+        .cell-unit[data-type="aisle"] { 
+            background: transparent !important; 
+            border: 1px dashed $mute;
+            cursor: default;
+        }
+	
+    } //seatmap-matrix
 
-		//---- SEAT RADIO ----
-		.seat-radio {
-			display: none;
-		}
-	
-		/* style du label (siège) */
-		.seat-radio + label {
-			cursor: pointer;
-		}
-	
-		/* état sélectionné */
-		.seat-radio:checked + label {
-			outline: 3px solid $success !important;
-			background: $success !important;
-			color: $white !important;
-			transform: scale(1.08);
-			z-index: 2;
-		}
-	
-		/* booked */
-		.seat-radio:disabled + label {
-			background: $gray;
-			cursor: not-allowed;
-			opacity: 0.5;
-		}
-		
-		//---CELL unit---
-		.cell-unit {
-			width: 40px;
-			height: 40px;
-			border-radius: 6px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 0.8rem;
-			font-weight: 700;
-			border: 1px solid rgba(0,0,0,0.1);
-			user-select: none;
-			transition: 0.15s ease;
-	
-			  /* STATES */
-			&.is-selected {
-				background: $success !important;
-				outline: 1px solid #111 !important;
-				transform: scale(1.1) !important;
-				z-index: 10;
-				color: $white !important;
-			}//.is-selected
-	
-			&.is-booked {
-				background: rgba($color: $danger, $alpha: .225); color: $danger;
-				pointer-events: none;
-				cursor:not-allowed;
-			}//.is-booked
-	
-	
-	
-		}//cell-unit
-	
-		/* TYPES */
-		.cell-unit[data-type="seat"] { background: rgba($color: $success, $alpha: .225); color: $success; cursor: pointer; }
-		.cell-unit[data-type="vip"] { background: linear-gradient($success,$dark); color: $white; cursor: pointer; }
-		
-		.cell-unit[data-type="driver"] { background: rgba($color: $danger, $alpha: .225); color: $danger; }
-		.cell-unit[data-type="wc"] { background: $dark; color: $white; }
-		.cell-unit[data-type="door"] { background: $primary; color: $white; }
-		
-		.cell-unit[data-type="aisle"] { background: $white !important; border: 1px dashed $mute;}
-	
-	}//seatmap-matrix
 
-
-	.seatmap-legend-bar{
+    .seatmap-legend-bar {
+        border-top: 1px solid $mute;
+        width: 100%;
+        max-width: 100%;
+        margin: 1.5rem auto 0 auto;
+        padding-top: 1.25rem;
+        box-sizing: border-box;
+        background: $white;
 	
-		border-top: 1px solid $mute;
-		//box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
-		width: max-content;
-		margin: auto;
-		padding-top: 1.25rem;
-		margin-top: 1rem;
-		border-bottom-left-radius: 8px;
-		border-bottom-right-radius: 8px;
-		background: $white;
-	
-		.legend {
-					font-size: .9rem;
-					color: $gray;
-					display: flex;
-					gap: 1rem;
+        .legend {
+            font-size: .8rem;
+            color: $gray;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap; // Permet aux puces de la légende de revenir à la ligne proprement sur mobile
+            justify-content: center;
+            margin: 0;
+            padding: 0;
 					
+            span {       
+                text-align: center;
+                padding: 5px 10px;
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 11px;
 				
-					span{       
-						text-align: center;
-						padding: 6px 14px;
-						border-radius: 6px;
-						font-weight: bold;
-				
-						&.available {
-							background: rgba($color: $success, $alpha: .225) !important;
-							color: $success !important;
-						}//available
-						
-						&.selected {
-							background: $success;
-							color: $white;
-						}//selected
-						
-						&.booked {
-							background: rgba($color: $danger, $alpha: .225);
-							color: $danger;
-						}//booked
-						
-						&.vip {
-							background: rgba($color: $primary, $alpha: .225);
-							color: $primary;
-						}//vip
-				
-					}//span
-				
-		}//legend
-	
-	}//seatmap-legend-bar
+                &.available {
+                    background: rgba($success, 0.15) !important;
+                    color: $success !important;
+                }
+                
+                &.selected {
+                    background: $success;
+                    color: $white;
+                }
+                
+                &.booked {
+                    background: rgba($danger, 0.15);
+                    color: $danger;
+                }
+                
+                &.vip {
+                    background: rgba($primary, 0.15);
+                    color: $primary;
+                }
+            }
+        }
+    } //seatmap-legend-bar
 
-}//seatmap-card
+} //seatmap-card
 
-//seatmap-section
-.seatmap-section-title{
-	text-align: center;
-	padding-block: 1.5rem;
-}////seatmap-section
-  
-  
+.seatmap-section-title {
+    text-align: center;
+    padding-block: 1.5rem;
+}  
 
-
-.dark{
-	.seatmap-card,.seatmap-legend-bar{background-color: $dm-bg;}
-	.seatmap-section-title{color: $success;}
-}//.dark
-
-
-
-
-
-
-
+/* COMMUTATION THEME SOMBRE NETTOYÉE */
+.dark {
+    .seatmap-card, .seatmap-legend-bar { 
+        background-color: $dm-bg; 
+    }
+    .seatmap-card .seatmap-matrix .cell-unit[data-type="aisle"] {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    .seatmap-section-title { 
+        color: $success; 
+    }
+}

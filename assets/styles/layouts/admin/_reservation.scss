@@ -259,6 +259,7 @@
         border-radius: $radius-card;
         padding: 1.5rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.005);
+        box-sizing: border-box;
 
         h2 {
             font-size: 14px;
@@ -322,6 +323,13 @@
 
         @media (max-width: 992px) { grid-template-columns: 1fr; }
     }
+
+
+    .id-seatmap-section-wrapper{
+       padding: 24px; background: $white; 
+       border-radius: $radius-card; 
+       border: 1px solid $mute; box-sizing: border-box;
+    }//id-seatmap-section-wrapper
 
     // --- VOLET DROIT COMPOSANT DE SÉCURITÉ DU BON (ASIDE) ---
     .summary {
@@ -425,23 +433,23 @@
 .dark {
     .admin-booking-creation-scope {
         .header {
-            .agency-back-action { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff; }
-            .title h2 { color: #fff; }
+            .agency-back-action { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $white; }
+            .title h2 { color: $white; }
         }
 
         .reservation-form .card {
             background: $dm-bg; border-color: rgba($mute, 0.25);
-            h2 { color: #fff; border-bottom-color: rgba($mute, 0.15); }
+            h2 { color: $white; border-bottom-color: rgba($mute, 0.15); }
             .field label { color: $mute; }
-            .field input, .field select { background: darken($dm-bg, 6%); border-color: rgba($mute, 0.2); color: #fff; }
+            .field input, .field select { background: darken($dm-bg, 6%); border-color: rgba($mute, 0.2); color: $white; }
         }
 
         .summary {
-            .billing-details-list li { color: $mute; span { color: #fff; } }
+            .billing-details-list li { color: $mute; span { color: $white; } }
             .summary-divider { border-top-color: rgba($mute, 0.15); }
-            .reservation-notice-zone { background-color: rgba($primary, 0.12); .notice-text { color: $mute; strong { color: #fff; } } }
-            .total { background: rgba($white, 0.02); color: #fff; }
-            .btn-full { background: #fff; color: $dark; }
+            .reservation-notice-zone { background-color: rgba($primary, 0.12); .notice-text { color: $mute; strong { color: $white; } } }
+            .total { background: rgba($white, 0.02); color: $white; }
+            .btn-full { background: $white; color: $dark; }
         }
     }
 }
@@ -636,24 +644,24 @@
 .dark {
     .admin-booking-creation-scope {
         .header {
-            .agency-back-action { background: darken($dm-bg, 3%); border-color: rgba($mute, 0.2); color: #fff; }
-            .title h2 { color: #fff; }
+            .agency-back-action { background: darken($dm-bg, 3%); border-color: rgba($mute, 0.2); color: $white; }
+            .title h2 { color: $white; }
         }
 
         .reservation-form .card {
             background: $dm-bg; border-color: rgba($mute, 0.25);
-            h2 { color: #fff; border-bottom-color: rgba($mute, 0.15); }
+            h2 { color: $white; border-bottom-color: rgba($mute, 0.15); }
             .field label, .summary .section-micro-label { color: $mute; }
-            .field input, .field select { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff; }
+            .field input, .field select { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $white; }
         }
 
         .summary {
-            .billing-details-list li { color: $mute; span { color: #fff; } }
-            .total { background: rgba($white, 0.02); color: #fff; }
+            .billing-details-list li { color: $mute; span { color: $white; } }
+            .total { background: rgba($white, 0.02); color: $white; }
             .summary-divider { border-top-color: rgba($mute, 0.15); }
             
             .payment-method-selectors .pay-method-item {
-                .custom-box { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: #fff; }
+                .custom-box { background: darken($dm-bg, 4%); border-color: rgba($mute, 0.2); color: $white; }
                 input[type="radio"]:checked + .custom-box { background: rgba($primary, 0.1); color: $primary; }
             }
         }
