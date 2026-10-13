@@ -133,6 +133,19 @@
                         </div>
                     </div>
 
+                    {# Dans templates/public/agency/register.html.twig #}
+
+                    <div class="field mb-25 checkbox-legal-consent-row">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" name="accept_legal" required>
+                            <span class="checkmark"></span>
+                            <span class="legal-label-text">
+                                En créant ce compte, la compagnie accepte expressément les <a href="{{ path('public_legal_cgu') }}" target="_blank" class="text-success text-weight-700">CGU d'infrastructure</a>, les obligations de paiement sous peine de suspension de données, et la clause de confidentialité MyDigitrans.
+                            </span>
+                        </label>
+                    </div>
+
+
                     <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">Créer mon compte agence</button>
 
                 </form>

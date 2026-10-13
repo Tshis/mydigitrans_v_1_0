@@ -206,6 +206,32 @@
     
     .text-success-mode-link { color: $success; text-decoration: none; &:hover { text-decoration: underline; } }
     .account-toggle-text { color: $gray; font-size: 13px; }
+
+
+    /* assets/styles/modules/_public-become-partner.scss */
+    .checkbox-legal-consent-row {
+        padding-top: 5px;
+        
+        .custom-checkbox {
+            display: flex;
+            align-items: flex-start; // Aligne la case à cocher en haut si le texte légal s'étale sur deux lignes
+            gap: .2rem;
+            cursor: pointer;
+            .checkmark {
+                margin-top: 1px; // Centre la case avec la première ligne de texte
+            }
+        }
+
+        .legal-label-text {
+            font-size: 10.5px;
+            line-height: 1.4;
+            color: $gray; // Couleur $gray officielle
+        }
+    }
+
+
+
+
 }
 
 
