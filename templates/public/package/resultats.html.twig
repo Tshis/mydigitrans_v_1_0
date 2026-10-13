@@ -88,13 +88,13 @@
                                     </div>
                                 
                                     {# Action d'enclenchement de la quittance colis #}
-                                    <form action="{{ path('public_package_book') }}" method="POST">
+                                    {#  <form action="{{ path('public_package_book') }}" method="POST">
                                         <input type="hidden" name="trip_id" value="{{ trip.id }}">
                                         <input type="hidden" name="weight" value="{{ search_query.weight }}">
                                         <button type="submit" class="btn-refined btn-primary-gradient w-100-percent">
                                             <i class="fa-solid fa-box-open"></i> Choisir ce départ
                                         </button>
-                                    </form>
+                                    </form> #}
                                 </div>
 
                             </div>
