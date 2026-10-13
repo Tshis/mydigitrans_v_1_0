@@ -12,6 +12,14 @@
 	border-top-left-radius:20px ;
 	border-top-right-radius:20px ;
 
+	display: flex;
+	flex-direction: column;
+	align-items: center; // Centre verticalement et horizontalement tout le bloc du bus
+	width: 100%;
+	overflow-x: auto; // Déclenche un scroll horizontal invisible si l'écran est plus petit que le bus
+	-webkit-overflow-scrolling: touch; // Rend le défilement tactile ultra-fluide sur iPhone/Android
+   
+
 	.bus-head{
 		color: $success;
 		font-weight: 700;
