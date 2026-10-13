@@ -129,8 +129,8 @@
         // 🚨 LE CORRECTIF DE SÉCURITÉ RESPONSIVE
         @media (max-width: 768px) { 
             flex-direction: column; 
-            align-items: center; // 🌟 Changé de flex-start à center pour redresser le layout
-            text-align: center;  // 🌟 Centre les textes pour le confort de lecture mobile
+            align-items: center !important; // 🌟 Changé de flex-start à center pour redresser le layout
+            text-align: center !important;  // 🌟 Centre les textes pour le confort de lecture mobile
             gap: 1.5rem; 
         }
     }
@@ -140,7 +140,7 @@
         flex: 0 0 180px;
         
         @media (max-width: 768px) {
-            flex: 1 1 100%; // 🌟 Libère la largeur figée sur mobile
+            flex: 1 1 100% !important; // 🌟 Libère la largeur figée sur mobile
             width: 100%;
         }
         
@@ -153,7 +153,7 @@
         flex: 1; display: flex; align-items: center; gap: 1.5rem; width: 100%;
         
         @media (max-width: 768px) {
-            max-width: 320px; // 🌟 Empêche l'axe routier de s'étirer à l'infini
+            max-width: 320px !important; // 🌟 Empêche l'axe routier de s'étirer à l'infini
             margin: 0 auto;
         }
         
@@ -179,9 +179,9 @@
         flex: 0 0 160px; width: 100%;
         
         @media (max-width: 768px) { 
-            flex: 1 1 100%; // 🌟 Annule les 160px pour occuper tout l'espace utile du smartphone
+            flex: 1 1 100% !important; // 🌟 Annule les 160px pour occuper tout l'espace utile du smartphone
             max-width: 100%;
-            text-align: center; // 🌟 Changé de left à center pour équilibrer le bouton
+            text-align: center !important; // 🌟 Changé de left à center pour équilibrer le bouton
             border-top: 1px dashed $mute; // Sépare élégamment la zone de paiement
             padding-top: 1rem;
         }

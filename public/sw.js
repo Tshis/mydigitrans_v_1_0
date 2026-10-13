@@ -1,5 +1,8 @@
 // public/sw.js
-const CACHE_NAME = 'mydigitrans-v1.0-cache';
+
+// 🚨 ON CHANGE LE NOM DE LA CLÉ POUR FORCER L'INCRÉMENTATION D'USINE
+const CACHE_NAME = 'mydigitrans-v1.0-cache'; 
+
 const ASSETS_TO_CACHE = [
     // 0. Les points d'entrée et liens structurels d'usine
     '/',
@@ -25,17 +28,41 @@ const ASSETS_TO_CACHE = [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css', // 🚨 AJOUTÉ : Ta version 6.7.2 optimisée !
 ];
 
-
-// Installation du cache d'usine
+// 1. ÉTAPE D'INSTALLATION (Création du nouveau conteneur)
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
             return cache.addAll(ASSETS_TO_CACHE);
+        }).then(() => {
+            // 🚨 FORCE LE SERVICE WORKER EN ATTENTE À S'ACTIVER TOUT DE SUITE
+            return self.skipWaiting();
         })
     );
 });
 
-// Distribution ultra-rapide des fichiers mis en cache
+// 2. 🚨 NOUVEAU - ÉTAPE D'ACTIVATION : NETTOYAGE CHIRURGICAL DES ANCIENS CACHES PERIMÉS
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            // 🚨 LE FIX : On utilise le point (.) de JavaScript à la place des deux-points (::) de PHP [Profile]
+            return Promise.all(
+                cacheNames.map(cache => {
+                    // Si le nom du cache en mémoire est différent du nouveau (v1.1), on le détruit d'office
+                    if (cache !== CACHE_NAME) {
+                        console.log('PWA MyDigitrans : Destruction de l\'ancien cache obsolète :', cache);
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        }).then(() => {
+            // Prend le contrôle immédiat de tous les onglets ouverts
+            return self.clients.claim();
+        })
+    );
+});
+
+
+// 3. DISTRIBUTION DES FLUX
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request).then(response => {
