@@ -1,0 +1,25 @@
+{
+    "id": "/?source=pwa",
+    "name": "MyDigitrans - Exploitation Transport",
+    "short_name": "MyDigitrans",
+    "description": "Logiciel SaaS de billetterie synchrone, colisage et réseau d'agences de transport urbain",
+    "start_url": "/connexion?source=pwa",
+    "display": "standalone",
+    "background_color": "#0c326d",
+    "theme_color": "#ef6e17",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/img-core/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/img-core/logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

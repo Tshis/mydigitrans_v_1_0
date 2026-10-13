@@ -6,7 +6,12 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 		<link rel="icon" href="/img-core/favicon.png">
-		<meta name="theme-color" content="#ef6e17"/>
+
+		{# Dans la balise <head> de templates/base.html.twig #}
+		<link rel="manifest" href="/manifest.json">
+		<meta name="theme-color" content="#ef6e17">
+		<script src="/js/pwa-register.js" defer></script>
+
 
 		<title>
 			{% block title %}My DigiTrans |
@@ -32,12 +37,12 @@
 		<!-- header-content -->
 
 		<div class="main-content"> {% block body %}{% endblock %}
-			</div>
-			<!--main-content-->
+		</div>
+		<!--main-content-->
 
-			<div class="page-footer-content">{{ include('/public/partials/_footer.html.twig') }}
-			</div>
-			<!-- footer -->
-		</body>
+		<div class="page-footer-content">{{ include('/public/partials/_footer.html.twig') }}
+		</div>
+		<!-- footer -->
+	</body>
 
-	</html>
+</html>

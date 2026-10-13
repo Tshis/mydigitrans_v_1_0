@@ -1,0 +1,1 @@
+"serviceWorker"in navigator&&window.addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").then(e=>{console.log("MyDigitrans PWA : Moteur local ServiceWorker activé avec succès !")}).catch(e=>{console.error("MyDigitrans PWA : Échec de l’enrôlement du ServiceWorker :",e)})});
