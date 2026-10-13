@@ -61,36 +61,86 @@
     .card-title-fix { font-size: 13px; font-weight: 800; text-transform: uppercase; color: $dark; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
 
     // Structure interne des lignes de bus
+    // --- CARTES DE TRAJETS (TRIP CARD) ---
+    .trip-result-card {
+        background: $white; border: 1px solid $mute; border-radius: $radius-card; padding: 24px; box-sizing: border-box; transition: box-shadow 0.2s ease;
+        &:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+    }
+
     .trip-card-body-layout {
         display: flex; justify-content: space-between; align-items: center; gap: 2rem;
-        @media (max-width: 768px) { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+        
+        // 🚨 LE CORRECTIF DE SÉCURITÉ RESPONSIVE
+        @media (max-width: 768px) { 
+            flex-direction: column; 
+            align-items: center; // 🌟 Changé de flex-start à center pour redresser le layout
+            text-align: center;  // 🌟 Centre les textes pour le confort de lecture mobile
+            gap: 1.5rem; 
+        }
     }
 
+    // Bloc marque
     .agency-brand-block {
         flex: 0 0 180px;
+        
+        @media (max-width: 768px) {
+            flex: 1 1 100%; // 🌟 Libère la largeur figée sur mobile
+            width: 100%;
+        }
+        
         .agency-name-title { font-size: 16px; font-weight: 800; color: $dark; margin: 0; }
-        .bus-badge-type { background: $mute; color: $dark; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; }
+        .bus-badge-type { background: rgba($gray, 0.05); color: $gray; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 6px; }
     }
 
+    // Ligne temporelle
     .route-timeline-block {
         flex: 1; display: flex; align-items: center; gap: 1.5rem; width: 100%;
+        
+        @media (max-width: 768px) {
+            max-width: 320px; // 🌟 Empêche l'axe routier de s'étirer à l'infini
+            margin: 0 auto;
+        }
+        
         .time-node {
             display: flex; flex-direction: column;
             .time { font-size: 18px; color: $dark; }
             .station-name { font-size: 12px; color: $gray; margin-top: 4px; }
+            
+            @media (max-width: 768px) {
+                flex: 1;
+            }
         }
+        
         .route-duration-line {
             flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;
-            .duration-text { font-size: 11px; color: $gray; }
+            .duration-text { font-size: 11px; }
             .visual-line { width: 100%; height: 2px; background: $mute; position: relative; &::after { content: ""; width: 6px; height: 6px; background: $primary; border-radius: 50%; position: absolute; top: -2px; right: 0; } }
         }
     }
 
+    // Tarification et Clic action
     .pricing-booking-block {
         flex: 0 0 160px; width: 100%;
-        .seat-left-alert { font-size: 11px; color: $success; }
-        .trip-price-tag { .price { font-size: 16px; color: $primary; } .currency { font-size: 14px; color: $primary; margin-left: 2px; } }
+        
+        @media (max-width: 768px) { 
+            flex: 1 1 100%; // 🌟 Annule les 160px pour occuper tout l'espace utile du smartphone
+            max-width: 100%;
+            text-align: center; // 🌟 Changé de left à center pour équilibrer le bouton
+            border-top: 1px dashed $mute; // Sépare élégamment la zone de paiement
+            padding-top: 1rem;
+        }
+        
+        .seat-left-alert { font-size: 11px; color: $primary; }
+        .trip-price-tag {
+            .price { font-size: 22px; color: $primary; }
+            .currency { font-size: 14px; color: $primary; margin-left: 2px; }
+        }
     }
+
+    .w-100-percent { width: 100%; box-sizing: border-box; justify-content: center; }
+    .monospace { font-family: monospace; }
+    .font-bold { font-weight: 800; }
+
 
     .notice-box-info { background: rgba($success, 0.04); border-radius: 6px; padding: 12px 14px; font-size: 11.5px; border: 1px dashed rgba($success, 0.2); color: $gray; }
     .notice-box-info-currency { background: rgba($primary, 0.04); border-radius: 6px; padding: 12px 14px; border: 1px dashed rgba($primary, 0.2); font-size: 11.5px; color: $gray; }
