@@ -1,0 +1,250 @@
+{# templates/admin/agency/fret/fret_vouchers_pdf.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Pièces Fret {{ package.waybill }}</title>
+		<style>
+			@import url("https://cloudflare.com");
+
+			@page {
+				margin: 0mm;
+				size: 80mm 280mm;
+			}
+			body {
+				font-family: "Helvetica", "Arial", sans-serif;
+				color: #000000;
+				font-size: 9px;
+				line-height: 1.3;
+				background: #ffffff;
+				padding: 0;
+				margin: 0;
+			}
+
+			.thermal-ticket-wrapper {
+				width: 250px;
+				max-width: 250px;
+				padding: 15px 8px 8px 8px;
+				border: 1px solid #afd3e7;
+				border-radius: 6px;
+				box-sizing: border-box;
+				background: #ffffff;
+				margin: 0 auto 15px auto;
+			}
+
+			.text-center {
+				text-align: center;
+			}
+			.monospace {
+				font-family: monospace;
+			}
+			.font-bold {
+				font-weight: bold;
+			}
+
+			.agency-title {
+				font-size: 13px;
+				font-weight: 900;
+				color: #0c326d;
+				margin: 0;
+				text-transform: uppercase;
+			}
+			.voucher-type-subtitle {
+				font-size: 8px;
+				color: #ef6e17;
+				margin: 2px 0 8px 0;
+				font-weight: bold;
+				border-bottom: 2px solid #0c326d;
+				padding-bottom: 4px;
+				text-transform: uppercase;
+			}
+			.waybill-number {
+				font-family: monospace;
+				font-size: 10px;
+				font-weight: bold;
+				background: #afd3e7;
+				color: #0c326d;
+				padding: 2px 5px;
+				border-radius: 3px;
+				display: inline-block;
+				margin-bottom: 8px;
+			}
+
+			.table-fret-details {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 6px;
+				table-layout: fixed;
+			}
+			.table-fret-details td {
+				padding: 4px 0;
+				vertical-align: middle;
+				border-bottom: 1px dashed rgba(175, 211, 231, 0.4);
+				font-size: 9px;
+				word-wrap: break-word;
+				overflow: hidden;
+			}
+			.table-fret-details td.lbl {
+				width: 42%;
+				text-align: left;
+				color: #4b5563;
+				font-weight: bold;
+			}
+			.table-fret-details td.val {
+				width: 58%;
+				text-align: right;
+				color: #0c326d;
+				font-weight: bold;
+			}
+
+			/* 🚨 BLOC CODE SECRET DE RETRAIT SECURISÉ */
+			.secret-pickup-vault {
+				background: rgba(217, 69, 22, 0.05);
+				border: 2px dashed #d94516;
+				border-radius: 6px;
+				padding: 8px;
+				margin: 8px 0;
+				text-align: center;
+			}
+			.secret-pickup-code {
+				font-size: 16px;
+				font-weight: 900;
+				color: #d94516;
+				font-family: monospace;
+				letter-spacing: 1px;
+			}
+
+			.weight-massive-box {
+				background: rgba(239, 110, 23, 0.06);
+				border: 1px solid #ef6e17;
+				border-radius: 5px;
+				padding: 6px;
+				margin-vertical: 6px;
+				text-align: center;
+			}
+			.weight-value {
+				font-size: 14px;
+				font-weight: 900;
+				color: #ef6e17;
+				font-family: monospace;
+			}
+			.price-vault-box {
+				border: 1px solid #1684c5;
+				background: #0c326d;
+				color: #ffffff;
+				padding: 5px;
+				border-radius: 4px;
+				font-size: 10px;
+				font-weight: 900;
+				margin-bottom: 6px;
+				text-align: center;
+			}
+
+			.qr-zone {
+				margin: 6px 0;
+				text-align: center;
+				width: 100%;
+			}
+			.qr-img {
+				width: 75px;
+				height: 75px;
+				display: block;
+				margin: 0 auto;
+			}
+			.footer-barcodes {
+				border-top: 1px dashed #afd3e7;
+				padding-top: 5px;
+				font-size: 7px;
+				color: #4b5563;
+				line-height: 1.2;
+				text-align: center;
+			}
+			.page-break-divider {
+				page-break-after: always;
+				border-bottom: 2px dashed #4b5563;
+				margin-vertical: 15px;
+			}
+		</style>
+	</head>
+	<body>
+
+		{# ========================================================================= #}
+		{# PIÈCE A : LE BON DE DÉPÔT (EXPÉDITEUR) - DUPLICATA AUTORISÉ               #}
+		{# ========================================================================= #}
+		<div class="thermal-ticket-wrapper text-center">
+			<h2 class="agency-title">{{ agency_name }}</h2>
+			<div class="voucher-type-subtitle">1. REÇU EXPÉDITEUR (BON DE DÉPÔT)</div>
+        
+			<div class="waybill-number">{{ package.waybill }}</div>
+
+			{# 🚨 INTEGRATION DU CODE DE SÉCURITÉ COMPTABLE D'USINE #}
+			<div class="secret-pickup-vault">
+				<span style="font-size: 7.5px; color: #4b5563; font-weight: bold; display: block; text-transform: uppercase; margin-bottom: 2px;">Code Secret de Retrait Obligatoire</span>
+				<span class="secret-pickup-code">{{ package.pickup_code }}</span>
+				<span style="font-size: 7px; color: #d94516; font-weight: 500; display: block; margin-top: 3px;">Transmettez ce code uniquement à votre destinataire.</span>
+			</div>
+
+			<table class="table-fret-details">
+				<tbody>
+					<tr><td class="lbl">Expéditeur :</td><td class="val">{{ package.sender_name }}</td></tr>
+					<tr><td class="lbl">Téléphone Ex. :</td><td class="val monospace">{{ package.sender_phone }}</td></tr>
+					<tr><td class="lbl">Destinataire :</td><td class="val">{{ package.receiver_name }}</td></tr>
+					<tr><td class="lbl">Téléphone Des. :</td><td class="val monospace">{{ package.receiver_phone }}</td></tr>
+					<tr><td class="lbl">Axe Routier :</td><td class="val">{{ package.route }}</td></tr>
+					<tr><td class="lbl">Gare Arrivée :</td><td class="val">{{ package.arrival_branch }}</td></tr>
+					<tr><td class="lbl">Nature Colis :</td><td class="val">{{ package.nature }}</td></tr>
+				</tbody>
+			</table>
+
+			<div class="weight-massive-box">
+				<span class="weight-value">{{ package.weight }} KG</span>
+			</div>
+
+			<div class="price-vault-box">
+				VALEUR PERÇUE : <span class="monospace">{{ package.amount_paid|number_format(2, ',', ' ') }} {{ package.currency }}</span>
+			</div>
+
+			<div class="footer-barcodes">
+				<p class="monospace" style="font-size: 8px; font-weight: bold; margin: 0 0 2px 0;">* {{ package.waybill }} *</p>
+				<p style="margin: 0;">Preuve de dépôt officielle MyDigitrans. En cas de perte, la réimpression de ce reçu au guichet conserve le même code secret.</p>
+			</div>
+		</div>
+
+
+		{# ========================================================================= #}
+		{# PIÈCE B : LE BON DE COLISAGE (CARTON) - COMPLÈTEMENT CENSURÉ SI DUPLICATA #}
+		{# ========================================================================= #}
+		{% if print_mode == 'creation' %}
+			<div class="page-break-divider"></div>
+
+			<div class="thermal-ticket-wrapper text-center">
+				<h2 class="agency-title">{{ agency_name }}</h2>
+				<div class="voucher-type-subtitle" style="color: #ef6e17; border-bottom-color: #ef6e17;">2. SÉCURITÉ RETRAIT (BON DE COLISAGE)</div>
+            
+				<div class="waybill-number" style="background: #ef6e17; color: white;">{{ package.waybill }}</div>
+
+				<table class="table-fret-details">
+					<tbody>
+						<tr><td class="lbl">Destinataire :</td><td class="val" style="font-size: 11px;">{{ package.receiver_name }}</td></tr>
+						<tr><td class="lbl">Téléphone Des. :</td><td class="val monospace">{{ package.receiver_phone }}</td></tr>
+						<tr><td class="lbl">Gare Retrait :</td><td class="val" style="color: #ef6e17;">{{ package.arrival_branch }}</td></tr>
+						<tr><td class="lbl">Contenu Déclaré :</td><td class="val">{{ package.nature }}</td></tr>
+						<tr><td class="lbl">Date Envoi :</td><td class="val monospace">{{ package.created_at|date('d/m/Y') }}</td></tr>
+					</tbody>
+				</table>
+
+				<div class="weight-massive-box"><span class="weight-value">{{ package.weight }} KG</span></div>
+
+				{% if qr_base64 %}
+					<div class="qr-zone"><img class="qr-img" src="{{ qr_base64 }}" alt="QR Fret Secure"></div>
+				{% endif %}
+
+				<div class="footer-barcodes">
+					<p class="monospace" style="font-size: 8px; font-weight: bold; margin: 0 0 2px 0; color: #ef6e17;">* RETRAIT-SECURE-{{ package.id }} *</p>
+					<p style="margin: 0;">Avis au manutentionnaire : Colis sous protection électronique. Le code secret de déblocage n'est pas imprimé sur cette étiquette soute.</p>
+				</div>
+			</div>
+		{% endif %}
+
+	</body>
+</html>

@@ -1,0 +1,52 @@
+{# templates/partials/_flash_messages.html.twig #}
+<div class="mydigitrans-alert-container">
+    {% for label, messages in app.flashes %}
+    {% for message in messages %}
+    <div class="bg-white">
+        <div class="alert-box alert-{{ label }}" role="alert" data-alert="auto-dismiss">
+            <div class="alert-content-flex">
+
+                {# SÉCURITÉ ALIGNEMENT ICÔNE GAUCHE #}
+                <div class="alert-icon-zone">
+                    {% if label == 'success' %}
+                    <i class="fa-solid fa-circle-check"></i>
+                    {% elseif label == 'danger' or label == 'error' %}
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {% elseif label == 'warning' %}
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    {% else %}
+                    <i class="fa-solid fa-circle-info"></i>
+                    {% endif %}
+                </div>
+
+                {# ZONE DU MESSAGE TEXTUEL #}
+                <div class="alert-text-wrapper">
+                    <p class="alert-text-message">{{ message|raw }}</p>
+                </div>
+
+                {# SÉCURITÉ ALIGNEMENT CRUCIAL BOUTON FERMETURE #}
+                <div class="alert-action-zone">
+                    <button type="button" class="alert-close-dismiss" onclick="this.closest('.alert-box').remove();"
+                        title="Fermer l'alerte">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div>
+
+<script>
+    // SCRIPT D'AUTO-DISMISS D'USINE : Disparition après 5 secondes
+    document.querySelectorAll('[data-alert="auto-dismiss"]').forEach((alert) => {
+        setTimeout(() => {
+            alert.style.transition = "transform 0.4s ease, opacity 0.4s ease";
+            alert.style.opacity = "0";
+            alert.style.transform = "translateX(50px)";
+            setTimeout(() => alert.remove(), 400);
+        }, 5000); // 5000 millisecondes = 5 secondes
+    });
+</script>

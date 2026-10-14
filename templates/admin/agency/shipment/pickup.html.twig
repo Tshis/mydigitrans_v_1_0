@@ -1,0 +1,97 @@
+{# templates/admin/agency/fret/pickup.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+    <div class="admin-booking-creation-scope container">
+
+        {# --- HEADER DE LA GARE DE DESTINATION --- #}
+        <header class="header-refined mb-25">
+            <div class="header-main-info">
+                <a href="{{ path('admin_agency_shipment_index') }}" class="agency-back-action" title="Retour au registre fret">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="title">
+                    <h1>Guichet Arrivée : Livraison Colis</h1>
+                    <p class="subtitle">Lettre de voiture : <strong class="text-primary">{{ package.waybill }}</strong></p>
+                </div>
+            </div>
+        </header>
+
+        {# --- TUNNEL DE VALIDATION REVERSÉ (RÉSUMÉ À DROITE EN PREMIER) --- #}
+        <form action="{{ path('admin_agency_shipment_pickup_process', {'reference': package.reference}) }}" method="POST" class="reservation-form">
+            <div class="reservation-container">
+
+                {# COLONNE DROITE : FICHE DESCRIPTIVE DU COLIS EN SOUTE (PLACÉE EN PREMIER DANS LE HTML) #}
+                <aside class="summary">
+                    <div class="card summary-sticky-card">
+                        <h2>Fiche de Marchandise</h2>
+                        <div class="reservation-notice-zone mb-20 success-accent-bg">
+                            <p class="notice-title text-success-mode">
+                                <i class="fa-solid fa-boxes-packing"></i> Colis Prêt au Retrait
+                            </p>
+                            <p class="notice-text">Ce colis est stocké en magasin à la gare de <strong>{{ package.arrival_branch }}</strong>.</p>
+                        </div>
+					
+                        <ul class="billing-details-list">
+                            <li><strong>Expéditeur :</strong> <span>{{ package.sender_name }}</span></li>
+                            <li><strong>Destinataire Attendu :</strong> <span class="font-bold text-primary">{{ package.receiver_name }}</span></li>
+                            <li><strong>Téléphone Destinataire :</strong> <span class="monospace">{{ package.receiver_phone }}</span></li>
+                            <li><strong>Nature du Fret :</strong> <span>{{ package.nature }}</span></li>
+                            <li><strong>Poids mesuré :</strong> <span class="font-bold text-danger-color">{{ package.weight }} KG</span></li>
+                        </ul>
+                    
+                        <hr class="summary-divider mb-15">
+                    
+                        <div class="total">
+                            Statut Comptable :
+                            <strong class="text-success-mode">Purement Encaissé</strong>
+                        </div>
+                    </div>
+                </aside>
+
+                {# COLONNE GAUCHE : FORMULAIRE DE VÉRIFICATION DES DEUX BARRIÈRES DE SÉCURITÉ #}
+                <div class="layout-main-panel">
+				
+                    {# BARRIÈRE 1 : LE CODE SECRET D'USINE #}
+                    <div class="card mb-20">
+                        <h2><i class="fa-solid fa-lock text-primary"></i> 1. Code Secret de Déblocage</h2>
+                        <p class="text-gray text-size-12 mb-15">Demandez au destinataire le code secret à 4 caractères que l'expéditeur lui a communiqué.</p>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Saisir le Code de Retrait Secret *</label>
+                            <input type="text" name="input_pickup_code" class="admin-bus-layout-add-input font-bold monospace text-center text-size-18 uppercase" placeholder="Ex: 591A" required autocomplete="off" max-length="10">
+                        </div>
+
+                        
+                    </div>
+
+                    {# BARRIÈRE 2 : CONTRÔLE DE LA PIÈCE D'IDENTITÉ REPRÉSENTATIVE #}
+                    <div class="card">
+                        <h2><i class="fa-solid fa-id-card text-primary"></i> 2. Décharge & Pièce d'Identité</h2>
+                        <p class="text-gray text-size-12 mb-15">Vérifiez la pièce physique originale avant de livrer la marchandise pour graver la décharge.</p>
+                        <div class="field-group">
+                            <div class="field">
+                                <label class="admin-bus-layout-add-label">Type de pièce d'identité *</label>
+                                <select name="receiver_id_type" class="admin-bus-layout-add-select" required>
+                                    <option value="carte_electeur">Carte d'Électeur (RDC)</option>
+                                    <option value="passeport">Passeport National</option>
+                                    <option value="permis">Permis de Conduire</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label class="admin-bus-layout-add-label">Numéro de la pièce présentée *</label>
+                                <input type="text" name="receiver_id_number" class="admin-bus-layout-add-input" placeholder="Ex: 123-4567-XYZ" required autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-25">
+                            <button type="submit" class="btn-refined btn-success-gradient btn-full w-100-percent">
+                                <i class="fa-solid fa-circle-check"></i> Valider la Livraison & Décharger la Soute
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+{% endblock %}

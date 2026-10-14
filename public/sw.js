@@ -2,7 +2,6 @@
 
 // 🚨 ON CHANGE LE NOM DE LA CLÉ POUR FORCER L'INCRÉMENTATION D'USINE
 const CACHE_NAME = 'mydigitrans-v1.0-cache'; 
-
 const ASSETS_TO_CACHE = [
     // 0. Les points d'entrée et liens structurels d'usine
     '/',
