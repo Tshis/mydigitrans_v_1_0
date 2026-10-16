@@ -10,5 +10,5 @@ enum SeatType: string
     case Normal = 'normal';
     case Vip = 'vip';
     case Extra = 'extra';
-    case Wc = 'wc';
+    case coDriver = 'coDriver';
 }
