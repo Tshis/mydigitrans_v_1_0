@@ -20,13 +20,10 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
 
-            # 🚨 LE VERROU SOUVERAIN : Ton authentificateur d'origine est l'unique juge
             entry_point: App\Security\UserAuthenticator
             custom_authenticator: App\Security\UserAuthenticator
-
-            # 🌟 LE CORRECTIF CHIRURGICAL : Suppression du bloc form_login obsolète.
-            # C'est ton UserAuthenticator qui gère le traitement de la mire de saisie.
 
             logout:
                 path: security_login_logout
