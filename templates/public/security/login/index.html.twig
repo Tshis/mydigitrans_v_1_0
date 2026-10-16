@@ -14,6 +14,12 @@
 
 			<form method="post">
 
+				{% if app.user %}
+					<div class="mb-3">
+						You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
+					</div>
+				{% endif %}
+
 				{% if error %}
 					<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
 				{% endif %}
@@ -24,7 +30,7 @@
 				<div class="field mb-25">
 					<div class="form-group">
 						<label>Email</label>
-						<input type="email" placeholder="exemple@mydigitrans.com" required>
+						<input value="{{ last_username }}" name="email" type="email" autocomplete="off" placeholder="exemple@mydigitrans.com" required autofocus>
 					</div>
 				</div>
 
@@ -32,13 +38,13 @@
 				<div class="field mb-25">
 					<div class="form-group">
 						<label>Mot de passe</label>
-						<input type="password" placeholder="••••••••" required>
+						<input name="password" type="password" placeholder="••••••••" required>
 					</div>
 				</div>
 
 				<div class="options mb-25">
 					<label class="remember">
-						<input type="checkbox">
+						<input name="_remember_me" type="checkbox">
 						Se souvenir de moi
 					</label>
 					<a href="{{ path('security_password_forgot') }}" class="forgot">Mot de passe oublié ?</a>

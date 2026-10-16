@@ -1,39 +1,53 @@
+# config/packages/security.yaml
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    # Hachage automatique des mots de passe utilisateurs de gares
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
 
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    # Chargement de ton entité étanche multi-tenant
     providers:
-        users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
+            # Autorise les outils de développement et l'App Shell de la PWA sans filtrage
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
+
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
+            # 🚨 LE VERROU SOUVERAIN : Ton authentificateur d'origine est l'unique juge
+            entry_point: App\Security\UserAuthenticator
+            custom_authenticator: App\Security\UserAuthenticator
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            # 🌟 LE CORRECTIF CHIRURGICAL : Suppression du bloc form_login obsolète.
+            # C'est ton UserAuthenticator qui gère le traitement de la mire de saisie.
 
-    # Note: Only the *first* matching rule is applied
+            logout:
+                path: security_login_logout
+                target: security_login_index # Redirige proprement vers ton écran d'accueil après déconnexion
+
+            remember_me:
+                secret: "%kernel.secret%"
+                lifetime: 604800 # Conserve la session mobile active pendant 7 jours en gare
+                path: /
+
+    # Gestion granulaire des accès aux consoles d'exploitations MyDigitrans
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # Tu débloqueras ces lignes au fur et à mesure du développement de tes contrôleurs :
+        # - { path: ^/admin/login, roles: PUBLIC_ACCESS }
+        # - { path: ^/admin, roles: ROLE_AGENCY_ADMIN }
 
 when@test:
     security:
         password_hashers:
-            # Password hashers are resource-intensive by design to ensure security.
-            # In tests, it's safe to reduce their cost to improve performance.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4
+                time_cost: 3
+                memory_cost: 10
