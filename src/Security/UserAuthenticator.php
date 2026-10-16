@@ -36,8 +36,6 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
         $email = (string) $request->getPayload()->get('email', '');
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
-        dd($email);
-
         return new Passport(
             new UserBadge($email),
             new PasswordCredentials((string) $request->getPayload()->get('password', '')),
