@@ -1,0 +1,100 @@
+{#
+    Formulaire unique de recherche de trajet.
+
+    Utilisation :
+        Page des trajets (par défaut) :
+            {% include 'public/_partials/line_search_form.html.twig' %}
+        Accueil (hero-card, champs empilés) :
+            {% include 'public/_partials/line_search_form.html.twig' with {variant: 'stack', compact: true} %}
+
+    Options :
+    - variant : 'inline' (défaut, HTML de la page des trajets) ou 'stack' (HTML de l'accueil).
+                Chaque variante reprend la structure d'origine de sa page : le CSS existant s'applique.
+    - compact : true masque le champ "nombre de passagers" (valeur 1 par défaut).
+    - searchForm : si le contrôleur le fournit (formulaire soumis avec ses erreurs), il est affiché ;
+                   sinon un formulaire vierge est créé.
+#}
+{% set searchForm = searchForm ?? line_search_form() %}
+{% set compact = compact ?? false %}
+{% set variant = variant ?? 'inline' %}
+
+{% if variant == 'stack' %}
+
+	{{ form_start(searchForm) }}
+
+	<div class="field mb-10">
+		{{ form_widget(searchForm.departure) }}
+		{{ form_errors(searchForm.departure) }}
+	</div>
+
+	<div class="field mb-10">
+		{{ form_widget(searchForm.arrival, {id: 'destination'}) }}
+		{{ form_errors(searchForm.arrival) }}
+	</div>
+
+	<div class="field mb-10">
+		{{ form_widget(searchForm.date) }}
+		{{ form_errors(searchForm.date) }}
+	</div>
+
+	{% if not compact %}
+		<div class="field mb-10">
+			{{ form_widget(searchForm.passengers) }}
+			{{ form_errors(searchForm.passengers) }}
+		</div>
+	{% endif %}
+
+	<button type="submit" class="btn-refined btn-primary-gradient btn-full">Rechercher</button>
+
+	{{ form_end(searchForm, {render_rest: false}) }}
+
+{% else %}
+
+	{{ form_start(searchForm, {attr: {class: 'search-form'}}) }}
+
+	<div class="field-group">
+
+		<div class="field">
+			{{ form_widget(searchForm.departure) }}
+			{{ form_errors(searchForm.departure) }}
+		</div>
+
+		<div class="field">
+			<button type="button" class="swap-btn" onclick="swapCities()">⇄</button>
+		</div>
+
+		<div class="field">
+			{{ form_widget(searchForm.arrival, {id: 'destination'}) }}
+			{{ form_errors(searchForm.arrival) }}
+		</div>
+
+	</div>
+	<!--departure - destination-->
+
+	<div class="field-group row">
+
+		<div class="field">
+			{{ form_widget(searchForm.date) }}
+			{{ form_errors(searchForm.date) }}
+		</div>
+
+		{% if not compact %}
+			<div class="field">
+				{{ form_widget(searchForm.passengers) }}
+				{{ form_errors(searchForm.passengers) }}
+			</div>
+		{% endif %}
+
+		<div class="field">
+			<button type="submit" class="btn-refined btn-primary-gradient">
+				<i class="fa-solid fa-magnifying-glass-location"></i>
+				Rechercher
+			</button>
+		</div>
+
+	</div>
+	<!--field row-->
+
+	{{ form_end(searchForm, {render_rest: false}) }}
+
+{% endif %}

@@ -35,22 +35,7 @@
 
 						<h3 class="mb-10">Trouvez votre trajet en quelques secondes</h3>
 
-						<form action="">
-
-							<div class="field mb-10">
-								<input placeholder="Ville de départ">
-							</div>
-
-							<div class="field mb-10">
-								<input placeholder="Destination">
-							</div>
-
-							<div class="field mb-10">
-								<input type="date">
-							</div>
-
-							<button class="btn-refined btn-primary-gradient btn-full">Rechercher</button>
-						</form>
+						{% include 'public/partials/line_search_form.html.twig' with {variant: 'stack', compact: true} %}
 
 					</div>
 					<!--hero-card-->
