@@ -19,11 +19,11 @@ final class LineSearchData
     #[Assert\Length(max: 100, maxMessage: 'Le nom de la ville est trop long.')]
     public ?string $arrival = null;
 
-    #[Assert\NotNull(message: 'Choisissez une date de voyage.')]
+    ##[Assert\NotNull(message: 'Choisissez une date de voyage.')]
     #[Assert\GreaterThanOrEqual('today', message: 'La date ne peut pas être dans le passé.')]
     public ?\DateTimeImmutable $date = null;
 
-    #[Assert\NotNull(message: 'Indiquez le nombre de passagers.')]
+    ##[Assert\NotNull(message: 'Indiquez le nombre de passagers.')]
     #[Assert\Range(
         min: 1,
         max: self::MAX_PASSENGERS,

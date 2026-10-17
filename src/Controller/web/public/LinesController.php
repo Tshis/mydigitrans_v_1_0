@@ -2,13 +2,15 @@
 
 namespace App\Controller\web\public;
 
+use App\Dto\LineSearchData;
+use App\Form\LineSearchType;
 use App\Service\BusLayoutGridBuilder;
+use App\Service\LineSearcher;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Encoding\Encoding;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,7 +31,7 @@ final class LinesController extends AbstractController
      * SÉQUENCE INTERACTION : TRAITEMENT DE LA RECHERCHE ET RENDU DES RÉSULTATS DISPONIBLES 
      */
     #[Route('/public/lines/results', name: 'public_lines_results')]
-    public function results(Request $request): Response
+    public function results(Request $request, LineSearcher $lineSearcher): Response
     {
         // Extraction des critères métiers saisis par le client (V1.0 multitenant)
         $searchQuery = [
@@ -71,12 +73,35 @@ final class LinesController extends AbstractController
             ]
         ];
 
+        $form = $this->createForm(LineSearchType::class);
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted()) {
+            return $this->redirectToRoute('public_lines_index');
+        }
+
+        if (!$form->isValid()) {
+            return $this->render('public/lines/index.html.twig', [
+                'page' => 'lignes',
+                'searchForm' => $form->createView(),
+            ], new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY));
+        }
+
+        /** @var LineSearchData $criteria */
+        $criteria = $form->getData();
+
         return $this->render('public/lines/results.html.twig', [
             'page' => 'lines',
             'search_query' => $searchQuery,
-            'trips_results' => $tripsResults
+            'trips_results' => $tripsResults,
+            'criteria' => $criteria,
+            'results' => $lineSearcher->search($criteria),
+            'searchForm' => $form->createView(),
         ]);
     } //results
+
+
+
 
     /**
      * TUNNEL RESERVATION ÉTAPE 1 : Coordonnées du Passager & Siège
