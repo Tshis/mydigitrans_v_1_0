@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Dto\LineSearchData;
-use App\Dto\LineSearchResult;
+use App\Dto\public\line\LineSearchData;
+use App\Dto\public\line\LineSearchResult;
 use App\Entity\Fare;
 use App\Entity\RouteStop;
 use App\Entity\Trip;

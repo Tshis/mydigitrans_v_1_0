@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Dto;
+namespace App\Dto\public\line;
 
 use App\Entity\Trip;
 

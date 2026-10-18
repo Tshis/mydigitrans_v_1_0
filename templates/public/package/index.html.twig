@@ -24,41 +24,42 @@
 		<!--info-section-->
 
 		<section class="form-section-colis">
-			<form action="{{ path('public_package_results') }}" method="post">
+			{# searchForm : formulaire vierge, ou formulaire soumis avec ses erreurs (renvoyé par le contrôleur) #}
+			{{ form_start(searchForm) }}
 
-				<div class="field mb-25">
-					<label>Ville de départ</label>
-					<input type="text" placeholder="Ex : Kinshasa" required>
-				</div>
+			<div class="field mb-25">
+				{{ form_label(searchForm.departure) }}
+				{{ form_widget(searchForm.departure) }}
+				{{ form_errors(searchForm.departure) }}
+			</div>
 
-				<div class="field mb-25">
-					<label>Ville d’arrivée</label>
-					<input type="text" placeholder="Ex : Matadi" required>
-				</div>
+			<div class="field mb-25">
+				{{ form_label(searchForm.arrival) }}
+				{{ form_widget(searchForm.arrival) }}
+				{{ form_errors(searchForm.arrival) }}
+			</div>
 
-				<div class="field mb-25">
-					<label>Date souhaitée d’envoi</label>
-					<input type="date" required>
-				</div>
+			<div class="field mb-25">
+				{{ form_label(searchForm.date) }}
+				{{ form_widget(searchForm.date) }}
+				{{ form_errors(searchForm.date) }}
+			</div>
 
-				<div class="field mb-25">
-					<label>Type de colis (optionnel)</label>
-					<input type="text" placeholder="Documents, marchandises, effets personnels">
-				</div>
+			<div class="field mb-25">
+				{{ form_label(searchForm.packageType) }}
+				{{ form_widget(searchForm.packageType) }}
+				{{ form_errors(searchForm.packageType) }}
+			</div>
 
-				<div class="field mb-25">
-					<label>Poids approximatif</label>
-					<select>
-						<option>Moins de 5 kg</option>
-						<option>5 – 10 kg</option>
-						<option>10 – 20 kg</option>
-						<option>Plus de 20 kg</option>
-					</select>
-				</div>
+			<div class="field mb-25">
+				{{ form_label(searchForm.weightRange) }}
+				{{ form_widget(searchForm.weightRange) }}
+				{{ form_errors(searchForm.weightRange) }}
+			</div>
 
-				<button class="btn-refined btn-primary-gradient btn-full">Vérifier la disponibilité</button>
+			<button type="submit" class="btn-refined btn-primary-gradient btn-full">Vérifier la disponibilité</button>
 
-			</form>
+			{{ form_end(searchForm, {render_rest: false}) }}
 		</section>
 		<!--form-selection-colis-->
 

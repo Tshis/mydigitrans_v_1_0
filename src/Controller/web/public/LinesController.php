@@ -2,7 +2,7 @@
 
 namespace App\Controller\web\public;
 
-use App\Dto\LineSearchData;
+use App\Dto\public\line\LineSearchData;
 use App\Form\LineSearchType;
 use App\Service\BusLayoutGridBuilder;
 use App\Service\LineSearcher;
