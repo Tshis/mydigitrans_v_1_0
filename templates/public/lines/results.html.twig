@@ -13,15 +13,13 @@
                 le <span class="monospace">{{ criteria.date|date('d/m/Y') }}</span> 
             
                 <p>
-                    <i class="fa-solid fa-user"></i> : {{ criteria.passengers }} {{ criteria.passengers > 1 ? ' passagers' : 'passager' }} 
+                    {{ criteria.passengers }} {{ criteria.passengers > 1 ? ' passagers' : 'passager' }} 
+                    <i class="fa-solid fa-circle text-size-10"></i>
+                    {{ results|length }} {{ results|length > 1 ? 'résultats' : 'résultat' }}
                 </p>
             </p>
 
-            <p>
-                <small>
-                    {{ results|length }} {{ results|length > 1 ? 'résultats' : 'résultat' }}
-                </small>
-            </p>
+          
         </header>
         
         <div class="public-search-results-scope container">
@@ -40,17 +38,20 @@
                             <form action="#" method="GET" class="filter-action-form">
 
                                 <div class="filter-group-section mb-20">
-                                    <label class="filter-micro-label">Compagnies Partenaires</label>
+                                    <label class="filter-micro-label ">Compagnies Partenaires</label>
                                
-                                    {% for trip in results %}
-                                
+                                    
+                               
+                                    {% for agencyName in agencies %}
                                         <div class="checkbox-item-row">
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" name="agencies[]" value="{{ trip.trip.id }}" checked>
-                                                <span class="checkmark"></span> {{ trip.agencyName|capitalize }}
+                                                <input type="checkbox" name="agencies[]" value="{{ agencyName }}" checked>
+                                                <span class="checkmark"></span> {{ agencyName|capitalize }}
                                             </label>
                                         </div>
                                     {% endfor %}
+                                    
+
 
                                 
                                 </div>

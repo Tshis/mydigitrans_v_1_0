@@ -50,11 +50,20 @@ final class LinesController extends AbstractController
         /** @var LineSearchData $criteria */
         $criteria = $form->getData();
 
+        $results = $lineSearcher->search($criteria);
+
+        // Extraction des noms d'agences uniques présents dans les résultats
+        $uniqueAgencies = array_unique(array_map(
+            static fn($item) => $item->agencyName,
+            $results
+        ));
+
 
         return $this->render('public/lines/results.html.twig', [
             'page' => 'lines',
             'criteria' => $criteria,
-            'results' => $lineSearcher->search($criteria),
+            'results' => $results,
+            'agencies' => $uniqueAgencies,
             'searchForm' => $form->createView(),
         ]);
     } //results
