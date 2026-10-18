@@ -26,8 +26,11 @@ final readonly class LineSearchResult
         /** Prix par passager (decimal en chaîne), null si aucun tarif applicable. */
         public ?string $unitPrice,
         public ?Currency $currency,
-    ) {
-    }
+        public readonly string $agencyName, // ◄ Ajout du nom de l'agence
+        public readonly string $busModel,   // ◄ Ajout du modèle de bus
+        public readonly int $durationInMinutes, // ◄ Ajout de la durée en minutes
+
+    ) {}
 
     /**
      * Prix total pour tous les passagers, pour l'affichage uniquement.

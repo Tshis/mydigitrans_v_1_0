@@ -25,10 +25,10 @@ use Doctrine\ORM\EntityManagerInterface;
  * Règles appliquées :
  *  - la ville de départ doit précéder la ville d'arrivée sur la route (stopOrder),
  *    les deux arrêts étant actifs ;
- *  - le voyage part à la date demandée, est « scheduled », sur une route disponible,
+ *  - le voyage part à la date demandée, est « scheduled », sur une route disponible si date demandéé,
  *    pour une agence active et un bus actif ;
  *  - si la date est aujourd'hui, le voyage ne doit pas être déjà parti ;
- *  - il reste au moins autant de places vendables que de passagers ;
+ *  - il reste au moins autant de places vendables que de passagers, si placess précisées ;
  *  - le prix vient du tarif actif le plus précis (arrêts exacts avant tarif de route).
  */
 final class LineSearcher
@@ -48,7 +48,7 @@ final class LineSearcher
     {
         $now ??= new \DateTimeImmutable();
 
-        if (null === $criteria->departure || null === $criteria->arrival || null === $criteria->date) {
+        if (null === $criteria->departure || null === $criteria->arrival) {
             return [];
         }
 
@@ -83,6 +83,8 @@ final class LineSearcher
             $freeSeats = $seatCounts[$tripId] ?? 0;
             $departureDate = $trip->getDepartureDate();
             $departureTime = $trip->getDepartureTime();
+            $agencyName = $trip->getRoute()->getAgency()->getName();
+            $busModel = $trip->getBus()->getModel();
 
             if ($freeSeats < $passengers || !isset($segments[$routeId]) || null === $departureDate || null === $departureTime) {
                 continue;
@@ -93,6 +95,9 @@ final class LineSearcher
 
             // Heure de départ de la route, puis décalage jusqu'aux arrêts demandés.
             $origin = $departureDate->setTime((int) $departureTime->format('H'), (int) $departureTime->format('i'));
+
+            // CALCUL DE LA DURÉE DU TRAJET POUR LE PASSAGER
+            $durationInMinutes = $segment['arrivalOffset'] - $segment['departureOffset'];
 
             $results[] = new LineSearchResult(
                 trip: $trip,
@@ -106,6 +111,9 @@ final class LineSearcher
                 passengers: $passengers,
                 unitPrice: $fare?->getAmount(),
                 currency: $fare?->getCurrency(),
+                agencyName: $agencyName, // ◄ Injecté ici
+                busModel: $busModel, // On extrait le code (ex: "CDF" ou "USD") selon ton entité Currency
+                durationInMinutes: $durationInMinutes, // ◄ Injecté ici
             );
         }
 
@@ -118,7 +126,6 @@ final class LineSearcher
      * Routes qui desservent les deux villes dans le bon sens.
      *
      * @return array<int, array{departureStopId: int, arrivalStopId: int, departureCity: string, arrivalCity: string, departureOffset: int, arrivalOffset: int}>
-     *         indexé par id de route (un seul tronçon par route)
      */
     private function findSegments(string $departure, string $arrival): array
     {
@@ -150,27 +157,29 @@ final class LineSearcher
         $segments = [];
 
         foreach ($rows as $row) {
+            // CORRECTION CRITIQUE : Cast explicite en int car IDENTITY() retourne souvent un string
             $routeId = (int) $row['routeId'];
 
             $segments[$routeId] ??= [
                 'departureStopId' => (int) $row['departureStopId'],
-                'arrivalStopId' => (int) $row['arrivalStopId'],
-                'departureCity' => (string) $row['departureCity'],
-                'arrivalCity' => (string) $row['arrivalCity'],
+                'arrivalStopId'   => (int) $row['arrivalStopId'],
+                'departureCity'   => (string) $row['departureCity'],
+                'arrivalCity'     => (string) $row['arrivalCity'],
                 'departureOffset' => (int) $row['departureOffset'],
-                'arrivalOffset' => (int) $row['arrivalOffset'],
+                'arrivalOffset'   => (int) $row['arrivalOffset'],
             ];
         }
 
         return $segments;
     }
 
+
     /**
      * @param list<int> $routeIds
      *
      * @return list<Trip>
      */
-    private function findTrips(array $routeIds, \DateTimeImmutable $date, \DateTimeImmutable $now): array
+    private function findTrips(array $routeIds, ?\DateTimeImmutable $date, \DateTimeImmutable $now): array
     {
         $qb = $this->em->createQueryBuilder()
             ->select('t', 'r', 'a', 'b')
@@ -179,26 +188,45 @@ final class LineSearcher
             ->join('r.agency', 'a')
             ->join('t.bus', 'b')
             ->andWhere('IDENTITY(t.route) IN (:routeIds)')
-            ->andWhere('t.departureDate = :date')
             ->andWhere('t.status = :tripStatus')
             ->andWhere('r.isAvailable = :yes')
             ->andWhere('a.isActive = :yes')
             ->andWhere('b.status = :busStatus')
             ->setParameter('routeIds', $routeIds)
-            ->setParameter('date', $date, Types::DATE_IMMUTABLE)
             ->setParameter('tripStatus', TripStatus::Scheduled->value)
             ->setParameter('busStatus', BusStatus::Active->value)
             ->setParameter('yes', true)
-            ->orderBy('t.departureTime', 'ASC');
+            ->orderBy('t.departureDate', 'ASC')
+            ->addOrderBy('t.departureTime', 'ASC');
 
-        // Recherche pour aujourd'hui : on écarte les voyages déjà partis.
-        if ($date->format('Y-m-d') === $now->format('Y-m-d')) {
-            $qb->andWhere('t.departureTime > :nowTime')
+        if (null !== $date) {
+            // CAS 1 : Une date spécifique est demandée
+            $qb->andWhere('t.departureDate = :date')
+                ->setParameter('date', $date, Types::DATE_IMMUTABLE);
+
+            // Si c'est aujourd'hui, on masque les bus déjà partis
+            if ($date->format('Y-m-d') === $now->format('Y-m-d')) {
+                $qb->andWhere('t.departureTime > :nowTime')
+                    ->setParameter('nowTime', $now, Types::TIME_IMMUTABLE);
+            }
+        } else {
+            // CAS 2 : Pas de date spécifiée -> On affiche uniquement les voyages futurs
+            $qb->andWhere('t.departureDate >= :today')
+                ->setParameter('today', $now->format('Y-m-d')); // Plus sûr et évite les instanciations de DateTime
+
+
+            // Filtre de sécurité pour les bus d'aujourd'hui déjà partis
+            $qb->andWhere($qb->expr()->orX(
+                't.departureDate > :todayDay',
+                '(t.departureDate = :todayDay AND t.departureTime > :nowTime)'
+            ))
+                ->setParameter('todayDay', $now, Types::DATE_IMMUTABLE)
                 ->setParameter('nowTime', $now, Types::TIME_IMMUTABLE);
         }
 
         return $qb->getQuery()->getResult();
     }
+
 
     /**
      * Nombre de places vendables par voyage. Une place « held » dont le délai

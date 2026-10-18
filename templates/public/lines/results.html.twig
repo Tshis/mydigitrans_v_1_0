@@ -9,17 +9,17 @@
             <h1>Trajets disponibles</h1>
             <p class="search-summary">
                 <i class="fa-solid fa-location-dot text-primary"></i> 
-                <strong>{{ search_query.departure }}</strong> ➔ <strong>{{ search_query.destination }}</strong> 
-                le <span class="monospace">{{ search_query.date|date('d/m/Y') }}</span> 
+                <strong>{{ criteria.departure }}</strong> ➔ <strong>{{ criteria.arrival }}</strong> 
+                le <span class="monospace">{{ criteria.date|date('d/m/Y') }}</span> 
             
                 <p>
-                    <i class="fa-solid fa-user"></i> : {{ search_query.passengers }} {{ search_query.passengers > 1 ? ' passagers' : 'passager' }} 
+                    <i class="fa-solid fa-user"></i> : {{ criteria.passengers }} {{ criteria.passengers > 1 ? ' passagers' : 'passager' }} 
                 </p>
             </p>
 
             <p>
                 <small>
-                    {{ trips_results|length }} {{ trips_results|length > 1 ? 'résultats' : 'résultat' }}
+                    {{ results|length }} {{ results|length > 1 ? 'résultats' : 'résultat' }}
                 </small>
             </p>
         </header>
@@ -31,7 +31,7 @@
             {# --- LAYOUT DOUBLE COLONNE ASYMÉTRIQUE --- #}
             <div class="results-layout-grid">
             
-                {% if trips_results|length > 0 %}
+                {% if results|length > 0 %}
                     {# COLONNE COMPACTE : FILTRES DE RAFFINEMENT DES COMPAGNIES #}
                     <aside class="filters-sidebar">
                         <div class="card filter-card sticky-filter-box">
@@ -42,12 +42,12 @@
                                 <div class="filter-group-section mb-20">
                                     <label class="filter-micro-label">Compagnies Partenaires</label>
                                
-                                    {% for trip in trips_results %}
+                                    {% for trip in results %}
                                 
                                         <div class="checkbox-item-row">
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" name="agencies[]" value="{{ trip.id }}" checked>
-                                                <span class="checkmark"></span> {{ trip.agency_name|capitalize }}
+                                                <input type="checkbox" name="agencies[]" value="{{ trip.trip.id }}" checked>
+                                                <span class="checkmark"></span> {{ trip.agencyName|capitalize }}
                                             </label>
                                         </div>
                                     {% endfor %}
@@ -82,29 +82,31 @@
 
                 {# COLONNE PRINCIPALE : CARTES DES VOYAGES DISPONIBLES #}
                 <main class="results-main-panel">
-                    {% for trip in trips_results %}
+                    {% for trip in results %}
                         <div class="card trip-result-card mb-20">
                             <div class="trip-card-body-layout">
                         
                                 {# 1. Identité Compagnie #}
                                 <div class="agency-brand-block">
-                                    <h3 class="agency-name-title">{{ trip.agency_name }}</h3>
-                                    <span class="bus-badge-type"><i class="fa-solid fa-bus"></i> {{ trip.bus_model }}</span>
+                                    <h3 class="agency-name-title">{{ trip.agencyName }}</h3>
+                                    <span class="bus-badge-type"><i class="fa-solid fa-bus"></i> {{ trip.busModel }}</span>
                                 </div>
 
                                 {# 2. Chronologie et Itinéraire #}
                                 <div class="route-timeline-block">
                                     <div class="time-node">
-                                        <span class="time font-bold monospace">{{ trip.departure_time }}</span>
-                                        <span class="station-name">{{ trip.departure_station }}</span>
+                                        <span class="time font-bold monospace">{{ trip.trip.departureTime|date('H:i') }}</span>
+                                        <span class="station-name font-bold">{{ trip.departureCity }}</span>
+                                        <span class="station-name text-primary font-bold">{{ trip.departureAt|date('d-m-Y') }}</span>
                                     </div>
                                     <div class="route-duration-line">
-                                        <span class="duration-text text-gray monospace">{{ trip.duration }}</span>
+                                        <span class="duration-text text-danger font-bold text-size-16 monospace">{{ trip.durationInMinutes|duration }}</span>
                                         <div class="visual-line"></div>
                                     </div>
                                     <div class="time-node">
-                                        <span class="time font-bold monospace">{{ trip.arrival_time }}</span>
-                                        <span class="station-name">{{ trip.arrival_station }}</span>
+                                        <span class="time font-bold monospace">{{ trip.arrivalAt|date('H:i') }}</span>
+                                        <span class="station-name font-bold">{{ trip.arrivalCity }}</span>
+                                        <span class="station-name text-primary font-bold">{{ trip.arrivalAt|date('d-m-Y') }}</span>
                                     </div>
                                 </div>
 
@@ -112,16 +114,16 @@
                                 <div class="pricing-booking-block text-right">
                                     <div class="seat-left-alert mb-10">
                                         <i class="fa-solid fa-chair text-warning"></i> 
-                                        <span class="font-bold text-size-12">{{ trip.seats_available }} places dispos</span>
+                                        <span class="font-bold text-size-12">{{ trip.availableSeats }} places dispos</span>
                                     </div>
                                     <div class="trip-price-tag mb-15">
-                                        <span class="price font-bold monospace">{{ trip.price|number_format(2, ',', ' ') }}</span>
-                                        <span class="currency font-bold">{{ trip.currency_code }}</span>
+                                        <span class="price font-bold monospace">{{ trip.unitPrice|number_format(2, ',', ' ') }}</span>
+                                        <span class="currency font-bold">{{ trip.currency.code|upper }}</span>
                                     </div>
                             
                                     {# Formulaire de soumission vers le tunnel d'achat #}
-                                    <form action="{{ path('public_lines_booking', {'slug': trip.slug}) }}" method="POST">
-                                        <input type="hidden" name="passengers_count" value="{{ search_query.passengers }}">
+                                    <form action="{{ path('public_lines_booking', {'slug': trip.trip.slug}) }}" method="POST">
+                                        <input type="hidden" name="passengers_count" value="{{ criteria.passengers }}">
                                         <button type="submit" class="btn-refined btn-success-gradient w-100-percent">
                                             <i class="fa-solid fa-ticket"></i> Réserver ma place
                                         </button>
