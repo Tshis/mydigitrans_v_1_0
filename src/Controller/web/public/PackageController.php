@@ -2,6 +2,9 @@
 
 namespace App\Controller\web\public;
 
+use App\Dto\public\package\PackageSearchData;
+use App\Form\PackageSearchType;
+use App\Service\PackageSearcher;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -9,76 +12,48 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class PackageController extends AbstractController
 {
-    #[Route('/public/package', name: 'public_package_index')]
+    #[Route('/colis', name: 'public_package_index', methods: ['GET'])]
     public function index(): Response
     {
+        $form = $this->createForm(PackageSearchType::class);
+
         return $this->render('public/package/index.html.twig', [
-            'page' => 'package',
+            'page' => 'colis',
+            'searchForm' => $form->createView(),
         ]);
-    } //index
+    } // index
 
     /**
      * VÉRIFICATION DES SOUTES ET DEPARTS DISPONIBLES POUR LES COLIS
      */
-    #[Route('/public/package/results', name: 'public_package_results')]
-    public function results(Request $request): Response
+    #[Route('/colis/resultats', name: 'public_package_results', methods: ['GET'])]
+    public function results(Request $request, PackageSearcher $searcher): Response
     {
+        $form = $this->createForm(PackageSearchType::class);
+        $form->handleRequest($request);
 
-        $searchQuery = [
-            'departure' => $request->request->get('departure', 'Kinshasa'),
-            'destination' => $request->request->get('destination', 'Matadi'),
-            'date' => new \DateTime($request->request->get('date', 'now')),
-            'weight' => $request->request->get('weight', '5 – 10 kg')
-        ];
+        // Accès direct à l'URL sans critères : retour au formulaire.
+        if (!$form->isSubmitted()) {
+            return $this->redirectToRoute('public_package_index');
+        }
 
-        // Simulation des lignes actives avec espace fret disponible en soute
-        $availableTrips = [
-            [
-                'id' => 801,
-                'agency' => [
-                    'name' => 'TransKin Express',
-                    'main_currency' => 'USD'
-                ],
-                'bus_model' => 'Marcopolo Cargo G7',
-                'departure_time' => '07h30',
-                'departure_station' => 'Gare Centrale (Gombe)',
-                'duration' => '6h 30m',
-                'arrival_time' => '14h00',
-                'arrival_station' => 'Gare Ville de Matadi',
-                'price_per_kg' => 1.20,
-                'estimated_fare' => [
-                    'min' => 5 * 1.2,
-                    'max' => 15 * 1.2
+        // Critères invalides : on réaffiche le formulaire avec les erreurs.
+        if (!$form->isValid()) {
+            return $this->render('public/package/index.html.twig', [
+                'page' => 'colis',
+                'searchForm' => $form->createView(),
+            ], new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY));
+        }
 
-                ] // Estimation selon la grille de poids
-            ],
-            [
-                'id' => 802,
-                'agency' => [
-                    'name' => 'Océan du Congo',
-                    'main_currency' => 'CDF'
-                ],
-                'bus_model' => 'Scania Streamline',
-                'departure_time' => '09h00',
-                'departure_station' => 'Poste de Kingabwa',
-                'duration' => '7h 00m',
-                'arrival_time' => '16h00',
-                'arrival_station' => 'Gare du Port (Matadi)',
-                'price_per_kg' => 3000,
-                'estimated_fare' => [
-                    'min' => 5 * 3000,
-                    'max' => 15 * 3000
-
-                ] // Estimation selon la grille de poids
-            ]
-        ];
+        /** @var PackageSearchData $criteria */
+        $criteria = $form->getData();
 
         return $this->render('public/package/resultats.html.twig', [
-            'page' => 'package',
-            'search_query' => $searchQuery,
-            'available_trips' => $availableTrips
+            'page' => 'colis',
+            'search_query' => $criteria,
+            'available_trips' => $searcher->search($criteria),
         ]);
-    } //results
+    } // results
 
 
     /**

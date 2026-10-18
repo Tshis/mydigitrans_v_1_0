@@ -98,6 +98,39 @@ final class AppFixtures extends Fixture
         $manager->persist($currencyAgency);
         $manager->flush();
 
+
+        // ... (Fin de la création de l'agence Lubumbashi et du CurrencyAgency) ...
+
+        $manager->persist($currencyAgency);
+        $manager->flush();
+
+        /*
+         * 3b. NOUVEAU - CRÉATION DES SUCCURSALES (BRANCHES) REQUISES POUR LES COLIS
+         */
+        $branchLubumbashi = (new \App\Entity\Branch())
+            ->setName('Dépôt Central Lubumbashi')
+            ->setCode('BR-LUB-001')
+            ->setCity('Lubumbashi')
+            ->setCountry('RDC')
+            ->setStatus(\App\Enum\BranchStatus::Opened) // REQUIS : Doit être Opened
+            ->setSlug('depot-central-lubumbashi')
+            ->setAgency($agency);
+
+        $manager->persist($branchLubumbashi);
+
+        $branchKolwezi = (new \App\Entity\Branch())
+            ->setName('Guichet Retrait Kolwezi')
+            ->setCode('BR-KOL-001')
+            ->setCity('Kolwezi')
+            ->setCountry('RDC')
+            ->setStatus(\App\Enum\BranchStatus::Opened) // REQUIS : Doit être Opened
+            ->setSlug('guichet-retrait-kolwezi')
+            ->setAgency($agency);
+        $manager->persist($branchKolwezi);
+
+        $manager->flush();
+
+
         /*
          * 4. CONFIGURATION CONDUCTEUR
          */
@@ -180,10 +213,12 @@ final class AppFixtures extends Fixture
             ->setName('Lubumbashi - Kolwezi via Likasi')
             ->setAgency($agency)
             ->setIsAvailable(true)
-            ->setSlug('lubumbashi-kolwezi')
+            ->setSlug('lubumbashi-kolwezi-via-likasi')
             ->setCode('RT-LUB-001')
             ->setDistance('320.00')
             ->setDuration(300)
+            ->setPricePerKg("12")
+            ->setCurrencyPricePerKg($currencyAgency->getCurrency())
             ->setCreatedBy($admin); // ◄ CORRECTION : Ajout du créateur obligatoire
         $manager->persist($route);
 

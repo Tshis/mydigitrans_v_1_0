@@ -16,9 +16,17 @@
                     <h1 class="mt-5">Départs Disponibles pour votre Colis</h1>
                     <p class="search-summary mt-5">
                         <i class="fa-solid fa-box text-primary"></i> 
-                        Axe : <strong>{{ search_query.departure }}</strong> ➔ <strong>{{ search_query.destination }}</strong> 
-                        • Date : <span class="monospace font-bold">{{ search_query.date|date('d/m/Y') }}</span>
-                        • Estimation : <span class="monospace font-bold">{{ search_query.weight }}</span>
+                        Axe : <strong>{{ search_query.departure }}</strong> ➔ <strong>{{ search_query.arrival }}</strong> 
+                        {# La date est facultative : sans date, on affiche les prochains départs #}
+                        {% if search_query.date %}
+                            • Date : <span class="monospace font-bold">{{ search_query.date|date('d/m/Y') }}</span>
+                        {% else %}
+                            • <span class="monospace font-bold">Prochains départs (30 jours)</span>
+                        {% endif %}
+                        • Estimation : <span class="monospace font-bold">{{ search_query.weightRange.label }}</span>
+                        {% if search_query.packageType %}
+                            • Colis : <span class="monospace font-bold">{{ search_query.packageType }}</span>
+                        {% endif %}
                     </p>
                 </div>
             </div>
@@ -46,28 +54,31 @@
                 {# COLONNE GAUCHE : LISTE DES BUS AVEC PLACE EN SOUTE #}
                 <main class="main-form-panel">
                     {% for trip in available_trips %}
+                        {% set currencyCode = trip.currency %}
                         <div class="card control-card mb-20 package-trip-card">
                             <div class="trip-card-body-layout">
                             
                                 {# 1. Compagnie & Bus #}
                                 <div class="agency-brand-block">
                                     <h3 class="agency-name-title">{{ trip.agency.name }}</h3>
-                                    <span class="bus-badge-type"><i class="fa-solid fa-bus"></i> {{ trip.bus_model }}</span>
+                                    <span class="bus-badge-type"><i class="fa-solid fa-bus"></i> {{ trip.busModel }}</span>
                                 </div>
 
                                 {# 2. Horaires du Voyage #}
                                 <div class="route-timeline-block">
                                     <div class="time-node">
-                                        <span class="time font-bold monospace">{{ trip.departure_time }}</span>
-                                        <span class="station-name">{{ trip.departure_station }}</span>
+                                        <span class="time font-bold monospace">{{ trip.departureAt|date('H:i') }}</span>
+                                        <span class="station-name">{{ trip.departureBranch.name }}</span>
+                                        <span class="station-name text-gray monospace">{{ trip.departureAt|date('d/m/Y') }}</span>
                                     </div>
                                     <div class="route-duration-line">
-                                        <span class="duration-text text-gray monospace">Transit : {{ trip.duration }}</span>
+                                        <span class="duration-text text-gray monospace">Transit : {{ trip.durationLabel }}</span>
                                         <div class="visual-line"></div>
                                     </div>
                                     <div class="time-node">
-                                        <span class="time font-bold monospace">{{ trip.arrival_time }}</span>
-                                        <span class="station-name">{{ trip.arrival_station }}</span>
+                                        <span class="time font-bold monospace">{{ trip.arrivalAt|date('H:i') }}</span>
+                                        <span class="station-name">{{ trip.arrivalBranch.name }}</span>
+                                        <span class="station-name text-gray monospace">{{ trip.arrivalAt|date('d/m/Y') }}</span>
                                     </div>
                                 </div>
 
@@ -78,19 +89,28 @@
                                         <span class="font-bold text-size-12">Espace Soute OK</span>
                                     </div>
                                     <div class="trip-price-tag mb-15">
-                                        <span class="price font-bold monospace text-size-14">
-                                            Min : {{ trip.estimated_fare.min|number_format(2, ',', ' ') }}
-                                            <span class="currency font-bold text-size-11">{{ trip.agency.main_currency }}</span>
-                                            <br>
-                                            Max : {{ trip.estimated_fare.max|number_format(2, ',', ' ') }}
-                                            <span class="currency font-bold text-size-11">{{ trip.agency.main_currency }}</span>
-                                        </span>
+                                        {% if trip.minFare is not null %}
+                                            <span class="price font-bold monospace text-size-14">
+                                                {% if trip.maxFare is not null %}
+                                                    Min : {{ trip.minFare|number_format(2, ',', ' ') }}
+                                                    <span class="currency font-bold text-size-11">{{ currencyCode }}</span>
+                                                    <br>
+                                                    Max : {{ trip.maxFare|number_format(2, ',', ' ') }}
+                                                    <span class="currency font-bold text-size-11">{{ currencyCode }}</span>
+                                                {% else %}
+                                                    À partir de : {{ trip.minFare|number_format(2, ',', ' ') }}
+                                                    <span class="currency font-bold text-size-11">{{ currencyCode }}</span>
+                                                {% endif %}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-gray text-size-12">Tarif communiqué au guichet</span>
+                                        {% endif %}
                                     </div>
                                 
                                     {# Action d'enclenchement de la quittance colis #}
                                     {#  <form action="{{ path('public_package_book') }}" method="POST">
-                                        <input type="hidden" name="trip_id" value="{{ trip.id }}">
-                                        <input type="hidden" name="weight" value="{{ search_query.weight }}">
+                                        <input type="hidden" name="trip_id" value="{{ trip.trip.id }}">
+                                        <input type="hidden" name="weight" value="{{ search_query.weightRange.value }}">
                                         <button type="submit" class="btn-refined btn-primary-gradient w-100-percent">
                                             <i class="fa-solid fa-box-open"></i> Choisir ce départ
                                         </button>
@@ -102,7 +122,7 @@
                     {% else %}
                         <div class="card control-card text-center padding-40">
                             <i class="fa-solid fa-box-tissue text-gray mb-15" style="font-size: 3rem;"></i>
-                            <h3>Aucune soute disponible pour cette date</h3>
+                            <h3>Aucune soute disponible{% if search_query.date %} pour cette date{% endif %}</h3>
                             <p class="text-gray mt-5">Toutes les capacités de fret sont saturées ou aucun bus ne circule sur cet axe pour le moment.</p>
                         </div>
                     {% endfor %}
