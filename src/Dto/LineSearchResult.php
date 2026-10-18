@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Dto;
 
-use App\Entity\Currency;
 use App\Entity\Trip;
 
 /**
@@ -25,7 +24,7 @@ final readonly class LineSearchResult
         public int $passengers,
         /** Prix par passager (decimal en chaîne), null si aucun tarif applicable. */
         public ?string $unitPrice,
-        public ?Currency $currency,
+        public readonly ?string $currency,
         public readonly string $agencyName, // ◄ Ajout du nom de l'agence
         public readonly string $busModel,   // ◄ Ajout du modèle de bus
         public readonly int $durationInMinutes, // ◄ Ajout de la durée en minutes

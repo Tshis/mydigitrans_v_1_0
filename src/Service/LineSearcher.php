@@ -83,8 +83,6 @@ final class LineSearcher
             $freeSeats = $seatCounts[$tripId] ?? 0;
             $departureDate = $trip->getDepartureDate();
             $departureTime = $trip->getDepartureTime();
-            $agencyName = $trip->getRoute()->getAgency()->getName();
-            $busModel = $trip->getBus()->getModel();
 
             if ($freeSeats < $passengers || !isset($segments[$routeId]) || null === $departureDate || null === $departureTime) {
                 continue;
@@ -93,11 +91,22 @@ final class LineSearcher
             $segment = $segments[$routeId];
             $fare = $this->pickFare($faresByRoute[$routeId] ?? [], $segment['departureStopId'], $segment['arrivalStopId']);
 
-            // Heure de départ de la route, puis décalage jusqu'aux arrêts demandés.
-            $origin = $departureDate->setTime((int) $departureTime->format('H'), (int) $departureTime->format('i'));
+            // 1. Initialisation propre de la base de départ (Heure de la route)
+            $baseDate = \DateTimeImmutable::createFromInterface($departureDate);
+            $origin = $baseDate->setTime(
+                (int) $departureTime->format('H'),
+                (int) $departureTime->format('i'),
+                0
+            );
 
-            // CALCUL DE LA DURÉE DU TRAJET POUR LE PASSAGER
+            $agencyName = $trip->getRoute()?->getAgency()?->getName() ?? 'Agence Inconnue';
+            $busModel   = $trip->getBus()?->getModel() ?? 'Bus Standard';
+
             $durationInMinutes = $segment['arrivalOffset'] - $segment['departureOffset'];
+
+            // ◄ RECORRECTION CRITIQUE AVEC DATEINTERVAL (Garantit le calcul 10h et 16h)
+            $departureAt = $origin->add(new \DateInterval(sprintf('PT%dM', $segment['departureOffset'])));
+            $arrivalAt = $origin->add(new \DateInterval(sprintf('PT%dM', $segment['arrivalOffset'])));
 
             $results[] = new LineSearchResult(
                 trip: $trip,
@@ -105,17 +114,19 @@ final class LineSearcher
                 arrivalStopId: $segment['arrivalStopId'],
                 departureCity: $segment['departureCity'],
                 arrivalCity: $segment['arrivalCity'],
-                departureAt: $origin->modify(sprintf('+%d minutes', $segment['departureOffset'])),
-                arrivalAt: $origin->modify(sprintf('+%d minutes', $segment['arrivalOffset'])),
+                departureAt: $departureAt,
+                arrivalAt: $arrivalAt,
+                durationInMinutes: $durationInMinutes,
                 availableSeats: $freeSeats,
                 passengers: $passengers,
+                agencyName: $agencyName,
+                busModel: $busModel,
                 unitPrice: $fare?->getAmount(),
-                currency: $fare?->getCurrency(),
-                agencyName: $agencyName, // ◄ Injecté ici
-                busModel: $busModel, // On extrait le code (ex: "CDF" ou "USD") selon ton entité Currency
-                durationInMinutes: $durationInMinutes, // ◄ Injecté ici
+                currency: $fare?->getCurrency()?->getCode(),
             );
         }
+
+
 
         usort($results, static fn(LineSearchResult $a, LineSearchResult $b): int => $a->departureAt <=> $b->departureAt);
 
@@ -157,21 +168,22 @@ final class LineSearcher
         $segments = [];
 
         foreach ($rows as $row) {
-            // CORRECTION CRITIQUE : Cast explicite en int car IDENTITY() retourne souvent un string
             $routeId = (int) $row['routeId'];
 
-            $segments[$routeId] ??= [
+            // ◄ CORRECTION : On force l'enregistrement précis de la ligne de résultat courante
+            $segments[$routeId] = [
                 'departureStopId' => (int) $row['departureStopId'],
                 'arrivalStopId'   => (int) $row['arrivalStopId'],
                 'departureCity'   => (string) $row['departureCity'],
                 'arrivalCity'     => (string) $row['arrivalCity'],
-                'departureOffset' => (int) $row['departureOffset'],
-                'arrivalOffset'   => (int) $row['arrivalOffset'],
+                'departureOffset' => (int) $row['departureOffset'], // Va enfin valoir 120 pour Likasi
+                'arrivalOffset'   => (int) $row['arrivalOffset'],   // Va enfin valoir 300 pour Kolwezi
             ];
         }
 
         return $segments;
     }
+
 
 
     /**
