@@ -3,9 +3,13 @@
 namespace App\Controller\web\public;
 
 use App\Dto\public\line\LineSearchData;
+use App\Entity\RouteStop;
+use App\Enum\FareTargetType;
 use App\Form\LineSearchType;
+use App\Repository\TripRepository;
 use App\Service\BusLayoutGridBuilder;
 use App\Service\LineSearcher;
+use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Endroid\QrCode\Encoding\Encoding;
@@ -18,6 +22,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class LinesController extends AbstractController
 {
+    public function __construct(private readonly EntityManagerInterface $em) {}
+
     #[Route('/public/lines', name: 'public_lines_index')]
     public function index(): Response
     {
@@ -75,43 +81,14 @@ final class LinesController extends AbstractController
      * TUNNEL RESERVATION ÉTAPE 1 : Coordonnées du Passager & Siège
      */
     #[Route('/public/lines/trip/{slug}/booking', name: 'public_lines_booking')]
-    public function booking(string $slug, Request $request, BusLayoutGridBuilder $busLayoutGridBuilder): Response
-    {
+    public function booking(
+        string $slug,
+        Request $request,
+        TripRepository $tripRepo,
+        LineSearcher $lineSearcher,
+        BusLayoutGridBuilder $busLayoutGridBuilder
+    ): Response {
 
-        $busLayout = [
-            "id" => 1,
-            "name" => "Yutong 50 places modele 3-2",
-            "agency" => null,
-            "rows" => 11,
-            "columns" => 4,
-            "aisles" => [0 => 2],
-            "specialPositions" => [
-                [
-                    "type" => "driver",
-                    "row" => 1,
-                    "col" => 1
-                ],
-                [
-                    "type" => "aisle",
-                    "row" => 1,
-                    "col" => 2
-                ],
-                [
-                    "type" => "door",
-                    "row" => 2,
-                    "col" => 4
-                ],
-                [
-                    "type" => "aisle",
-                    "row" => 2,
-                    "col" => 3
-                ]
-            ],
-            "hasBackExtraSeat" => true,
-            "isValided" => false,
-            "createdAt" => "2026-10-07 16:52:1",
-            "resolvedAt" => null,
-        ];
 
         if ($request->isMethod('post')) {
 
@@ -129,17 +106,76 @@ final class LinesController extends AbstractController
             // return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reservation['reference']]);
         }
 
+        // ◄ CORRECTION : On récupère le Trip en BDD grâce au slug de l'URL
+        $trip = $tripRepo->findOneBySlugWithLayout($slug);
 
-        // Extraction du voyage concerné [Profile]
+        if (!$trip) {
+            $this->addFlash('danger', 'Voyage introuvable.');
+            return $this->redirectToRoute('public_lines_index');
+        }
+
+        $busLayout = ($trip->getBus()->getBusLayout())->toArray();
+
+        // ◄ SÉCURISATION : Chargement des entités réelles depuis les IDs du formulaire
+        $departureStopId = $request->request->get('departure_stop_id');
+        $arrivalStopId = $request->request->get('arrival_stop_id');
+
+        $departureStop = $this->em->getRepository(RouteStop::class)->find((int)$departureStopId);
+        $arrivalStop = $this->em->getRepository(RouteStop::class)->find((int)$arrivalStopId);
+
+        // Sécurité supplémentaire : On vérifie que ces arrêts appartiennent bien à la route du bus !
+        if (!$departureStop || !$arrivalStop || $departureStop->getRoute() !== $trip->getRoute()) {
+            $this->addFlash('danger', 'Une erreur de sécurité est survenue sur l\'itinéraire.');
+            return $this->redirectToRoute('public_lines_index');
+        }
+
+        // 1. EXTRACTION DE L'AGENCE (MCD 19)
+        $agency = $trip->getRoute()?->getAgency();
+
+        // 2. ◄ RÉCUPÉRATION DU TARIF VIA LE RECOURS À TON SERVICE DE GRILLE (MCD 21)
+        // On charge les tarifs liés à la route de l'agence pour l'associer à l'algorithme
+        $fares = $this->em->getRepository(\App\Entity\Fare::class)->findBy([
+            'targetType' => FareTargetType::Route,
+            'targetId' => $trip->getRoute()->getId(),
+            'isActive' => true
+        ]);
+
+        // On appelle directement pickFare de ton LineSearcher qui est maintenant accessible !
+        $fareEntity = $lineSearcher->pickFare($fares, $departureStop->getId(), $arrivalStop->getId());
+        $ticketPrice = $fareEntity?->getAmount() ?? 0.0;
+        $ticketCurrency = $fareEntity?->getCurrency()->getCode();
+
+
+        //3. Recuperation de la bonne heure
+        // 3.1. Initialisation de l'heure brute du point de départ initial (ex: 08:00)
+        $baseDate = \DateTimeImmutable::createFromInterface($trip->getDepartureDate());
+        $departureTime = $trip->getDepartureTime();
+
+        $origin = $baseDate->setTime(
+            (int) $departureTime->format('H'),
+            (int) $departureTime->format('i'),
+            0
+        );
+
+        // 3.2. ◄ CALCUL DE L'HEURE REELLE PAR INTERVALLE (ex: 08h00 + 120 min = 10h00)
+        // On récupère les minutes de décalage stockées dans l'arrêt de départ sécurisé
+        $departureOffset = (int) $departureStop->getDurationFromDeparture(); //
+        $realDepartureAt = $origin->add(new \DateInterval(sprintf('PT%dM', $departureOffset)));
+
+        // 4. Intégration sécurisée dans ton tableau $trip destiné à Twig :
         $trip = [
-            'id' => 101,
-            'agency_name' => 'TransKin Express',
-            'departure' => 'Kinshasa',
-            'destination' => 'Kikwit',
-            'date' => new \DateTime('+2 days'),
-            'departure_time' => '14h30',
-            'price' => 45000,
-            'currency_code' => 'CDF'
+            'id' => $trip->getId(),
+            'agency_name' => $agency?->getName() ?? 'Agence Indéfini',
+            'departure' => $departureStop->getCity(),
+            'destination' => $arrivalStop->getCity(),
+            'date' => $trip->getDepartureDate(),
+            'departure_time' =>  $realDepartureAt,
+
+            // ◄ SÉCURISATION DES DONNÉES FINANCIÈRES (Tirées de l'ORM, impossibles à falsifier)
+            /* 'price' => $ticketPrice,
+            'currency_code' => $ticketCurrency */
+            'price' => $ticketPrice, // Prix exact et certifié recalculé en arrière-plan
+            'currency_code' => $ticketCurrency ?? 'CDF'
         ];
 
         return $this->render('public/lines/booking.html.twig', [

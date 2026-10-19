@@ -164,47 +164,81 @@ final class AppFixtures extends Fixture
         $manager->flush();
 
         /*
-         * 5. CONFIGURATION DU BUS, LAYOUT & SIÈGES FIXES
+         * 5. CONFIGURATION DU BUS LAYOUT (YUTONG 50 PLACES)
          */
+        $specialPositions = [
+            ["type" => "driver", "row" => 1, "col" => 1],
+            ["type" => "aisle", "row" => 1, "col" => 2],
+            ["type" => "door", "row" => 2, "col" => 4],
+            ["type" => "aisle", "row" => 2, "col" => 3]
+        ];
+
         $layout = (new BusLayout())
-            ->setName('Layout Standard Lushi')
+            ->setName('Yutong 50 places modele 3-2')
             ->setAgency($agency)
-            ->setRows(10)
+            ->setRows(11)
             ->setColumns(4)
             ->setAisles(['2'])
-            ->setSpecialPositions([])
             ->setHasBackExtraSeat(true)
-            ->setCode('LYT-LUB-STD');
-        $manager->persist($layout);
+            ->setCode('LYT-YUT-50-VIP');
 
+        $cleanPositions = json_decode(json_encode($specialPositions), true);
+        $layout->setSpecialPositions($cleanPositions);
+
+        $manager->persist($layout);
+        $manager->flush(); // On fige le layout pour stabiliser le JSON
+
+        /*
+         * 5b. CONFIGURATION DU BUS & GÉNÉRATION DES SIÈGES FIXES
+         */
         $bus = (new Bus())
             ->setAgency($agency)
             ->setBusLayout($layout)
-            ->setCode('BUS-LUB-01')
-            ->setName('Bus Interurbain Lubumbashi')
-            ->setPlateNumber('KV-4321-RDC')
-            ->setBrand('Mercedes-Benz')
-            ->setModel('Tourismo')
+            ->setCode('BUS-LUB-YUT-01')
+            ->setName('Yutong Premium Confort')
+            ->setPlateNumber('KV-7890-RDC')
+            ->setBrand('Yutong')
+            ->setModel('Modèle 50 places 3-2 VIP')
             ->setStatus(BusStatus::Active)
-            ->setMileage(45000)
-            ->setYear(2023)
+            ->setMileage(12000)
+            ->setYear(2025)
             ->setCreatedBy($admin);
         $manager->persist($bus);
 
+        $staticPositions = [
+            ["row" => 1, "col" => 1],
+            ["row" => 1, "col" => 2],
+            ["row" => 2, "col" => 4],
+            ["row" => 2, "col" => 3]
+        ];
+
+        // ◄ INITIALISATION DU TABLEAU POUR COMPLÉTER LE MANQUE
         $seats = [];
-        for ($r = 1; $r <= 5; $r++) { // 20 sièges générés pour le test
+
+        for ($r = 1; $r <= 11; $r++) {
             for ($c = 1; $c <= 4; $c++) {
-                $seat = (new Seat())
-                    ->setBus($bus)
-                    ->setSeatLabel(chr(64 + $c) . $r)
-                    ->setType($r === 1 ? SeatType::Vip : SeatType::Normal)
-                    ->setRow($r)
-                    ->setColumn($c);
-                $manager->persist($seat);
-                $seats[] = $seat;
+                $isSpecial = false;
+                foreach ($staticPositions as $pos) {
+                    if ($pos['row'] === $r && $pos['col'] === $c) {
+                        $isSpecial = true;
+                        break;
+                    }
+                }
+
+                if (!$isSpecial) {
+                    $seat = (new Seat())
+                        ->setBus($bus)
+                        ->setSeatLabel(sprintf('%d%s', $r, chr(64 + $c)))
+                        ->setType($r <= 2 ? SeatType::Vip : SeatType::Normal)
+                        ->setRow($r)
+                        ->setColumn($c);
+
+                    $manager->persist($seat);
+                    $seats[] = $seat; // ◄ REMPLISSAGE DU TABLEAU : Règle l'erreur variable non reconnue
+                }
             }
         }
-        $manager->flush();
+        $manager->flush(); // Enregistre le bus et les sièges physiques
 
         /*
          * 6. CRÉATION DE LA ROUTE & DES ARRÊTS (STOPS)
@@ -213,80 +247,71 @@ final class AppFixtures extends Fixture
             ->setName('Lubumbashi - Kolwezi via Likasi')
             ->setAgency($agency)
             ->setIsAvailable(true)
-            ->setSlug('lubumbashi-kolwezi-via-likasi')
+            ->setSlug('lubumbashi-kolwezi')
             ->setCode('RT-LUB-001')
             ->setDistance('320.00')
             ->setDuration(300)
-            ->setPricePerKg("12")
-            ->setCurrencyPricePerKg($currencyAgency->getCurrency())
-            ->setCreatedBy($admin); // ◄ CORRECTION : Ajout du créateur obligatoire
+            ->setCreatedBy($admin);
         $manager->persist($route);
 
         $stopLubumbashi = (new RouteStop())
             ->setCity('Lubumbashi')
-            ->setCountry('RDC') // ◄ CORRECTION : Pays obligatoire
+            ->setCountry('RDC')
             ->setStopOrder(1)
             ->setDurationFromDeparture(0)
-            ->setDistanceFromDeparture('0.00') // ◄ CORRECTION : Point de départ
+            ->setDistanceFromDeparture('0.00')
             ->setIsActive(true)
-            ->setCreatedBy($admin)
             ->setRoute($route);
         $manager->persist($stopLubumbashi);
 
         $stopLikasi = (new RouteStop())
             ->setCity('Likasi')
-            ->setCountry('RDC') // ◄ CORRECTION : Pays obligatoire
+            ->setCountry('RDC')
             ->setStopOrder(2)
-            ->setDurationFromDeparture(120) // +2h
-            ->setDistanceFromDeparture('120') // ◄ CORRECTION : Point de départ
+            ->setDurationFromDeparture(120)
+            ->setDistanceFromDeparture('120.00')
             ->setIsActive(true)
-            ->setCreatedBy($admin)
             ->setRoute($route);
         $manager->persist($stopLikasi);
 
         $stopKolwezi = (new RouteStop())
             ->setCity('Kolwezi')
+            ->setCountry('RDC')
             ->setStopOrder(3)
-            ->setCountry('RDC') // ◄ CORRECTION : Pays obligatoire
-            ->setDurationFromDeparture(300) // +5h
-            ->setDistanceFromDeparture('356') // ◄ CORRECTION : Point de départ
+            ->setDurationFromDeparture(300)
+            ->setDistanceFromDeparture('320.00')
             ->setIsActive(true)
-            ->setCreatedBy($admin)
             ->setRoute($route);
         $manager->persist($stopKolwezi);
 
-        $manager->flush();
-
         /*
-         * 7. CONFIGURATION DES TARIFS (FARES) LIÉS AUX DEVISES
+         * 7. CONFIGURATION DES TARIFS (FARES)
          */
-        // Tarif Général Ligne Complète (Fallback)
         $generalFare = (new Fare())
             ->setTargetType(FareTargetType::Route)
-            ->setTargetId($route->getId())
+            ->setTargetId((int) $route->getId())
             ->setFareType(FareType::Standard)
-            ->setAmount('35.00') // 35$
-            ->setCurrency($usd) // Reçoit l'objet Currency complet
+            ->setAmount('35.00')
+            ->setCurrency($usd)
             ->setIsActive(true)
             ->setValidFrom(new \DateTimeImmutable('-1 month'))
             ->setDepartureStop(null)
-            ->setCreatedBy($admin)
             ->setArrivalStop(null);
         $manager->persist($generalFare);
 
-        // Tarif Spécifique Tronçon Court (Lubumbashi -> Likasi)
         $specificFare = (new Fare())
             ->setTargetType(FareTargetType::Route)
-            ->setTargetId($route->getId())
+            ->setTargetId((int) $route->getId())
             ->setFareType(FareType::Standard)
-            ->setAmount('15.00') // 15$
-            ->setCurrency($usd) // Reçoit l'objet Currency complet
+            ->setAmount('15.00')
+            ->setCurrency($usd)
             ->setIsActive(true)
             ->setValidFrom(new \DateTimeImmutable('-1 month'))
             ->setDepartureStop($stopLubumbashi)
-            ->setCreatedBy($admin)
             ->setArrivalStop($stopLikasi);
         $manager->persist($specificFare);
+
+        $manager->flush();
 
         /*
          * 8. PLANIFICATION DE DEUX VOYAGES (TRIPS) SUR LA MÊME ROUTE (MATIN & APRÈS-MIDI)
@@ -301,17 +326,15 @@ final class AppFixtures extends Fixture
                 ->setRoute($route)
                 ->setBus($bus)
                 ->setStatus(TripStatus::Scheduled)
-                ->setDepartureDate(new \DateTimeImmutable('tomorrow')) // Date identique (demain)
-                ->setDepartureTime(new \DateTimeImmutable($data['time'])) // Heures différentes
-                ->setArrivalDate(new \DateTimeImmutable('tomorrow')) // Date identique (demain)
-                ->setArrivalTime(new \DateTimeImmutable($data['time'])) // Heures différentes
+                ->setDepartureDate(new \DateTimeImmutable('tomorrow'))
+                ->setDepartureTime(new \DateTimeImmutable($data['time']))
                 ->setCode($data['code'])
-                ->setSlug('trip-' . $data["code"])
-                ->SetCreatedBy($admin)
-                ->setDriver($driver);
+                ->setDriver($driver)
+                ->setSlug(strtolower($data['code']));
+
             $manager->persist($trip);
 
-            // Génération de l'état des sièges vendables pour chaque trajet (TripSeat)
+            // Génération des TripSeats - Le tableau $seats contient à présent les 46 sièges réels !
             foreach ($seats as $seat) {
                 $tripSeat = (new TripSeat())
                     ->setTrip($trip)
@@ -322,5 +345,6 @@ final class AppFixtures extends Fixture
         }
 
         $manager->flush();
+        $manager->clear();
     }
 }

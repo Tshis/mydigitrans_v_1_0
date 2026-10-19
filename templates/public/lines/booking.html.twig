@@ -61,7 +61,7 @@
                                 <label class="admin-bus-layout-add-label">
                                     <i class="fa-solid fa-calendar-days"></i> Horaires de Départ
                                 </label>
-                                <span class="trip-summary-text-value monospace">{{ trip.departure_time }} (Le {{
+                                <span class="trip-summary-text-value monospace">{{ trip.departure_time|date('H:i') }} (Le {{
                                 trip.date|date('d/m/Y') }})</span>
                             </div>
 

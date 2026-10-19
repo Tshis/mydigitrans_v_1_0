@@ -170,4 +170,19 @@ class BusLayout
 
         return $this;
     }
+
+    // src/Entity/BusLayout.php
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'rows' => $this->getRows(), // Aligné sur le vrai nom de ton MCD
+            'columns' => $this->getColumns(),
+            'aisles' => $this->getAisles(),
+            'specialPositions' => $this->getSpecialPositions(),
+            'hasBackExtraSeat' => $this->hasBackExtraSeat(),
+        ];
+    }
 }

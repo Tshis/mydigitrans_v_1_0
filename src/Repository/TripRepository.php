@@ -27,4 +27,21 @@ class TripRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['slug' => $value]);
     }
+
+    /**
+     * Récupère un voyage avec son bus et son layout en une seule requête SQL.
+     */
+    public function findOneBySlugWithLayout(string $slug): ?Trip
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t', 'b', 'bl', 'r', 'a') // On force la sélection de toutes les entités liées
+            ->join('t.bus', 'b')
+            ->join('b.busLayout', 'bl')
+            ->join('t.route', 'r')
+            ->join('r.agency', 'a')
+            ->andWhere('t.slug = :slug')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+    } //findOneBySlugWithLayout
 }

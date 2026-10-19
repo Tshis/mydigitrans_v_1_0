@@ -116,19 +116,20 @@
                                         <span class="currency font-bold">{{ trip.currency|upper }}</span>
                                     </div>
 
-                                    {# Formulaire de soumission vers le tunnel d'achat #}
-                                    {# ◄ RECORRECTION ICI : Utilisation du slug de la route pour correspondre aux exigences de
-                            la route #}
-                                    <form
-                                        action="{{ path('public_lines_booking', {'slug': trip.trip.slug}) }}"
-                                        method="POST"
-                                    >
+                                    
+                                    <form action="{{ path('public_lines_booking', {'slug': trip.trip.slug}) }}" method="POST">
                                         <input type="hidden" name="trip_id" value="{{ trip.trip.id }}">
                                         <input type="hidden" name="passengers_count" value="{{ criteria.passengers }}">
+    
+                                        {# ◄ SÉCURISATION : On passe uniquement les IDs certifiés par le service #}
+                                        <input type="hidden" name="departure_stop_id" value="{{ trip.departureStopId }}">
+                                        <input type="hidden" name="arrival_stop_id" value="{{ trip.arrivalStopId }}">
+
                                         <button type="submit" class="btn-refined btn-success-gradient w-100-percent">
                                             <i class="fa-solid fa-ticket"></i> Réserver ma place
                                         </button>
                                     </form>
+
                                 </div>
 
                             </div>

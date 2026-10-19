@@ -323,10 +323,12 @@ final class LineSearcher
      *
      * @param list<Fare> $fares
      */
-    private function pickFare(array $fares, int $departureStopId, int $arrivalStopId): ?Fare
+    public function pickFare(array $fares, int $departureStopId, int $arrivalStopId): ?Fare
     {
         $specific = [];
         $generic = [];
+
+        // dd($fares, $departureStopId, $arrivalStopId);
 
         foreach ($fares as $fare) {
             $fromId = $fare->getDepartureStop()?->getId();
