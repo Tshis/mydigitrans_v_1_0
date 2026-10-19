@@ -74,27 +74,44 @@ final class LinesController extends AbstractController
     /**
      * TUNNEL RESERVATION ÉTAPE 1 : Coordonnées du Passager & Siège
      */
-    #[Route('/public/lines/{slug}/booking', name: 'public_lines_booking')]
+    #[Route('/public/lines/trip/{slug}/booking', name: 'public_lines_booking')]
     public function booking(string $slug, Request $request, BusLayoutGridBuilder $busLayoutGridBuilder): Response
     {
-        $session = $request->getSession();
 
-        $layouts = $session->get('bus_layout', []);
-
-        // simulation bus -> layout
-        $busToLayoutMap = [
-            'kin-matadi-trans-david-01' => 1,
-            'kin-matadi-trans-david-02' => 2,
-            'kin-matadi-trans-david-03' => 3,
+        $busLayout = [
+            "id" => 1,
+            "name" => "Yutong 50 places modele 3-2",
+            "agency" => null,
+            "rows" => 11,
+            "columns" => 4,
+            "aisles" => [0 => 2],
+            "specialPositions" => [
+                [
+                    "type" => "driver",
+                    "row" => 1,
+                    "col" => 1
+                ],
+                [
+                    "type" => "aisle",
+                    "row" => 1,
+                    "col" => 2
+                ],
+                [
+                    "type" => "door",
+                    "row" => 2,
+                    "col" => 4
+                ],
+                [
+                    "type" => "aisle",
+                    "row" => 2,
+                    "col" => 3
+                ]
+            ],
+            "hasBackExtraSeat" => true,
+            "isValided" => false,
+            "createdAt" => "2026-10-07 16:52:1",
+            "resolvedAt" => null,
         ];
-
-        $layoutId = $busToLayoutMap[$slug] ?? null;
-
-        $busLayout = $layouts[$layoutId] ?? null;
-
-        if (!$busLayout) {
-            throw $this->createNotFoundException('Bus layout introuvable');
-        }
 
         if ($request->isMethod('post')) {
 
