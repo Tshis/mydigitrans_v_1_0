@@ -1,0 +1,58 @@
+<div class="seatmap-card">
+
+	<div class="bus-head">L'avant du bus</div>
+
+	<div class="seatmap-matrix" style="--grid-cols: {{ seatmap.totalColumns }};">
+
+		{% for cell in seatmap.cells %}
+
+			{% if cell.type in ['seat', 'vip'] %}
+
+				<input type="radio" name="seat" id="seat-{{ cell.row }}-{{ cell.col }}" value="{{ cell.row }}-{{ cell.col }}" class="seat-radio js-seat-btn">
+
+				<label for="seat-{{ cell.row }}-{{ cell.col }}" class="cell-unit" data-type="{{ cell.type }}">
+					<span class="-number">
+						{{ cell.label }}
+					</span>
+				</label>
+
+			{% else %}
+
+				<div class="cell-unit" data-type="{{ cell.type }}">
+					{% if cell.type == 'driver' %}
+						<i class="fa-solid fa-circle-user text-size-20"></i>
+					{% elseif cell.type == 'coDriver' %}
+						<i class="fa-solid fa-id-card"></i>
+					{% elseif cell.type == 'wc' %}
+						<i class="fa-solid fa-restroom"></i>
+					{% elseif cell.type == 'door' %}
+						<i class="fa-solid fa-door-open"></i>
+					{% elseif cell.type == 'cashier' %}
+						<i class="fa-solid fa-hand-holding-dollar"></i>
+					{% elseif cell.type == 'porter' %}
+						<i class="fa-solid fa-image-portrait"></i>
+					{% endif %}
+				</div>
+
+			{% endif %}
+
+		{% endfor %}
+
+	</div>
+	<!--seatmap-matrix-->
+
+	{# Barre de légende du seatmap #}
+	<div class="seatmap-legend-bar">
+		<p class="legend">
+			<span class="available">Disponible</span>
+
+			<span class="selected">Sélectionné</span>
+
+			<span class="vip">VIP</span>
+
+			<span class="booked">Occupé</span>
+		</p>
+		<!--legend-->
+	</div>
+</div>
+<!--seatmap-card-->

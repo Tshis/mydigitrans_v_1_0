@@ -1,0 +1,115 @@
+{# templates/public/booking/payment_method.html.twig #}
+{% extends "public/base.html.twig" %}
+
+{% block body %}
+	<div class="public-booking-scope">
+    
+		{# --- HEADER PLEINE LARGEUR SANS CONTAINER --- #}
+		<header class="page-header mb-25">
+			<div class="header-main-info container">
+				<div class="title">
+					<div class="sub-header-flex text-size-16 text-weight-700">
+						<span class="">Tunnel de Réservation</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary  text-highlight">Étape 2 sur 2</span>
+					</div>
+					<h1 class="mt-5">Mode de Règlement & Validation</h1>
+				</div>
+			</div>
+		</header>
+
+		<div class="container">
+			{# --- FORMULAIRE DOUBLE COLONNE INVERSÉ --- #}
+			<form action="{{ path('public_lines_booking_finalize', {'reference': booking.reference}) }}" method="POST" class="settings-form-layout">
+				<input type="hidden" name="booking_id" value="{{ booking.id }}">
+
+				<div class="settings-container-grid">
+
+					{# COLONNE DROITE : SYNTHÈSE DU BILLET PRÉ-BLOQUÉ (EN PREMIER DANS LE HTML) #}
+					<aside class="sidebar-action-panel">
+						<div class="card sticky-aside-card public-invoice-sidebar-theme">
+							<h2 class="card-title-fix">
+								<i class="fa-solid fa-ticket text-primary"></i> Récapitulatif Billet
+							</h2>
+                        
+							<div class="financial-block-summary mb-12">
+								<label class="admin-bus-layout-add-label">Voyageur</label>
+								<span class="trip-summary-text-value font-bold">{{ booking.passenger_name }}</span>
+							</div>
+
+							<div class="financial-block-summary mb-12">
+								<label class="admin-bus-layout-add-label">Itinéraire</label>
+								<span class="trip-summary-text-value font-bold text-primary-mode">{{ booking.departure }} ➔ {{ booking.destination }}</span>
+							</div>
+
+							<div class="financial-block-summary mb-12">
+								<label class="admin-bus-layout-add-label">Bus & Siège</label>
+								<span class="trip-summary-text-value monospace">{{ booking.bus_model }} • <strong>Siège N° {{ booking.seat_number }}</strong></span>
+							</div>
+
+							<hr class="summary-divider mb-15">
+
+							<div class="financial-block-summary mb-20">
+								<label class="admin-bus-layout-add-label">Montant du Billet</label>
+								<span class="invoice-macro-amount font-primary">{{ booking.price|number_format(2, ',', ' ') }} {{ booking.currency_code }}</span>
+							</div>
+						</div>
+					</aside>
+
+					{# COLONNE GAUCHE : SÉLECTEUR DE MÉTHODE DE PAIEMENT #}
+					<div class="main-form-panel">
+						<div class="card control-card mb-20">
+							<h2 class="card-title-fix mb-20">
+								<i class="fa-solid fa-wallet text-primary"></i> Choisir votre mode de règlement
+							</h2>
+
+							{# OPTION A : PAIEMENT MOBILE MONEY IMMÉDIAT #}
+							<div class="payment-method-option-card mb-15">
+								<label class="payment-radio-container">
+									<input type="radio" name="payment_method" value="mobile_money" checked>
+									<span class="radio-marker"></span>
+									<div class="option-label-content">
+										<span class="option-title">Payer maintenant par Mobile Money</span>
+										<p class="option-desc">Validation instantanée de votre billet électronique. Votre siège est sécurisé à 100%.</p>
+                                    
+										{# Logos des opérateurs de RDC #}
+										<div class="operator-logos-grid mt-10">
+											<span class="op-logo op-mpesa">M-Pesa</span>
+											<span class="op-logo op-orange">Orange Money</span>
+											<span class="op-logo op-airtel">Airtel Money</span>
+										</div>
+									</div>
+								</label>
+							</div>
+
+							{# OPTION B : RÉSERVATION GRATUITE & PAIEMENT AU GUICHET #}
+							<div class="payment-method-option-card standard-accent-border">
+								<label class="payment-radio-container">
+									<input type="radio" name="payment_method" value="station_cash">
+									<span class="radio-marker"></span>
+									<div class="option-label-content">
+										<span class="option-title text-warning-mode">Réserver sans payer (Règlement au Guichet)</span>
+										<p class="option-desc">Génère un Bon de Réservation temporaire. Vous paierez en espèces à la gare avant le départ.</p>
+                                    
+										<div class="notice-box-danger-dashboard mt-10">
+											<p><i class="fa-solid fa-clock-history"></i> <strong>Règle de carence :</strong> Ce bon expirera automatiquement <strong>2 heures</strong> avant le départ du bus s'il n'est pas soldé à la gare.</p>
+										</div>
+									</div>
+								</label>
+							</div>
+
+						</div>
+
+						{# BOUTONS D'ACTION #}
+						<div class="admin-bus-layout-add-action-zone">
+							<button type="submit" class="btn-refined btn-success-gradient">
+								<i class="fa-solid fa-circle-check"></i> Confirmer & Éditer ma pièce
+							</button>
+						</div>
+					</div>
+
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

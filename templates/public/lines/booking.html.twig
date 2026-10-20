@@ -1,4 +1,4 @@
-{# templates/public/booking/passenger_form.html.twig #}
+{# templates/public/lines/booking.html.twig #}
 {% extends "public/base.html.twig" %}
 
 {% block javascripts %}
@@ -24,157 +24,159 @@
         </header>
 
         <div class="container">
+
+            
             {# --- FORMULAIRE DOUBLE COLONNE INVERSÉ --- #}
-            <form
-                action="{{ path('public_lines_booking_step_2', {'reference': 'RSV-defini-001'}) }}"
-                method="POST"
-                class="settings-form-layout"
-            >
-                <input type="hidden" name="trip_id" value="{{ trip.id }}">
-                <input type="hidden" name="selected_seat" id="js-selected-seat-input" required>
+            {# Sans action : le formulaire est envoyé à cette même adresse, qui enregistre la réservation. #}
+            {{ form_start(form, {attr: {class: 'settings-form-layout'}}) }}
 
-                <div class="settings-container-grid">
+            {{ form_widget(form.departureStop) }}
+            {{ form_widget(form.arrivalStop) }}
 
-                    {# COLONNE DROITE : RÉCAPITULATIF DU SÉJOUR (PLACÉE EN PREMIER DANS LA GRILLE HTML) #}
-                    <aside class="sidebar-action-panel">
-                        <div class="card sticky-aside-card public-invoice-sidebar-theme">
-                            <h2 class="card-title-fix">
-                                <i class="fa-solid fa-receipt text-primary"></i> Détails de mon Voyage
-                            </h2>
+            {% if form.vars.errors|length > 0 %}
+                <div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
+            {% endif %}
 
-                            <div class="financial-block-summary mb-15">
-                                <label class="admin-bus-layout-add-label">
-                                    <i class="fa-solid fa-building"></i> Compagnie
-                                </label>
-                                <span class="trip-summary-text-value">{{ trip.agency_name }}</span>
-                            </div>
+            <div class="settings-container-grid">
 
-                            <div class="financial-block-summary mb-15">
-                                <label class="admin-bus-layout-add-label">
-                                    <i class="fa-solid fa-route"></i> Itinéraire
-                                </label>
-                                <span class="trip-summary-text-value font-bold">{{ trip.departure }} ➔ {{ trip.destination
-                                }}</span>
-                            </div>
+                {# COLONNE DROITE : RÉCAPITULATIF DU SÉJOUR (PLACÉE EN PREMIER DANS LA GRILLE HTML) #}
+                <aside class="sidebar-action-panel">
+                    <div class="card sticky-aside-card public-invoice-sidebar-theme">
+                        <h2 class="card-title-fix">
+                            <i class="fa-solid fa-receipt text-primary"></i> Détails de mon Voyage
+                        </h2>
 
-                            <div class="financial-block-summary mb-15">
-                                <label class="admin-bus-layout-add-label">
-                                    <i class="fa-solid fa-calendar-days"></i> Horaires de Départ
-                                </label>
-                                <span class="trip-summary-text-value monospace">{{ trip.departure_time|date('H:i') }} (Le {{
-                                trip.date|date('d/m/Y') }})</span>
-                            </div>
+                        <div class="financial-block-summary mb-15">
+                            <label class="admin-bus-layout-add-label">
+                                <i class="fa-solid fa-building"></i> Compagnie
+                            </label>
+                            <span class="trip-summary-text-value">{{ trip.agency_name }}</span>
+                        </div>
 
-                            <hr class="summary-divider mb-15">
+                        <div class="financial-block-summary mb-15">
+                            <label class="admin-bus-layout-add-label">
+                                <i class="fa-solid fa-route"></i> Itinéraire
+                            </label>
+                            <span class="trip-summary-text-value font-bold">{{ trip.departure }} ➔ {{ trip.destination }}</span>
+                        </div>
 
-                            <ul class="billing-details-list mb-20">
-                                <li><strong>Siège sélectionné :</strong> <span
-                                        id="js-summary-seat-badge"
-                                        class="font-bold text-danger-color"
-                                    >Aucun choisi</span></li>
-                            </ul>
+                        <div class="financial-block-summary mb-15">
+                            <label class="admin-bus-layout-add-label">
+                                <i class="fa-solid fa-calendar-days"></i> Horaires de Départ
+                            </label>
+                            <span class="trip-summary-text-value monospace">{{ trip.departure_time|date('H:i') }} (Le {{ trip.departure_time|date('d/m/Y') }})</span>
+                        </div>
 
-                            <div class="financial-block-summary mb-20">
-                                <label class="admin-bus-layout-add-label">
-                                    <i class="fa-regular fa-money-bill-1"></i>
-                                    Prix Total du Billet
-                                </label>
+                        <hr class="summary-divider mb-15">
+
+                        <ul class="billing-details-list mb-20">
+                            <li><strong>Siège(s) sélectionné(s) :</strong> <span
+                                    id="js-summary-seat-badge"
+                                    class="font-bold text-danger-color"
+                                >Aucun choisi</span></li>
+                            <li><strong>Places à réserver :</strong> <span class="font-bold">{{ form.seats|length }}</span></li>
+                        </ul>
+
+                        <div class="financial-block-summary mb-20">
+                            <label class="admin-bus-layout-add-label">
+                                <i class="fa-regular fa-money-bill-1"></i>
+                                Prix par siège
+                            </label>
+                            {% if trip.price is not null %}
                                 <span class="invoice-macro-amount font-primary">{{ trip.price|number_format(2, ',', ' ') }}
                                     {{ trip.currency_code }}</span>
-                            </div>
-
-                            <div class="notice-box-info">
-                                <p><strong><i class="fa-solid fa-clock"></i> Garantie :</strong> Les places ne sont bloquées
-                                    dans la flotte qu'après validation complète de l'étape de paiement Mobile Money
-                                    suivante.</p>
-                            </div>
-                        </div>
-                    </aside>
-
-                    {# COLONNE GAUCHE : COORDONNÉES ET CARROSSERIE DU PLAN DES SIÈGES #}
-                    <div class="main-form-panel">
-
-                        {# COMPOSANT 1 : FORMULAIRE VOYAGEUR #}
-                        <div class="card control-card mb-20">
-                            <h2 class="card-title-fix">
-                                <i class="fa-solid fa-user-pen text-primary"></i> 1. Identité du Passager
-                            </h2>
-
-                            <div class="field-group mb-20">
-                                <div class="field">
-                                    <label class="admin-bus-layout-add-label">Nom complet (Identité nationale) *</label>
-                                    <input
-                                        type="text"
-                                        name="passenger_name"
-                                        class="admin-bus-layout-add-input"
-                                        placeholder="Ex: Jean Mukendi"
-                                        required
-                                        autocomplete="off"
-                                    >
-                                </div>
-                                <div class="field">
-                                    <label class="admin-bus-layout-add-label">Numéro de Téléphone (Pour suivi & Billet)
-                                        *</label>
-                                    <input
-                                        type="tel"
-                                        name="passenger_phone"
-                                        class="admin-bus-layout-add-input"
-                                        placeholder="Ex: +243 812 345 678"
-                                        required
-                                        autocomplete="off"
-                                    >
-                                </div>
-                            </div>
-
-                            <div class="field-group mb-20">
-                                <div class="field">
-                                    <label class="admin-bus-layout-add-label">Arret de depart *</label>
-                                    <select name="" id="">
-                                        <option value="">Choisir le point d'embarquement</option>
-                                        <option value="">Gare Central</option>
-                                        <option value="">Carrefour</option>
-                                    </select>
-                                </div>
-                                <div class="field">
-                                    <label class="admin-bus-layout-add-label">Arret d'arrivée
-                                        *</label>
-                                    <select name="" id="">
-                                        <option value="">Choisir le point de debarquement</option>
-                                        <option value="">Gare Central</option>
-                                        <option value="">Carrefour</option>
-                                    </select>
-                                </div>
-                            </div>
-
+                                <small class="text-gray text-size-12">Le total exact est calculé selon les sièges choisis (un siège VIP peut coûter plus cher).</small>
+                            {% else %}
+                                <span class="text-gray">Tarif non disponible</span>
+                            {% endif %}
                         </div>
 
-                        {# COMPOSANT 2 : CHOIX DU SIÈGE INTERACTIF #}
-                        <div class="card control-card id-seatmap-section">
-                            <h2 class="card-title-fix mb-10">
-                                <i class="fa-solid fa-chair text-primary"></i> 2. Choisissez votre place à bord
-                            </h2>
-                            <p class="text-gray text-size-12 mb-20">Cliquez directement sur un siège libre de la cabine pour
-                                l'attribuer à votre réservation.</p>
-
-                            {# Inclusion de ta matrice de bus standardisée #}
-                            {{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
-                        </div>
-
-                        {# BOUTONS D'ENCHAÎNEMENT DU TUNNEL #}
-                        <div class="admin-bus-layout-add-action-zone mt-20">
-                            <a href="{{ path('public_lines_results') }}" class="btn-refined btn-gray-gradient my-5">
-                                <i class="fa-solid fa-diamond-turn-right"></i>
-                                Retour aux lignes
-                            </a>
-                            <button type="submit" class="btn-refined btn-success-gradient my-5">
-                                Confirmer La Reservation
-                                <i class="fa-solid fa-circle-chevron-right"></i>
-                            </button>
+                        <div class="notice-box-info">
+                            <p><strong><i class="fa-solid fa-clock"></i> Garantie :</strong> Vos sièges sont retenus pendant
+                                quelques minutes, le temps de choisir votre mode de règlement à l'étape suivante.</p>
                         </div>
                     </div>
+                </aside>
 
+                {# COLONNE GAUCHE : COORDONNÉES ET CARROSSERIE DU PLAN DES SIÈGES #}
+                <div class="main-form-panel">
+
+                    {# COMPOSANT 1 : FORMULAIRE VOYAGEUR #}
+                    <div class="card control-card mb-20">
+                        <h2 class="card-title-fix">
+                            <i class="fa-solid fa-user-pen text-primary"></i> 1. Identité du Passager
+                        </h2>
+
+                        <div class="field-group mb-20">
+                            <div class="field">
+                                {{ form_label(form.fullName) }}
+                                {{ form_widget(form.fullName) }}
+                                {{ form_errors(form.fullName) }}
+                            </div>
+                            <div class="field">
+                                {{ form_label(form.phone) }}
+                                {{ form_widget(form.phone) }}
+                                {{ form_errors(form.phone) }}
+                            </div>
+                        </div>
+
+                        {# Les arrêts viennent de la recherche : ils sont fixes pour ce voyage #}
+                        <div class="field-group mb-20">
+                            <div class="field financial-block-summary">
+                                <label class="admin-bus-layout-add-label">Arrêt de départ</label>
+                                <span class="trip-summary-text-value">{{ trip.departure }}</span>
+                            </div>
+                            <div class="field financial-block-summary">
+                                <label class="admin-bus-layout-add-label">Arrêt d'arrivée</label>
+                                <span class="trip-summary-text-value">{{ trip.destination }}</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {# COMPOSANT 2 : CHOIX DU SIÈGE INTERACTIF #}
+                    <div class="card control-card id-seatmap-section">
+                        <h2 class="card-title-fix mb-10">
+                            <i class="fa-solid fa-chair text-primary"></i> 2. Choisissez votre place à bord
+                        </h2>
+                        <p class="text-gray text-size-12 mb-20">Cliquez directement sur un siège libre de la cabine pour
+                            l'attribuer à votre réservation.</p>
+
+                        {# Un champ caché par place. Le premier garde l'id js-selected-seat-input attendu par seatmap_selection.js. #}
+                        {% for seat in form.seats %}
+                            {{ form_widget(seat, {
+                                    id: loop.first ? 'js-selected-seat-input' : 'js-seat-input-' ~ loop.index0,
+                                    attr: {'data-seat-input': loop.index0}
+                                }) }}
+                            {{ form_errors(seat) }}
+                        {% endfor %}
+                        {{ form_errors(form.seats) }}
+
+                        {# Inclusion de ta matrice de bus standardisée #}
+                        {{ include('system/seatmap.html.twig', {
+                                'seatmap': seatmap,
+                                'seat_info': seat_info,
+                                'max_seats': form.seats|length
+                            }) }}
+                    </div>
+
+                    {# BOUTONS D'ENCHAÎNEMENT DU TUNNEL #}
+                    <div class="admin-bus-layout-add-action-zone mt-20">
+                        <a href="{{ path('public_lines_index') }}" class="btn-refined btn-gray-gradient my-5">
+                            <i class="fa-solid fa-diamond-turn-right"></i>
+                            Retour aux lignes
+                        </a>
+                        <button type="submit" class="btn-refined btn-success-gradient my-5">
+                            Confirmer La Reservation
+                            <i class="fa-solid fa-circle-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
-            </form>
+
+            </div>
+
+            {{ form_widget(form._token) }}
+            {{ form_end(form, {render_rest: false}) }}
         </div>
     </div>
 {% endblock %}

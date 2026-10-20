@@ -78,11 +78,17 @@ class BusLayoutGridBuilder
 
                     $seatIndex[$key] = $cell['label'];
                 } elseif ($cell['type'] === 'driver') {
-                    $cell['label'] = 'CH';
+                    $cell['label'] = 'DRV';
+                } elseif ($cell['type'] === 'coDriver') {
+                    $cell['label'] = 'cDRV';
                 } elseif ($cell['type'] === 'wc') {
                     $cell['label'] = 'WC';
+                } elseif ($cell['type'] === 'cashier') {
+                    $cell['label'] = 'CASHIER';
+                } elseif ($cell['type'] === 'porter') {
+                    $cell['label'] = 'PORTER';
                 } elseif ($cell['type'] === 'door') {
-                    $cell['label'] = 'PORT';
+                    $cell['label'] = 'PORTE';
                 }
 
                 $cells[] = $cell;

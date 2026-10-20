@@ -1,56 +1,72 @@
 <div class="seatmap-card">
 
-	<div class="bus-head">L'avant du bus</div>
+    <div class="bus-head">L'avant du bus</div>
 
-	<div class="seatmap-matrix" style="--grid-cols: {{ seatmap.totalColumns }};">
+    <div class="seatmap-matrix" style="--grid-cols: {{ seatmap.totalColumns }};">
 
-		{% for cell in seatmap.cells %}
+        {# ◄ SÉCURITÉ : Mode checkbox uniquement si max_seats est défini et supérieur à 1 #}
+        {% set max_passengers = max_seats|default(1) %}
+        {% set input_type = max_passengers > 1 ? 'checkbox' : 'radio' %}
 
-			{% if cell.type in ['seat', 'vip'] %}
+        {% for cell in seatmap.cells %}
 
-				<input type="radio" name="seat" id="seat-{{ cell.row }}-{{ cell.col }}" value="{{ cell.row }}-{{ cell.col }}" class="seat-radio">
+            {% if cell.type in ['seat', 'vip', 'normal'] %}
 
-				<label for="seat-{{ cell.row }}-{{ cell.col }}" class="cell-unit" data-type="{{ cell.type }}">
-					<span class="-number">
-						{{ cell.label }}
-					</span>
-				</label>
+                {# ◄ ATTRIBUTS SÉCURISÉS : Si seat_info n'est pas fourni, le bouton est "available" par défaut #}
+                {% set current_status = seat_info[cell.label]|default('available') %}
+                {% set is_occupied = current_status in ['held', 'reserved', 'blocked'] %}
 
-			{% else %}
+                <input
+                    type="{{ input_type }}"
+                    name="seat"
+                    id="seat-{{ cell.row }}-{{ cell.col }}"
+                    value="{{ cell.label }}"
+                    class="seat-radio js-seat-btn"
+                    data-seat-label="{{ cell.label }}"
+                    {# Désactivé si occupé OU si on est sur une simple page "show" sans formulaire #}
+                    {{ is_occupied or form is not defined ? 'disabled' : '' }}
+                >
 
-				<div class="cell-unit" data-type="{{ cell.type }}">
-					{% if cell.type == 'driver' %}
-						<i class="fa-solid fa-id-card"></i>
-					{% elseif cell.type == 'wc' %}
-						<i class="fa-solid fa-restroom"></i>
-					{% elseif cell.type == 'door' %}
-						<i class="fa-solid fa-door-open"></i>
-					{% elseif cell.type == 'cashier' %}
-						<i class="fa-solid fa-hand-holding-dollar"></i>
-					{% elseif cell.type == 'porter' %}
-						<i class="fa-solid fa-image-portrait"></i>
-					{% endif %}
-				</div>
+                <label
+                    for="seat-{{ cell.row }}-{{ cell.col }}"
+                    class="cell-unit {{ current_status }}"
+                    data-type="{{ cell.type }}"
+                >
+                    <span class="-number">
+                        {{ cell.label }}
+                    </span>
+                </label>
 
-			{% endif %}
+            {% else %}
 
-		{% endfor %}
+                <div class="cell-unit" data-type="{{ cell.type }}">
+                    {% if cell.type == 'driver' %}
+                        <i class="fa-solid fa-circle-user text-size-20"></i>
+                    {% elseif cell.type == 'coDriver' %}
+                        <i class="fa-solid fa-id-card"></i>
+                    {% elseif cell.type == 'wc' %}
+                        <i class="fa-solid fa-restroom"></i>
+                    {% elseif cell.type == 'door' %}
+                        <i class="fa-solid fa-door-open"></i>
+                    {% elseif cell.type == 'cashier' %}
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                    {% elseif cell.type == 'porter' %}
+                        <i class="fa-solid fa-image-portrait"></i>
+                    {% endif %}
+                </div>
 
-	</div>
-	<!--seatmap-matrix-->
+            {% endif %}
 
-	{# Barre de légende du seatmap #}
-	<div class="seatmap-legend-bar">
-		<p class="legend">
-			<span class="available">Disponible</span>
+        {% endfor %}
 
-			<span class="selected">Sélectionné</span>
+    </div>
 
-			<span class="vip">VIP</span>
-
-			<span class="booked">Occupé</span>
-		</p>
-		<!--legend-->
-	</div>
+    <div class="seatmap-legend-bar">
+        <p class="legend">
+            <span class="available">Disponible</span>
+            <span class="selected">Sélectionné</span>
+            <span class="vip">VIP</span>
+            <span class="booked">Occupé</span>
+        </p>
+    </div>
 </div>
-<!--seatmap-card-->

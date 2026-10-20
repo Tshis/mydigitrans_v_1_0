@@ -2,28 +2,31 @@
 
 namespace App\Controller\web\public;
 
+
+use App\Dto\public\line\BookingData;
 use App\Dto\public\line\LineSearchData;
-use App\Entity\RouteStop;
-use App\Enum\FareTargetType;
+use App\Entity\User;
+use App\Enum\ReservationStatus;
+use App\Exception\BookingException;
+use App\Form\BookingType;
 use App\Form\LineSearchType;
 use App\Repository\TripRepository;
+use App\Service\BookingService;
 use App\Service\BusLayoutGridBuilder;
 use App\Service\LineSearcher;
-use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class LinesController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em) {}
-
     #[Route('/public/lines', name: 'public_lines_index')]
     public function index(): Response
     {
@@ -34,7 +37,7 @@ final class LinesController extends AbstractController
 
 
     /**
-     * SÉQUENCE INTERACTION : TRAITEMENT DE LA RECHERCHE ET RENDU DES RÉSULTATS DISPONIBLES 
+     * SÉQUENCE INTERACTION : TRAITEMENT DE LA RECHERCHE ET RENDU DES RÉSULTATS DISPONIBLES
      */
     #[Route('/public/lines/results', name: 'public_lines_results')]
     public function results(Request $request, LineSearcher $lineSearcher): Response
@@ -78,35 +81,21 @@ final class LinesController extends AbstractController
 
 
     /**
-     * TUNNEL RESERVATION ÉTAPE 1 : Coordonnées du Passager & Siège
+     * TUNNEL RESERVATION ÉTAPE 1 : Coordonnées du passager & sièges
+     *
+     * - Ouverture (depuis la page des résultats, en POST ou en GET) : departure_stop_id, arrival_stop_id
+     *   et passengers_count servent à préparer le formulaire.
+     * - Soumission du formulaire (champ « booking ») : crée la réservation « pending », retient les sièges
+     *   (TripSeat « held ») puis redirige vers l'étape 2.
      */
-    #[Route('/public/lines/trip/{slug}/booking', name: 'public_lines_booking')]
+    #[Route('/public/lines/trip/{slug}/booking', name: 'public_lines_booking', methods: ['GET', 'POST'])]
     public function booking(
         string $slug,
         Request $request,
         TripRepository $tripRepo,
-        LineSearcher $lineSearcher,
+        BookingService $booking,
         BusLayoutGridBuilder $busLayoutGridBuilder
     ): Response {
-
-
-        if ($request->isMethod('post')) {
-
-            //enregistrement de la reservation avec le status pending & imprimer
-
-
-            $reservation = [
-                'reference' => 'RSV-001-2026',
-                //.......
-            ];
-
-
-
-            //redirection vers la 2e etape Lorsque le paiement en ligne sera dispo
-            // return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reservation['reference']]);
-        }
-
-        // ◄ CORRECTION : On récupère le Trip en BDD grâce au slug de l'URL
         $trip = $tripRepo->findOneBySlugWithLayout($slug);
 
         if (!$trip) {
@@ -114,119 +103,144 @@ final class LinesController extends AbstractController
             return $this->redirectToRoute('public_lines_index');
         }
 
-        $busLayout = ($trip->getBus()->getBusLayout())->toArray();
+        $now = new \DateTimeImmutable();
 
-        // ◄ SÉCURISATION : Chargement des entités réelles depuis les IDs du formulaire
-        $departureStopId = $request->request->get('departure_stop_id');
-        $arrivalStopId = $request->request->get('arrival_stop_id');
-
-        $departureStop = $this->em->getRepository(RouteStop::class)->find((int)$departureStopId);
-        $arrivalStop = $this->em->getRepository(RouteStop::class)->find((int)$arrivalStopId);
-
-        // Sécurité supplémentaire : On vérifie que ces arrêts appartiennent bien à la route du bus !
-        if (!$departureStop || !$arrivalStop || $departureStop->getRoute() !== $trip->getRoute()) {
-            $this->addFlash('danger', 'Une erreur de sécurité est survenue sur l\'itinéraire.');
+        try {
+            $booking->assertBookable($trip, $now);
+        } catch (BookingException $e) {
+            $this->addFlash('danger', $e->getMessage());
             return $this->redirectToRoute('public_lines_index');
         }
 
-        // 1. EXTRACTION DE L'AGENCE (MCD 19)
-        $agency = $trip->getRoute()?->getAgency();
+        $data = new BookingData();
 
-        // 2. ◄ RÉCUPÉRATION DU TARIF VIA LE RECOURS À TON SERVICE DE GRILLE (MCD 21)
-        // On charge les tarifs liés à la route de l'agence pour l'associer à l'algorithme
-        $fares = $this->em->getRepository(\App\Entity\Fare::class)->findBy([
-            'targetType' => FareTargetType::Route,
-            'targetId' => $trip->getRoute()->getId(),
-            'isActive' => true
-        ]);
+        if (!$request->request->has('booking')) {
+            // Ouverture de l'étape 1 : arrêts choisis et nombre de places viennent de la page des résultats.
+            $data->departureStop = $this->input($request, 'departure_stop_id');
+            $data->arrivalStop = $this->input($request, 'arrival_stop_id');
+            $count = max(1, min(BookingData::MAX_SEATS, (int) ($this->input($request, 'passengers_count') ?? 1)));
+            $data->seats = array_fill(0, $count, null);
 
-        // On appelle directement pickFare de ton LineSearcher qui est maintenant accessible !
-        $fareEntity = $lineSearcher->pickFare($fares, $departureStop->getId(), $arrivalStop->getId());
-        $ticketPrice = $fareEntity?->getAmount() ?? 0.0;
-        $ticketCurrency = $fareEntity?->getCurrency()->getCode();
+            $user = $this->getUser();
+            if ($user instanceof User) {
+                $data->fullName = $user->getFullName();
+                $data->phone = $user->getPhone();
+            }
+        }
 
+        $form = $this->createForm(BookingType::class, $data);
+        $form->handleRequest($request);
 
-        //3. Recuperation de la bonne heure
-        // 3.1. Initialisation de l'heure brute du point de départ initial (ex: 08:00)
-        $baseDate = \DateTimeImmutable::createFromInterface($trip->getDepartureDate());
-        $departureTime = $trip->getDepartureTime();
+        // Les arrêts sont vérifiés côté serveur : ils doivent appartenir à la route de ce voyage, dans le bon ordre.
+        try {
+            [$departureStop, $arrivalStop] = $booking->resolveSegment($trip, $data->departureStop, $data->arrivalStop);
+        } catch (BookingException $e) {
+            $this->addFlash('danger', $e->getMessage());
+            return $this->redirectToRoute('public_lines_index');
+        }
 
-        $origin = $baseDate->setTime(
-            (int) $departureTime->format('H'),
-            (int) $departureTime->format('i'),
-            0
-        );
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $reservation = $booking->createPendingReservation($trip, $departureStop, $arrivalStop, $data, $this->getUser(), $now);
 
-        // 3.2. ◄ CALCUL DE L'HEURE REELLE PAR INTERVALLE (ex: 08h00 + 120 min = 10h00)
-        // On récupère les minutes de décalage stockées dans l'arrêt de départ sécurisé
-        $departureOffset = (int) $departureStop->getDurationFromDeparture(); //
-        $realDepartureAt = $origin->add(new \DateInterval(sprintf('PT%dM', $departureOffset)));
+                return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reservation->getReference()]);
+            } catch (BookingException $e) {
+                $form->addError(new FormError($e->getMessage()));
+            }
+        }
 
-        // 4. Intégration sécurisée dans ton tableau $trip destiné à Twig :
-        $trip = [
+        // Le prix vient de la base (Fare), jamais du navigateur.
+        $quote = $booking->quote($trip, $departureStop, $arrivalStop, \App\Enum\SeatType::Normal, $now);
+
+        $tripView = [
             'id' => $trip->getId(),
-            'agency_name' => $agency?->getName() ?? 'Agence Indéfini',
+            'agency_name' => $trip->getRoute()?->getAgency()?->getName() ?? 'Agence Indéfini',
             'departure' => $departureStop->getCity(),
             'destination' => $arrivalStop->getCity(),
             'date' => $trip->getDepartureDate(),
-            'departure_time' =>  $realDepartureAt,
-
-            // ◄ SÉCURISATION DES DONNÉES FINANCIÈRES (Tirées de l'ORM, impossibles à falsifier)
-            /* 'price' => $ticketPrice,
-            'currency_code' => $ticketCurrency */
-            'price' => $ticketPrice, // Prix exact et certifié recalculé en arrière-plan
-            'currency_code' => $ticketCurrency ?? 'CDF'
+            'departure_time' => $booking->departureAt($trip, $departureStop),
+            'price' => $quote['amount'] ?? null,
+            'currency_code' => $quote ? $quote['currency']->getCode() : '',
         ];
+
+        $busLayout = ($trip->getBus()->getBusLayout())->toArray();
 
         return $this->render('public/lines/booking.html.twig', [
             'page' => 'lines',
-            'trip' => $trip,
+            'form' => $form->createView(),
+            'trip' => $tripView,
             'seatmap' => $busLayoutGridBuilder->build($busLayout),
-        ]);
+            // État et prix de chaque siège, indexés par libellé : available, held, reserved ou blocked.
+            'seat_info' => $booking->seatInfo($trip, $departureStop, $arrivalStop, $now),
+        ], new Response(status: $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK));
     } //booking
 
 
     /**
      * TUNNEL RESERVATION ÉTAPE 2 : SÉLECTION DU MODE DE RÈGLEMENT
      */
-    #[Route('/public/lines/booking/{reference}/step-2', name: 'public_lines_booking_step_2')]
-    public function step_2(string $reference): Response
+    #[Route('/public/lines/booking/{reference}/step-2', name: 'public_lines_booking_step_2', methods: ['GET'])]
+    public function step_2(string $reference, BookingService $booking): Response
     {
-        $booking = [
-            'id' => 112,
-            'reference' => 'CODE-TRIP-001',
-            'passenger_name' => 'Kabila Dieudonné',
-            'departure' => 'Kinshasa',
-            'destination' => 'Kikwit',
-            'bus_model' => 'Mercedes Marcopolo (VIP)',
-            'seat_number' => '01',
-            'price' => 45.00,
-            'currency_code' => 'USD'
-        ];
+        $now = new \DateTimeImmutable();
+
+        try {
+            $reservation = $booking->findPendingReservation($reference, $now);
+        } catch (BookingException $e) {
+            $this->addFlash('danger', $e->getMessage());
+            return $this->redirectToRoute('public_lines_index');
+        }
 
         return $this->render('public/lines/booking_step_2.html.twig', [
             'page' => 'lines',
-            'booking' => $booking
+            'booking' => $booking->summary($reservation),
+            // Échéance du bon de réservation (départ moins le délai de la route), null si le départ est trop proche.
+            'station_deadline' => $booking->stationDeadline($reservation, $now),
+            // Version 2 : passer à true quand le paiement direct (Mobile Money) sera branché.
+            'online_payment_enabled' => false,
         ]);
-    }//step_2
+    } //step_2
 
     /**
      * STEP 3 : FINALISATION DU TRAJET : ROUTAGE SELON LE MODE CHOISI
      */
-    #[Route('/public/lines/booking/{reference}/finaliser', name: 'public_lines_booking_finalize')]
-    public function finalize(Request $request): Response
+    #[Route('/public/lines/booking/{reference}/finaliser', name: 'public_lines_booking_finalize', methods: ['POST'])]
+    public function finalize(string $reference, Request $request, BookingService $booking): Response
     {
-        $method = $request->request->get('payment_method');
-
-        if ($method === 'station_cash') {
-            $this->addFlash('warning', 'Votre réservation au guichet a été enregistrée. Veuillez la régler sous 2 heures.');
-            // Route Symfony d'impression Dompdf du bon de réservation que nous avons codé ensemble
-            return $this->redirectToRoute('public_reservation_print_voucher', ['reference' => 'RSV-2026-001']);
+        if (!$this->isCsrfTokenValid('finalize' . $reference, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton de sécurité invalide.');
         }
 
-        // Sinon : Routage vers l'API de l'opérateur Mobile Money sélectionné
-        $this->addFlash('success', 'Billet électronique payé et validé avec succès.');
-        return $this->redirectToRoute('public_lines_ticket_download', ['reference' => 'RSV-2026-001']);
+        $now = new \DateTimeImmutable();
+
+        try {
+            $reservation = $booking->findPendingReservation($reference, $now);
+            $method = (string) $request->request->get('payment_method');
+
+            if ($method === 'station_cash') {
+                $booking->confirmStationPayment($reservation, $now);
+                $deadline = $reservation->getExpiresAt();
+
+                $this->addFlash('warning', sprintf(
+                    'Votre réservation au guichet a été enregistrée. Veuillez la régler avant le %s.',
+                    $deadline?->format('d/m/Y à H:i')
+                ));
+
+                // Route Symfony d'impression Dompdf du bon de réservation
+                return $this->redirectToRoute('public_reservation_print_voucher', ['reference' => $reference]);
+            }
+
+            if ($method === 'mobile_money') {
+                // Version 2 : paiement direct. À brancher ici : initier le paiement auprès de l'opérateur,
+                // puis, à la confirmation, passer la réservation à « paid » et créer le Ticket.
+                throw new BookingException('Le paiement en ligne sera bientôt disponible. Choisissez le règlement au guichet.');
+            }
+
+            throw new BookingException('Choisissez un mode de règlement.');
+        } catch (BookingException $e) {
+            $this->addFlash('danger', $e->getMessage());
+            return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reference]);
+        }
     } //finalize
 
 
@@ -239,23 +253,35 @@ final class LinesController extends AbstractController
      * RESERVATION PDF 4.1 : COMPILATION DU BON TEMPORAIRE VIA DOMPDF
      */
     #[Route('/lines/reservations/{reference}/print-voucher', name: 'public_reservation_print_voucher', methods: ['GET'])]
-    public function printVoucherPdf(string $reference): Response
+    public function printVoucherPdf(string $reference, BookingService $booking): Response
     {
-        // 1. Modélisation et extraction de ton entité de Réservation en cours
+        $entity = $booking->findReservation($reference);
+
+        if (!$entity || !in_array($entity->getStatus(), [ReservationStatus::Pending, ReservationStatus::Paid], true)) {
+            $this->addFlash('danger', 'Ce bon de réservation n\'est plus valable.');
+            return $this->redirectToRoute('public_lines_index');
+        }
+
+        // 1. Données réelles de la réservation, avec les clés attendues par voucher.html.twig
+        $summary = $booking->summary($entity);
+
         $reservation = [
-            'id' => 1,
-            'reference' => $reference,
-            'code' => $reference,
-            'trip_code' => 'TRP-2026-0042',
-            'route_label' => 'Kinshasa - Kikwit via Kenge',
-            'departure_stop' => 'Kinshasa (Gare Centrale)',
-            'arrival_stop' => 'Kikwit (Terminus)',
-            'passenger_name' => 'Kabila Dieudonné',
-            'passenger_phone' => '+243 812 345 678',
-            'seat_number' => '01',
-            'fare_category' => 'VIP',
-            'amount' => 45.00,
-            'currency_code' => 'USD'
+            'id' => $summary->id,
+            'reference' => $summary->reference,
+            'code' => $summary->reference,
+            'trip_code' => $summary->tripCode,
+            'route_label' => $summary->routeLabel,
+            'departure_stop' => $summary->departureCity,
+            'arrival_stop' => $summary->arrivalCity,
+            'passenger_name' => $summary->passengerName,
+            'passenger_phone' => $summary->passengerPhone,
+            'seat_number' => implode(', ', $summary->seats),
+            'seats' => $summary->seats,
+            'fare_category' => $summary->fareCategory,
+            'amount' => $summary->total,
+            'currency_code' => $summary->currencyCode,
+            'departure_at' => $summary->departureAt,
+            'expires_at' => $summary->expiresAt,
         ];
 
         // 2. Configuration stricte des options d'usine Dompdf
@@ -268,7 +294,7 @@ final class LinesController extends AbstractController
 
         // 3. Rendu du code HTML Twig en mémoire morte
         $html = $this->renderView('public/lines/voucher.html.twig', [
-            'agency_name' => 'TransKin Express', // Lié au context de l'utilisateur connecté
+            'agency_name' => $summary->agencyName,
             'reservation' => $reservation,
             'is_pdf_mode' => true
         ]);
@@ -277,7 +303,7 @@ final class LinesController extends AbstractController
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        // 4. Capture du flux binaire binaire et retour via Symfony Response
+        // 4. Capture du flux binaire et retour via Symfony Response
         $pdfOutput = $dompdf->output();
         $filename = sprintf('Bon_Reservation_%s.pdf', $reservation['code']);
 
@@ -295,6 +321,7 @@ final class LinesController extends AbstractController
 
     /**
      * BILLET COMPTANT PUBLIC : GÉNÉRATION ET TÉLÉCHARGEMENT DU BILLET SÉCURISÉ A4 [Profile]
+     * Version 2 : à brancher sur un vrai Ticket (réservation payée) quand le paiement direct existera.
      */
     #[Route('/lines/ticket/{reference}/telecharger', name: 'public_lines_ticket_download')]
     public function downloadPublicTicket(string $reference): Response
@@ -363,4 +390,15 @@ final class LinesController extends AbstractController
             'Content-Disposition' => sprintf('attachment; filename="%s"', $filename) // 'attachment' force le téléchargement direct sur le smartphone du client
         ]);
     } //downloadPublicTickets
+
+
+    /**
+     * Lit un champ envoyé par la page des résultats, en POST ou en GET.
+     */
+    private function input(Request $request, string $key): ?string
+    {
+        $value = $request->request->get($key) ?? $request->query->get($key);
+
+        return \is_scalar($value) && '' !== (string) $value ? (string) $value : null;
+    }
 }
