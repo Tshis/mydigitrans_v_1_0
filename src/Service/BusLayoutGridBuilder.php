@@ -11,7 +11,9 @@ class BusLayoutGridBuilder
         $totalRows = $layout['rows'];
         $seatCols = $layout['columns'];
 
-        $aisles = $layout['aisles'] ?? [];
+
+        // CONVERSION ICI : Force tous les éléments du tableau en entiers
+        $aisles = array_map('intval', $layout['aisles'] ?? []);
         sort($aisles);
 
         $specials = $layout['specialPositions'] ?? [];
