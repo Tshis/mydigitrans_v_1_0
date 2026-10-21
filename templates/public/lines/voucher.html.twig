@@ -241,14 +241,14 @@
                     <tr>
                         <td>
                             <strong>Billet Passager Interurbain</strong><br>
-                            <span style="font-size: 10px; color: #4b5563;">Segment : {{ reservation.departure_stop }} ➔ {{ reservation.arrival_stop }}</span>
+                            <span style="font-size: 10px; color: #4b5563;">Segment : {{ reservation.departure_stop }} => {{ reservation.arrival_stop }}</span>
                         </td>
                         <td class="text-center font-bold">{{ reservation.fare_category }}</td>
-                        <td class="text-right font-bold monospace">{{ reservation.amount|number_format(2, ',', ' ') }} {{ reservation.currency_code }}</td>
+                        <td class="text-right font-bold monospace">{{ reservation.amount }} {{ reservation.currency_code }}</td>
                     </tr>
                     <tr class="total-highlight-row">
                         <td colspan="2" class="font-bold">TOTAL À SOLDER AU GUICHET :</td>
-                        <td class="text-right font-bold monospace">{{ reservation.amount|number_format(2, ',', ' ') }} {{ reservation.currency_code }}</td>
+                        <td class="text-right font-bold monospace">{{ reservation.amount }} {{ reservation.currency_code }}</td>
                     </tr>
                 </tbody>
             </table>

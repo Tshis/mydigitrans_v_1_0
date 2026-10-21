@@ -4,6 +4,26 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="/js/public/seatmap_selection.js" defer></script>
+   
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector(".settings-form-layout");
+
+            if (form) {
+                form.addEventListener("submit", () => {
+                    // 1. On force temporairement le formulaire à envoyer sa réponse dans un nouvel onglet pour capturer le PDF
+                    form.setAttribute("target", "_blank");
+
+                    // 2. On rafraîchit la page actuelle juste après pour faire apparaître le bandeau Flash de succès
+                    setTimeout(() => {
+                        form.removeAttribute("target");
+                        window.location.reload();
+                    }, 500); // 500ms laissent le temps au navigateur de valider le flux POST
+                });
+            }
+        });
+    </script>
+
 {% endblock %}
 
 {% block body %}

@@ -1,7 +1,8 @@
 // public/sw.js
 
 // 🚨 ON CHANGE LE NOM DE LA CLÉ POUR FORCER L'INCRÉMENTATION D'USINE
-//date du 21/10/2026 à 13H58 LSHI derniere modification
+//date du 21/10/2026 à 23H33 LSHI derniere modification
+
 const CACHE_NAME = 'mydigitrans-v1.0-cache'; 
 const ASSETS_TO_CACHE = [
     // 0. Les points d'entrée et liens structurels d'usine
@@ -11,6 +12,7 @@ const ASSETS_TO_CACHE = [
     '/register-agency',
     '/contact',
     '/manifest.json', // 🚨 AJOUTÉ : Indispensable pour l'installation sur smartphone !
+
 
     // 1. L'identité visuelle brute (Logo et Favicon)
     '/img-core/favicon.png',

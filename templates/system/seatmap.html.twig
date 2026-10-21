@@ -18,15 +18,19 @@
                 {% set is_occupied = current_status in ['held', 'reserved', 'blocked'] %}
 
                 {# 3. Rendu de l'input : Désactivé si occupé OU si on est hors du tunnel d'achat (form absent) #}
+                {# templates/system/seatmap.html.twig #}
+
                 <input
                     type="{{ input_type }}"
-                    name="seat"
+                    name="seat[]"
+                    {# ◄ AJOUT DES CROCHETS POUR LE MULTICHOIX #}
                     id="seat-{{ cell.row }}-{{ cell.col }}"
                     value="{{ cell.label }}"
                     class="seat-radio js-seat-btn"
                     data-seat-label="{{ cell.label }}"
                     {{ is_occupied or form is not defined ? 'disabled' : '' }}
                 >
+
 
                 {# Le label reçoit la classe CSS exacte pour la couleur (ex: available, vip, held, blocked) #}
                 <label

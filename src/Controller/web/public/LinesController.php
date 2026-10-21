@@ -20,7 +20,6 @@ use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -139,17 +138,44 @@ final class LinesController extends AbstractController
             return $this->redirectToRoute('public_lines_index');
         }
 
+        /**
+         * Soumission du formulaire de reservation public (voyage)
+         */
         if ($form->isSubmitted() && $form->isValid()) {
-            //dd($form->getErrors(true, true));
             try {
                 $reservation = $booking->createPendingReservation($trip, $departureStop, $arrivalStop, $data, $this->getUser(), $now);
 
-                return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reservation->getReference()]);
+                /**
+                 * CETTE LIGNE SERA REACTIVEE LORSQU'ON AJOUTERA L'OPTION PAIEMENT EN LIGNE 
+                 */
+                //return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reservation->getReference()]);
+
+                /**
+                 * ces lignes seront supprimées après activation du paiement en ligne
+                 */
+                $reference = $reservation->getReference();
+                $deadline = $reservation->getExpiresAt();
+
+                $this->addFlash('warning', sprintf(
+                    'Votre réservation au guichet a été enregistrée. Veuillez la régler avant le %s.',
+                    $deadline?->format('d/m/Y à H:i')
+                ));
+
+                // Route Symfony d'impression Dompdf du bon de réservation
+                return $this->redirectToRoute('public_reservation_print_voucher', ['reference' => $reference]);
+                //supprimée jusqu'à celle ci au dessus
             } catch (BookingException $e) {
-                dd($e->getMessage());
-                $form->addError(new FormError($e->getMessage()));
+                $this->addFlash('danger', $e->getMessage());
+
+                // 3. ◄ ON FORCE LE RETOUR SUR LA MÊME PAGE DE RÉSERVATION (Garde l'utilisateur sur le seatmap)
+                return $this->redirectToRoute('public_lines_booking', [
+                    'slug' => $trip->getSlug(),
+                    'departure_stop_id' => $departureStop->getId(),
+                    'arrival_stop_id' => $arrivalStop->getId()
+                ]);
             }
         }
+
 
         // Le prix vient de la base (Fare), jamais du navigateur.
         $quote = $booking->quote($trip, $departureStop, $arrivalStop, \App\Enum\SeatType::Normal, $now);
@@ -404,5 +430,5 @@ final class LinesController extends AbstractController
         $value = $request->request->get($key) ?? $request->query->get($key);
 
         return \is_scalar($value) && '' !== (string) $value ? (string) $value : null;
-    }
+    } //input
 }

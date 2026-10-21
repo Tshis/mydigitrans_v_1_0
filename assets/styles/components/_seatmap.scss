@@ -14,18 +14,7 @@
     padding-bottom: 10px;
 }
 
-/* Désactive physiquement le pointeur et le clic sur le label d'un siège indisponible */
-.js-seat-btn[disabled] + .cell-unit,
-.cell-unit.held,
-.cell-unit.reserved,
-.cell-unit.blocked {
-    pointer-events: none !important;
-    cursor: not-allowed !important;
-    opacity: 0.65;
-    background: rgba($danger, 0.15); 
-    color: $danger;
-    pointer-events: none;
-}
+
 
 
 .seatmap-card {
@@ -86,7 +75,20 @@
         .seat-radio:disabled + .cell-unit {
             background: #cbd5e1 !important;
             color: #94a3b8 !important;
-            cursor: not-allowed;
+            cursor: not-allowed !important;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Désactive physiquement le pointeur et le clic sur le label d'un siège indisponible */
+        .js-seat-btn[disabled] + .cell-unit,
+        .seat-radio:disabled + .cell-unit,
+        .cell-unit.held,
+        .cell-unit.reserved,
+        .cell-unit.blocked {
+            background: #cbd5e1 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed !important;
             opacity: 0.6;
             pointer-events: none;
         }
@@ -114,10 +116,11 @@
             }
 	
             &.is-booked {
-                background: rgba($danger, 0.15); 
-                color: $danger;
+                 background: #cbd5e1 !important;
+                color: #94a3b8 !important;
+                cursor: not-allowed !important;
+                opacity: 0.6;
                 pointer-events: none;
-                cursor: not-allowed;
             }
         }
     
@@ -155,6 +158,7 @@
             border: 1px dashed $mute;
             cursor: default;
         }
+
 	
     } //seatmap-matrix
 
@@ -195,14 +199,17 @@
                     color: $white;
                 }
                 
-                &.booked {
-                    background: rgba($danger, 0.15);
-                    color: $danger;
+                &.booked,
+                &.held,
+                &.blocked
+                {
+                    background: #cbd5e1 !important;
+                    color: #94a3b8 !important;
                 }
                 
                 &.vip {
-                    background: rgba($primary, 0.15);
-                    color: $primary;
+                   background: linear-gradient(135deg, $success 0%, $dark 100%); 
+                    color: $white; 
                 }
             }
         }
