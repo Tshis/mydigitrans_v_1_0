@@ -1,7 +1,7 @@
 // public/sw.js
 
 // 🚨 ON CHANGE LE NOM DE LA CLÉ POUR FORCER L'INCRÉMENTATION D'USINE
-//date du 20/10/2026 à 12H43 LSHI derniere modification
+//date du 21/10/2026 à 13H58 LSHI derniere modification
 const CACHE_NAME = 'mydigitrans-v1.0-cache'; 
 const ASSETS_TO_CACHE = [
     // 0. Les points d'entrée et liens structurels d'usine

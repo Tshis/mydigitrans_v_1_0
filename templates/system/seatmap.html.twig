@@ -1,21 +1,23 @@
+{# templates/system/seatmap.html.twig #}
 <div class="seatmap-card">
 
     <div class="bus-head">L'avant du bus</div>
 
     <div class="seatmap-matrix" style="--grid-cols: {{ seatmap.totalColumns }};">
 
-        {# ◄ SÉCURITÉ : Mode checkbox uniquement si max_seats est défini et supérieur à 1 #}
-        {% set max_passengers = max_seats|default(1) %}
+        {# 1. Configuration du type d'input selon le nombre de places requis (Fallback à 1) #}
+        {% set max_passengers = max_seats ?? 1 %}
         {% set input_type = max_passengers > 1 ? 'checkbox' : 'radio' %}
 
         {% for cell in seatmap.cells %}
 
             {% if cell.type in ['seat', 'vip', 'normal'] %}
 
-                {# ◄ ATTRIBUTS SÉCURISÉS : Si seat_info n'est pas fourni, le bouton est "available" par défaut #}
-                {% set current_status = seat_info[cell.label]|default('available') %}
+                {# 2. Extraction sécurisée du statut du siège d'après l'ORM #}
+                {% set current_status = (seat_info is defined and seat_info[cell.label] is defined) ? seat_info[cell.label] : 'available' %}
                 {% set is_occupied = current_status in ['held', 'reserved', 'blocked'] %}
 
+                {# 3. Rendu de l'input : Désactivé si occupé OU si on est hors du tunnel d'achat (form absent) #}
                 <input
                     type="{{ input_type }}"
                     name="seat"
@@ -23,10 +25,10 @@
                     value="{{ cell.label }}"
                     class="seat-radio js-seat-btn"
                     data-seat-label="{{ cell.label }}"
-                    {# Désactivé si occupé OU si on est sur une simple page "show" sans formulaire #}
                     {{ is_occupied or form is not defined ? 'disabled' : '' }}
                 >
 
+                {# Le label reçoit la classe CSS exacte pour la couleur (ex: available, vip, held, blocked) #}
                 <label
                     for="seat-{{ cell.row }}-{{ cell.col }}"
                     class="cell-unit {{ current_status }}"
@@ -39,6 +41,7 @@
 
             {% else %}
 
+                {# 4. Rendu des éléments fixes de la carrosserie (Balise imbriquée corrigée) #}
                 <div class="cell-unit" data-type="{{ cell.type }}">
                     {% if cell.type == 'driver' %}
                         <i class="fa-solid fa-circle-user text-size-20"></i>
@@ -60,7 +63,9 @@
         {% endfor %}
 
     </div>
+    <!--seatmap-matrix-->
 
+    {# Barre de légende du seatmap #}
     <div class="seatmap-legend-bar">
         <p class="legend">
             <span class="available">Disponible</span>
@@ -70,3 +75,4 @@
         </p>
     </div>
 </div>
+<!--seatmap-card-->

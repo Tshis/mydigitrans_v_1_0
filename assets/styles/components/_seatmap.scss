@@ -14,6 +14,20 @@
     padding-bottom: 10px;
 }
 
+/* Désactive physiquement le pointeur et le clic sur le label d'un siège indisponible */
+.js-seat-btn[disabled] + .cell-unit,
+.cell-unit.held,
+.cell-unit.reserved,
+.cell-unit.blocked {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    opacity: 0.65;
+    background: rgba($danger, 0.15); 
+    color: $danger;
+    pointer-events: none;
+}
+
+
 .seatmap-card {
     width: 100%;
     max-width: 340px;         // Fige la carrosserie pour garder une silhouette d'autocar élégante [1.1]

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Dto\public\line\BookingData;
 use App\Dto\public\line\BookingSummary;
+use App\Dto\public\line\BookingData;
 use App\Entity\CurrencyAgency;
 use App\Entity\Fare;
 use App\Entity\Reservation;
@@ -31,10 +31,8 @@ final readonly class BookingService
      */
     public function assertBookable(Trip $trip, \DateTimeImmutable $now): void
     {
-
-
         if ($trip->getStatus() !== TripStatus::Scheduled) {
-            throw new BookingException('Ce voyage n\'est plus ouvert aux réservations.');
+            throw new BookingException('Le statut de ce voyage ne permet plus de réservations.');
         }
 
         $departureAt = $trip->getDepartureDate()->setTime(
@@ -66,8 +64,7 @@ final readonly class BookingService
             throw new BookingException('L\'un des arrêts sélectionnés n\'est plus actif.');
         }
 
-        $route = $trip->getRoute();
-        if ($departureStop->getRoute() !== $route || $arrivalStop->getRoute() !== $route) {
+        if ($departureStop->getRoute() !== $trip->getRoute() || $arrivalStop->getRoute() !== $trip->getRoute()) {
             throw new BookingException('Ces arrêts n\'appartiennent pas à l\'itinéraire de ce voyage.');
         }
 
@@ -86,8 +83,8 @@ final readonly class BookingService
     public function quote(Trip $trip, RouteStop $departure, RouteStop $arrival, SeatType $seatType, \DateTimeImmutable $now): array
     {
         $fares = $this->em->getRepository(Fare::class)->findBy([
-            'targetType' => FareTargetType::Route->value,
-            'targetId' => (string) $trip->getRoute()?->getId(),
+            'targetType' => FareTargetType::Route,
+            'targetId' => (int) $trip->getRoute()?->getId(),
             'isActive' => true
         ]);
 
@@ -106,7 +103,6 @@ final readonly class BookingService
         $finalAmount = 0.0;
 
         foreach ($fares as $fare) {
-            // Tronçon spécifique (ex: Lubumbashi -> Likasi)
             if ($fare->getDepartureStop() !== null && $fare->getArrivalStop() !== null) {
                 if (
                     $fare->getDepartureStop()->getId() === $departure->getId() &&
@@ -116,7 +112,6 @@ final readonly class BookingService
                     break;
                 }
             }
-            // Fallback tarif global de la ligne
             if ($fare->getDepartureStop() === null && $fare->getArrivalStop() === null && $finalAmount === 0.0) {
                 $finalAmount = (float) $fare->getAmount();
             }
@@ -151,38 +146,69 @@ final readonly class BookingService
     }
 
     /**
-     * ÉTAPE 1 : Enregistrement initial de la Réservation au statut PENDING (Pas de ticket émis).
+     * ÉTAPE 1 : Résolution complète et sécurisée de l'écriture en base PostgreSQL.
      */
     public function createPendingReservation(Trip $trip, RouteStop $departure, RouteStop $arrival, BookingData $data, ?User $currentUser, \DateTimeImmutable $now): Reservation
     {
-        $seatLabel = $data->seats[0] ?? null;
+        $seatsList = $data->seats;
+        $seatLabel = !empty($seatsList) ? reset($seatsList) : null;
+
         if (null === $seatLabel) {
             throw new BookingException('Veuillez choisir un siège sur le plan de la cabine.');
         }
 
-        // Vérification de la disponibilité physique du siège [MCD 17]
-        $tripSeat = $this->em->getRepository(TripSeat::class)->findOneBy([
-            'trip' => $trip,
-            'seatLabel' => $seatLabel // Assure-toi que la propriété s'appelle seatLabel dans ton TripSeat
-        ]);
+        // Extraction par jointure numérique stricte pour contrer le typage PostgreSQL
+        $tripSeat = $this->em->getRepository(TripSeat::class)->createQueryBuilder('ts')
+            ->join('ts.seat', 's')
+            ->join('ts.trip', 't')
+            ->andWhere('t.id = :tripId')
+            ->andWhere('s.seatLabel = :seatLabel')
+            ->setParameter('tripId', (int) $trip->getId())
+            ->setParameter('seatLabel', (string) $seatLabel)
+            ->getQuery()
+            ->getOneOrNullResult();
 
-        if (!$tripSeat || $tripSeat->getSeatStatus() !== TripSeatStatus::Available->value) {
+        if (!$tripSeat || $tripSeat->getSeatStatus() !== TripSeatStatus::Available) {
             throw new BookingException(sprintf('Le siège %s n\'est plus disponible.', $seatLabel));
         }
 
-        // Enregistrement des coordonnées passager dans l'User (Client reconverti) [MCD 3]
+        // ◄ TOUS LES CHAMPS REQUIS DE L'USER SONT SÉCURISÉS ICI :
+        $parts = array_filter(explode(' ', trim((string) $data->fullName)));
+        $firstname = array_shift($parts) ?? 'Passager';
+        $lastname = !empty($parts) ? implode(' ', $parts) : 'Client';
+
         $user = $currentUser ?? new User();
-        $user->setFirstname($data->fullName);
+        $user->setFirstname($firstname);
+        $user->setLastname($lastname);
         $user->setPhone($data->phone);
         $user->setUserType(UserType::Client);
         $user->setIsActive(true);
+
+
+
+        // Remplissage défensif des propriétés non-nulles de la sécurité Symfony
+        $cleanPhone = preg_replace('/[^0-9]/', '', (string) $data->phone);
+
+        if (!$user->getEmail()) {
+            $user->setEmail(sprintf('rsv.%s@mydigitrans.local', $cleanPhone ?: bin2hex(random_bytes(4))));
+        }
+
+        // ◄ SÉCURISATION DU CHAMP CODE REQUIS : Génération d'un matricule client unique
+        if (method_exists($user, 'setCode') && !$user->getCode()) {
+            $user->setCode(sprintf('CLT-%s', $cleanPhone ?: strtoupper(bin2hex(random_bytes(4)))));
+        }
+
+        if (!$user->getPassword()) {
+            // Un mot de passe aléatoire de sécurité pour satisfaire PostgreSQL sans bloquer le client
+            $user->setPassword(bin2hex(random_bytes(16)));
+        }
+
         if (!$user->getId()) {
             $this->em->persist($user);
         }
 
-        // Recalcul du montant certifié BDD pour contrer toute triche
+        // Recalcul du montant certifié BDD
         $quote = $this->quote($trip, $departure, $arrival, SeatType::Normal, $now);
-
         $reference = 'RSV-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
 
         $reservation = (new Reservation())
@@ -192,13 +218,15 @@ final readonly class BookingService
             ->setArrivalStop($arrival)
             ->setAgency($trip->getRoute()?->getAgency())
             ->setUser($user)
-            ->setStatus(ReservationStatus::Pending) // Reste PENDING selon ton MCD V1 [MCD 22]
+            ->setStatus(ReservationStatus::Pending)
             ->setTotalAmount($quote['amount'])
-            ->setCurrency($quote['currency']);
+            ->setCurrency($trip->getRoute()->getAgency()->getDefaultCurrency())
+            // ◄ SÉCURISATION DU CHAMP REQUIS : L'auteur est l'utilisateur connecté ou le client lui-même
+            ->setCreatedBy($currentUser ?? $user);
 
         $this->em->persist($reservation);
 
-        // Verrouillage temporaire du siège à bord (held pour 15 min) [MCD 17]
+        // Verrouillage temporaire du siège à bord (held pour 15 min)
         $tripSeat->setSeatStatus(TripSeatStatus::Held);
         $tripSeat->setHeldUntil($now->modify('+15 minutes'));
         $tripSeat->setReservation($reservation);
@@ -209,29 +237,24 @@ final readonly class BookingService
     }
 
     /**
-     * ÉTAPE 3 : Validation définitive de la réservation au comptoir de la gare (espèces).
+     * ÉTAPE 3 : Validation définitive au comptoir de la gare.
      */
     public function confirmStationPayment(Reservation $reservation, \DateTimeImmutable $now): void
     {
         $tripSeat = $this->em->getRepository(TripSeat::class)->findOneBy(['reservation' => $reservation]);
 
-        // Logique Documentaire V1 : Le statut reste PENDING (unpaid) mais la place passe en "held" figée
         $reservation->setStatus(ReservationStatus::Pending);
-
         $deadline = $this->stationDeadline($reservation, $now);
-        $reservation->setExpiresAt($deadline); // Fixe l'échéance de carence des 2h [MCD 22]
+        $reservation->setExpiresAt($deadline);
 
         if ($tripSeat) {
             $tripSeat->setSeatStatus(TripSeatStatus::Held);
-            $tripSeat->setHeldUntil($deadline); // Bloqué jusqu'à la limite des 2h de carence
+            $tripSeat->setHeldUntil($deadline);
         }
 
         $this->em->flush();
     }
 
-    /**
-     * Récupère une réservation PENDING active en BDD.
-     */
     public function findPendingReservation(string $reference, \DateTimeImmutable $now): Reservation
     {
         $reservation = $this->em->getRepository(Reservation::class)->findOneBy(['reference' => $reference]);
@@ -243,36 +266,28 @@ final readonly class BookingService
         return $reservation;
     }
 
-    /**
-     * Recherche une réservation pour l'édition de pièces PDF.
-     */
     public function findReservation(string $reference): ?Reservation
     {
         return $this->em->getRepository(Reservation::class)->findOneBy(['reference' => $reference]);
     }
 
-    /**
-     * Extrait l'état géométrique de chaque siège pour la grille interactive (Seatmap).
-     */
     public function seatInfo(Trip $trip, RouteStop $departure, RouteStop $arrival, \DateTimeImmutable $now): array
     {
         $tripSeats = $this->em->getRepository(TripSeat::class)->findBy(['trip' => $trip]);
         $info = [];
-
         foreach ($tripSeats as $ts) {
 
-            $status = $ts->getSeatStatus();
-            // Si un verrou temporaire a expiré, on le reconsidère virtuellement libre
-            if ($status === TripSeatStatus::Held->value && $ts->getHeldUntil() && $ts->getHeldUntil() < $now) {
-                $status = TripSeatStatus::Available->value;
+            $statusEnum = $ts->getSeatStatus();
+
+            // ◄ EXTRACTION DE LA VALEUR BRUTE : Convertit l'Enum en string ("available", "held", etc.)
+            $status = $statusEnum instanceof \BackedEnum ? $statusEnum->value : (string) $statusEnum;
+            if ($status === TripSeatStatus::Held && $ts->getHeldUntil() && $ts->getHeldUntil() < $now) {
+                $status = TripSeatStatus::Available;
             }
             $info[$ts->getSeat()?->getSeatLabel()] = $status;
         }
         return $info;
     }
-    /**
-     * Compile les entités brutes PostgreSQL dans ton DTO immuable BookingSummary.
-     */
     public function summary(Reservation $reservation): BookingSummary
     {
         $user = $reservation->getUser();
@@ -284,7 +299,7 @@ final readonly class BookingService
         return new BookingSummary(
             id: (int) $reservation->getId(),
             reference: $reservation->getReference(),
-            status: (string) $reservation->getStatus(),
+            status: $reservation->getStatus()->value,
             tripCode: $trip?->getCode() ?? 'TRIP-UNK',
             routeLabel: $trip?->getRoute()?->getName() ?? 'Ligne Inconnue',
             agencyName: $reservation->getAgency()?->getName() ?? 'Agence Indéfinie',
@@ -293,10 +308,10 @@ final readonly class BookingService
             busModel: trim(($bus?->getBrand() ?? '') . ' ' . ($bus?->getModel() ?? 'Standard')),
             departureAt: $departureAt,
             expiresAt: $reservation->getExpiresAt(),
-            passengerName: $user ? (string) $user->getFirstname() : 'Voyageur Anonyme',
+            passengerName: $user ? (string) $user->getFirstname() . ' ' . $user->getLastname() : 'Voyageur Anonyme',
             passengerPhone: $user ? (string) $user->getPhone() : '-',
             seats: [$seatLabel],
-            fareCategory: $tripSeat && 'vip' === strtolower((string)$tripSeat->getSeat()?->getType()) ? 'VIP' : 'Standard',
+            fareCategory: $tripSeat && 'vip' === strtolower((string)$tripSeat->getSeat()?->getType()->value) ? 'VIP' : 'Standard',
             total: number_format((float) $reservation->getTotalAmount(), 2, ',', ' '),
             currencyCode: $reservation->getCurrency()?->getCode() ?? 'CDF'
         );

@@ -12,7 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxPassengersCount = allSeatInputs.length; 
 
     seatRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
+
+         radio.addEventListener('change', (e) => {
+        // ◄ SÉCURITÉ ABSOLUE : Si l'input est désactivé par Twig, on annule immédiatement
+        if (radio.disabled || radio.classList.contains('disabled')) {
+            radio.checked = false;
+            return;
+        }
             const checkedBoxes = document.querySelectorAll('.js-seat-btn:checked');
             let selectedSeats = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-seat-label'));
 

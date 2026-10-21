@@ -44,10 +44,10 @@ final class AppFixtures extends Fixture
         $admin = (new User())
             ->setFirstname('Super')
             ->setLastname('Admin')
-            ->setEmail('admin@example.com')
+            ->setEmail('admin1@example.com')
             ->setPhone('+243810000000')
             ->setUserType(UserType::Platform)
-            ->setCode('ADM-001')
+            ->setCode('ADM-0011')
             ->setIsActive(true)
             ->setIsOnline(false);
 
@@ -188,8 +188,9 @@ final class AppFixtures extends Fixture
         $manager->persist($layout);
         $manager->flush(); // On fige le layout pour stabiliser le JSON
 
+
         /*
-         * 5b. CONFIGURATION DU BUS & GÉNÉRATION DES SIÈGES FIXES
+         * 5b. CONFIGURATION DU BUS & GÉNÉRATION DES SIÈGES FIXES (NUMÉROTATION SIMPLE)
          */
         $bus = (new Bus())
             ->setAgency($agency)
@@ -212,7 +213,8 @@ final class AppFixtures extends Fixture
             ["row" => 2, "col" => 3]
         ];
 
-        // ◄ INITIALISATION DU TABLEAU POUR COMPLÉTER LE MANQUE
+        // ◄ COMPTEUR DE SIÈGE UNIQUE POUR NUMÉROTATION SEQUENTIELLE (1, 2, 3...)
+        $seatSequenceNumber = 1;
         $seats = [];
 
         for ($r = 1; $r <= 11; $r++) {
@@ -228,17 +230,21 @@ final class AppFixtures extends Fixture
                 if (!$isSpecial) {
                     $seat = (new Seat())
                         ->setBus($bus)
-                        ->setSeatLabel(sprintf('%d%s', $r, chr(64 + $c)))
+                        ->setSeatLabel((string) $seatSequenceNumber) // ◄ ENREGISTRE "1", "2", "3", "5" EN BDD
                         ->setType($r <= 2 ? SeatType::Vip : SeatType::Normal)
                         ->setRow($r)
                         ->setColumn($c);
 
                     $manager->persist($seat);
-                    $seats[] = $seat; // ◄ REMPLISSAGE DU TABLEAU : Règle l'erreur variable non reconnue
+                    $seats[] = $seat;
+
+                    $seatSequenceNumber++; // Incrémentation continue
                 }
             }
         }
-        $manager->flush(); // Enregistre le bus et les sièges physiques
+        $manager->flush();
+
+
 
         /*
          * 6. CRÉATION DE LA ROUTE & DES ARRÊTS (STOPS)
@@ -261,7 +267,8 @@ final class AppFixtures extends Fixture
             ->setDurationFromDeparture(0)
             ->setDistanceFromDeparture('0.00')
             ->setIsActive(true)
-            ->setRoute($route);
+            ->setRoute($route)
+            ->setCreatedBy($admin);
         $manager->persist($stopLubumbashi);
 
         $stopLikasi = (new RouteStop())
@@ -271,7 +278,8 @@ final class AppFixtures extends Fixture
             ->setDurationFromDeparture(120)
             ->setDistanceFromDeparture('120.00')
             ->setIsActive(true)
-            ->setRoute($route);
+            ->setRoute($route)
+            ->setCreatedBy($admin);
         $manager->persist($stopLikasi);
 
         $stopKolwezi = (new RouteStop())
@@ -281,37 +289,59 @@ final class AppFixtures extends Fixture
             ->setDurationFromDeparture(300)
             ->setDistanceFromDeparture('320.00')
             ->setIsActive(true)
-            ->setRoute($route);
+            ->setRoute($route)
+            ->setCreatedBy($admin);
         $manager->persist($stopKolwezi);
 
+        // ◄ IMPÉRATIF : On pousse en BDD pour générer physiquement les IDs de la route et des arrêts
+        $manager->flush();
+
         /*
-         * 7. CONFIGURATION DES TARIFS (FARES)
+         * 7. CONFIGURATION DES TARIFS (FARES) EN CDF
          */
+        // Tarif Général : Lubumbashi - Kolwezi (35 000 FC)
         $generalFare = (new Fare())
             ->setTargetType(FareTargetType::Route)
-            ->setTargetId((int) $route->getId())
+            ->setTargetId((int) $route->getId()) // ◄ ALIGNEMENT TYPE : Forcé en (int) et ID enfin disponible
             ->setFareType(FareType::Standard)
-            ->setAmount('35.00')
-            ->setCurrency($usd)
+            ->setAmount("35000.00")
+            ->setCurrency($cdf)
             ->setIsActive(true)
             ->setValidFrom(new \DateTimeImmutable('-1 month'))
             ->setDepartureStop(null)
-            ->setArrivalStop(null);
+            ->setArrivalStop(null)
+            ->setCreatedBy($admin);
         $manager->persist($generalFare);
 
-        $specificFare = (new Fare())
+        // Tarif Tronçon 1 : Lubumbashi - Likasi (15 000 FC)
+        $fareLshiLikasi = (new Fare())
             ->setTargetType(FareTargetType::Route)
-            ->setTargetId((int) $route->getId())
+            ->setTargetId((int) $route->getId()) // ◄ ALIGNEMENT TYPE
             ->setFareType(FareType::Standard)
-            ->setAmount('15.00')
-            ->setCurrency($usd)
+            ->setAmount("15000.00")
+            ->setCurrency($cdf)
             ->setIsActive(true)
             ->setValidFrom(new \DateTimeImmutable('-1 month'))
             ->setDepartureStop($stopLubumbashi)
-            ->setArrivalStop($stopLikasi);
-        $manager->persist($specificFare);
+            ->setArrivalStop($stopLikasi)
+            ->setCreatedBy($admin);
+        $manager->persist($fareLshiLikasi);
 
-        $manager->flush();
+        // Tarif Tronçon 2 : Likasi - Kolwezi (25 000 FC)
+        $fareLikasiKzi = (new Fare())
+            ->setTargetType(FareTargetType::Route)
+            ->setTargetId((int) $route->getId()) // ◄ ALIGNEMENT TYPE
+            ->setFareType(FareType::Standard)
+            ->setAmount("25000.00")
+            ->setCurrency($cdf)
+            ->setIsActive(true)
+            ->setValidFrom(new \DateTimeImmutable('-1 month'))
+            ->setDepartureStop($stopLikasi)
+            ->setArrivalStop($stopKolwezi)
+            ->setCreatedBy($admin);
+        $manager->persist($fareLikasiKzi);
+
+
 
         /*
          * 8. PLANIFICATION DE DEUX VOYAGES (TRIPS) SUR LA MÊME ROUTE (MATIN & APRÈS-MIDI)
@@ -322,19 +352,32 @@ final class AppFixtures extends Fixture
         ];
 
         foreach ($tripsData as $data) {
+            $departureDate = new \DateTimeImmutable('tomorrow');
+            $departureTime = new \DateTimeImmutable($data['time']);
+
+            // Calcul précis de l'arrivée : Départ + 5 heures (300 minutes de la route)
+            $departureAt = $departureDate->setTime((int)$departureTime->format('H'), (int)$departureTime->format('i'), 0);
+            $arrivalAt = $departureAt->modify('+5 hours');
+
             $trip = (new Trip())
                 ->setRoute($route)
                 ->setBus($bus)
                 ->setStatus(TripStatus::Scheduled)
-                ->setDepartureDate(new \DateTimeImmutable('tomorrow'))
-                ->setDepartureTime(new \DateTimeImmutable($data['time']))
+                ->setDepartureDate($departureDate)
+                ->setDepartureTime($departureTime)
+
+                // ◄ AJOUT : Alignement sur les contraintes NOT NULL de ton entité Trip
+                ->setArrivalDate(\DateTimeImmutable::createFromInterface($arrivalAt))
+                ->setArrivalTime(\DateTimeImmutable::createFromInterface($arrivalAt))
+
                 ->setCode($data['code'])
                 ->setDriver($driver)
-                ->setSlug(strtolower($data['code']));
+                ->setSlug(strtolower($data['code']))
+                ->setCreatedBy($admin);
 
             $manager->persist($trip);
 
-            // Génération des TripSeats - Le tableau $seats contient à présent les 46 sièges réels !
+            // Génération des TripSeats pour chaque voyage
             foreach ($seats as $seat) {
                 $tripSeat = (new TripSeat())
                     ->setTrip($trip)

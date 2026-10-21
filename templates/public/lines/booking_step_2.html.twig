@@ -64,7 +64,7 @@
 
 							<div class="financial-block-summary mb-20">
 								<label class="admin-bus-layout-add-label">Montant Total</label>
-								<span class="invoice-macro-amount font-primary">{{ booking.total|number_format(2, ',', ' ') }} {{ booking.currencyCode }}</span>
+								<span class="invoice-macro-amount font-primary">{{ booking.total }} {{ booking.currencyCode }}</span>
 							</div>
 
 							{% if booking.expiresAt %}

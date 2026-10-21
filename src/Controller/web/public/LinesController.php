@@ -140,11 +140,13 @@ final class LinesController extends AbstractController
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
+            //dd($form->getErrors(true, true));
             try {
                 $reservation = $booking->createPendingReservation($trip, $departureStop, $arrivalStop, $data, $this->getUser(), $now);
 
                 return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reservation->getReference()]);
             } catch (BookingException $e) {
+                dd($e->getMessage());
                 $form->addError(new FormError($e->getMessage()));
             }
         }
@@ -190,6 +192,8 @@ final class LinesController extends AbstractController
             $this->addFlash('danger', $e->getMessage());
             return $this->redirectToRoute('public_lines_index');
         }
+
+
 
         return $this->render('public/lines/booking_step_2.html.twig', [
             'page' => 'lines',
