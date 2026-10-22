@@ -59,10 +59,10 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
         // À adapter : remplace ces noms de routes par tes vrais tableaux de bord.
         $route = match ($user instanceof User ? $user->getUserType() : null) {
-            UserType::Platform => 'app_platform_dashboard',
-            UserType::Agency => 'app_agency_dashboard',
-            UserType::Partner => 'app_partner_dashboard',
-            default => 'app_home',
+            UserType::Platform => 'admin_platform_dashboard',
+            UserType::Agency => 'admin_agency_dashboard',
+            UserType::Partner => 'admin_partner_dashboard_index',
+            default => 'security_login_index',
         };
 
         return new RedirectResponse($this->urlGenerator->generate($route));

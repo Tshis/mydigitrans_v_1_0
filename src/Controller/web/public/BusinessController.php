@@ -2,7 +2,13 @@
 
 namespace App\Controller\web\public;
 
+use App\Dto\public\business\PartnerRegistrationData;
+use App\Exception\PartnerRegistrationException;
+use App\Form\PartnerRegistrationType;
+use App\Service\PartnerRegistrationService;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,92 +26,75 @@ final class BusinessController extends AbstractController
 
 
     /**
-     * VUE PUBLIQUE : ACCÈS ET REPRÉGULATION DU FORMULAIRE D'INSCRIPTION PARTENAIRE [Profile]
+     * VUE PUBLIQUE : ACCÈS AU FORMULAIRE D'INSCRIPTION PARTENAIRE
+     * Avec un lien d'affiliation valide, le parrain est préchargé et verrouillé.
      */
     #[Route('/business/devenir-partenaire', name: 'business_become_partner')]
     #[Route('/business/devenir-partenaire/{referal_token}', name: 'business_become_partner_sponsored')]
-    public function become_partner(?string $referal_token = null, Request $request): Response
+    public function become_partner(PartnerRegistrationService $registration, ?string $referal_token = null): Response
     {
-        // Capture du jeton de parrainage s'il est présent dans l'URL (?ref=MOMBONGO85) [Profile]
-        $requestedSponsor = $referal_token;
+        $data = new PartnerRegistrationData();
+        $locked = false;
+
+        if (null !== $referal_token) {
+            if (null !== $registration->findSponsor($referal_token)) {
+                $data->sponsorToken = trim($referal_token);
+                $locked = true;
+            } else {
+                $this->addFlash('warning', 'Ce lien de parrainage n\'est pas valide. Vous pouvez tout de même vous inscrire.');
+            }
+        }
+
+        $form = $this->createForm(PartnerRegistrationType::class, $data, [
+            'action' => $this->generateUrl('public_partner_register_process'),
+        ]);
+        $form->get('sponsorLocked')->setData($locked ? '1' : '');
 
         return $this->render('public/business/become_partner.html.twig', [
             'page' => 'business',
-            'requested_sponsor' => $requestedSponsor
+            'form' => $form->createView(),
+            'sponsor_locked' => $locked,
         ]);
-    }//become_partner
+    } //become_partner
 
     /**
      * TRAITEMENT DE L'INSCRIPTION ET PERSISTANCE DE L'APPORTEUR
+     * Crée l'utilisateur partenaire, son jeton de parrainage, son rattachement au parrain (parent) et son rôle.
      */
     #[Route('/devenir-partenaire/process', name: 'public_partner_register_process', methods: ['POST'])]
-    public function processRegister(Request $request): Response
+    public function processRegister(Request $request, PartnerRegistrationService $registration): Response
     {
-        // En production : On chiffre le mot de passe, on génère un referral_token unique pour le nouveau venu,
-        // et s'il a un sponsor_token valide, on l'associe à l'entité User parente (parent_id) [Profile].
+        $data = new PartnerRegistrationData();
+        $form = $this->createForm(PartnerRegistrationType::class, $data, [
+            'action' => $this->generateUrl('public_partner_register_process'),
+        ]);
+        $form->handleRequest($request);
 
-        $this->addFlash('success', 'Votre compte partenaire a été initialisé. Bienvenue dans l\'infrastructure MLM MyDigitrans !');
-        return $this->redirectToRoute('partner_dashboard_index'); // Redirection directe vers son espace
-    }//processRegister
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $registration->register($data, new \DateTimeImmutable());
 
+                $this->addFlash('success', 'Votre compte partenaire a été créé. Connectez-vous pour accéder à votre espace.');
 
-    //private UserRepository $userRepository;
-
-    /**
-     * CONSTRUCTEUR : INJECTION DE LA SÉCURITÉ DE POINTAGE DE LA BASE DE DONNÉES
-     */
-    /*  public function __construct(UserRepository $userRepository)
-        {
-            $this->userRepository = $userRepository;
-        }
-    */
-    /**
-     * GÉNÉRATEUR D'USINE V1.0 : STRUCTURE IMMUABLE MDT + 3 LETTRES PRÉNOM + 3 CHIFFRES [MNS]
-     * 
-     * @param string $firstname Le prénom saisi par le partenaire à l'inscription
-     * @return string Le code referral_token unique et immuable généré (Ex: MDTDAN718)
-     */
-    public function generateBrandToken(string $firstname): string
-    {
-        // 1. Filtrage et nettoyage strict de la chaîne (Suppression des accents et espaces)
-        $cleanFirst = preg_replace('/[^A-Za-z]/', '', iconv('UTF-8', 'ASCII//TRANSLIT', $firstname));
-
-        // 2. Si le prénom est totalement absent ou invalide, fallback de secours sur "PRN" (Partner)
-        if (empty($cleanFirst)) {
-            $cleanFirst = 'PRN';
+                return $this->redirectToRoute('security_login_index');
+            } catch (PartnerRegistrationException $e) {
+                $target = null !== $e->getField() && $form->has($e->getField()) ? $form->get($e->getField()) : $form;
+                $target->addError(new FormError($e->getMessage()));
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('business_become_partner');
+            } catch (UniqueConstraintViolationException) {
+                // Deux inscriptions simultanées avec le même email : la contrainte d'unicité de la base a tranché.
+                $form->get('email')->addError(new FormError('Cette adresse email est déjà utilisée.'));
+                $error = $form->get('email')->addError(new FormError('Cette adresse email est déjà utilisée.'));
+                $this->addFlash('error', $error);
+                return $this->redirectToRoute('business_become_partner');
+            }
         }
 
-        // 3. Extraction chirurgicale des 3 premières lettres du prénom en MAJUSCULES
-        $userPart = strtoupper(substr($cleanFirst, 0, 3));
-
-        // 🚨 SÉCURITÉ PRÉNOMS COURTS (Ex: Al -> ALX / Jo -> JOX)
-        // Ajoute un 'X' tant que la chaîne n'atteint pas strictement 3 caractères
-        while (strlen($userPart) < 3) {
-            $userPart .= 'X';
-        }
-
-        // 4. Préfixe fixe et immuable de ta marque MyDigitrans
-        $brandPrefix = 'MDT';
-
-        // 5. BOUCLE ANTI-COLLISION : Vérification de l'unicité absolue en Base de Données
-        do {
-            // Tirage de 3 chiffres aléatoires d'usine
-            $randomNumber = rand(100, 999);
-
-            // Assemblage de la structure : MDT + DAN + 718 = MDTDAN718
-            $finalToken = sprintf('%s%s%d', $brandPrefix, $userPart, $randomNumber);
-
-            // Pointage SQL direct dans la table User pour vérifier l'existence
-            // $exists = $this->userRepository->findOneBy(['referralToken' => $finalToken]);
-            $exists = [];
-        } while ($exists !== null); // Si le jeton est déjà pris, la boucle relance un tirage de chiffres
-
-        // Renvoie le jeton unique validé à 100% pour la persistance
-        return $finalToken;
-    } //generateBrandToken
-
-
-
-
-
+        return $this->render('public/business/become_partner.html.twig', [
+            'page' => 'business',
+            'form' => $form->createView(),
+            'sponsor_locked' => '1' === (string) $form->get('sponsorLocked')->getData(),
+        ], new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY));
+    } //processRegister
 }

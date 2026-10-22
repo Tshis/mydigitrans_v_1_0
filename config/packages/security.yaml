@@ -36,9 +36,13 @@ security:
 
     # Gestion granulaire des accès aux consoles d'exploitations MyDigitrans
     access_control:
-        # Tu débloqueras ces lignes au fur et à mesure du développement de tes contrôleurs :
-        # - { path: ^/admin/login, roles: PUBLIC_ACCESS }
-        # - { path: ^/admin, roles: ROLE_AGENCY_ADMIN }
+        - {
+              path: ^/admin/partner,
+              allow_if: "is_granted('IS_AUTHENTICATED_FULLY') and user.getUserType().value == 'partner'",
+          }
+          # Tu débloqueras ces lignes au fur et à mesure du développement de tes contrôleurs :
+          # - { path: ^/admin/login, roles: PUBLIC_ACCESS }
+          # - { path: ^/admin, roles: ROLE_AGENCY_ADMIN }
 
 when@test:
     security:
