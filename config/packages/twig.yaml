@@ -1,5 +1,10 @@
 twig:
-    file_name_pattern: '*.twig'
+    file_name_pattern: "*.twig"
+    form_themes: ["form_theme/tshis_form_theme.html.twig"]
+    globals:
+        app_phone_number: "+243 85 50 63 200"
+        app_whatsapp_phone_number: "+243 85 50 63 200"
+        app_mail: "support@mydigitrans.com"
 
 when@test:
     twig:

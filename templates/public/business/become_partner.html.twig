@@ -28,83 +28,83 @@
                 {# L'action est fixée dans le contrôleur : public_partner_register_process #}
                 {{ form_start(form) }}
 
-                    {% if form.vars.errors|length > 0 %}
-                        <div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
-                    {% endif %}
+                {% if form.vars.errors|length > 0 %}
+                    <div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
+                {% endif %}
 
-                    <div class="field-group mb-20">
-                        <div class="field">
-                            {{ form_label(form.lastname) }}
-                            {{ form_widget(form.lastname) }}
-                            {{ form_errors(form.lastname) }}
-                        </div>
-
-                        <div class="field">
-                            {{ form_label(form.firstname) }}
-                            {{ form_widget(form.firstname) }}
-                            {{ form_errors(form.firstname) }}
-                        </div>
+                <div class="field-group mb-20">
+                    <div class="field">
+                        {{ form_label(form.lastname) }}
+                        {{ form_widget(form.lastname) }}
+                        {{ form_errors(form.lastname) }}
                     </div>
 
-                    <div class="field-group mb-20">
-                        <div class="field">
-                            {{ form_label(form.phone) }}
-                            {{ form_widget(form.phone) }}
-                            {{ form_errors(form.phone) }}
-                        </div>
-                        <div class="field">
-                            {{ form_label(form.email) }}
-                            {{ form_widget(form.email) }}
-                            {{ form_errors(form.email) }}
-                        </div>
+                    <div class="field">
+                        {{ form_label(form.firstname) }}
+                        {{ form_widget(form.firstname) }}
+                        {{ form_errors(form.firstname) }}
+                    </div>
+                </div>
+
+                <div class="field-group mb-20">
+                    <div class="field">
+                        {{ form_label(form.phone) }}
+                        {{ form_widget(form.phone) }}
+                        {{ form_errors(form.phone) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email) }}
+                        {{ form_errors(form.email) }}
+                    </div>
+                </div>
+
+                {# CHAMP SPONSOR : PRÉCHARGÉ ET VERROUILLÉ QUAND IL VIENT DU LIEN D'AFFILIATION #}
+                <div class="field mb-20">
+                    {{ form_label(form.sponsorToken) }}
+                    {{ form_widget(form.sponsorToken, {attr : {readonly : sponsor_locked ? 'readonly' : false}}) }}
+                    {{ form_errors(form.sponsorToken) }}
+                    <small class="text-primary text-size-11 text-weight-500 mt-5">
+                        {% if sponsor_locked %}
+                            <i class="fa-solid fa-link text-success-mode"></i> Lien d'affiliation détecté et sécurisé.
+                        {% else %}
+                            Laissez vide si vous n'avez pas de parrain direct.
+                        {% endif %}
+                    </small>
+                </div>
+                {{ form_widget(form.sponsorLocked) }}
+
+                <div class="field-group mb-25">
+                    <div class="field">
+                        {{ form_label(form.password) }}
+                        {{ form_widget(form.password) }}
+                        {{ form_errors(form.password) }}
+                        <small class="text-primary text-size-11 text-weight-500 mt-5">Au moins 8 caractères (une lettre et un chiffre).</small>
                     </div>
 
-                    {# CHAMP SPONSOR : PRÉCHARGÉ ET VERROUILLÉ QUAND IL VIENT DU LIEN D'AFFILIATION #}
-                    <div class="field mb-20">
-                        {{ form_label(form.sponsorToken) }}
-                        {{ form_widget(form.sponsorToken, {attr: {readonly: sponsor_locked ? 'readonly' : false}}) }}
-                        {{ form_errors(form.sponsorToken) }}
-                        <small class="text-gray mt-5">
-                            {% if sponsor_locked %}
-                                <i class="fa-solid fa-link text-success-mode"></i> Lien d'affiliation détecté et sécurisé.
-                            {% else %}
-                                Laissez vide si vous n'avez pas de parrain direct.
-                            {% endif %}
-                        </small>
+                    <div class="field">
+                        {{ form_label(form.confirmPassword) }}
+                        {{ form_widget(form.confirmPassword) }}
+                        {{ form_errors(form.confirmPassword) }}
                     </div>
-                    {{ form_widget(form.sponsorLocked) }}
+                </div>
 
-                    <div class="field-group mb-25">
-                        <div class="field">
-                            {{ form_label(form.password) }}
-                            {{ form_widget(form.password) }}
-                            {{ form_errors(form.password) }}
-                            <small class="text-gray mt-5">Au moins 8 caractères, avec une lettre et un chiffre.</small>
-                        </div>
+                <div class="field mb-25 checkbox-legal-consent-row">
+                    <label class="custom-checkbox">
+                        {{ form_widget(form.acceptLegal) }}
+                        <span class="checkmark"></span>
+                        <span class="legal-label-text">
+                            J'ai lu et j'accepte les <a href="{{ path('public_legal_cgu') }}" target="_blank" class="text-success-mode-link font-bold">Conditions Générales d'Utilisation</a> et la <a href="{{ path('public_legal_privacy') }}" target="_blank" class="text-success-mode-link font-bold">Politique de Confidentialité</a>.
+                        </span>
+                    </label>
+                    {{ form_errors(form.acceptLegal) }}
+                </div>
 
-                        <div class="field">
-                            {{ form_label(form.confirmPassword) }}
-                            {{ form_widget(form.confirmPassword) }}
-                            {{ form_errors(form.confirmPassword) }}
-                        </div>
-                    </div>
+                <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">
+                    <i class="fa-solid fa-square-check"></i> Créer mon compte partenaire
+                </button>
 
-                    <div class="field mb-25 checkbox-legal-consent-row">
-                        <label class="custom-checkbox">
-                            {{ form_widget(form.acceptLegal) }}
-                            <span class="checkmark"></span>
-                            <span class="legal-label-text">
-                                J'ai lu et j'accepte les <a href="{{ path('public_legal_cgu') }}" target="_blank" class="text-success-mode-link font-bold">Conditions Générales d'Utilisation</a> et la <a href="{{ path('public_legal_privacy') }}" target="_blank" class="text-success-mode-link font-bold">Politique de Confidentialité</a>.
-                            </span>
-                        </label>
-                        {{ form_errors(form.acceptLegal) }}
-                    </div>
-
-                    <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">
-                        <i class="fa-solid fa-square-check"></i> Créer mon compte partenaire
-                    </button>
-
-                    {{ form_widget(form._token) }}
+                {{ form_widget(form._token) }}
                 {{ form_end(form, {render_rest: false}) }}
 
                 <p class="mt-25 text-weight-500 text-center account-toggle-text">
