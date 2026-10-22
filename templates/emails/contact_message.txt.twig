@@ -1,0 +1,12 @@
+Nouveau message depuis le site MyDigitrans
+
+Nom      : {{ full_name }}
+Email    : {{ email }}
+Objet    : {{ subject_label }}
+Reçu le  : {{ sent_at|date('d/m/Y à H:i') }}
+{% if ip %}Adresse IP : {{ ip }}
+{% endif %}
+Message :
+{{ message }}
+
+Pour répondre, utilisez « Répondre » : la réponse part vers {{ email }}.

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <body style="font-family: Arial, Helvetica, sans-serif; color: #1f2933; line-height: 1.5;">
+        <h2 style="margin: 0 0 12px;">Nouveau message depuis le site MyDigitrans</h2>
+
+        <table cellpadding="6" cellspacing="0" style="border-collapse: collapse; margin-bottom: 16px;">
+            <tr><td><strong>Nom</strong></td><td>{{ full_name }}</td></tr>
+            <tr><td><strong>Email</strong></td><td>{{ email }}</td></tr>
+            <tr><td><strong>Objet</strong></td><td>{{ subject_label }}</td></tr>
+            <tr><td><strong>Reçu le</strong></td><td>{{ sent_at|date('d/m/Y à H:i') }}</td></tr>
+            {% if ip %}<tr><td><strong>Adresse IP</strong></td><td>{{ ip }}</td></tr>{% endif %}
+        </table>
+
+        <div style="padding: 12px 16px; background: #f3f5f7; border-left: 4px solid #1a8754;">
+            {{ message|nl2br }}
+        </div>
+
+        <p style="color: #6b7280; font-size: 12px; margin-top: 16px;">
+            Pour répondre, utilisez simplement « Répondre » : la réponse part vers {{ email }}.
+        </p>
+    </body>
+</html>
