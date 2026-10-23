@@ -8,12 +8,12 @@ use App\Form\LineSearchType;
 use App\Service\ContactMailer;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\DependencyInjection\Attribute\Target; // <-- AJOUT
 
 final class HomeController extends AbstractController
 {
@@ -26,10 +26,7 @@ final class HomeController extends AbstractController
         return $this->render('public/home/index.html.twig', [
             'page' => 'accueil',
         ]);
-    } //index
-
-
-
+    }
 
     /**
      * PAGE DE CONTACT : valide le message puis l'envoie par email à l'équipe.
@@ -39,7 +36,7 @@ final class HomeController extends AbstractController
     public function contact(
         Request $request,
         ContactMailer $contactMailer,
-        RateLimiterFactoryInterface $contactLimiter,
+        #[Target('contact')] RateLimiterFactoryInterface $contactLimiter,
         LoggerInterface $logger
     ): Response {
         $data = new ContactData();
@@ -47,8 +44,6 @@ final class HomeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Piège à robots : le champ « website » est invisible, seul un robot le remplit.
-            // On répond comme si tout allait bien, sans rien envoyer.
             if ('' !== trim((string) $data->website)) {
                 $this->addFlash('success', 'Votre message a bien été envoyé. Nous vous répondrons dans les plus brefs délais.');
 
@@ -58,21 +53,24 @@ final class HomeController extends AbstractController
             $limit = $contactLimiter->create($request->getClientIp() ?? 'unknown')->consume();
 
             if (!$limit->isAccepted()) {
-                $error = $form->addError(new FormError('Vous avez envoyé trop de messages. Merci de réessayer plus tard.'));
-                $this->addFlash('error', $error);
-                return $this->redirectToRoute('home_contact');
-            } else {
-                try {
-                    $contactMailer->send($data, $request->getClientIp(), new \DateTimeImmutable());
-                    $this->addFlash('success', 'Votre message a bien été envoyé. Nous vous répondrons dans les plus brefs délais.');
+                // CORRECTION : On passe une chaîne de caractères pure au flash message
+                $this->addFlash('error', 'Vous avez envoyé trop de messages. Merci de réessayer plus tard.');
 
-                    return $this->redirectToRoute('home_contact');
-                } catch (TransportExceptionInterface $e) {
-                    $logger->error('Échec de l\'envoi du message de contact.', ['exception' => $e]);
-                    $error = $form->addError(new FormError('Votre message n\'a pas pu être envoyé. Merci de réessayer dans quelques instants ou de nous écrire directement par email.'));
-                    $this->addFlash('error', $error);
-                    return $this->redirectToRoute('home_contact');
-                }
+                return $this->redirectToRoute('home_contact');
+            }
+
+            try {
+                $contactMailer->send($data, $request->getClientIp(), new \DateTimeImmutable());
+                $this->addFlash('success', 'Votre message a bien été envoyé. Nous vous répondrons dans les plus brefs délais.');
+
+                return $this->redirectToRoute('home_contact');
+            } catch (TransportExceptionInterface $e) {
+                $logger->error('Échec de l\'envoi du message de contact.', ['exception' => $e]);
+
+                // CORRECTION : On passe une chaîne de caractères pure au flash message
+                $this->addFlash('error', 'Votre message n\'a pas pu être envoyé. Merci de réessayer dans quelques instants ou de nous écrire directement par email.');
+
+                return $this->redirectToRoute('home_contact');
             }
         }
 
@@ -80,9 +78,5 @@ final class HomeController extends AbstractController
             'page' => 'contacts',
             'form' => $form->createView(),
         ], new Response(status: $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK));
-    } //contact
-
-
-
-
+    }
 }

@@ -124,7 +124,7 @@ final class DashboardController extends AbstractController
     /**
      * 48. ACKNOWLEDGE : ACCUSÉ DE RÉCEPTION ÉLECTRONIQUE PAR LE PARTENAIRE [MCD 48]
      */
-    #[Route('/partner/my-withdrawals/{id}/acknowledge', name: 'partner_withdrawal_acknowledge', methods: ['POST'])]
+    #[Route('admin/partner/my-withdrawals/{id}/acknowledge', name: 'partner_withdrawal_acknowledge', methods: ['POST'])]
     public function acknowledgePayment(int $id): Response
     {
         // EN LOGIQUE ORM DE PRODUCTION :
@@ -138,5 +138,5 @@ final class DashboardController extends AbstractController
 
         $this->addFlash('success', 'Votre accusé de réception a été scellé. La transaction est officiellement clôturée.');
         return $this->redirectToRoute('partner_withdrawal_index');
-    }
+    } //acknowledgePayment
 }

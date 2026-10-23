@@ -1,22 +1,81 @@
 <!DOCTYPE html>
 <html lang="fr">
-    <body style="font-family: Arial, Helvetica, sans-serif; color: #1f2933; line-height: 1.5;">
-        <h2 style="margin: 0 0 12px;">Nouveau message depuis le site MyDigitrans</h2>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Nouveau message de contact</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; color: #4b5563; -webkit-font-smoothing: antialiased;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f3f4f6; padding: 40px 20px;">
+            <tr>
+                <td align="center">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 768px; background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                    
+                        <!-- En-tête (Header) -->
+                        <tr>
+                            <td style="background-color: #0c326d; padding: 32px 40px; text-align: left; border-bottom: 4px solid #ef6e17;">
+                                <h1 style="margin: 0; color: #fff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">MyDigitrans</h1>
+                                <p style="margin: 4px 0 0 0; color: #afd3e7; font-size: 14px;">Formulaire de contact du site internet</p>
+                            </td>
+                        </tr>
 
-        <table cellpadding="6" cellspacing="0" style="border-collapse: collapse; margin-bottom: 16px;">
-            <tr><td><strong>Nom</strong></td><td>{{ full_name }}</td></tr>
-            <tr><td><strong>Email</strong></td><td>{{ email }}</td></tr>
-            <tr><td><strong>Objet</strong></td><td>{{ subject_label }}</td></tr>
-            <tr><td><strong>Reçu le</strong></td><td>{{ sent_at|date('d/m/Y à H:i') }}</td></tr>
-            {% if ip %}<tr><td><strong>Adresse IP</strong></td><td>{{ ip }}</td></tr>{% endif %}
+                        <!-- Contenu (Body) -->
+                        <tr>
+                            <td style="padding: 40px;">
+                                <h2 style="margin: 0 0 24px 0; color: #0c326d; font-size: 18px; font-weight: 600;">Un nouveau message a été déposé :</h2>
+                            
+                                <!-- Détails du message -->
+                                <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 32px; font-size: 14px; line-height: 24px;">
+                                    <tr>
+                                        <td width="30%" style="padding: 6px 0; color: #4b5563; font-weight: 600; vertical-align: top;">Expéditeur</td>
+                                        <td style="padding: 6px 0; color: #000; font-weight: 500; vertical-align: top;">{{ full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 6px 0; color: #4b5563; font-weight: 600; vertical-align: top;">Adresse e-mail</td>
+                                        <td style="padding: 6px 0; color: #000; vertical-align: top;"><a href="mailto:{{ sender_email }}" style="color: #1684c5; text-decoration: none; font-weight: 500;">{{ sender_email }}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 6px 0; color: #4b5563; font-weight: 600; vertical-align: top;">Objet</td>
+                                        <td style="padding: 6px 0; color: #0c326d; font-weight: 600; vertical-align: top;">{{ subject_label }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 6px 0; color: #4b5563; font-weight: 600; vertical-align: top;">Reçu le</td>
+                                        <td style="padding: 6px 0; color: #4b5563; vertical-align: top;">{{ sent_at|date('d/m/Y à H:i') }}</td>
+                                    </tr>
+                                    {% if ip %}
+                                        <tr>
+                                            <td style="padding: 6px 0; color: #4b5563; font-weight: 600; vertical-align: top;">Adresse IP</td>
+                                            <td style="padding: 6px 0; color: #4b5563; font-family: monospace; font-size: 13px; vertical-align: top;">{{ ip }}</td>
+                                        </tr>
+                                    {% endif %}
+                                </table>
+
+                                <!-- Bloc Message -->
+                                <div style="margin-bottom: 12px; color: #0c326d; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Contenu du message :</div>
+                                <div style="padding: 24px; background-color: #f3f4f6; border-left: 4px solid #ef6e17; border-radius: 4px; color: #000; font-size: 15px; line-height: 1.6; white-space: pre-line;">
+                                    {{ message }}
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Pied de page (Footer) -->
+                        <tr>
+                            <td style="background-color: #ef6e17; padding: 24px 40px; text-align: center;">
+                                <p style="margin: 0; color: #fff; font-size: 13px; line-height: 20px; font-weight: 500;">
+                                    Pour répondre, utilisez simplement le bouton <strong>« Répondre »</strong> de votre messagerie.<br>Le message partira vers <strong>{{ sender_email }}</strong>.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin-top: 24px;">
+                        <tr>
+                            <td style="text-align: center; color: #4b5563; font-size: 12px;">
+                                © {{ 'now'|date('Y') }} MyDigitrans. Tous droits réservés.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
         </table>
-
-        <div style="padding: 12px 16px; background: #f3f5f7; border-left: 4px solid #1a8754;">
-            {{ message|nl2br }}
-        </div>
-
-        <p style="color: #6b7280; font-size: 12px; margin-top: 16px;">
-            Pour répondre, utilisez simplement « Répondre » : la réponse part vers {{ email }}.
-        </p>
     </body>
 </html>

@@ -1,7 +1,7 @@
 Nouveau message depuis le site MyDigitrans
 
 Nom      : {{ full_name }}
-Email    : {{ email }}
+Email    : {{ sender_email }}
 Objet    : {{ subject_label }}
 Reçu le  : {{ sent_at|date('d/m/Y à H:i') }}
 {% if ip %}Adresse IP : {{ ip }}
@@ -9,4 +9,4 @@ Reçu le  : {{ sent_at|date('d/m/Y à H:i') }}
 Message :
 {{ message }}
 
-Pour répondre, utilisez « Répondre » : la réponse part vers {{ email }}.
+Pour répondre, utilisez « Répondre » : la réponse part vers {{ sender_email }}.

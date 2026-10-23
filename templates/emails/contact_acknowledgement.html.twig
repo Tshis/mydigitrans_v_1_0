@@ -1,27 +1,62 @@
 <!DOCTYPE html>
 <html lang="fr">
-<body style="font-family: Arial, Helvetica, sans-serif; color: #1f2933; line-height: 1.6;">
-    <h2 style="margin: 0 0 12px;">Nous avons bien reçu votre message</h2>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Accusé de réception - MyDigitrans</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; color: #4b5563; -webkit-font-smoothing: antialiased;">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f3f4f6; padding: 40px 20px;">
+            <tr>
+                <td align="center">
+                    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                    
+                        <!-- En-tête (Header) -->
+                        <tr>
+                            <td style="background-color: #0c326d; padding: 32px 40px; text-align: left; border-bottom: 4px solid #1684c5;">
+                                <h1 style="margin: 0; color: #fff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">MyDigitrans</h1>
+                            </td>
+                        </tr>
 
-    <p>Bonjour {{ full_name }},</p>
+                        <!-- Contenu (Body) -->
+                        <tr>
+                            <td style="padding: 40px;">
+                                <h2 style="margin: 0 0 16px 0; color: #0c326d; font-size: 20px; font-weight: 600;">Bonjour {{ full_name }},</h2>
+                            
+                                <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #000;">
+                                    Nous avons bien reçu votre message concernant l'objet <strong>« {{ subject_label }} »</strong> et nous vous remercions de votre prise de contact.
+                                </p>
+                            
+                                <p style="margin: 0 0 32px 0; font-size: 15px; line-height: 1.6; color: #4b5563;">
+                                    Notre équipe étudie votre demande. Nous reviendrons vers vous dans les plus brefs délais pour vous accompagner dans votre projet.
+                                </p>
 
-    <p>
-        Merci d'avoir contacté MyDigitrans. Votre message concernant « <strong>{{ subject_label }}</strong> »
-        nous est bien parvenu le {{ sent_at|date('d/m/Y à H:i') }}.
-    </p>
+                                <p>Notre équipe vous répondra dans les plus brefs délais, à cette adresse email.</p>
 
-    <p>Notre équipe vous répondra dans les plus brefs délais, à cette adresse email.</p>
+                                <p>
+                                    Pour compléter votre demande, vous pouvez répondre directement à ce message
+                                    ou écrire à <a href="mailto:{{ support_email }}">{{ support_email }}</a>.
+                                </p>
 
-    <p>
-        Pour compléter votre demande, vous pouvez répondre directement à ce message
-        ou écrire à <a href="mailto:{{ support_email }}">{{ support_email }}</a>.
-    </p>
+                                <!-- Rappel de leur message -->
+                                <div style="background-color: #f3f4f6; border-radius: 8px; padding: 20px; border: 1px solid #afd3e7;">
+                                    <h3 style="margin: 0 0 12px 0; color: #0c326d; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Rappel de votre message :</h3>
+                                    <div style="color: #4b5563; font-size: 14px; line-height: 1.6; font-style: italic; white-space: pre-line;">
+                                        "{{ message }}"
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
 
-    <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">
-        Cet email est un accusé de réception automatique. Si vous n'êtes pas à l'origine de cette demande,
-        vous pouvez simplement l'ignorer : aucune autre action n'est nécessaire.
-    </p>
-
-    <p>L'équipe MyDigitrans</p>
-</body>
+                        <!-- Pied de page (Footer) -->
+                        <tr>
+                            <td style="background-color: #f3f4f6; padding: 24px 40px; text-align: center; border-top: 1px solid #afd3e7; color: #4b5563; font-size: 13px;">
+                                Cet e-mail est un accusé de réception automatique généré par MyDigitrans. Si vous n'êtes pas à l'origine de cette demande, vous pouvez simplement l'ignorer .
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
 </html>

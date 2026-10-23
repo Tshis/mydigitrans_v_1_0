@@ -12,10 +12,8 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 
 /**
- * Envoie à l'équipe MyDigitrans le message écrit dans le formulaire de contact.
- *
- * L'expéditeur est toujours l'adresse du site (sinon les messageries rejettent le mail) ;
- * l'adresse du visiteur est en « répondre à », pour répondre directement depuis la boîte de réception.
+ * Envoie à l'équipe MyDigitrans le message écrit dans le formulaire de contact
+ * et transmet un accusé de réception automatique au visiteur.
  */
 final class ContactMailer
 {
@@ -25,8 +23,8 @@ final class ContactMailer
         private readonly string $recipient,
         #[Autowire(env: 'MAILER_FROM_ADDRESS')]
         private readonly string $fromAddress,
-    ) {
-    }
+    ) {}
+
 
     /**
      * @throws TransportExceptionInterface
@@ -36,6 +34,7 @@ final class ContactMailer
         $name = trim((string) preg_replace('/[\r\n\t]+/', ' ', (string) $data->fullName));
         $subject = $data->subject?->label() ?? 'Autre';
 
+        // 1. E-mail destiné à l'équipe MyDigitrans
         $email = (new TemplatedEmail())
             ->from(new Address($this->fromAddress, 'MyDigitrans - Formulaire de contact'))
             ->to($this->recipient)
@@ -45,7 +44,7 @@ final class ContactMailer
             ->textTemplate('emails/contact_message.txt.twig')
             ->context([
                 'full_name' => $name,
-                'email' => $data->email,
+                'sender_email' => $data->email,
                 'subject_label' => $subject,
                 'message' => $data->message,
                 'ip' => $ip,
@@ -53,5 +52,22 @@ final class ContactMailer
             ]);
 
         $this->mailer->send($email);
+
+        // 2. Accusé de réception destiné au visiteur (Instanciation propre et dédiée)
+        $acknowledgement = new TemplatedEmail();
+        $acknowledgement
+            ->from(new Address($this->fromAddress, 'MyDigitrans'))
+            ->to(new Address((string) $data->email, $name))
+            ->subject('MyDigitrans - Accusé de réception de votre message')
+            ->htmlTemplate('emails/contact_acknowledgement.html.twig')
+            ->textTemplate('emails/contact_acknowledgement.txt.twig')
+            ->context([
+                'full_name' => $name,
+                'subject_label' => $subject,
+                'message' => $data->message,
+                'support_email' => $this->fromAddress,
+            ]);
+
+        $this->mailer->send($acknowledgement);
     }
 }
