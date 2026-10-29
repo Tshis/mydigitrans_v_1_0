@@ -1,7 +1,7 @@
 // public/sw.js
 
 // 🚨 ON CHANGE LE NOM DE LA CLÉ POUR FORCER L'INCRÉMENTATION D'USINE
-//date du 21/10/2026 à 23H33 LSHI derniere modification
+//date du 29/10/2026 à 20h09 LSHI derniere modification
 
 const CACHE_NAME = 'mydigitrans-v1.0-cache'; 
 const ASSETS_TO_CACHE = [
@@ -9,7 +9,7 @@ const ASSETS_TO_CACHE = [
     '/',
     '/login',
     '/business',
-    '/register-agency',
+    '/agence/inscription',
     '/contact',
     '/manifest.json', // 🚨 AJOUTÉ : Indispensable pour l'installation sur smartphone !
 

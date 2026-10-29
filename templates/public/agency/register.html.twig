@@ -16,142 +16,165 @@
         <section class="form-container mb-25 container">
             <div class="form-card card control-card">
 
-                <form action="{{ path('public_agency_register_process') }}" method="POST">
+                {% for type in ['success', 'warning', 'danger'] %}
+                    {% for message in app.flashes(type) %}
+                        <div class="notice-box-danger-dashboard mb-15"><p>{{ message }}</p></div>
+                    {% endfor %}
+                {% endfor %}
 
-                    {# --- SECTION 1 : INFORMATIONS AGENCE --- #}
-                    <h3 class="card-section-title-fix mb-20">
-                        <i class="fa-solid fa-hotel text-primary"></i> Informations agence
-                    </h3>
+                {# L'action est fixée dans le contrôleur : public_agency_register_process #}
+                {{ form_start(form) }}
 
-                    <div class="field mb-20">
-                        <label class="admin-bus-layout-add-label">Nom Commercial de la Compagnie *</label>
-                        <input type="text" name="agency_name" class="admin-bus-layout-add-input" placeholder="Ex: TransKin Express" required autocomplete="off">
+                {% if form.vars.errors|length > 0 %}
+                    <div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
+                {% endif %}
+
+                {# --- SECTION 1 : INFORMATIONS AGENCE --- #}
+                <h3 class="card-section-title-fix mb-20">
+                    <i class="fa-solid fa-hotel text-primary"></i> Informations agence
+                </h3>
+
+                <div class="field mb-20">
+                    {{ form_label(form.agencyName) }}
+                    {{ form_widget(form.agencyName) }}
+                    {{ form_errors(form.agencyName) }}
+                </div>
+
+                <div class="field-group mb-20">
+                    <div class="field">
+                        {{ form_label(form.registrationNumber) }}
+                        {{ form_widget(form.registrationNumber) }}
+                        {{ form_errors(form.registrationNumber) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.taxNumber) }}
+                        {{ form_widget(form.taxNumber) }}
+                        {{ form_errors(form.taxNumber) }}
+                    </div>
+                </div>
+
+                <div class="field-group mb-25">
+                    <div class="field">
+                        {{ form_label(form.agencyPhone) }}
+                        {{ form_widget(form.agencyPhone) }}
+                        {{ form_errors(form.agencyPhone) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.agencyEmail) }}
+                        {{ form_widget(form.agencyEmail) }}
+                        {{ form_errors(form.agencyEmail) }}
+                    </div>
+                </div>
+                <!--field-group-->
+
+                {# --- SECTION 2 : ANTENNE PRINCIPALE (SIÈGE) : créée automatiquement avec l'agence --- #}
+                <h3 class="card-section-title-fix my-20">
+                    <i class="fa-solid fa-building text-primary"></i> Siège de l'agence
+                </h3>
+
+                <div class="field-group mb-25">
+                    <div class="field">
+                        {{ form_label(form.mainCity) }}
+                        {{ form_widget(form.mainCity) }}
+                        {{ form_errors(form.mainCity) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.country) }}
+                        {{ form_widget(form.country) }}
+                        {{ form_errors(form.country) }}
+                    </div>
+                </div>
+
+                <div class="field mb-25">
+                    {{ form_label(form.address) }}
+                    {{ form_widget(form.address) }}
+                    {{ form_errors(form.address) }}
+                    <small class="text-gray mt-5">Le siège de l'agence est créé automatiquement à cette adresse. Vous pourrez ajouter d'autres gares ensuite.</small>
+                </div>
+
+                {# --- SECTION 3 : PARRAINAGE & AFFILIATION --- #}
+                <h3 class="card-section-title-fix my-20">
+                    <i class="fa-solid fa-code-branch text-primary"></i> Programme d'Affiliation
+                </h3>
+
+                <div class="field mb-25">
+                    {{ form_label(form.sponsorToken) }}
+                    {{ form_widget(form.sponsorToken, {attr : {readonly : sponsor_locked ? 'readonly' : false}}) }}
+                    {{ form_errors(form.sponsorToken) }}
+                    <small class="text-gray mt-5">
+                        {% if sponsor_locked %}
+                            <i class="fa-solid fa-link text-success-mode"></i> Ce code d'apporteur d'affaires est sécurisé par le lien d'invitation.
+                        {% else %}
+                            Saisissez manuellement le code MDT du partenaire qui vous a parrainé pour activer vos bonus de réseau.
+                        {% endif %}
+                    </small>
+                    {{ form_widget(form.sponsorLocked) }}
+                </div>
+
+                {# --- SECTION 4 : RESPONSABLE --- #}
+                <h3 class="card-section-title-fix my-20">
+                    <i class="fa-solid fa-user text-primary"></i> Responsable (Manager Général)
+                </h3>
+
+                <div class="field-group mb-25">
+                    <div class="field">
+                        {{ form_label(form.ownerLastname) }}
+                        {{ form_widget(form.ownerLastname) }}
+                        {{ form_errors(form.ownerLastname) }}
                     </div>
 
-                    <div class="field-group mb-20">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Numéro RCCM </label>
-                            <input type="text" name="registration_number" class="admin-bus-layout-add-input monospace" placeholder="RCCM-KIN-...">
-                        </div>
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Numéro d'Identification Fiscale (NIF) </label>
-                            <input type="text" name="tax_number" class="admin-bus-layout-add-input monospace" placeholder="NIF-...">
-                        </div>
+                    <div class="field">
+                        {{ form_label(form.ownerFirstname) }}
+                        {{ form_widget(form.ownerFirstname) }}
+                        {{ form_errors(form.ownerFirstname) }}
+                    </div>
+                </div>
+
+                <div class="field mb-25">
+                    {{ form_label(form.ownerPhone) }}
+                    {{ form_widget(form.ownerPhone) }}
+                    {{ form_errors(form.ownerPhone) }}
+                </div>
+
+                <div class="field mb-25">
+                    {{ form_label(form.ownerEmail) }}
+                    {{ form_widget(form.ownerEmail) }}
+                    {{ form_errors(form.ownerEmail) }}
+                </div>
+
+                <div class="field-group mb-25">
+                    <div class="field">
+                        {{ form_label(form.password) }}
+                        {{ form_widget(form.password) }}
+                        {{ form_errors(form.password) }}
+                        <small class="text-gray mt-5">Au moins 8 caractères, avec une lettre et un chiffre.</small>
                     </div>
 
-                    <div class="field-group mb-25">
-
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Téléphone agence</label>
-                            <input type="tel" class="admin-bus-layout-add-input monospace" placeholder="+24381........" required>
-                        </div>
-
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Email</label>
-                            <input type="text" class="admin-bus-layout-add-input monospace" placeholder="agency@exemple.com" required>
-                        </div>
+                    <div class="field">
+                        {{ form_label(form.confirmPassword) }}
+                        {{ form_widget(form.confirmPassword) }}
+                        {{ form_errors(form.confirmPassword) }}
                     </div>
-                    <!--field-group-->
+                </div>
 
-                    {# --- SECTION 2 : ANTENNE PRINCIPALE (SIÈGE) --- #}
-                    <div class="field-group mb-25">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Ville principale *</label>
-                            <input type="text" name="main_city" class="admin-bus-layout-add-input" placeholder="Ex: Kinshasa" required>
-                        </div>
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Pays *</label>
-                            <input type="text" name="country" class="admin-bus-layout-add-input" placeholder="Ex: RDC" required>
-                        </div>
-                    </div>
+                <div class="field mb-25 checkbox-legal-consent-row">
+                    <label class="custom-checkbox">
+                        {{ form_widget(form.acceptLegal) }}
+                        <span class="checkmark"></span>
+                        <span class="legal-label-text">
+                            En créant ce compte, la compagnie accepte expressément les <a href="{{ path('public_legal_cgu') }}" target="_blank" class="text-success text-weight-700">CGU d'infrastructure</a>, les obligations de paiement sous peine de suspension de données, et la clause de confidentialité MyDigitrans.
+                        </span>
+                    </label>
+                    {{ form_errors(form.acceptLegal) }}
+                </div>
 
-                    <div class="field mb-25">
-                        <label class="admin-bus-layout-add-label">Adresse *</label>
-                        <input type="text" name="address" class="admin-bus-layout-add-input" placeholder="Ex: N°45, Boulevard du 30 Juin, Gombe" required>
-                    </div>
+                <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">Créer mon compte agence</button>
 
-                    {# --- 🚨 NOUVEAU - SECTION 3 : PARRAINAGE & AFFILIATION [MNS] --- #}
-                    <h3 class="card-section-title-fix my-20">
-                        <i class="fa-solid fa-code-branch text-primary"></i> Programme d'Affiliation
-                    </h3>
-
-                    <div class="field mb-25">
-                        <label class="admin-bus-layout-add-label">Code d'Affiliation Apporteur / Sponsor Token</label>
-                        <input
-                            type="text"
-                            name="sponsor_token"
-                            class="admin-bus-layout-add-input font-monospace-code"
-                            placeholder="Ex : MDTDAN718 (Laissez vide si enrôlement direct)"
-                            value="{{ requested_sponsor }}"
-                            {{ requested_sponsor ? 'readonly' : '' }}
-                        >
-                        <small class="text-gray mt-5">
-                            {% if requested_sponsor %}
-                                <i class="fa-solid fa-link text-success-mode"></i> Ce code d'apporteur d'affaires est sécurisé par le lien d'invitation [MNS].
-                            {% else %}
-                                Saisissez manuellement le code MDT du partenaire qui vous a parrainé pour activer vos bonus de réseau.
-                            {% endif %}
-                        </small>
-                    </div>
-
-                    {# --- SECTION 4 : RESPONSABLE --- #}
-                    <h3 class="card-section-title-fix my-20">
-                        <i class="fa-solid fa-user text-primary"></i> Responsable (Manager Général)
-                    </h3>
-
-                    <div class="field-group mb-25">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Nom *</label>
-                            <input type="text" name="owner_lastname" class="admin-bus-layout-add-input" placeholder="Ex: Lukonu" required autocomplete="off">
-                        </div>
-
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Prénom *</label>
-                            <input type="text" name="owner_firstname" class="admin-bus-layout-add-input" placeholder="Ex: Daniel" required autocomplete="off">
-                        </div>
-                    </div>
-
-                    <div class="field mb-25">
-                        <label class="admin-bus-layout-add-label">Téléphone *</label>
-                        <input type="tel" name="owner_phone" class="admin-bus-layout-add-input" placeholder="Ex: +243..." required>
-                    </div>
-
-                    <div class="field mb-25">
-                        <label class="admin-bus-layout-add-label">Email *</label>
-                        <input type="email" name="owner_email" class="admin-bus-layout-add-input" placeholder="Ex: admin@agence.com" required autocomplete="email">
-                    </div>
-
-                    <div class="field-group mb-25">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Mot de passe de sécurité *</label>
-                            <input type="password" name="password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
-                        </div>
-
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Confirmer le mot de passe *</label>
-                            <input type="password" name="confirm_password" class="admin-bus-layout-add-input" placeholder="••••••••" required>
-                        </div>
-                    </div>
-
-                    {# Dans templates/public/agency/register.html.twig #}
-
-                    <div class="field mb-25 checkbox-legal-consent-row">
-                        <label class="custom-checkbox">
-                            <input type="checkbox" name="accept_legal" required>
-                            <span class="checkmark"></span>
-                            <span class="legal-label-text">
-                                En créant ce compte, la compagnie accepte expressément les <a href="{{ path('public_legal_cgu') }}" target="_blank" class="text-success text-weight-700">CGU d'infrastructure</a>, les obligations de paiement sous peine de suspension de données, et la clause de confidentialité MyDigitrans.
-                            </span>
-                        </label>
-                    </div>
-
-
-                    <button type="submit" class="btn-refined btn-primary-gradient btn-full w-100-percent">Créer mon compte agence</button>
-
-                </form>
+                {{ form_widget(form._token) }}
+                {{ form_end(form, {render_rest: false}) }}
 
                 <p class="mt-25 text-weight-500 text-center account-toggle-text">
-                    Déjà un compte ? 
+                    Déjà un compte ?
                     <a class="text-success-mode-link font-bold" href="{{ path('security_login_index') }}">Se connecter</a>
                 </p>
 

@@ -2,124 +2,115 @@
 
 namespace App\Controller\web\public;
 
+
+use App\Dto\public\agency\AgencyRegistrationData;
+use App\Exception\AgencyRegistrationException;
+use App\Form\AgencyRegistrationType;
+use App\Service\AgencyRegistrationService;
+use App\Service\PartnerRegistrationService;
+use App\Service\SubscriptionPlanCatalog;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Création d'une agence (inscription publique) puis choix du plan d'abonnement.
+ * À fusionner avec ton contrôleur d'agence existant : adapte les chemins à ceux de tes routes.
+ */
 final class AgencyController extends AbstractController
 {
-
-    #[Route('/public/agency/create', name: 'public_agency_add')]
-    public function add(): Response
-    {
-        return $this->render('public/agency/add1.html.twig', [
-            'page' => 'agency',
-        ]);
-    } //add
+    /** Agence en cours d'inscription : conservée en session le temps de choisir un plan. */
+    private const ONBOARDING_SESSION_KEY = 'onboarding_agency_id';
 
     /**
-     * ENRÔLEMENT : FORMULAIRE DOUBLE ROUTE DE CRÉATION D'AGENCE AVEC ACCROCHAGE SPONSOR [Profile, MNS]
+     * ÉTAPE 1 : AFFICHAGE ET TRAITEMENT DE L'INSCRIPTION
+     * Gère à la fois l'affichage initial (GET) et la soumission du formulaire (POST).
      */
-    #[Route('/register-agency', name: 'public_agency_register', methods: ['GET'])]
-    #[Route('/register-agency/{referal_token}', name: 'public_agency_register_sponsored', methods: ['GET'])]
-    public function showRegisterForm(?string $referal_token = null): Response
-    {
-        // Capture du jeton de parrainage s'il est présent dans l'URL (Ex: /register-agency/MDTDAN718) [MNS]
-        $requestedSponsor = $referal_token;
+    #[Route('/agence/inscription', name: 'public_agency_register', methods: ['GET', 'POST'])]
+    #[Route('/agence/inscription/{referal_token}', name: 'public_agency_register_sponsored', methods: ['GET', 'POST'])]
+    public function register(
+        Request $request,
+        AgencyRegistrationService $registration,
+        PartnerRegistrationService $partners,
+        ?string $referal_token = null
+    ): Response {
+        $data = new AgencyRegistrationData();
+        $locked = false;
+
+        // Préchargement du jeton de parrainage uniquement en cas d'affichage initial (GET)
+        if (!$request->isMethod('POST') && null !== $referal_token) {
+            if (null !== $partners->findSponsor($referal_token)) {
+                $data->sponsorToken = trim($referal_token);
+                $locked = true;
+            } else {
+                $this->addFlash('warning', 'Ce lien d\'invitation n\'est pas valide. Vous pouvez tout de même créer votre agence.');
+            }
+        }
+
+        // Création du formulaire (sans forcer l'option 'action' pour qu'il reste sur l'URL courante)
+        $form = $this->createForm(AgencyRegistrationType::class, $data);
+
+        if (!$request->isMethod('POST')) {
+            $form->get('sponsorLocked')->setData($locked ? '1' : '');
+        }
+
+        // Traitement de la requête
+        $form->handleRequest($request);
+
+        // Traitement après soumission et validation
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $result = $registration->register($data, new \DateTimeImmutable());
+
+                $request->getSession()->set(self::ONBOARDING_SESSION_KEY, $result->agency->getId());
+                $this->addFlash('success', sprintf(
+                    'L\'agence « %s » est créée avec son siège de %s. Choisissez maintenant votre plan d\'abonnement.',
+                    $result->agency->getName(),
+                    $result->headquarters->getCity()
+                ));
+
+                return $this->redirectToRoute('public_agency_choose_plan');
+            } catch (AgencyRegistrationException $e) {
+                foreach ($e->getErrors() as $field => $message) {
+                    $target = $form->has($field) ? $form->get($field) : $form;
+                    $target->addError(new FormError($message));
+                }
+            } catch (UniqueConstraintViolationException) {
+                $form->addError(new FormError('Une agence ou un compte avec ces informations existe déjà.'));
+            }
+        }
+
+        $status = $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK;
 
         return $this->render('public/agency/register.html.twig', [
             'page' => 'agency',
-            'requested_sponsor' => $requestedSponsor
-        ]);
-    }//showRegisterForm
+            'form' => $form->createView(),
+            'sponsor_locked' => '1' === (string) $form->get('sponsorLocked')->getData() || $locked,
+        ], new Response(status: $status));
+    }//register
+
+
+
 
     /**
-     * PROCESSEUR ÉTAPE 1 : INTERCEPTION ET REDIRECTION VERS LE CATALOGUE SAAS [INDEX]
+     * ÉTAPE 2 : CHOIX DU PLAN D'ABONNEMENT
+     * Réservée à l'agence qui vient d'être créée dans cette session.
      */
-    #[Route('/register-agency/process', name: 'public_agency_register_process', methods: ['POST'])]
-    public function processRegister(Request $request): Response
+    #[Route('/agence/choisir-un-plan', name: 'public_agency_choose_plan', methods: ['GET'])]
+    public function choose_plan(Request $request, SubscriptionPlanCatalog $catalog): Response
     {
-        // EN COULISSES DOCTRINE :
-        // 1. Instanciation de la nouvelle "1. Agency" au statut d'attente
-        // 2. Si sponsor_token est fourni, on pointe la table User pour lier l'agence à l'apporteur (parent_id) [Profile]
-        // 3. Redirection vers la sélection immédiate du forfait (31. subscriptionPlan) [INDEX]
+        if (!$request->getSession()->has(self::ONBOARDING_SESSION_KEY)) {
+            $this->addFlash('warning', 'Créez d\'abord votre agence pour choisir un plan d\'abonnement.');
 
-        $this->addFlash('success', 'Votre structure a été configurée avec succès. Choisissez votre formule SaaS.');
-        return $this->redirectToRoute('public_agency_choose_plan');
-    } //processRegister
-
-
-   // src/Controller/Public/PublicAgencyRegistrationController.php
-
-    /**
-     * ÉTAPE 2 : EXPOSITION DES MODULES ET GRILLES DE RECRUTEMENT SUBSCRIPTIONPLAN [INDEX]
-     */
-    #[Route('/agency/choose-plan', name: 'public_agency_choose_plan', methods: ['GET'])]
-    public function choosePlan(): Response
-    {
-        // 3. Référentiel d'usine des forfaits commerciaux du SaaS
-        $platformPlans = [
-            [
-                'id' => 1,
-                'name' => 'trial',
-                'price' => 0.00,
-                'currency' => 'USD',
-                'duration_days' => 14, // Période d'évaluation standard de 2 semaines
-                'max_branches' => 1,
-                'max_users' => 2,
-                'max_buses' => 3,
-                'level' => 'Évaluation',
-                'features' => [
-                    'online_booking' => 'Réservation de billets basique au guichet',
-                    'advanced_reports' => 'Statistiques d\'activité journalières'
-                ]
-            ],
-            [
-                'id' => 2,
-                'name' => 'pro',
-                'price' => 250.00,
-                'currency' => 'USD',
-                'duration_days' => 30,
-                'max_branches' => 99,
-                'max_users' => 99,
-                'max_buses' => 99,
-                'level' => 'Recommandé',
-                'features' => ['online_booking' => 'Réservation en ligne synchrone', 'advanced_reports' => 'Statistiques avancées', 'shipment_module' => 'Gestion complète des colis & fret']
-            ],
-            [
-                'id' => 1,
-                'name' => 'basic',
-                'price' => 75.00,
-                'currency' => 'USD',
-                'duration_days' => 30,
-                'max_branches' => 1,
-                'max_users' => 5,
-                'max_buses' => 5,
-                'level' => 'Starter',
-                'features' => ['online_booking' => 'Réservation de billets basique', 'advanced_reports' => 'Rapports locaux limités']
-            ],
-        ];
-
-        // 4. Extraction de tes entités réelles "30. Feature" du MCD pour nourrir ton 3ème Onglet
-        $systemFeatures = [
-            ['code' => 'online_booking', 'name' => 'Réservation en Ligne', 'description' => 'Vente de billets en temps réel avec sélection tactile sur Seatmap.', 'createdAt' => new \DateTime('2024-01-10'), 'status' => 'active'],
-            ['code' => 'shipment_module', 'name' => 'Gestion des Colis & Fret', 'description' => 'Expédition, pesée et édition des bordereaux de colisage en gare.', 'createdAt' => new \DateTime('2024-02-15'), 'status' => 'active'],
-            ['code' => 'advanced_reports', 'name' => 'Rapports & Audits Avancés', 'description' => 'Graphiques de performances financières et exportation des livres de caisses.', 'createdAt' => new \DateTime('2024-03-20'), 'status' => 'active'],
-            ['code' => 'driver_app_api', 'name' => 'Interface API Chauffeurs', 'description' => 'Synchronisation des fiches de routes sur l\'application mobile conducteurs.', 'createdAt' => new \DateTime('2025-05-12'), 'status' => 'inactive']
-        ];
+            return $this->redirectToRoute('public_agency_register');
+        }
 
         return $this->render('public/agency/choose_plan.html.twig', [
             'page' => 'agency',
-            'system_features' => $systemFeatures,
-            'platform_plans' => $platformPlans, // Injection cruciale !
+            'platform_plans' => $catalog->activePlans(),
         ]);
-    } //choosePlan
-
-    #[Route('/register-agency/subscribe/finalize', name: 'public_agency_subscribe_finalize', methods: ['POST'])]
-    public function finalizeSubscription(): Response
-    {
-        $this->addFlash('success', 'Votre licence d\'exploitation a été provisionnée. Connectez-vous à présent.');
-        return $this->redirectToRoute('public_login');
-    } //finalizeSubscription
+    } //choose_plan
 }
