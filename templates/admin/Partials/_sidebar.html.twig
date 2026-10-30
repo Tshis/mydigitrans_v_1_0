@@ -12,7 +12,8 @@
 	<!--header-->
 
 	<nav class="menu">
-		{% set user_type = app.user.userType|default('agency') %}
+		
+		{% set user_type = app.user.userType.value %}
 		{% if user_type is same as('agency') %}
 			{% include "admin/partials/menu/_agency.html.twig" %}
 		{% elseif user_type is same as('platform') %}
@@ -25,7 +26,7 @@
 	<!--menu-->
 
 	<div class="sidebar-footer">
-		<a href="" class="menu-link" data-tooltip="Déconnexion">
+		<a href="{{ path('security_login_logout') }}" class="menu-link" data-tooltip="Déconnexion">
 			<span class="icon">
 				<i class="fa-solid fa-right-from-bracket"></i>
 			</span>
