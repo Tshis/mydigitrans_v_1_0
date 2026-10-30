@@ -112,13 +112,13 @@ final class AgencyRegistrationService
 
             // 2. Le siège : succursale principale, créée automatiquement avec l'agence
             $headquarters = (new Branch())
-                ->setName('Siège - ' . $city)
+                ->setName('Siège - ' . ucfirst($agency->getName()))
                 ->setAgency($agency)
                 ->setCity($city)
                 ->setCountry($country)
                 ->setStatus(BranchStatus::Opened)
-                ->setCode(self::HEADQUARTERS_CODE)
-                ->setSlug($this->slug($city, 'siege'));
+                ->setCode(uniqid())
+                ->setSlug($this->slug(mb_strtolower(self::HEADQUARTERS_CODE) . '-' . $agency->getSlug(), 'siege'));
 
             $this->em->persist($headquarters);
 
