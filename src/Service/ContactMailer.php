@@ -34,6 +34,7 @@ final class ContactMailer
         $name = trim((string) preg_replace('/[\r\n\t]+/', ' ', (string) $data->fullName));
         $subject = $data->subject?->label() ?? 'Autre';
 
+
         // 1. E-mail destiné à l'équipe MyDigitrans
         $email = (new TemplatedEmail())
             ->from(new Address($this->fromAddress, 'MyDigitrans - Formulaire de contact'))
@@ -54,8 +55,7 @@ final class ContactMailer
         $this->mailer->send($email);
 
         // 2. Accusé de réception destiné au visiteur (Instanciation propre et dédiée)
-        $acknowledgement = new TemplatedEmail();
-        $acknowledgement
+        $acknowledgement = (new TemplatedEmail())
             ->from(new Address($this->fromAddress, 'MyDigitrans'))
             ->to(new Address((string) $data->email, $name))
             ->subject('MyDigitrans - Accusé de réception de votre message')

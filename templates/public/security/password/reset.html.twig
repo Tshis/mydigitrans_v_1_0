@@ -13,7 +13,7 @@
 
 		<div class="login-card">
 
-			<form method="post">
+			{# <form method="post">
 
 
 				<div class="field mb-25">
@@ -33,7 +33,24 @@
 
 				<button class="btn-refined btn-primary-gradient btn-full">Valider</button>
 
+			</form> #}
+
+			<form method="post">
+				<div class="field mb-25">
+					<div class="form-group">
+						<label>Nouveau mot de passe</label>
+						<input type="password" name="password" placeholder="••••••••" required>
+					</div>
+				</div>
+				<div class="field mb-25">
+					<div class="form-group">
+						<label>Confirmer</label>
+						<input type="password" name="password_confirm" placeholder="••••••••" required>
+					</div>
+				</div>
+				<button type="submit" class="btn-refined btn-primary-gradient btn-full">Valider</button>
 			</form>
+
 
 		</div>
 

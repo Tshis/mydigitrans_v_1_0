@@ -16,7 +16,7 @@
 		<div class="login-card">
 
 
-			<form method="post">
+			{# <form method="post">
 
 				<div class="field mb-25">
 					<label>Email</label>
@@ -25,6 +25,22 @@
 
 				<button class="btn-refined btn-primary-gradient btn-full mb-25">Envoyer le lien</button>
 
+			</form>
+ #}
+
+			<form method="post">
+				{% if error %}
+					<div class="alert alert-danger mb-25">{{ error }}</div>
+				{% endif %}
+				{% if success %}
+					<div class="alert alert-success mb-25">Un lien de réinitialisation vous a été envoyé si votre compte est éligible.</div>
+				{% endif %}
+
+				<div class="field mb-25">
+					<label>Email</label>
+					<input type="email" name="email" placeholder="exemple@voyagest.com" required>
+				</div>
+				<button type="submit" class="btn-refined btn-primary-gradient btn-full mb-25">Envoyer le lien</button>
 			</form>
 
 			<p class="back-link">
