@@ -11,7 +11,7 @@
                         <span class="text-gray text-size-13">Exploitation</span>
                         <span class="arrow-divider">•</span>
                         <span class="text-primary text-size-13 text-highlight">
-                            {{ isCentral ? 'Console Générale (Siège Central)' : 'Console Locale : ' ~ current_branch_name }}
+                            {{ isCentral ? 'Console Générale (Siège Central)' ~ (selected_branch ? ' › ' ~ current_branch_name : '') : 'Console Locale : ' ~ current_branch_name }}
                         </span>
                     </div>
                     <h1 class="mt-5">Tableau de bord Temps Réel</h1>
@@ -65,6 +65,9 @@
                     </div>
 
                     <span>Espèces en Coffre</span>
+                    {% if stats.revenue.missing_rates %}
+                        <small class="text-danger text-size-11">Taux manquant, non converti : {{ stats.revenue.missing_rates|join(', ') }}</small>
+                    {% endif %}
                 </div>
             </div>
 
@@ -133,6 +136,10 @@
                                         </span>
                                     </td>
                                 </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-gray italic padding-15">Aucun départ programmé pour aujourd'hui ou demain.</td>
+                                </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -167,7 +174,7 @@
                         <p>
                             <strong>{{ stats.expired_docs }}
                                 Document(s) légal(aux)</strong>
-                            expiré(s) ou en attente urgente de renouvellement.
+                            expiré(s) ou à renouveler dans les 30 jours.
                         </p>
                     </div>
                 </div>
@@ -200,8 +207,12 @@
                                 <td><strong>{{ currency.name }}</strong></td>
                                 <td class="monospace font-bold text-primary-mode">{{ currency.code }}</td>
                                 <td class="text-center font-bold monospace text-live-rate">
-                                    1 {{ currency.code }} = 
-                                    {{ currency.exchange_rate|number_format(currency.code == 'CDF' ? 0 : 2, ',', ' ') }} {{ agency_currency_settings.base_currency }}
+                                    {% if currency.exchange_rate is not null %}
+                                        1 {{ currency.code }} = 
+                                        {{ currency.exchange_rate|number_format(currency.exchange_rate >= 100 ? 0 : 2, ',', ' ') }} {{ agency_currency_settings.base_currency }}
+                                    {% else %}
+                                        <span class="text-gray">Taux non défini</span>
+                                    {% endif %}
                                 </td>
                                 <td class="text-center">
                                     <span class="pill-report-audit {{ currency.isActive ? 'closed' : 'open' }}">
