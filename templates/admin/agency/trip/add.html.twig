@@ -27,7 +27,12 @@
 	</header>
 
 	{# --- LAYOUT A DEUX COLONNES STANDARDISÉ --- #}
-	<form id="trip-plan-form" action="#" method="POST" class="agency-trip-add-form">
+	{# Formulaire Symfony : les champs gardent les noms d'origine (route_id, bus_id, driver_id, codriver_id, departureDate...) #}
+	{{ form_start(form, {attr: {id: 'trip-plan-form', class: 'agency-trip-add-form'}}) }}
+		{% if form.vars.errors|length > 0 %}
+			<div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
+		{% endif %}
+
 		<div class="agency-trip-add-container">
 
 			{# COLONNE GAUCHE : FORMULAIRE DE SAISIE #}
@@ -43,27 +48,15 @@
 
 					<div class="direct-pricing-row">
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Ligne / Route Réseau</label>
-							<select name="route_id" class="admin-bus-layout-add-select" required>
-								<option value="">-- Choisir la ligne --</option>
-								{% for r in routes %}
-								<option value="{{ r.id }}">{{ r.code }}
-									:
-									{{ r.name }}</option>
-								{% endfor %}
-							</select>
+							{{ form_label(form.route_id) }}
+							{{ form_widget(form.route_id) }}
+							{{ form_errors(form.route_id) }}
 						</div>
 
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Bus Assigné</label>
-							<select name="bus_id" class="admin-bus-layout-add-select" required>
-								<option value="">-- Choisir un véhicule --</option>
-								{% for b in buses %}
-								<option value="{{ b.id }}">{{ b.plate }}
-									—
-									{{ b.model }}</option>
-								{% endfor %}
-							</select>
+							{{ form_label(form.bus_id) }}
+							{{ form_widget(form.bus_id) }}
+							{{ form_errors(form.bus_id) }}
 						</div>
 					</div>
 				</div>
@@ -77,23 +70,15 @@
 
 					<div class="direct-pricing-row">
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Chauffeur Titulaire</label>
-							<select name="driver_id" class="admin-bus-layout-add-select" required>
-								<option value="">-- Sélectionner le conducteur --</option>
-								{% for d in drivers %}
-								<option value="{{ d.id }}">{{ d.name }}</option>
-								{% endfor %}
-							</select>
+							{{ form_label(form.driver_id) }}
+							{{ form_widget(form.driver_id) }}
+							{{ form_errors(form.driver_id) }}
 						</div>
 
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Convoyeur / Co-Chauffeur</label>
-							<select name="codriver_id" class="admin-bus-layout-add-select">
-								<option value="">-- Aucun convoyeur --</option>
-								{% for d in drivers %}
-								<option value="{{ d.id }}">{{ d.name }}</option>
-								{% endfor %}
-							</select>
+							{{ form_label(form.codriver_id) }}
+							{{ form_widget(form.codriver_id) }}
+							{{ form_errors(form.codriver_id) }}
 						</div>
 					</div>
 				</div>
@@ -107,25 +92,27 @@
 
 					<div class="direct-pricing-row mb-20">
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Date de Départ</label>
-							<input type="date" name="departureDate" class="matrix-input" value="{{ " now"|date("Y-m-d")
-								}}" required>
+							{{ form_label(form.departureDate) }}
+							{{ form_widget(form.departureDate) }}
+							{{ form_errors(form.departureDate) }}
 						</div>
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Heure de Départ</label>
-							<input type="time" name="departureTime" class="matrix-input" value="06:00" required>
+							{{ form_label(form.departureTime) }}
+							{{ form_widget(form.departureTime) }}
+							{{ form_errors(form.departureTime) }}
 						</div>
 					</div>
 
 					<div class="direct-pricing-row">
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Date d'Arrivée Estimée</label>
-							<input type="date" name="arrivalDate" class="matrix-input" value="{{ " now"|date("Y-m-d")
-								}}" required>
+							{{ form_label(form.arrivalDate) }}
+							{{ form_widget(form.arrivalDate) }}
+							{{ form_errors(form.arrivalDate) }}
 						</div>
 						<div class="field">
-							<label class="admin-bus-layout-add-label">Heure d'Arrivée Estimée</label>
-							<input type="time" name="arrivalTime" class="matrix-input" value="18:00" required>
+							{{ form_label(form.arrivalTime) }}
+							{{ form_widget(form.arrivalTime) }}
+							{{ form_errors(form.arrivalTime) }}
 						</div>
 					</div>
 				</div>
@@ -170,6 +157,7 @@
 			</aside>
 
 		</div>
-	</form>
+		{{ form_widget(form._token) }}
+	{{ form_end(form, {render_rest: false}) }}
 </div>
 {% endblock %}

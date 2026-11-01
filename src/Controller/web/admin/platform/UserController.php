@@ -130,6 +130,32 @@ final class UserController extends AbstractController
             return $this->redirectToRoute('admin_platform_agent_index');
         }
 
+        /**
+         * POUR LE TRAITEMENT DES USERS et EVITER QU'UN ADMIN SOIT MODIFIER ou qu'UN MANAGER ACTIVE UN USER...
+         */
+
+        // 1. Si c'est un manager, on force l'état inactif avant de traiter le formulaire
+        // if ($this->isGranted('ROLE_MANAGER')) {
+        //  $agentData->isActive = '0'; // Bloqué par défaut à la création
+        // }
+
+
+        // $form->handleRequest($request);
+
+        // if ($form->isSubmitted() && $form->isValid()) {
+        // 2. Sécurité supplémentaire après soumission pour les managers en mode édition
+        //  if ($this->isGranted('ROLE_MANAGER')) {
+        // Un manager ne peut jamais modifier l'état actif/inactif d'un compte existant
+        //    $agentData->isActive = $agent->getIsActive() ? '1' : '0';
+
+        // Règle du MCD : Un agent de succursale ne gère que sa succursale
+        //  $agentData->branchCode = $this->getUser()->getBranch();
+        //}
+
+        // ... suite de ton traitement (persistance en base)
+        //}
+
+
 
 
 

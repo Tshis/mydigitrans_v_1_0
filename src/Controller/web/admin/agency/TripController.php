@@ -2,12 +2,19 @@
 
 namespace App\Controller\web\admin\agency;
 
+use App\Dto\admin\agency\TripPlanningData;
+use App\Entity\User;
+use App\Exception\TripPlanningException;
+use App\Form\TripPlanningType;
+use App\Service\AgencyTripListing;
 use App\Service\BusLayoutGridBuilder;
+use App\Service\TripPlanningService;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Endroid\QrCode\QrCode; // Utilisation de l'objet natif direct
 use Endroid\QrCode\Writer\PngWriter; // Utilisation du Writer standard
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,41 +22,75 @@ use Symfony\Component\Routing\Attribute\Route;
 final class TripController extends AbstractController
 {
 
+    /**
+     * LISTE DES VOYAGES : statistiques et filtres (date exacte, ligne, état opérationnel).
+     */
     #[Route('/admin/agency/trips', name: 'admin_agency_trip_index')]
-    public function index(Request $request): Response
+    public function index(Request $request, AgencyTripListing $listing): Response
     {
+        $user = $this->agencyUser();
+        $agency = $user->getAgency();
+        $branch = AgencyTripListing::scopeBranch($user);
+        $now = new \DateTimeImmutable();
+
+        $filters = [
+            'date' => $this->parseDate($request->query->get('filter_date')),
+            'route' => ctype_digit((string) $request->query->get('filter_route')) ? (int) $request->query->get('filter_route') : null,
+            'status' => \array_key_exists((string) $request->query->get('filter_status'), AgencyTripListing::STATUS_FILTERS)
+                ? (string) $request->query->get('filter_status')
+                : null,
+        ];
 
         return $this->render('admin/agency/trip/index.html.twig', [
             'page' => 'trip',
+            'stats' => $listing->stats($agency, $branch, $now),
+            'trips' => $listing->search($agency, $branch, $filters, $now),
+            'route_options' => $listing->routeOptions($agency),
+            'filters' => [
+                'date' => $filters['date']?->format('Y-m-d') ?? '',
+                'route' => $filters['route'],
+                'status' => $filters['status'] ?? '',
+            ],
         ]);
     } //index
 
-    #[Route('/admin/agency/trip/add', name: 'admin_agency_trip_add')]
-    public function add(Request $request): Response
+    /**
+     * PLANIFICATION D'UN VOYAGE : crée le voyage et, en cascade, tous les sièges du bus.
+     */
+    #[Route('/admin/agency/trip/add', name: 'admin_agency_trip_add', methods: ['GET', 'POST'])]
+    public function add(Request $request, TripPlanningService $planner): Response
     {
+        $user = $this->agencyUser();
 
-        // Données nécessaires pour remplir le formulaire de planification
-        $routes = [
-            ['id' => 1, 'code' => 'KIN-KKW', 'name' => 'Kinshasa - Kikwit'],
-            ['id' => 2, 'code' => 'KIN-MUA', 'name' => 'Kinshasa - Muanda'],
-        ];
+        $data = new TripPlanningData();
+        $today = new \DateTimeImmutable('today');
+        $data->departureDate = $today;
+        $data->departureTime = new \DateTimeImmutable('1970-01-01 06:00');
+        $data->arrivalDate = $today;
+        $data->arrivalTime = new \DateTimeImmutable('1970-01-01 18:00');
 
-        $buses = [
-            ['id' => 10, 'plate' => 'A-1234-BC', 'model' => 'Coaster (30 places)', 'capacity' => 30],
-            ['id' => 11, 'plate' => 'B-5678-CD', 'model' => 'King Long (50 places)', 'capacity' => 50],
-        ];
+        $form = $this->createForm(TripPlanningType::class, $data, ['agency' => $user->getAgency()]);
+        $form->handleRequest($request);
 
-        $drivers = [
-            ['id' => 50, 'name' => 'Jean-Pierre Makila'],
-            ['id' => 51, 'name' => 'Dieudonné Mwamba'],
-        ];
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $trip = $planner->plan($data, $user);
+
+                $this->addFlash('success', sprintf('Le voyage %s est planifié : les places sont ouvertes à la vente.', $trip->getCode()));
+
+                return $this->redirectToRoute('admin_agency_trip_index');
+            } catch (TripPlanningException $e) {
+                foreach ($e->getErrors() as $field => $message) {
+                    $target = $form->has($field) ? $form->get($field) : $form;
+                    $target->addError(new FormError($message));
+                }
+            }
+        }
 
         return $this->render('admin/agency/trip/add.html.twig', [
             'page' => 'trip',
-            'routes' => $routes,
-            'buses' => $buses,
-            'drivers' => $drivers,
-        ]);
+            'form' => $form->createView(),
+        ], new Response(status: $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK));
     } //add
 
 
@@ -62,14 +103,13 @@ final class TripController extends AbstractController
         ]);
     } //show
 
+    /**
+     * Ancienne adresse de recherche : les filtres sont gérés par la liste.
+     */
     #[Route('/admin/agency/trip/search/', name: 'admin_agency_trip_search')]
     public function search(Request $request): Response
     {
-        $result = true;
-        return $this->render('admin/agency/trip/search_result.html.twig', [
-            'page' => 'trip',
-            'result' => $result
-        ]);
+        return $this->redirectToRoute('admin_agency_trip_index', $request->query->all());
     } //search
 
 
@@ -277,4 +317,32 @@ final class TripController extends AbstractController
             'Content-Disposition' => 'inline; filename="Ticket.pdf"'
         ]);
     } //printTicketPdf
+
+
+    /**
+     * Utilisateur connecté, obligatoirement rattaché à une agence.
+     */
+    private function agencyUser(): User
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $user = $this->getUser();
+
+        if (!$user instanceof User || null === $user->getAgency()) {
+            throw $this->createAccessDeniedException('Aucune agence n\'est associée à ce compte.');
+        }
+
+        return $user;
+    }
+
+    private function parseDate(mixed $value): ?\DateTimeImmutable
+    {
+        if (!\is_string($value) || '' === $value) {
+            return null;
+        }
+
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+
+        return false === $date ? null : $date;
+    }
 }
