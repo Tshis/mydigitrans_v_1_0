@@ -2,6 +2,8 @@
 
 namespace App\Controller\web\public;
 
+use App\Entity\User;
+use App\Enum\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,6 +14,24 @@ final class LoginController extends AbstractController
     #[Route('/login', name: 'security_login_index')]
     public function index(AuthenticationUtils $authenticationUtils): Response
     {
+        /**
+         * @var User
+         */
+        $user = $this->getUser();
+
+        if ($user !== null) {
+            // À adapter : remplace ces noms de routes par tes vrais tableaux de bord.
+            $route = match ($user instanceof User ? $user->getUserType() : null) {
+                UserType::Platform => 'admin_platform_dashboard',
+                UserType::Agency => 'admin_agency_dashboard',
+                UserType::Partner => 'admin_partner_dashboard_index',
+                default => 'security_login_index',
+            };
+
+            return $this->redirectToRoute($route);
+        }
+
+
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
 
