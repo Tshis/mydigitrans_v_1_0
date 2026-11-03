@@ -349,6 +349,28 @@ final class SeedAccessCommand extends Command
         $this->em->flush();
         $io->writeln('✓ Permissions système synchronisées de manière unique.');
 
+        //============================================
+        //ROLE NAMES
+        //============================================
+        $roleNames = [
+            // --- PORTÉE PLATEFORME SAAS ---
+            'ROLE_SUPER_ADMIN'         => 'Super administrateur',
+            'ROLE_PLATFORM_ACCOUNTANT' => 'Comptable plateforme',
+            'ROLE_PLATFORM_CASHIER'    => 'Caissier plateforme',
+            'ROLE_PLATFORM_SUPPORT'    => 'Support plateforme',
+
+            // --- PORTÉE MULTI-AGENCE ---
+            'ROLE_AGENCY_ADMIN'        => 'Administrateur d\'agence',
+            'ROLE_GENERAL_MANAGER'     => 'Directeur Général',
+            'ROLE_MANAGER'             => 'Gestionnaire',
+            'ROLE_CASHIER'             => 'Caissier / Guichetier',
+            'ROLE_CONTROLLER'          => 'Contrôleur de bord',
+            'ROLE_ACCOUNTANT'          => 'Comptable d\'agence',
+            'ROLE_DISPATCHER'          => 'Dispatcheur',
+            'ROLE_DRIVER'              => 'Chauffeur',
+        ];
+
+
 
 
         // =========================================================================
@@ -366,7 +388,7 @@ final class SeedAccessCommand extends Command
                 $role->setScope($meta['scope']);
                 $role->setIsActive(true);
             }
-            $role->setName(str_replace('ROLE_', '', $currentRoleCode));
+            $role->setName($roleNames[$currentRoleCode]);
             $role->setDescription($meta['description']);
             $this->em->persist($role);
             $this->em->flush();

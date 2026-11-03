@@ -2,215 +2,133 @@
 
 namespace App\Controller\web\admin\platform;
 
-
+use App\Dto\admin\AgentData;
+use App\Form\AgentType;
+use App\Entity\User;
+use App\Enum\UserType;
+use App\Security\Voter\UserVoter;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class UserController extends AbstractController
 {
-
     #[Route('/admin/platform/agents', name: 'admin_platform_agent_index')]
-    public function index(): Response
+    public function index(EntityManagerInterface $em): Response
     {
-        // Simulation des utilisateurs rattachés à l'agence courante [MCD 3, 4, 5]
-        $users = [
-            [
-                'firstname' => 'Daniel',
-                'lastname' => 'Lukonu',
-                'phone' => '+243 812 345 678',
-                'email' => 'd.lukonu@mydigitrans.cd',
-                'userType' => 'platform',
-                'isActive' => true,
-                'isOnline' => true,
-                'lastLoginAt' => new \DateTime('now'),
-                'branchName' => null, // Administrateur général (Siège)
-                'branchCode' => null,
-                'code' => 'agt-512',
-                'role' => [
-                    'code' => 'ROLE_AGENCY_ADMIN',
-                    'description' => 'Gestion totale de l\'agence',
-                    'isActive' => true
-                ]
-            ],
-            [
-                'firstname' => 'Antoinette',
-                'lastname' => 'Mputu',
-                'phone' => '+243 897 112 233',
-                'email' => 'a.mputu@mydigitrans.cd',
-                'userType' => 'platform',
-                'isActive' => true,
-                'isOnline' => false,
-                'lastLoginAt' => new \DateTime('-1 day'),
-                'branchName' => 'Victoire - Rond Point',
-                'branchCode' => 'SUC-KIN-01',
-                'code' => 'agt-510',
-                'role' => [
-                    'code' => 'ROLE_CASHIER',
-                    'description' => 'Vente de billets et encaissement colis',
-                    'isActive' => false
-                ]
-            ],
-            [
-                'firstname' => 'Alphonse',
-                'lastname' => 'Kabeya',
-                'phone' => '+243 824 556 778',
-                'email' => 'a.kabeya@mydigitrans.cd',
-                'userType' => 'partner', // Partenaire externe (ex: sous-traitant logistique)
-                'isActive' => false, // Compte révoqué ou bloqué
-                'isOnline' => false,
-                'lastLoginAt' => null,
-                'branchName' => 'Matadi Ville - Port',
-                'branchCode' => 'SUC-MAT-02',
-                'code' => 'agt-513',
-                'role' => [
-                    'code' => 'ROLE_CONTROLLER',
-                    'description' => 'Vérification des TripSeats à l\'embarquement',
-                    'isActive' => true
-                ]
-            ]
-        ];
+        $this->denyAccessUnlessGranted(UserVoter::VIEW);
 
-
+        // Liste uniquement le personnel interne du SaaS [MCD 3]
+        $users = $em->getRepository(User::class)->findBy(['userType' => 'platform']);
 
         return $this->render('admin/agent/index.html.twig', [
             'page' => 'agent',
             'users' => $users
         ]);
-    } //index
+    }
 
     #[Route('/admin/platform/agent/add', name: 'admin_platform_agent_add')]
     #[Route('/admin/platform/agent/{code}/edit', name: 'admin_platform_agent_edit')]
-    public function add_and_edit(Request $request, ?string $code = null): Response
-    {
+    public function add_and_edit(
+        Request $request,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher,
+        ?string $code = null
+    ): Response {
 
         $isEdit = $code !== null;
-        $agent = null;
+        $agentEntity = $isEdit ? $em->getRepository(User::class)->findOneBy(['code' => $code]) : new User();
 
-        // Simulation de ta liste de succursales pour l'affectation guichet
-        $branches = [
-            ['code' => 'SUC-KIN-01', 'name' => 'Victoire - Rond Point'],
-            ['code' => 'SUC-MAT-02', 'name' => 'Matadi Ville - Port']
-        ];
-
-        // Simulation des rôles disponibles au sein du scope Agency [MCD 4]
-        $availableRoles = [
-            ['code' => 'ROLE_CASHIER', 'name' => 'Caissier / Guichetier', 'description' => 'Vente de billets'],
-            ['code' => 'ROLE_CONTROLLER', 'name' => 'Contrôleur de bord', 'description' => 'Check-in passagers'],
-            ['code' => 'ROLE_ACCOUNTANT', 'name' => 'Comptable d\'agence', 'description' => 'Audit financier']
-        ];
-
-        if ($isEdit) {
-            // Extraction fictive de ton utilisateur [MCD 3 & 5] pour pré-remplir le formulaire
-            $agent = [
-                'firstname' => 'Antoinette',
-                'lastname' => 'Mputu',
-                'code' => $code,
-                'email' => 'a.mputu@mydigitrans.com',
-                'phone' => '+243 897 112 233',
-                'userType' => 'platform',
-                'branchCode' => 'SUC-KIN-01',
-                'currentRoleCode' => 'ROLE_CASHIER',
-                'isActive' => true
-            ];
+        if ($isEdit && !$agentEntity) {
+            throw $this->createNotFoundException("Utilisateur plateforme introuvable.");
         }
 
-        if ($request->isMethod('POST')) {
-            $firstname = $request->request->get('firstname');
-            $lastname = $request->request->get('lastname');
+        if ($isEdit) {
+            $this->denyAccessUnlessGranted(UserVoter::WRITE, $agentEntity);
+        }
 
-            $this->addFlash(
-                'success',
-                $isEdit
-                    ? sprintf('Les habilitations de l\'agent %s %s ont été mises à jour.', $firstname, $lastname)
-                    : sprintf('Le compte de l\'agent %s %s a été créé et déployé.', $firstname, $lastname)
-            );
+        $agentData = new AgentData();
+        if ($isEdit) {
+            $agentData->firstname = $agentEntity->getFirstname();
+            $agentData->lastname = $agentEntity->getLastname();
+            $agentData->email = $agentEntity->getEmail();
+            $agentData->phone = $agentEntity->getPhone();
+            $agentData->isActive = $agentEntity->isActive() ? '1' : '0';
+        }
 
+        // Rôles spécifiques au scope Plateforme
+        $platformRoles = [
+            ['code' => 'ROLE_PLATFORM_ACCOUNTANT', 'name' => 'Comptable plateforme', 'description' => 'Facturation et commissions'],
+            ['code' => 'ROLE_PLATFORM_CASHIER', 'name' => 'Caissier plateforme', 'description' => 'Encaissement abonnements'],
+            ['code' => 'ROLE_PLATFORM_SUPPORT', 'name' => 'Support plateforme', 'description' => 'Accompagnement agences']
+        ];
+
+        $form = $this->createForm(AgentType::class, $agentData, [
+            'is_edit' => $isEdit,
+            'roles' => $platformRoles,
+            'with_branch' => false, // Pas de succursale d'agence pour l'équipe du SaaS
+            'branches' => [],
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted(UserVoter::WRITE, $agentData);
+
+            $agentEntity->setFirstname($agentData->firstname);
+            $agentEntity->setLastname($agentData->lastname);
+            $agentEntity->setEmail($agentData->email);
+            $agentEntity->setPhone($agentData->phone);
+            $agentEntity->setUserType(UserType::Platform); // Isolation stricte [MCD 3]
+            $agentEntity->setBranch(null);
+            $agentEntity->setAgency(null);
+
+            if (!$isEdit) {
+                $agentEntity->setPassword($passwordHasher->hashPassword($agentEntity, $agentData->password));
+                $agentEntity->setCode('plt-' . random_int(1000, 9999));
+            }
+
+            // Seul le rôle SUPER_ADMIN gère le cycle actif des comptes plateforme via le voter
+            $agentEntity->setIsActive($agentData->isActive === '1');
+
+            $em->persist($agentEntity);
+            $em->flush();
+
+            $this->addFlash('success', 'Compte membre plateforme configuré avec succès.');
             return $this->redirectToRoute('admin_platform_agent_index');
         }
 
-        /**
-         * POUR LE TRAITEMENT DES USERS et EVITER QU'UN ADMIN SOIT MODIFIER ou qu'UN MANAGER ACTIVE UN USER...
-         */
-
-        // 1. Si c'est un manager, on force l'état inactif avant de traiter le formulaire
-        // if ($this->isGranted('ROLE_MANAGER')) {
-        //  $agentData->isActive = '0'; // Bloqué par défaut à la création
-        // }
-
-
-        // $form->handleRequest($request);
-
-        // if ($form->isSubmitted() && $form->isValid()) {
-        // 2. Sécurité supplémentaire après soumission pour les managers en mode édition
-        //  if ($this->isGranted('ROLE_MANAGER')) {
-        // Un manager ne peut jamais modifier l'état actif/inactif d'un compte existant
-        //    $agentData->isActive = $agent->getIsActive() ? '1' : '0';
-
-        // Règle du MCD : Un agent de succursale ne gère que sa succursale
-        //  $agentData->branchCode = $this->getUser()->getBranch();
-        //}
-
-        // ... suite de ton traitement (persistance en base)
-        //}
-
-
-
-
-
-        return $this->render('admin/agent/form.html.twig', [
-            'page' => 'agent',
+        return $this->render('admin/platform_agent/form.html.twig', [
+            'form' => $form->createView(),
             'isEdit' => $isEdit,
-            'branches' => $branches,
-            'available_roles' => $availableRoles,
-            'agent' => $agent
+            'agent' => $agentEntity
         ]);
-    } //add_and_edit
+    }
 
 
     #[Route('/admin/platform/agent/{code}/details', name: 'admin_platform_agent_show')]
-    public function show(string $code): Response
+    public function show(string $code, EntityManagerInterface $em): Response
     {
-        // Extraction des tables 3 et 5 de ton MCD
-        $agent = [
-            'firstname' => 'Jean',
-            'lastname' => 'Mukendi',
-            'email' => 'j.mukendi@mydigitrans.com',
+        // 1. Récupération de l'utilisateur ayant le scope plateforme [MCD 3]
+        $agentEntity = $em->getRepository(User::class)->findOneBy([
             'code' => $code,
-            'phone' => '+243 897 000 000', // Nettoyage du format
-            'isOnline' => true,
-            'role' => [
-                'name' => 'Caissier Principal',
-                'code' => 'ROLE_CASHIER',
-                'description' => 'Vente de billets et encaissement colis',
-                'isActive' => true
-            ],
-            'career_history' => [
-                // Jointure temporelle issue de la table pivot  
-                [
-                    // CORRECTION : L'espace après roleName a été supprimé ici
-                    'roleName' => 'Caissier principal',
-                    'branchName' => 'Gare Centrale - Gombe',
-                    'assignedAt' => new \DateTime('2020-10-09'),
-                    'assignedBy' => 'Daniel Lukonu',
-                    'revokedAt' => new \DateTime('2026-10-09'),
-                    'revokedBy' => 'Daniel Lukonu'
-                ],
-                [
-                    'roleName' => 'Guichetier Principal',
-                    'branchName' => 'Victoire - Rond Point',
-                    'assignedAt' => new \DateTime('2026-10-09'),
-                    'assignedBy' => 'Daniel Lukonu',
-                    'revokedAt' => null, // En poste actuellement
-                    'revokedBy' => null
-                ]
-            ]
-        ];
+            'userType' => UserType::Platform // Isolation stricte plateforme [MCD 3]
+        ]);
 
+        if (!$agentEntity) {
+            throw $this->createNotFoundException("Utilisateur plateforme introuvable.");
+        }
+
+        // 2. Contrôle de sécurité via le UserVoter
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $agentEntity);
+
+        // 3. Rendu du template dédié au personnel SaaS
         return $this->render('admin/agent/show.html.twig', [
             'page' => 'agent',
-            'agent' => $agent
+            'agent' => $agentEntity
         ]);
-    } //show
+    }
 }

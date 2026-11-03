@@ -7,8 +7,7 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-user-index-scope container">
+	<div class="admin-agency-user-index-scope container">
 		{# --- HEADER DE LA CONSOLE --- #}
 		<header class="header-refined mb-30">
 			<div class="header-left">
@@ -21,7 +20,7 @@
 				<p class="subtitle">Gestion des comptes agents, affectations aux guichets et habilitations RBAC.</p>
 			</div>
 			<div class="header-right">
-				<a href="{{path('admin_agency_agent_add')}}" class="btn-refined btn-primary-gradient">
+				<a href="{{ path('admin_' ~ app.user.userType.value ~ '_agent_add') }}" class="btn-refined btn-primary-gradient">
 					<i class="fa-solid fa-user-plus"></i>
 					<span>Créer un utilisateur</span>
 				</a>
@@ -60,7 +59,7 @@
 			</form>
 		</div>
 
-		{# --- LE TABLEAU STRICT ET CONFORME (TA STRUCTURE TEXTUELLE REPRISE) --- #}
+		{# --- LE TABLEAU REVISITÉ ET CONFORME AU MODELE --- #}
 		<div class="table-responsive-wrapper">
 			<table class="table table-scrollable table-striped js-datatable">
 				<thead>
@@ -68,9 +67,9 @@
 						<th>Utilisateur</th>
 						<th>Contact & Email</th>
 						<th>Affectation Guichet</th>
-						<th>Status du poste/Fonction</th>
+						<th>Fonction / Rôle</th>
 						<th class="text-center">Dernière Connexion</th>
-						<th class="text-center">Status</th>
+						<th class="text-center">Statut</th>
 						<th class="text-right">Actions</th>
 					</tr>
 				</thead>
@@ -79,15 +78,9 @@
 						<tr>
 							<td>
 								<div class="user-profile-cell">
-
 									<div class="meta">
 										<span class="full-name">
-											<strong>{{ agent.firstname }}
-												{{ agent.lastname }}</strong>
-										</span>
-										<span class="online-indicator-text">
-											<i class="fa-solid fa-circle {{ agent.isOnline ? 'text-success' : 'text-muted' }}"></i>
-											{{ agent.isOnline ? 'En ligne' : 'Hors-ligne' }}
+											<strong>{{ agent.firstname }} {{ agent.lastname }}</strong>
 										</span>
 									</div>
 								</div>
@@ -98,30 +91,31 @@
 									<small class="phone-text monospace">{{ agent.phone }}</small>
 								</div>
 							</td>
-
 							<td>
-								{% if agent.branchName %}
-									<strong>{{ agent.branchName }}</strong>
-									<br><small class="text-muted">#{{ agent.branchCode }}</small>
+								{# Correction : Accès via la relation d'objet branch du MCD #}
+								{% if agent.branch %}
+									<strong>{{ agent.branch.name }}</strong>
+									<br><small class="text-muted">#{{ agent.branch.code }}</small>
 								{% else %}
 									<span class="text-gray italic">Siège Central (Général)</span>
 								{% endif %}
 							</td>
 							<td>
-								{% if not agent.role.isActive %}
-									<span class="pill-user-account-status inactive">
-										<i class="fa-solid fa-triangle-exclamation"></i>
-										Poste Suspendu
-									</span>
-								{% else %}
-									<span class="pill-user-account-status active">
-										<i class="fa-solid fa-circle-check"></i>
-										Poste Actif
-									</span>
-								{% endif %}
+								{# Extraction propre du premier rôle métier du tableau (R RBAC de Symfony) #}
+								{% set mainRole = 'ROLE_USER' %}
+								{% for role in agent.roles %}
+									{% if role != 'ROLE_USER' %}
+										{% set mainRole = role %}
+									{% endif %}
+								{% endfor %}
+								
+								<span class="badge-role monospace text-size-12">
+									{{ mainRole }}
+								</span>
 							</td>
 							<td class="text-center monospace text-size-12">
-								{{ agent.lastLoginAt ? agent.lastLoginAt|date('d/m/Y H:i') : 'Jamais connecté' }}
+								{# Propriété optionnelle présente dans l'entité #}
+								{{ agent.lastLoginAt is defined and agent.lastLoginAt ? agent.lastLoginAt|date('d/m/Y H:i') : 'Jamais connecté' }}
 							</td>
 							<td class="text-center">
 								<span class="pill-user-account-status {{ agent.isActive ? 'active' : 'inactive' }}">
@@ -130,14 +124,11 @@
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									<a href="{{path('admin_agency_agent_show',{'code':agent.code})}}" class="action-link config" title="Détails sur l'agent">
+									<a href="{{ path('admin_' ~ app.user.userType.value ~ '_agent_show', {'code': agent.code}) }}" class="action-link config" title="Détails sur l'agent">
 										<i class="fa-solid fa-eye"></i>
 									</a>
-									<a href="{{path('admin_agency_agent_edit',{'code':agent.code})}}" class="action-link config" title="Modifier le compte">
+									<a href="{{ path('admin_' ~ app.user.userType.value ~ '_agent_edit', {'code': agent.code}) }}" class="action-link config" title="Modifier le compte">
 										<i class="fa-solid fa-user-pen"></i>
-									</a>
-									<a href="{{path('admin_password_reset',{'code':agent.code})}}" class="action-link config" title="Modifier le mot de passe">
-										<i class="fa-solid fa-key"></i>
 									</a>
 								</div>
 							</td>
