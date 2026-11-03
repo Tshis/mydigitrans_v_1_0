@@ -25,7 +25,6 @@ class AgentType extends AbstractType
     private const INPUT = 'admin-bus-layout-add-input';
     private const SELECT = 'admin-bus-layout-add-select';
 
-    // Injection du service de sécurité de Symfony
     public function __construct(
         private readonly Security $security
     ) {}
@@ -64,8 +63,10 @@ class AgentType extends AbstractType
 
         if ($options['with_branch']) {
             $branches = [];
+            /** @var \App\Entity\Branch $branch */
             foreach ($options['branches'] as $branch) {
-                $branches[sprintf('%s (#%s)', $branch['name'], $branch['code'])] = $branch['code'];
+                // Utilisation des getters de l'objet Branch issu de la BDD
+                $branches[sprintf('%s (#%s)', $branch->getName(), $branch->getCode())] = $branch->getCode();
             }
 
             $builder->add('branch_code', ChoiceType::class, [
@@ -79,25 +80,25 @@ class AgentType extends AbstractType
             ]);
         }
 
-        $roles = [];
+        $rolesChoices = [];
         $descriptions = [];
+        /** @var \App\Entity\Role $role */
         foreach ($options['roles'] as $role) {
-            $roles[$role['name']] = $role['code'];
-            $descriptions[$role['code']] = $role['description'];
+            // Utilisation des getters de l'objet Role issu de la BDD
+            $rolesChoices[$role->getName()] = $role->getCode();
+            $descriptions[$role->getCode()] = $role->getDescription();
         }
 
         $builder->add('role_code', ChoiceType::class, [
             'property_path' => 'roleCode',
             'label' => 'Fonction (rôle système) *',
             'label_attr' => self::LABEL,
-            'choices' => $roles,
+            'choices' => $rolesChoices,
             'choice_attr' => static fn(string $code): array => ['title' => $descriptions[$code] ?? ''],
             'placeholder' => '-- Choisir une fonction --',
             'attr' => ['class' => self::SELECT],
         ]);
 
-        // LOGIQUE DE SÉCURITÉ : Si l'utilisateur connecté est un MANAGER, on n'ajoute pas le champ d'activation
-        // Le champ isActive du DTO restera à sa valeur par défaut '0' (Inactif) ou '1' en édition si déjà actif.
         if ($this->security->isGranted('ROLE_AGENCY_ADMIN')) {
             $builder->add('is_active', ChoiceType::class, [
                 'property_path' => 'isActive',

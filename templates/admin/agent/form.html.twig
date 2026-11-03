@@ -94,8 +94,8 @@
 							<div class="direct-pricing-row">
 								<div class="field">
 									<label class="admin-bus-layout-add-label">Succursale d'affectation *</label>
-									{{ form_widget(form.branchCode, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
-									{{ form_errors(form.branchCode) }}
+									{{ form_widget(form.branch_code, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+									{{ form_errors(form.branch_code) }}
 								</div>
 							</div>
 						</div>
@@ -113,8 +113,8 @@
 						</h2>
 						<div class="field">
 							<label class="admin-bus-layout-add-label">Attribuer une Fonction ou un poste *</label>
-							{{ form_widget(form.roleCode, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
-							{{ form_errors(form.roleCode) }}
+							{{ form_widget(form.role_code, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+							{{ form_errors(form.role_code) }}
 						</div>
 					</div>
 
@@ -125,8 +125,10 @@
 							État du Compte</h2>
 						<div class="field mb-20">
 							<label class="admin-bus-layout-add-label">Autoriser la connexion</label>
-							{{ form_widget(form.isActive, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
-							{{ form_errors(form.isActive) }}
+							{% if form.is_active is defined %} {# Recommandé de vérifier car soumis à condition de rôle #}
+								{{ form_widget(form.is_active, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+								{{ form_errors(form.is_active) }}
+							{% endif %}
 						</div>
 						<hr class="section-divider my-15">
 						<div class="notice-box-info">

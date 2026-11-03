@@ -3,9 +3,11 @@
 namespace App\Controller\web\admin\agency;
 
 use App\Dto\admin\AgentData;
-use App\Form\AgentType;
+use App\Entity\Branch;
+use App\Entity\Role;
 use App\Entity\User;
 use App\Enum\UserType;
+use App\Form\AgentType;
 use App\Security\Voter\UserVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -54,9 +56,7 @@ final class UserController extends AbstractController
         ?string $code = null
     ): Response {
 
-        /**
-         *@var User
-         */
+        /** @var User */
         $currentUser = $this->getUser();
 
         $isEdit = $code !== null;
@@ -66,10 +66,8 @@ final class UserController extends AbstractController
             throw $this->createNotFoundException("Agent introuvable.");
         }
 
-        // Hydratation du DTO pour le formulaire
         $agentData = new AgentData();
         if ($isEdit) {
-            // Vérification des droits sur l'entité ciblée avant traitement
             $this->denyAccessUnlessGranted(UserVoter::WRITE, $agentEntity);
 
             $agentData->firstname = $agentEntity->getFirstname();
@@ -80,57 +78,69 @@ final class UserController extends AbstractController
             $agentData->isActive = $agentEntity->isActive() ? '1' : '0';
         }
 
-        // Simulation ou récupération réelle des choix de ton catalogue
-        $branches = $em->getRepository(\App\Entity\Branch::class)->findBy(['agency' => $currentUser->getAgency()]);
-        $availableRoles = [
-            ['code' => 'ROLE_CASHIER', 'name' => 'Caissier / Guichetier', 'description' => 'Vente de billets'],
-            ['code' => 'ROLE_CONTROLLER', 'name' => 'Contrôleur de bord', 'description' => 'Check-in passagers'],
-            ['code' => 'ROLE_ACCOUNTANT', 'name' => 'Comptable d\'agence', 'description' => 'Audit financier']
-        ];
+        $branches = $em->getRepository(Branch::class)->findBy(['agency' => $currentUser->getAgency()]);
 
-        // Création de l'instance du formulaire Symfony [Form 4]
+        // Récupération dynamique des rôles Agence depuis la BDD
+        $allAgencyRoles = $em->getRepository(Role::class)->findBy([
+            'scope' => 'agency',
+            'isActive' => true
+        ]);
+
+        // Filtrage hiérarchique strict
+        $availableRoles = [];
+        foreach ($allAgencyRoles as $role) {
+            // RÈGLE : 'ROLE_AGENCY_ADMIN' n'apparaît JAMAIS dans le formulaire
+            if ($role->getCode() === 'ROLE_AGENCY_ADMIN') {
+                continue;
+            }
+
+            // Un gestionnaire simple ne peut pas attribuer le rôle de Direction Générale
+            if (!$this->isGranted('ROLE_AGENCY_ADMIN')) {
+                if ($role->getCode() === 'ROLE_GENERAL_MANAGER') {
+                    continue;
+                }
+            }
+            $availableRoles[] = $role;
+        }
+
         $form = $this->createForm(AgentType::class, $agentData, [
             'is_edit' => $isEdit,
             'branches' => $branches,
             'roles' => $availableRoles,
             'with_branch' => true,
-            'can_choose_general' => $this->isGranted('ROLE_AGENCY_ADMIN'), // Seul le siège peut laisser à null
+            'can_choose_general' => $this->isGranted('ROLE_AGENCY_ADMIN'),
         ]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // RE-VÉRIFICATION SÉCURITÉ : Validation du DTO complet par le Voter
             $this->denyAccessUnlessGranted(UserVoter::WRITE, $agentData);
 
             $agentEntity->setFirstname($agentData->firstname);
             $agentEntity->setLastname($agentData->lastname);
             $agentEntity->setEmail($agentData->email);
             $agentEntity->setPhone($agentData->phone);
-            $agentEntity->setUserType(UserType::Agency); // Fixé par le contrôleur de portée [MCD 3]
+            $agentEntity->setUserType(UserType::Agency);
             $agentEntity->setAgency($currentUser->getAgency());
 
-            // Assignation de la succursale
             if ($agentData->branchCode) {
-                $branch = $em->getRepository(\App\Entity\Branch::class)->findOneBy(['code' => $agentData->branchCode]);
+                $branch = $em->getRepository(Branch::class)->findOneBy(['code' => $agentData->branchCode]);
                 $agentEntity->setBranch($branch);
             } else {
-                $agentEntity->setBranch(null); // Siège Central
+                $agentEntity->setBranch(null);
             }
 
-            // Chiffrement du mot de passe à la création [Form 3]
             if (!$isEdit) {
                 $hashedPassword = $passwordHasher->hashPassword($agentEntity, $agentData->password);
                 $agentEntity->setPassword($hashedPassword);
                 $agentEntity->setCode('agt-' . random_int(1000, 9999));
             }
 
-            // Gestion des droits d'activation (Seul l'Admin peut modifier, sinon '0' par défaut pour le Manager)
             if ($this->isGranted('ROLE_AGENCY_ADMIN')) {
                 $agentEntity->setIsActive($agentData->isActive === '1');
             } else {
                 if (!$isEdit) {
-                    $agentEntity->setIsActive(false); // Forcé inactif si créé par un manager simple
+                    $agentEntity->setIsActive(false);
                 }
             }
 
@@ -142,11 +152,14 @@ final class UserController extends AbstractController
         }
 
         return $this->render('admin/agent/form.html.twig', [
+            'page' => 'agent',
             'form' => $form->createView(),
             'isEdit' => $isEdit,
             'agent' => $agentEntity
         ]);
     }
+
+
 
 
     #[Route('/admin/agency/agent/{code}/details', name: 'admin_agency_agent_show')]

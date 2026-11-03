@@ -3,9 +3,10 @@
 namespace App\Controller\web\admin\platform;
 
 use App\Dto\admin\AgentData;
-use App\Form\AgentType;
+use App\Entity\Role;
 use App\Entity\User;
 use App\Enum\UserType;
+use App\Form\AgentType;
 use App\Security\Voter\UserVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,6 +30,7 @@ final class UserController extends AbstractController
             'users' => $users
         ]);
     }
+
 
     #[Route('/admin/platform/agent/add', name: 'admin_platform_agent_add')]
     #[Route('/admin/platform/agent/{code}/edit', name: 'admin_platform_agent_edit')]
@@ -59,17 +61,26 @@ final class UserController extends AbstractController
             $agentData->isActive = $agentEntity->isActive() ? '1' : '0';
         }
 
-        // Rôles spécifiques au scope Plateforme
-        $platformRoles = [
-            ['code' => 'ROLE_PLATFORM_ACCOUNTANT', 'name' => 'Comptable plateforme', 'description' => 'Facturation et commissions'],
-            ['code' => 'ROLE_PLATFORM_CASHIER', 'name' => 'Caissier plateforme', 'description' => 'Encaissement abonnements'],
-            ['code' => 'ROLE_PLATFORM_SUPPORT', 'name' => 'Support plateforme', 'description' => 'Accompagnement agences']
-        ];
+        // Récupération dynamique des rôles Plateforme depuis la BDD
+        $allPlatformRoles = $em->getRepository(Role::class)->findBy([
+            'scope' => 'platform',
+            'isActive' => true
+        ]);
+
+        // Filtrage strict
+        $platformRoles = [];
+        foreach ($allPlatformRoles as $role) {
+            // RÈGLE : 'ROLE_SUPER_ADMIN' n'apparaît JAMAIS dans le formulaire plateforme
+            if ($role->getCode() === 'ROLE_SUPER_ADMIN') {
+                continue;
+            }
+            $platformRoles[] = $role;
+        }
 
         $form = $this->createForm(AgentType::class, $agentData, [
             'is_edit' => $isEdit,
             'roles' => $platformRoles,
-            'with_branch' => false, // Pas de succursale d'agence pour l'équipe du SaaS
+            'with_branch' => false,
             'branches' => [],
         ]);
 
@@ -82,7 +93,7 @@ final class UserController extends AbstractController
             $agentEntity->setLastname($agentData->lastname);
             $agentEntity->setEmail($agentData->email);
             $agentEntity->setPhone($agentData->phone);
-            $agentEntity->setUserType(UserType::Platform); // Isolation stricte [MCD 3]
+            $agentEntity->setUserType(UserType::Platform);
             $agentEntity->setBranch(null);
             $agentEntity->setAgency(null);
 
@@ -91,7 +102,6 @@ final class UserController extends AbstractController
                 $agentEntity->setCode('plt-' . random_int(1000, 9999));
             }
 
-            // Seul le rôle SUPER_ADMIN gère le cycle actif des comptes plateforme via le voter
             $agentEntity->setIsActive($agentData->isActive === '1');
 
             $em->persist($agentEntity);
@@ -101,12 +111,15 @@ final class UserController extends AbstractController
             return $this->redirectToRoute('admin_platform_agent_index');
         }
 
-        return $this->render('admin/platform_agent/form.html.twig', [
+        return $this->render('admin/agent/form.html.twig', [
+            'page' => 'agent',
             'form' => $form->createView(),
             'isEdit' => $isEdit,
             'agent' => $agentEntity
         ]);
     }
+
+
 
 
     #[Route('/admin/platform/agent/{code}/details', name: 'admin_platform_agent_show')]
