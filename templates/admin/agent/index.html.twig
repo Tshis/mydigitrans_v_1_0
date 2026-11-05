@@ -20,7 +20,8 @@
 				<p class="subtitle">Gestion des comptes agents, affectations aux guichets et habilitations RBAC.</p>
 			</div>
 			<div class="header-right">
-				<a href="{{ path('admin_' ~ app.user.userType.value ~ '_agent_add') }}" class="btn-refined btn-primary-gradient">
+				{# ✅ Utilisation dynamique sécurisée du préfixe de route #}
+				<a href="{{ path(route_prefix ~ '_agent_add') }}" class="btn-refined btn-primary-gradient">
 					<i class="fa-solid fa-user-plus"></i>
 					<span>Créer un utilisateur</span>
 				</a>
@@ -32,22 +33,24 @@
 			<form action="#" method="GET" class="field-group">
 				<div class="field">
 					<label class="admin-bus-layout-add-label">Rechercher un agent</label>
-					<input type="text" name="search" class="admin-bus-layout-add-input" placeholder="Nom, email ou téléphone...">
+					<input type="text" name="search" value="{{ filters.search }}" class="admin-bus-layout-add-input" placeholder="Nom, email ou téléphone...">
 				</div>
 				<div class="field">
 					<label class="admin-bus-layout-add-label">Succursale / Affectation</label>
-					<select name="branch" class="admin-bus-layout-add-select">
+					<select name="branch_code" class="admin-bus-layout-add-select">
 						<option value="">-- Toutes les succursales --</option>
-						<option value="SUC-KIN-01">Victoire - Rond Point</option>
-						<option value="SUC-MAT-02">Matadi Ville - Port</option>
+						{# ✅ Dynamisation des succursales avec les données du contrôleur #}
+						{% for branch in branch_options %}
+							<option value="{{ branch.code }}" {{ filters.branch == branch.code ? 'selected' : '' }}>{{ branch.name }}</option>
+						{% endfor %}
 					</select>
 				</div>
 				<div class="field">
 					<label class="admin-bus-layout-add-label">État du compte</label>
 					<select name="status" class="admin-bus-layout-add-select">
 						<option value="">-- Tous --</option>
-						<option value="active">Actif</option>
-						<option value="inactive">Bloqué / Suspendu</option>
+						<option value="active" {{ filters.status == 'active' ? 'selected' : '' }}>Actif</option>
+						<option value="inactive" {{ filters.status == 'inactive' ? 'selected' : '' }}>Bloqué / Suspendu</option>
 					</select>
 				</div>
 				<div class="field-actions">
@@ -59,7 +62,7 @@
 			</form>
 		</div>
 
-		{# --- LE TABLEAU REVISITÉ ET CONFORME AU MODELE --- #}
+		{# --- LE TABLEAU CONFORME AU MODELE TABLEAU APLETI --- #}
 		<div class="table-responsive-wrapper">
 			<table class="table table-scrollable table-striped js-datatable">
 				<thead>
@@ -81,6 +84,9 @@
 									<div class="meta">
 										<span class="full-name">
 											<strong>{{ agent.firstname }} {{ agent.lastname }}</strong>
+											{% if agent.isSelf %}
+												<span class="badge badge-info text-size-10">Moi</span>
+											{% endif %}
 										</span>
 									</div>
 								</div>
@@ -92,30 +98,22 @@
 								</div>
 							</td>
 							<td>
-								{# Correction : Accès via la relation d'objet branch du MCD #}
-								{% if agent.branch %}
-									<strong>{{ agent.branch.name }}</strong>
-									<br><small class="text-muted">#{{ agent.branch.code }}</small>
+								{# ✅ Correction de l'erreur : Utilisation des clés plates branchCode et branchName #}
+								{% if agent.branchCode %}
+									<strong>{{ agent.branchName }}</strong>
+									<br><small class="text-muted">#{{ agent.branchCode }}</small>
 								{% else %}
 									<span class="text-gray italic">Siège Central (Général)</span>
 								{% endif %}
 							</td>
 							<td>
-								{# Extraction propre du premier rôle métier du tableau (R RBAC de Symfony) #}
-								{% set mainRole = 'ROLE_USER' %}
-								{% for role in agent.roles %}
-									{% if role != 'ROLE_USER' %}
-										{% set mainRole = role %}
-									{% endif %}
-								{% endfor %}
-								
-								<span class="badge-role monospace text-size-12">
-									{{ mainRole }}
+								{# ✅ Correction de l'erreur : Récupération du rôle métier pré-traité par ton service #}
+								<span class="badge-role monospace text-size-12" title="{{ agent.role.description }}">
+									{{ agent.role.name }}
 								</span>
 							</td>
 							<td class="text-center monospace text-size-12">
-								{# Propriété optionnelle présente dans l'entité #}
-								{{ agent.lastLoginAt is defined and agent.lastLoginAt ? agent.lastLoginAt|date('d/m/Y H:i') : 'Jamais connecté' }}
+								{{ agent.lastLoginAt ? agent.lastLoginAt|date('d/m/Y H:i') : 'Jamais connecté' }}
 							</td>
 							<td class="text-center">
 								<span class="pill-user-account-status {{ agent.isActive ? 'active' : 'inactive' }}">
@@ -124,12 +122,15 @@
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									<a href="{{ path('admin_' ~ app.user.userType.value ~ '_agent_show', {'code': agent.code}) }}" class="action-link config" title="Détails sur l'agent">
+									<a href="{{ path(route_prefix ~ '_agent_show', {'code': agent.code}) }}" class="action-link config" title="Détails sur l'agent">
 										<i class="fa-solid fa-eye"></i>
 									</a>
-									<a href="{{ path('admin_' ~ app.user.userType.value ~ '_agent_edit', {'code': agent.code}) }}" class="action-link config" title="Modifier le compte">
-										<i class="fa-solid fa-user-pen"></i>
-									</a>
+									{# ✅ CORRECTION : Le bouton Edit réapparaît pour l'admin, sauf sur sa propre ligne (isSelf) #}
+									{% if is_granted('user.write') and not agent.isSelf %}
+										<a href="{{ path(route_prefix ~ '_agent_edit', {'code': agent.code}) }}" class="action-link config" title="Modifier le compte">
+											<i class="fa-solid fa-user-pen"></i>
+										</a>
+									{% endif %}
 								</div>
 							</td>
 						</tr>

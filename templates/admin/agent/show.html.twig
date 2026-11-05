@@ -11,8 +11,8 @@
         {# --- EN-TÊTE DU PROFIL DYNAMIQUE --- #}
         <header class="header-refined mb-25">
             <div class="header-main-info">
-                {% set indexUrl = agent.userType == 'platform' ? path('admin_platform_agent_index') : path('admin_agency_agent_index') %}
-                <a href="{{ indexUrl }}" class="agency-back-action">
+                {# ✅ Correction : Utilisation de la variable globale `route_prefix` passée par le contrôleur #}
+                <a href="{{ path(route_prefix ~ '_agent_index') }}" class="agency-back-action">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
                 <div class="title">
@@ -23,18 +23,10 @@
                         <span class="text-gray text-size-13">Poste actuel</span>
                         <span class="arrow-divider">•</span>
                     
-                        {# Extraction du nom du rôle actif depuis la table 5. UserRole du MCD #}
-                        {% set currentRoleName = 'Aucun rôle assigné' %}
-                        {% if agent.userRoles is defined and agent.userRoles|length > 0 %}
-                            {% for userRole in agent.userRoles %}
-                                {# Si le rôle n'est pas révoqué, c'est le poste actuel #}
-                                {% if userRole.revokedAt is null %}
-                                    {% set currentRoleName = userRole.role.name %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    
-                        <span class="text-primary text-size-13 text-highlight">{{ currentRoleName|upper }}</span>
+                        {# ✅ Correction : Récupération du rôle actif pré-traité par le service #}
+                        <span class="text-primary text-size-13 text-highlight">
+                            {{ agent.role.name|upper }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -64,7 +56,7 @@
                     </div>
                 </div>
 
-                {# HISTORIQUE ISSU DE LA TABLE 5. USERROLE (MCD) #}
+                {# HISTORIQUE DES ATTRIBUTIONS (MCD : USERROLE) #}
                 <div class="table-responsive-wrapper my-20">
                     <h2 class="card-title-fix text-size-13 py-10">
                         <i class="fa-solid fa-history text-primary"></i>
@@ -81,35 +73,30 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% set userRoles = agent.userRoles is defined ? agent.userRoles : [] %}
-                            {% for userRole in userRoles %}
+                            {# ✅ Correction : Lecture du tableau `career_history` configuré par ton service #}
+                            {% for history in agent.career_history %}
                                 <tr>
-                                    {# Table 4. Role -> name #}
-                                    <td><strong>{{ userRole.role.name }}</strong></td>
-                                    {# Relation branch(nullable) de UserRole #}
-                                    <td>{{ userRole.branch ? userRole.branch.name : 'Siège Central (Général)' }}</td>
-                                    {# assignedAt de UserRole #}
-                                    <td>{{ userRole.assignedAt|date('d/m/Y') }}</td>
+                                    <td><strong>{{ history.roleName }}</strong></td>
+                                    <td>{{ history.branchName ?: 'Siège Central (Général)' }}</td>
+                                    <td>{{ history.assignedAt|date('d/m/Y') }}</td>
                                     <td>
-                                        {# RevokedAt de UserRole #}
-                                        {% if userRole.revokedAt %}
-                                            <span class="pill-branch-status inactive">{{ userRole.revokedAt|date('d/m/Y') }}</span>
+                                        {% if history.revokedAt %}
+                                            <span class="pill-branch-status inactive">{{ history.revokedAt|date('d/m/Y') }}</span>
                                         {% else %}
                                             <span class="pill-branch-status active">Actuel</span>
                                         {% endif %}
                                     </td>
                                     <td class="text-right text-gray text-size-12">
-                                        {# AssignedBy et revokedBy de UserRole #}
-                                        <small>Par : {{ userRole.assignedBy ? userRole.assignedBy.firstname : 'Système' }}</small>
-                                        {% if userRole.revokedBy %}
-                                            <br><small>Clos par : {{ userRole.revokedBy.firstname }}</small>
+                                        <small>Par : {{ history.assignedBy ?: 'Système' }}</small>
+                                        {% if history.revokedBy %}
+                                            <br><small>Clos par : {{ history.revokedBy }}</small>
                                         {% endif %}
                                     </td>
                                 </tr>
                             {% else %}
                                 <tr>
                                     <td colspan="5" class="text-center text-gray italic padding-20">
-                                        Aucun historique d'affectation enregistré pour cet utilisateur dans la table UserRole.
+                                        Aucun historique d'affectation enregistré pour cet utilisateur.
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -128,9 +115,9 @@
                     <div class="current-status-box mb-15">
                         <span class="label">Connexion :</span>
                         <strong class="status-text">
-                            <span class="{{ agent.isOnline is defined and agent.isOnline ? 'active' : 'inactive' }}">
+                            <span class="{{ agent.isOnline ? 'active' : 'inactive' }}">
                                 <i class="fa-solid fa-globe"></i>
-                                {{ agent.isOnline is defined and agent.isOnline ? 'EN LIGNE' : 'HORS LIGNE' }}
+                                {{ agent.isOnline ? 'EN LIGNE' : 'HORS LIGNE' }}
                             </span>
                         </strong>
                     </div>
@@ -149,13 +136,6 @@
                                 </span>
                             {% endif %}
                         </strong>
-                    </div>
-                    <hr class="section-divider mb-15">
-                    <div class="notice-box-info">
-                        <p>
-                            <i class="fa-solid fa-circle-info"></i>
-                            Ce registre historique basé sur la table de sécurité **UserRole** audite les habilitations et la responsabilité financière des caisses de chaque guichet.
-                        </p>
                     </div>
                 </div>
             </aside>

@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 final class SystemActor
 {
-    private const SYSTEM_EMAIL = 'system@mydigitrans.com';
+    public const EMAIL = 'system@mydigitrans.com';
     private ?User $systemUser = null;
 
     public function __construct(
@@ -32,7 +32,7 @@ final class SystemActor
         }
 
         $repo = $this->em->getRepository(User::class);
-        $user = $repo->findOneBy(['email' => self::SYSTEM_EMAIL]);
+        $user = $repo->findOneBy(['email' => self::EMAIL]);
 
         if ($user instanceof User) {
             $this->systemUser = $user;
@@ -43,7 +43,7 @@ final class SystemActor
         $user = (new User())
             ->setFirstname('Système')
             ->setLastname('MyDigitrans')
-            ->setEmail(self::SYSTEM_EMAIL)
+            ->setEmail(self::EMAIL)
             ->setPhone('+243000000000')
             ->setUserType(UserType::Platform) // Il appartient à la plateforme
             ->setCode('USR-SYSTEM-ROBOT')

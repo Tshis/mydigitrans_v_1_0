@@ -33,17 +33,17 @@ class AgentType extends AbstractType
     {
         $builder
             ->add('firstname', TextType::class, [
-                'label' => 'Prénom (firstname) *',
+                'label' => 'Prénom *',
                 'label_attr' => self::LABEL,
                 'attr' => ['class' => self::INPUT, 'placeholder' => 'Ex: Jean', 'maxlength' => 100, 'autocomplete' => 'off'],
             ])
             ->add('lastname', TextType::class, [
-                'label' => 'Nom (lastname) *',
+                'label' => 'Nom *',
                 'label_attr' => self::LABEL,
                 'attr' => ['class' => self::INPUT, 'placeholder' => 'Ex: Mukendi', 'maxlength' => 100, 'autocomplete' => 'off'],
             ])
             ->add('email', EmailType::class, [
-                'label' => 'Adresse Email (Identifiant de connexion) *',
+                'label' => 'Adresse Email *',
                 'label_attr' => self::LABEL,
                 'attr' => ['class' => self::INPUT, 'placeholder' => 'j.mukendi@exemple.com', 'maxlength' => 180, 'autocomplete' => 'off'],
             ])
@@ -53,20 +53,25 @@ class AgentType extends AbstractType
                 'attr' => ['class' => self::INPUT . ' font-bold', 'placeholder' => '+243...', 'maxlength' => 20],
             ]);
 
-        if (!$options['is_edit']) {
-            $builder->add('password', PasswordType::class, [
-                'label' => 'Mot de passe initial *',
-                'label_attr' => self::LABEL,
-                'attr' => ['class' => self::INPUT, 'placeholder' => '••••••••', 'autocomplete' => 'new-password'],
-            ]);
-        }
+        // src/Form/AgentType.php -> dans la méthode buildForm()
 
+        // Le champ est toujours présent, mais requis uniquement à la création
+        $builder->add('password', PasswordType::class, [
+            'label' => $options['is_edit'] ? 'Nouveau mot de passe (laisser vide pour inchangé)' : 'Mot de passe initial *',
+            'label_attr' => self::LABEL,
+            'required' => !$options['is_edit'], // Obligatoire seulement si c'est un nouveau compte
+            'attr' => [
+                'class' => self::INPUT,
+                'placeholder' => $options['is_edit'] ? 'Laisser vide si inchangé' : '••••••••',
+                'autocomplete' => 'new-password'
+            ],
+        ]);
+
+        // Si on est dans le Scope Agence, on affiche les succursales
         if ($options['with_branch']) {
             $branches = [];
-            /** @var \App\Entity\Branch $branch */
             foreach ($options['branches'] as $branch) {
-                // Utilisation des getters de l'objet Branch issu de la BDD
-                $branches[sprintf('%s (#%s)', $branch->getName(), $branch->getCode())] = $branch->getCode();
+                $branches[sprintf('%s (#%s)', $branch['name'], $branch['code'])] = $branch['code'];
             }
 
             $builder->add('branch_code', ChoiceType::class, [
@@ -80,26 +85,29 @@ class AgentType extends AbstractType
             ]);
         }
 
+        // Chargement des rôles
         $rolesChoices = [];
         $descriptions = [];
-        /** @var \App\Entity\Role $role */
         foreach ($options['roles'] as $role) {
-            // Utilisation des getters de l'objet Role issu de la BDD
-            $rolesChoices[$role->getName()] = $role->getCode();
-            $descriptions[$role->getCode()] = $role->getDescription();
+            $rolesChoices[$role['name']] = $role['code'];
+            $descriptions[$role['code']] = $role['description'];
         }
 
         $builder->add('role_code', ChoiceType::class, [
             'property_path' => 'roleCode',
-            'label' => 'Fonction (rôle système) *',
+            'label' => 'Fonction *',
             'label_attr' => self::LABEL,
             'choices' => $rolesChoices,
-            'choice_attr' => static fn(string $code): array => ['title' => $descriptions[$code] ?? ''],
+            'choice_attr' => static fn(?string $code): array => ['title' => $descriptions[$code] ?? ''],
             'placeholder' => '-- Choisir une fonction --',
             'attr' => ['class' => self::SELECT],
         ]);
 
-        if ($this->security->isGranted('ROLE_AGENCY_ADMIN')) {
+        // ✅ CORRECTION DU STATUT : Affichage garanti si autorisé par le contrôleur
+        // OU si l'acteur connecté possède un rôle de hiérarchie d'agence
+        $isAgencyManager = $this->security->isGranted('ROLE_AGENCY_ADMIN') || $this->security->isGranted('ROLE_GENERAL_MANAGER');
+
+        if ($options['can_activate'] || $isAgencyManager) {
             $builder->add('is_active', ChoiceType::class, [
                 'property_path' => 'isActive',
                 'label' => 'État du compte',
@@ -118,6 +126,8 @@ class AgentType extends AbstractType
             'is_edit' => false,
             'with_branch' => true,
             'can_choose_general' => true,
+            'can_activate' => false,
+            'identity_only' => false,
             'branches' => [],
             'roles' => [],
             'validation_groups' => static fn(FormInterface $form): array => $form->getConfig()->getOption('is_edit') ? ['Default'] : ['Default', 'create'],
@@ -127,6 +137,8 @@ class AgentType extends AbstractType
             ->setAllowedTypes('is_edit', 'bool')
             ->setAllowedTypes('with_branch', 'bool')
             ->setAllowedTypes('can_choose_general', 'bool')
+            ->setAllowedTypes('can_activate', 'bool')
+            ->setAllowedTypes('identity_only', 'bool')
             ->setAllowedTypes('branches', 'array')
             ->setAllowedTypes('roles', 'array');
     }

@@ -3,10 +3,13 @@
 
 {% block body %}
 	<div class="admin-agency-user-form-scope container">
+		{# ✅ ÉTAPE 1 : On ouvre le formulaire tout en haut pour englober le header et ses actions #}
+		{{ form_start(form, {'attr': {'class': 'user-form-layout'}}) }}
+		
 		{# --- HEADER DYNAMIQUE --- #}
 		<header class="header mb-25">
 			<div class="header-main-info">
-				<a href="{{ path('admin_agency_agent_index') }}" class="agency-back-action">
+				<a href="{{ path(route_prefix ~ '_agent_index') }}" class="agency-back-action">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
@@ -21,126 +24,131 @@
 				</div>
 			</div>
 			<div class="header-actions">
-				<button type="submit" form="user-master-form" class="btn-refined btn-success-gradient">
+				{# ✅ ÉTAPE 2 : Un bouton submit HTML classique, sans JS, sans attribut form, entièrement natif #}
+				<button type="submit" class="btn-refined btn-success-gradient">
 					<i class="fa-solid {{ isEdit ? 'fa-user-check' : 'fa-user-plus' }}"></i>
 					<span>{{ isEdit ? 'Enregistrer les modifications' : 'Déployer le compte' }}</span>
 				</button>
 			</div>
 		</header>
 
-		{# --- FORMULAIRE UNIQUE MULTI-RÔLES UNIQUE --- #}
-		{{ form_start(form, {'id': 'user-master-form', 'attr': {'class': 'user-form-layout'}}) }}
-			<div class="user-container-grid">
+		<div class="user-container-grid">
 
-				{# COLONNE GAUCHE : IDENTITÉ & RATTACEMENT #}
-				<div class="main-form-panel">
+			{# COLONNE GAUCHE : IDENTITÉ & RATTACEMENT #}
+			<div class="main-form-panel">
 
-					{# CARD 1 : IDENTITÉ DE L'AGENT #}
-					<div class="card control-card mb-20">
-						<h2 class="card-title-fix">
-							<i class="fa-solid fa-id-card text-primary"></i>
-							Identité Civile de l'Agent
-						</h2>
+				{# CARD 1 : IDENTITÉ DE L'AGENT & RATTACEMENT RESEAU #}
+				<div class="card control-card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-id-card text-primary"></i>
+						Identité Civile de l'Agent
+					</h2>
 
-						{# Affichage des erreurs globales du formulaire si présentes #}
-						{{ form_errors(form) }}
-
-						<div class="direct-pricing-row mb-20">
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Prénom (firstname) *</label>
-								{{ form_widget(form.firstname, {'attr': {'class': 'admin-bus-layout-add-input', 'placeholder': 'Ex: Antoinette'}}) }}
-								{{ form_errors(form.firstname) }}
-							</div>
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Nom de famille (lastname) *</label>
-								{{ form_widget(form.lastname, {'attr': {'class': 'admin-bus-layout-add-input', 'placeholder': 'Ex: Mputu'}}) }}
-								{{ form_errors(form.lastname) }}
-							</div>
+					{# Affichage des erreurs globales du formulaire si présentes #}
+					{% if not form.vars.valid %}
+						<div class="alert alert-danger mb-20 p-10 text-size-12 radius-4">
+							<i class="fa-solid fa-triangle-exclamation"></i>
+							<strong>Erreur :</strong> Impossible de soumettre le formulaire. Vérifiez les champs ci-dessous.
+							{{ form_errors(form) }}
 						</div>
+					{% endif %}
 
-						<div class="direct-pricing-row">
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Adresse Email Professionnelle *</label>
-								{{ form_widget(form.email, {'attr': {'class': 'admin-bus-layout-add-input', 'placeholder': 'Ex: a.mputu@mydigitrans.cd'}}) }}
-								{{ form_errors(form.email) }}
-							</div>
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Numéro de Téléphone mobile *</label>
-								{{ form_widget(form.phone, {'attr': {'class': 'admin-bus-layout-add-input font-bold', 'placeholder': 'Ex: +243 897 112 233'}}) }}
-								{{ form_errors(form.phone) }}
-							</div>
+					<div class="direct-pricing-row mb-20">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Prénom (firstname) *</label>
+							{{ form_widget(form.firstname, {'attr': {'class': 'admin-bus-layout-add-input', 'placeholder': 'Ex: Antoinette'}}) }}
+							{{ form_errors(form.firstname) }}
 						</div>
-
-						{# Le mot de passe n'est mappé que s'il existe dans le formulaire (Mode Création) #}
-						{% if form.password is defined %}
-							<div class="direct-pricing-row mt-20">
-								<div class="field">
-									<label class="admin-bus-layout-add-label">Mot de passe initial *</label>
-									{{ form_widget(form.password, {'attr': {'class': 'admin-bus-layout-add-input', 'placeholder': '••••••••'}}) }}
-									{{ form_errors(form.password) }}
-								</div>
-							</div>
-						{% endif %}
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Nom de famille (lastname) *</label>
+							{{ form_widget(form.lastname, {'attr': {'class': 'admin-bus-layout-add-input', 'placeholder': 'Ex: Mputu'}}) }}
+							{{ form_errors(form.lastname) }}
+						</div>
 					</div>
 
-					{# CARD 2 : PIVOT RATTACEMENT MULTI-TENANT #}
-					{% if form.branchCode is defined %}
-						<div class="card control-card success-accent">
-							<h2 class="card-title-fix">
-								<i class="fa-solid fa-circle-nodes text-success"></i>
-								Périmètre d'Affectation Réseau
-							</h2>
+					<div class="direct-pricing-row">
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Adresse Email Professionnelle *</label>
+							{{ form_widget(form.email, {'attr': {'class': 'admin-bus-layout-add-input', 'placeholder': 'Ex: a.mputu@mydigitrans.cd'}}) }}
+							{{ form_errors(form.email) }}
+						</div>
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Numéro de Téléphone mobile *</label>
+							{{ form_widget(form.phone, {'attr': {'class': 'admin-bus-layout-add-input font-bold', 'placeholder': 'Ex: +243 897 112 233'}}) }}
+							{{ form_errors(form.phone) }}
+						</div>
+					</div>
 
-							<div class="direct-pricing-row">
-								<div class="field">
-									<label class="admin-bus-layout-add-label">Succursale d'affectation *</label>
-									{{ form_widget(form.branch_code, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
-									{{ form_errors(form.branch_code) }}
-								</div>
+					{# Le mot de passe n'est mappé que s'il existe dans le formulaire (Mode Création) #}
+					{% if form.password is defined %}
+						<div class="direct-pricing-row mt-20">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Mot de passe initial *</label>
+								{{ form_widget(form.password, {'attr': {'class': 'admin-bus-layout-add-input', 'placeholder': '••••••••'}}) }}
+								{{ form_errors(form.password) }}
 							</div>
 						</div>
 					{% endif %}
+
+					{# Affichage du champ succursale au sein de la carte UNIQUEMENT pour la portée d'agence #}
+					{% if is_agency_scope and form.branch_code is defined %}
+						<hr class="section-divider my-20">
+						<h3 class="text-size-14 text-dark mb-15">
+							<i class="fa-solid fa-circle-nodes text-success"></i>
+							Périmètre d'Affectation Réseau
+						</h3>
+						<div class="direct-pricing-row">
+							<div class="field">
+								<label class="admin-bus-layout-add-label">Succursale d'affectation</label>
+								{{ form_widget(form.branch_code, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+								{{ form_errors(form.branch_code) }}
+							</div>
+						</div>
+					{% endif %}
+					
+				</div>
+			</div>
+
+			{# COLONNE DROITE : ATTRIBUTION DES RÔLES & STATUT DU COMPTE #}
+			<aside class="sidebar-action-panel">
+
+				{# COMPOSANT RBAC : SÉLECTION DES RÔLES #}
+				<div class="card control-card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-user-shield text-primary"></i>
+						Fonction & Habilitations
+					</h2>
+					<div class="field">
+						<label class="admin-bus-layout-add-label">Attribuer une Fonction ou un poste *</label>
+						{{ form_widget(form.role_code, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+						{{ form_errors(form.role_code) }}
+					</div>
 				</div>
 
-				{# COLONNE DROITE : ATTRIBUTION DES RÔLES & STATUT DU COMPTE #}
-				<aside class="sidebar-action-panel">
-
-					{# COMPOSANT RBAC : SÉLECTION DES RÔLES #}
-					<div class="card control-card mb-20">
-						<h2 class="card-title-fix">
-							<i class="fa-solid fa-user-shield text-primary"></i>
-							Fonction & Habilitations
-						</h2>
-						<div class="field">
-							<label class="admin-bus-layout-add-label">Attribuer une Fonction ou un poste *</label>
-							{{ form_widget(form.role_code, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
-							{{ form_errors(form.role_code) }}
-						</div>
+				{# BLOC ACTIVATION COMPTE #}
+				<div class="card sticky-aside-card">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-sliders text-gray"></i>
+						État du Compte</h2>
+					<div class="field mb-20">
+						<label class="admin-bus-layout-add-label">Autoriser la connexion</label>
+						{% if form.is_active is defined %}
+							{{ form_widget(form.is_active, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+							{{ form_errors(form.is_active) }}
+						{% endif %}
 					</div>
-
-					{# BLOC ACTIVATION COMPTE #}
-					<div class="card sticky-aside-card">
-						<h2 class="card-title-fix">
-							<i class="fa-solid fa-sliders text-gray"></i>
-							État du Compte</h2>
-						<div class="field mb-20">
-							<label class="admin-bus-layout-add-label">Autoriser la connexion</label>
-							{% if form.is_active is defined %} {# Recommandé de vérifier car soumis à condition de rôle #}
-								{{ form_widget(form.is_active, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
-								{{ form_errors(form.is_active) }}
-							{% endif %}
-						</div>
-						<hr class="section-divider my-15">
-						<div class="notice-box-info">
-							<p>
-								<i class="fa-solid fa-bolt"></i>
-								Les permissions (<strong>Permission</strong>) associées à ce rôle s'appliqueront automatiquement à l'agent lors de sa prochaine authentification.
-							</p>
-						</div>
+					<hr class="section-divider my-15">
+					<div class="notice-box-info">
+						<p>
+							<i class="fa-solid fa-bolt"></i>
+							Les permissions (<strong>Permission</strong>) associées à ce rôle s'appliqueront automatiquement à l'agent lors de sa prochaine authentification.
+						</p>
 					</div>
-				</aside>
+				</div>
+			</aside>
 
-			</div>
+		</div>
+		
 		{# Permet d'inclure le token CSRF généré par Symfony automatiquement #}
 		{{ form_end(form) }}
 	</div>
