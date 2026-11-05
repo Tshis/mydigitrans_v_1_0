@@ -263,6 +263,12 @@ final class UserManagementService
                 ->setPhone($this->normalizePhone((string) $data->phone))
                 ->setEmail($email);
 
+            // ✅ AJOUT : Si l'administrateur a saisi un nouveau mot de passe, on le écrase
+            if (null !== $data->password && '' !== trim((string) $data->password)) {
+                $agent->setPassword($this->passwordHasher->hashPassword($agent, (string) $data->password));
+            }
+
+
             if ($isSelf) {
                 return;
             }
