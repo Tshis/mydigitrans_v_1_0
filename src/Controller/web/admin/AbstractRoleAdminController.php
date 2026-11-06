@@ -6,7 +6,6 @@ namespace App\Controller\web\admin;
 
 use App\Entity\Role;
 use App\Entity\RolePermission;
-use App\Entity\User;
 use App\Enum\Scope;
 use App\Repository\PermissionRepository;
 use App\Security\AccessCatalog;
@@ -25,8 +24,13 @@ abstract class AbstractRoleAdminController extends AbstractController
     protected function listAction(RoleDirectory $roleDirectory): Response
     {
         $scope = $this->scope();
-        $roles = $roleDirectory->rolesOf($scope);
+        $user = $this->getUser();
+        if (!$user instanceof \App\Entity\User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $isAgency = (Scope::Agency === $scope);
+        $roles = $roleDirectory->rolesOf($scope, $isAgency ? $user->getAgency() : null);
 
         return $this->render('admin/role/index.html.twig', [
             'page'        => 'job title',
@@ -42,12 +46,26 @@ abstract class AbstractRoleAdminController extends AbstractController
     {
         $this->denyAccessUnlessGranted(RoleVoter::VIEW, $role);
         $scope = $this->scope();
+        $user = $this->getUser();
+        if (!$user instanceof \App\Entity\User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $isAgency = (Scope::Agency === $scope);
 
-        $rolePermissions = $em->getRepository(RolePermission::class)->findBy([
-            'role'      => $role,
-            'revokedAt' => null
-        ]);
+        $qb = $em->getRepository(RolePermission::class)->createQueryBuilder('rp')
+            ->andWhere('rp.role = :role')
+            ->andWhere('rp.revokedAt IS NULL')
+            ->setParameter('role', $role);
+
+        if ($isAgency) {
+            $qb->andWhere('rp.agency IS NULL OR rp.agency = :agency')
+                ->setParameter('agency', $user->getAgency());
+        } else {
+            $qb->andWhere('rp.agency IS NULL');
+        }
+
+        $rolePermissions = $qb->getQuery()->getResult();
 
         $groups = [];
         foreach ($rolePermissions as $rp) {
@@ -86,13 +104,12 @@ abstract class AbstractRoleAdminController extends AbstractController
         EntityManagerInterface $em,
         ?Role $role = null
     ): Response {
-
+        $isEdit = ($role !== null);
         $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException('Utilisateur non connecté ou invalide.');
+        if (!$user instanceof \App\Entity\User) {
+            throw $this->createAccessDeniedException();
         }
 
-        $isEdit = ($role !== null);
         $scope = $this->scope();
         $isAgency = (Scope::Agency === $scope);
 
@@ -129,9 +146,12 @@ abstract class AbstractRoleAdminController extends AbstractController
             $allowedAccessModes = ['none', 'read', 'write', 'read_write'];
 
             if ($isEdit) {
+                // Pour l'agence, on nettoie uniquement les lignes spécifiques de cette agence lors d'une modification locale
                 $criteria = ['role' => $role];
                 if ($isAgency) {
                     $criteria['agency'] = $user->getAgency();
+                } else {
+                    $criteria['agency'] = null;
                 }
                 $oldPermissions = $em->getRepository(RolePermission::class)->findBy($criteria);
                 foreach ($oldPermissions as $oldPerm) {
@@ -170,9 +190,7 @@ abstract class AbstractRoleAdminController extends AbstractController
                         $rolePermission = new RolePermission();
                         $rolePermission->setRole($role);
                         $rolePermission->setPermission($permission);
-
-                        // 🟢 FIX NOT NULL : Hydratation obligatoire de l'utilisateur affectant l'habilitation
-                        $rolePermission->setAssignedBy($user); //
+                        $rolePermission->setAssignedBy($user);
 
                         if ($isAgency) {
                             $rolePermission->setAgency($user->getAgency());
@@ -213,13 +231,21 @@ abstract class AbstractRoleAdminController extends AbstractController
             }
 
             if ($isEdit) {
-                $criteria = ['role' => $role, 'permission' => $perm];
+                // 🟢 LE FIX CRUCIAL : On cherche si le lien existe globalement (NULL) OU au niveau de l'agence connectée
+                $qbCheck = $em->getRepository(RolePermission::class)->createQueryBuilder('rp')
+                    ->andWhere('rp.role = :role')
+                    ->andWhere('rp.permission = :perm')
+                    ->andWhere('rp.revokedAt IS NULL')
+                    ->setParameter('role', $role)
+                    ->setParameter('perm', $perm);
                 if ($isAgency) {
-                    $criteria['agency'] = $user->getAgency();
+                    $qbCheck->andWhere('rp.agency IS NULL OR rp.agency = :agency')
+                        ->setParameter('agency', $user->getAgency());
+                } else {
+                    $qbCheck->andWhere('rp.agency IS NULL');
                 }
-                $hasLink = $em->getRepository(RolePermission::class)->findOneBy($criteria);
-
-                if ($hasLink) {
+                $hasLink = $qbCheck->setMaxResults(1)->getQuery()->getOneOrNullResult();
+                if ($hasLink !== null) {
                     $code = strtolower((string) $perm->getCode());
                     if (str_contains($code, 'view') || str_contains($code, 'index') || str_contains($code, 'show') || str_contains($code, 'read')) {
                         $matrixRows[$moduleKey]['has_view'] = true;
@@ -230,7 +256,6 @@ abstract class AbstractRoleAdminController extends AbstractController
                 }
             }
         }
-
         foreach ($matrixRows as $key => $row) {
             if ($row['has_view'] && $row['has_write']) {
                 $matrixRows[$key]['value'] = 'read_write';

@@ -186,8 +186,6 @@ final class UserManagementService
 
     // ------------------------------------------------------------------ BLOC 3 : ÉCRITURE & MUTATIONS
 
-        // ------------------------------------------------------------------ BLOC 3 : ÉCRITURE & MUTATIONS
-
     /**
      * @throws AgentManagementException
      */
@@ -228,7 +226,7 @@ final class UserManagementService
 
             return $agent;
         });
-    }
+    }//create
 
     /**
      * @throws AgentManagementException
@@ -284,7 +282,7 @@ final class UserManagementService
                 $this->assign($agent, $role, $branch, $actor);
             }
         });
-    }
+    } //update
 
 
     // ------------------------------------------------------------------ BLOC 4 : UTILITAIRES INTERNES

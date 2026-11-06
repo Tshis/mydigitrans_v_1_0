@@ -37,22 +37,23 @@ final class RoleVoter extends Voter
         $userScopeStr = PermissionResolver::scopeOf($user)->value;
         $roleScopeStr = $role->getScope() instanceof Scope ? $role->getScope()->value : (string) $role->getScope();
 
-        // 🟢 ACCÈS MAÎTRE AUTOMATIQUE : Si l'utilisateur est de portée Plateforme (SuperAdmin / Admin Système)
+        // 1. Périmètre Plateforme (SuperAdmin / Admin Système)
         if (Scope::Platform->value === $userScopeStr || $user->getUserType() === 'platform') {
             return Scope::Platform->value === $roleScopeStr;
         }
 
-        // 2. Un gérant d'Agence gère uniquement la portée Agence
+        // 2. Périmètre Agence (Gérants)
         if (Scope::Agency->value === $userScopeStr || $user->getUserType() === 'agency') {
             if (Scope::Agency->value !== $roleScopeStr) {
                 return false;
             }
 
-            // Si c'est l'administrateur principal de l'agence, on évite le blocage
+            // 🛑 RESTRICTION MAXIMALE : Seul l'Admin racine de l'agence (sans compte parent) peut créer/modifier des fonctions
             if ($attribute === self::EDIT) {
-                return $this->permissionResolver->has($user, 'MANAGE_AGENCY_ROLES') || $user->getParent() === null;
+                return $user->getParent() === null;
             }
 
+            // La consultation simple (VIEW) reste autorisée pour les autres agents de la succursale
             return true;
         }
 

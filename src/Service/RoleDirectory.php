@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\Agency;
 use App\Entity\Role;
 use App\Entity\RolePermission;
 use App\Enum\Scope;
 use App\Security\AccessCatalog;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Consultation des rôles du système (lecture seule) : liste d'une portée et permissions d'un rôle.
+ */
 final class RoleDirectory
 {
     public function __construct(private readonly EntityManagerInterface $em) {}
@@ -17,7 +22,7 @@ final class RoleDirectory
     /**
      * @return list<array{id: int, name: string, code: string, description: string, scope: string, isActive: bool, permissions_count: int}>
      */
-    public function rolesOf(Scope $scope): array
+    public function rolesOf(Scope $scope, ?Agency $currentAgency = null): array
     {
         /** @var list<Role> $roles */
         $roles = $this->em->createQueryBuilder()
@@ -34,28 +39,39 @@ final class RoleDirectory
             ->getResult();
 
         $counts = [];
-        foreach (
-            $this->em->createQueryBuilder()
-                ->select('IDENTITY(rp.role) AS roleId', 'COUNT(rp.id) AS total')
-                ->from(RolePermission::class, 'rp')
-                ->andWhere('rp.revokedAt IS NULL')
-                ->andWhere('rp.agency IS NULL')
-                ->groupBy('rp.role')
-                ->getQuery()
-                ->getArrayResult() as $row
-        ) {
+
+        /** @var QueryBuilder $qbCounts */
+        $qbCounts = $this->em->createQueryBuilder()
+            ->select('IDENTITY(rp.role) AS roleId', 'COUNT(rp.id) AS total')
+            ->from(RolePermission::class, 'rp')
+            ->andWhere('rp.revokedAt IS NULL');
+
+        // 🟢 FIX : On compte les permissions globales (NULL) OU celles surchargées pour cette agence spécifique
+        if (Scope::Agency === $scope && $currentAgency !== null) {
+            $qbCounts->andWhere('rp.agency IS NULL OR rp.agency = :agency')
+                ->setParameter('agency', $currentAgency);
+        } else {
+            $qbCounts->andWhere('rp.agency IS NULL');
+        }
+
+        foreach ($qbCounts->groupBy('rp.role')->getQuery()->getArrayResult() as $row) {
             $counts[(int) $row['roleId']] = (int) $row['total'];
         }
 
-        return array_map(static fn(Role $r): array => [
-            'id'                => (int) $r->getId(),
-            'name'              => (string) $r->getName(),
-            'code'              => (string) $r->getCode(),
-            'description'       => (string) $r->getDescription(),
-            'scope'             => $r->getScope() instanceof Scope ? $r->getScope()->value : (string) $r->getScope(),
-            'isActive'          => $r->isActive(),
-            'permissions_count' => $counts[(int) $r->getId()] ?? 0,
-        ], $roles);
+        return array_map(static function (Role $r) use ($counts): array {
+            $scopeEnum = $r->getScope();
+            $scopeStr = $scopeEnum instanceof Scope ? $scopeEnum->value : (string) $scopeEnum;
+
+            return [
+                'id'                => (int) $r->getId(),
+                'name'              => (string) $r->getName(),
+                'code'              => (string) $r->getCode(),
+                'description'       => (string) $r->getDescription(),
+                'scope'             => $scopeStr,
+                'isActive'          => $r->isActive(),
+                'permissions_count' => $counts[(int) $r->getId()] ?? 0,
+            ];
+        }, $roles);
     }
 
     public function find(Scope $scope, string $code): ?Role
@@ -72,7 +88,6 @@ final class RoleDirectory
             ->join('rp.permission', 'p')
             ->andWhere('IDENTITY(rp.role) = :role')
             ->andWhere('rp.revokedAt IS NULL')
-            ->andWhere('rp.agency IS NULL')
             ->andWhere('p.scope = :scope')
             ->setParameter('role', $role->getId())
             ->setParameter('scope', $role->getScope() instanceof Scope ? $role->getScope()->value : (string) $role->getScope())
