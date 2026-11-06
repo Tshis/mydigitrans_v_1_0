@@ -1,4 +1,4 @@
-{# templates/admin/agency/role/index.html.twig #}
+{# templates/admin/role/index.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
@@ -7,9 +7,7 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-role-index-scope container">
-		{# --- HEADER DE LA CONSOLE --- #}
+	<div class="admin-agency-role-index-scope container">
 		<header class="header-refined mb-30">
 			<div class="header-left">
 				<div class="breadcrumb-mini">
@@ -17,58 +15,59 @@
 					<i class="fa-solid fa-chevron-right"></i>
 					<strong>Postes & Fonctions</strong>
 				</div>
-				<h1>Structure des Postes</h1>
+				<h1>Structure des Postes ({{ isAgency ? 'Agence' : 'Plateforme' }})</h1>
 				<p class="subtitle">Définissez les fonctions de votre personnel et configurez leurs accès granulaires.</p>
 			</div>
 			<div class="header-right">
-				<a href="{{ path('admin_agency_role_add') }}" class="btn-refined btn-primary-gradient">
+				<a href="{{ path(add_route) }}" class="btn-refined btn-primary-gradient">
 					<i class="fa-solid fa-plus-circle"></i>
 					<span>Créer une fonction</span>
 				</a>
 			</div>
 		</header>
 
-		{# --- LE TABLEAU STRICT ET CONFORME (TA STRUCTURE TEXTUELLE REPRISE) --- #}
 		<div class="table-responsive-wrapper">
 			<table class="table table-scrollable table-striped js-datatable">
 				<thead>
 					<tr>
 						<th>Intitulé de la fonction</th>
 						<th>Description du Poste</th>
-						<th class="text-center">Status</th>
+						<th class="text-center">Permissions</th>
+						<th class="text-center">Statut</th>
 						<th class="text-right">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for role in roles %}
+					{% for r in roles %}
 						<tr>
 							<td>
 								<div class="job-title-cell">
 									<i class="fa-solid fa-briefcase text-gray"></i>
-									<strong>{{ role.name }}</strong>
+									<strong>{{ r.name }}</strong>
 								</div>
 							</td>
 							<td>
-								{{ role.description|default('Aucune description métier enregistrée.') }}
+								{{ r.description|default('Aucune description métier enregistrée.') }}
 							</td>
 							<td class="text-center">
-								<span class="pill-role-status {{ role.isActive ? 'active' : 'inactive' }}">
-									{{ role.isActive ? 'Actif' : 'Désactivé' }}
+								<span class="badge bg-secondary">{{ r.permissions_count }} actives</span>
+							</td>
+							<td class="text-center">
+								<span class="pill-role-status {{ r.isActive ? 'active' : 'inactive' }}">
+									{{ r.isActive ? 'Actif' : 'Désactivé' }}
 								</span>
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									{% if role.scope == 'agency' %}
-										<a href="{{ path('admin_agency_role_edit', {code: role.code}) }}" class="action-link config" title="Modifier l'intitulé et les droits">
-											<i class="fa-solid fa-user-gear"></i>
-										</a>
-									{% endif %}
+									<a href="{{ path(edit_route, {id: r.id}) }}" class="action-link config" title="Modifier l'intitulé et les droits">
+										<i class="fa-solid fa-user-gear"></i>
+									</a>
 								</div>
 							</td>
 						</tr>
 					{% else %}
 						<tr>
-							<td colspan="6" class="text-center text-gray italic padding-20">
+							<td colspan="5" class="text-center text-gray italic padding-20">
 								Aucune fonction configurée pour le moment.
 							</td>
 						</tr>

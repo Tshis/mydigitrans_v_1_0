@@ -10,17 +10,12 @@ use App\Enum\Scope;
 use App\Security\AccessCatalog;
 use Doctrine\ORM\EntityManagerInterface;
 
-/**
- * Consultation des rôles du système (lecture seule) : liste d'une portée et permissions d'un rôle.
- */
 final class RoleDirectory
 {
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
-    }
+    public function __construct(private readonly EntityManagerInterface $em) {}
 
     /**
-     * @return list<array{name: string, code: string, description: string, scope: string, isActive: bool, permissions_count: int}>
+     * @return list<array{id: int, name: string, code: string, description: string, scope: string, isActive: bool, permissions_count: int}>
      */
     public function rolesOf(Scope $scope): array
     {
@@ -29,45 +24,45 @@ final class RoleDirectory
             ->select('r')
             ->from(Role::class, 'r')
             ->andWhere('r.scope = :scope')
+            ->andWhere('r.code NOT IN (:excludedRoles)')
+            ->andWhere('r.code NOT LIKE :noAdmin')
             ->setParameter('scope', $scope->value)
+            ->setParameter('excludedRoles', ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'])
+            ->setParameter('noAdmin', '%_ADMIN%')
             ->orderBy('r.name', 'ASC')
             ->getQuery()
             ->getResult();
 
         $counts = [];
-        foreach ($this->em->createQueryBuilder()
-            ->select('IDENTITY(rp.role) AS roleId', 'COUNT(rp.id) AS total')
-            ->from(RolePermission::class, 'rp')
-            ->andWhere('rp.revokedAt IS NULL')
-            ->andWhere('rp.agency IS NULL')
-            ->groupBy('rp.role')
-            ->getQuery()
-            ->getArrayResult() as $row) {
+        foreach (
+            $this->em->createQueryBuilder()
+                ->select('IDENTITY(rp.role) AS roleId', 'COUNT(rp.id) AS total')
+                ->from(RolePermission::class, 'rp')
+                ->andWhere('rp.revokedAt IS NULL')
+                ->andWhere('rp.agency IS NULL')
+                ->groupBy('rp.role')
+                ->getQuery()
+                ->getArrayResult() as $row
+        ) {
             $counts[(int) $row['roleId']] = (int) $row['total'];
         }
 
-        return array_map(static fn (Role $r): array => [
-            'name' => (string) $r->getName(),
-            'code' => (string) $r->getCode(),
-            'description' => (string) $r->getDescription(),
-            'scope' => $r->getScope()->value,
-            'isActive' => $r->isActive(),
+        return array_map(static fn(Role $r): array => [
+            'id'                => (int) $r->getId(),
+            'name'              => (string) $r->getName(),
+            'code'              => (string) $r->getCode(),
+            'description'       => (string) $r->getDescription(),
+            'scope'             => $r->getScope() instanceof Scope ? $r->getScope()->value : (string) $r->getScope(),
+            'isActive'          => $r->isActive(),
             'permissions_count' => $counts[(int) $r->getId()] ?? 0,
         ], $roles);
     }
 
     public function find(Scope $scope, string $code): ?Role
     {
-        $role = $this->em->getRepository(Role::class)->findOneBy(['code' => $code, 'scope' => $scope]);
-
-        return $role instanceof Role ? $role : null;
+        return $this->em->getRepository(Role::class)->findOneBy(['code' => $code, 'scope' => $scope]);
     }
 
-    /**
-     * Permissions d'un rôle, regroupées par module.
-     *
-     * @return list<array{module: string, label: string, icon: string, permissions: list<array{code: string, name: string}>}>
-     */
     public function permissionsByModule(Role $role): array
     {
         /** @var list<RolePermission> $links */
@@ -80,14 +75,13 @@ final class RoleDirectory
             ->andWhere('rp.agency IS NULL')
             ->andWhere('p.scope = :scope')
             ->setParameter('role', $role->getId())
-            ->setParameter('scope', $role->getScope()->value)
+            ->setParameter('scope', $role->getScope() instanceof Scope ? $role->getScope()->value : (string) $role->getScope())
             ->orderBy('p.module', 'ASC')
             ->addOrderBy('p.code', 'ASC')
             ->getQuery()
             ->getResult();
 
         $groups = [];
-
         foreach ($links as $link) {
             $permission = $link->getPermission();
             $module = (string) $permission?->getModule();
