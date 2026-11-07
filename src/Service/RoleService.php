@@ -13,9 +13,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Consultation des rôles du système (lecture seule) : liste d'une portée et permissions d'un rôle.
+ * Service central de gestion et de consultation des rôles et des fonctions système.
  */
-final class RoleDirectory
+final class RoleService
 {
     public function __construct(private readonly EntityManagerInterface $em) {}
 
@@ -24,19 +24,27 @@ final class RoleDirectory
      */
     public function rolesOf(Scope $scope, ?Agency $currentAgency = null): array
     {
-        /** @var list<Role> $roles */
-        $roles = $this->em->createQueryBuilder()
+        $excludedSystemRoles = [AccessCatalog::SUPER_ADMIN, AccessCatalog::AGENCY_ADMIN];
+
+        $qb = $this->em->createQueryBuilder()
             ->select('r')
             ->from(Role::class, 'r')
             ->andWhere('r.scope = :scope')
             ->andWhere('r.code NOT IN (:excludedRoles)')
-            ->andWhere('r.code NOT LIKE :noAdmin')
             ->setParameter('scope', $scope->value)
-            ->setParameter('excludedRoles', ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'])
-            ->setParameter('noAdmin', '%_ADMIN%')
-            ->orderBy('r.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->setParameter('excludedRoles', $excludedSystemRoles);
+
+        // 🟢 FIX ÉTANCHÉITÉ MULTI-TENANT : Utilisation d'une structure de paramètres séparés
+        // Doctrine résout r.agency de manière safe si on sépare la clause d'appartenance de la clause système NULL.
+        if (Scope::Agency === $scope && $currentAgency !== null) {
+            $qb->andWhere('r.agency IS NULL OR r.agency = :currentAgency')
+                ->setParameter('currentAgency', $currentAgency);
+        } else {
+            $qb->andWhere('r.agency IS NULL');
+        }
+
+        /** @var list<Role> $roles */
+        $roles = $qb->orderBy('r.name', 'ASC')->getQuery()->getResult();
 
         $counts = [];
 
@@ -46,7 +54,6 @@ final class RoleDirectory
             ->from(RolePermission::class, 'rp')
             ->andWhere('rp.revokedAt IS NULL');
 
-        // 🟢 FIX : On compte les permissions globales (NULL) OU celles surchargées pour cette agence spécifique
         if (Scope::Agency === $scope && $currentAgency !== null) {
             $qbCounts->andWhere('rp.agency IS NULL OR rp.agency = :agency')
                 ->setParameter('agency', $currentAgency);
@@ -76,11 +83,14 @@ final class RoleDirectory
 
     public function find(Scope $scope, string $code): ?Role
     {
-        return $this->em->getRepository(Role::class)->findOneBy(['code' => $code, 'scope' => $scope]);
+        return $this->em->getRepository(Role::class)->findOneBy(['code' => $code, 'scope' => $scope->value]);
     }
 
     public function permissionsByModule(Role $role): array
     {
+        $roleScope = $role->getScope();
+        $scopeEnum = $roleScope instanceof Scope ? $roleScope : Scope::from((string) $roleScope);
+
         /** @var list<RolePermission> $links */
         $links = $this->em->createQueryBuilder()
             ->select('rp', 'p')
@@ -90,7 +100,7 @@ final class RoleDirectory
             ->andWhere('rp.revokedAt IS NULL')
             ->andWhere('p.scope = :scope')
             ->setParameter('role', $role->getId())
-            ->setParameter('scope', $role->getScope() instanceof Scope ? $role->getScope()->value : (string) $role->getScope())
+            ->setParameter('scope', $scopeEnum->value)
             ->orderBy('p.module', 'ASC')
             ->addOrderBy('p.code', 'ASC')
             ->getQuery()
@@ -101,8 +111,11 @@ final class RoleDirectory
             $permission = $link->getPermission();
             $module = (string) $permission?->getModule();
 
-            $groups[$module] ??= ['module' => $module] + AccessCatalog::moduleMeta($role->getScope(), $module) + ['permissions' => []];
-            $groups[$module]['permissions'][] = ['code' => (string) $permission?->getCode(), 'name' => (string) $permission?->getName()];
+            $groups[$module] ??= ['module' => $module] + AccessCatalog::moduleMeta($scopeEnum, $module) + ['permissions' => []];
+            $groups[$module]['permissions'][] = [
+                'code' => (string) $permission?->getCode(),
+                'name' => (string) $permission?->getName()
+            ];
         }
 
         return array_values($groups);

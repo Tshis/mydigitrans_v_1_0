@@ -1,132 +1,175 @@
+{# templates/admin/partials/menu/_agency.html.twig #}
+
 {# 1. OPÉRATIONS QUOTIDIENNES #}
-<a href="{{path('admin_agency_dashboard')}}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Tableau de bord">
+<a href="{{ path('admin_agency_dashboard') }}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Tableau de bord">
 	<span class="icon">
 		<i class="fa-solid fa-gauge"></i>
 	</span>
 	<span class="text">Dashboard</span>
 </a>
 
-{# NOUVEAU : Planification des départs réels (MCD table 12) #}
-<a href="{{path('admin_agency_trip_index')}}" class="menu-link {{ page is same as('trip') ? 'active' : '' }}" data-tooltip="Gestion des Voyages">
-	<span class="icon">
-		<i class="fa-solid fa-calendar-days"></i>
-	</span>
-	<span class="text">Voyages</span>
-</a>
+{# Planification des départs (Voyages) #}
+{% if is_granted('trip.view') %}
+	<a href="{{ path('admin_agency_trip_index') }}" class="menu-link {{ page is same as('trip') ? 'active' : '' }}" data-tooltip="Gestion des Voyages">
+		<span class="icon">
+			<i class="fa-solid fa-calendar-days"></i>
+		</span>
+		<span class="text">Voyages</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_agency_reservation_index')}}" class="menu-link {{ page is same as('reservation') ? 'active' : '' }}" data-tooltip="Réservations & Billetterie">
-	<span class="icon">
-		<i class="fa-solid fa-file-circle-check"></i>
-	</span>
-	<span class="text">Réservations</span>
-</a>
+{# Réservations #}
+{% if is_granted('reservation.view') %}
+	<a href="{{ path('admin_agency_reservation_index') }}" class="menu-link {{ page is same as('reservation') ? 'active' : '' }}" data-tooltip="Réservations & Billetterie">
+		<span class="icon">
+			<i class="fa-solid fa-file-circle-check"></i>
+		</span>
+		<span class="text">Réservations</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_agency_shipment_index')}}" class="menu-link {{ page is same as('shipment') ? 'active' : '' }}" data-tooltip="Gestion des Colis">
-	<span class="icon">
-		<i class="fa-solid fa-box-open"></i>
-	</span>
-	<span class="text">Colis</span>
-</a>
+{# Gestion des Colis #}
+{% if is_granted('shipment.view') %}
+	<a href="{{ path('admin_agency_shipment_index') }}" class="menu-link {{ page is same as('shipment') ? 'active' : '' }}" data-tooltip="Gestion des Colis">
+		<span class="icon">
+			<i class="fa-solid fa-box-open"></i>
+		</span>
+		<span class="text">Colis</span>
+	</a>
+{% endif %}
 
 {# 2. FINANCES #}
-<a href="{{path('admin_agency_cashier_index')}}" class="menu-link {{ page is same as('cashier') ? 'active' : '' }}" data-tooltip="Gestion des Caisses">
-	<span class="icon">
-		<i class="fa-solid fa-cash-register"></i>
-	</span>
-	<span class="text">Caisse</span>
-</a>
+{# Caisse #}
+{% if is_granted('cash.view') %}
+	<a href="{{ path('admin_agency_cashier_index') }}" class="menu-link {{ page is same as('cashier') ? 'active' : '' }}" data-tooltip="Gestion des Caisses">
+		<span class="icon">
+			<i class="fa-solid fa-cash-register"></i>
+		</span>
+		<span class="text">Caisse</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_agency_finance_index')}}" class="menu-link {{ page is same as('finances') ? 'active' : '' }}" data-tooltip="Paiements & Dépenses">
-	<span class="icon">
-		<i class="fa-solid fa-hand-holding-dollar"></i>
-	</span>
-	<span class="text">Finances / Flux</span>
-</a>
-
+{# Flux / Dépenses #}
+{% if is_granted('payment.view') or is_granted('expense.view') %}
+	<a href="{{ path('admin_agency_finance_index') }}" class="menu-link {{ page is same as('finances') ? 'active' : '' }}" data-tooltip="Paiements & Dépenses">
+		<span class="icon">
+			<i class="fa-solid fa-hand-holding-dollar"></i>
+		</span>
+		<span class="text">Finances / Flux</span>
+	</a>
+{% endif %}
 
 {# 3. LOGISTIQUE & CONFIGURATION #}
-<a href="{{path('admin_agency_line_index')}}" class="menu-link {{ page is same as('line') ? 'active' : '' }}" data-tooltip="Lignes et Arrêts">
-	<span class="icon">
-		<i class="fa-solid fa-route"></i>
-	</span>
-	<span class="text">Trajets</span>
-</a>
+{# Trajets #}
+{% if is_granted('route.view') %}
+	<a href="{{ path('admin_agency_line_index') }}" class="menu-link {{ page is same as('line') ? 'active' : '' }}" data-tooltip="Lignes et Arrêts">
+		<span class="icon">
+			<i class="fa-solid fa-route"></i>
+		</span>
+		<span class="text">Trajets</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_agency_fare_add')}}" class="menu-link {{ page is same as('fare') ? 'active' : '' }}" data-tooltip="Grille Tarifaire">
-	<span class="icon">
-		<i class="fa-solid fa-tags"></i>
-	</span>
-	<span class="text">Ajouter tarifs</span>
-</a>
+{# Tarifs #}
+{% if is_granted('fare.view') %}
+	<a href="{{ path('admin_agency_fare_add') }}" class="menu-link {{ page is same as('fare') ? 'active' : '' }}" data-tooltip="Grille Tarifaire">
+		<span class="icon">
+			<i class="fa-solid fa-tags"></i>
+		</span>
+		<span class="text">Ajouter tarifs</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_agency_ticket_index')}}" class="menu-link {{ page is same as('ticket') ? 'active' : '' }}" data-tooltip="Billeterie et controle">
-	<span class="icon">
-		<i class="fa-solid fa-file-invoice"></i>
-	</span>
-	<span class="text">Billetterie & Contrôle</span>
-</a>
+{# Billetterie & Contrôle #}
+{% if is_granted('ticket.view') %}
+	<a href="{{ path('admin_agency_ticket_index') }}" class="menu-link {{ page is same as('ticket') ? 'active' : '' }}" data-tooltip="Billeterie et controle">
+		<span class="icon">
+			<i class="fa-solid fa-file-invoice"></i>
+		</span>
+		<span class="text">Billetterie & Contrôle</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_agency_bus_index')}}" class="menu-link {{ page is same as('bus') ? 'active' : '' }}" data-tooltip="Flotte de Bus">
-	<span class="icon">
-		<i class="fa-solid fa-bus-simple"></i>
-	</span>
-	<span class="text">Bus</span>
-</a>
+{# Flotte de Bus #}
+{% if is_granted('bus.view') %}
+	<a href="{{ path('admin_agency_bus_index') }}" class="menu-link {{ page is same as('bus') ? 'active' : '' }}" data-tooltip="Flotte de Bus">
+		<span class="icon">
+			<i class="fa-solid fa-bus-simple"></i>
+		</span>
+		<span class="text">Bus</span>
+	</a>
 
-<a href="{{path('admin_agency_maintenance_index')}}" class="menu-link {{ page is same as('maintenance') ? 'active' : '' }}" data-tooltip="Flotte de Bus">
-	<span class="icon">
-		<i class="fa-solid fa-screwdriver-wrench"></i>
-	</span>
-	<span class="text">Maintenance & Pannes</span>
-</a>
+	<a href="{{ path('admin_agency_maintenance_index') }}" class="menu-link {{ page is same as('maintenance') ? 'active' : '' }}" data-tooltip="Flotte de Bus">
+		<span class="icon">
+			<i class="fa-solid fa-screwdriver-wrench"></i>
+		</span>
+		<span class="text">Maintenance & Pannes</span>
+	</a>
+{% endif %}
 
 {# 4. RESSOURCES HUMAINES & STRUCTURE #}
-<a href="{{path('admin_agency_branch_index')}}" class="menu-link {{ page is same as('branch') ? 'active' : '' }}" data-tooltip="Succursales">
-	<span class="icon">
-		<i class="fa-solid fa-folder-tree"></i>
-	</span>
-	<span class="text">Branches</span>
-</a>
+{# Succursales #}
+{% if is_granted('branch.view') %}
+	<a href="{{ path('admin_agency_branch_index') }}" class="menu-link {{ page is same as('branch') ? 'active' : '' }}" data-tooltip="Succursales">
+		<span class="icon">
+			<i class="fa-solid fa-folder-tree"></i>
+		</span>
+		<span class="text">Branches</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_agency_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
-	<span class="icon">
-		<i class="fa-solid fa-users"></i>
-	</span>
-	<span class="text">Utilisateurs</span>
-</a>
+{# Utilisateurs #}
+{% if is_granted('user.view') %}
+	<a href="{{ path('admin_agency_agent_index') }}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
+		<span class="icon">
+			<i class="fa-solid fa-users"></i>
+		</span>
+		<span class="text">Utilisateurs</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_agency_role_index')}}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
-	<span class="icon">
-		<i class="fa-solid fa-id-card-clip"></i>
-	</span>
-	<span class="text">Fonctions du Personnel</span>
-</a>
+{# Fonctions du Personnel #}
+{% if is_granted('role.view') %}
+	<a href="{{ path('admin_agency_role_index') }}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
+		<span class="icon">
+			<i class="fa-solid fa-id-card-clip"></i>
+		</span>
+		<span class="text">Fonctions du Personnel</span>
+	</a>
+{% endif %}
 
-{# 5. PILOTAGE #}
-<a href="{{path('admin_agency_bus_document_index')}}" class="menu-link {{ page is same as('document') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
-	<span class="icon">
-		<i class="fa-solid fa-file"></i>
-	</span>
-	<span class="text">Documents</span>
-</a>
+{# 5. PILOTAGE & RÉFÉRENTIELS #}
+{# Documents #}
+{% if is_granted('subscription.view') %}
+	<a href="{{ path('admin_agency_bus_document_index') }}" class="menu-link {{ page is same as('document') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
+		<span class="icon">
+			<i class="fa-solid fa-file"></i>
+		</span>
+		<span class="text">Documents</span>
+	</a>
+{% endif %}
 
-{# 5. PILOTAGE #}
-<a href="{{path('admin_agency_currency_index')}}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
-	<span class="icon">
-		<i class="fa-solid fa-money-bill-1-wave"></i>
-	</span>
-	<span class="text">Dévise</span>
-</a>
+{# Devise #}
+{% if is_granted('currency.view') %}
+	<a href="{{ path('admin_agency_currency_index') }}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
+		<span class="icon">
+			<i class="fa-solid fa-money-bill-1-wave"></i>
+		</span>
+		<span class="text">Devise</span>
+	</a>
+{% endif %}
 
-{# 5. PILOTAGE #}
-<a href="{{path('admin_agency_report_index')}}" class="menu-link {{ page is same as('report') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
-	<span class="icon">
-		<i class="fa-solid fa-newspaper"></i>
-	</span>
-	<span class="text">Rapports</span>
-</a>
+{# Rapports #}
+{% if is_granted('report.view') %}
+	<a href="{{ path('admin_agency_report_index') }}" class="menu-link {{ page is same as('report') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
+		<span class="icon">
+			<i class="fa-solid fa-newspaper"></i>
+		</span>
+		<span class="text">Rapports</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_password_change')}}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
+<a href="{{ path('admin_password_change') }}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
 	<span class="icon">
 		<i class="fa-solid fa-gear"></i>
 	</span>

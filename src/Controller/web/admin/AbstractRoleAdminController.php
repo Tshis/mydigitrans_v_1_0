@@ -6,31 +6,35 @@ namespace App\Controller\web\admin;
 
 use App\Entity\Role;
 use App\Entity\RolePermission;
+use App\Entity\UserRole;
 use App\Enum\Scope;
 use App\Repository\PermissionRepository;
 use App\Security\AccessCatalog;
-use App\Security\Voter\RoleVoter;
-use App\Service\RoleDirectory;
+use App\Security\PermissionResolver;
+use App\Service\RoleService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+// 🟢 FIX : On supprime AbstractController de Symfony et on utilise ton contrôleur de base unifié
+use App\Controller\web\admin\AbstractAdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-abstract class AbstractRoleAdminController extends AbstractController
+/**
+ * Contrôleur parent d'administration pour la gestion de l'organigramme (générique).
+ * Hérite désormais proprement de AbstractAdminController pour partager la méthode actor().
+ */
+abstract class AbstractRoleAdminController extends AbstractAdminController // 🟢 CHANGEMENT ICI
 {
     abstract protected function scope(): Scope;
 
-    protected function listAction(RoleDirectory $roleDirectory): Response
+    protected function listAction(RoleService $roleService): Response
     {
         $scope = $this->scope();
-        $user = $this->getUser();
-        if (!$user instanceof \App\Entity\User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->actor(); // Utilise de manière sécurisée ton raccourci d'authentification unifiée
 
         $isAgency = (Scope::Agency === $scope);
-        $roles = $roleDirectory->rolesOf($scope, $isAgency ? $user->getAgency() : null);
+        $roles = $roleService->rolesOf($scope, $isAgency ? $user->getAgency() : null);
 
         return $this->render('admin/role/index.html.twig', [
             'page'        => 'job title',
@@ -44,13 +48,10 @@ abstract class AbstractRoleAdminController extends AbstractController
 
     protected function showAction(EntityManagerInterface $em, Role $role): Response
     {
-        $this->denyAccessUnlessGranted(RoleVoter::VIEW, $role);
-        $scope = $this->scope();
-        $user = $this->getUser();
-        if (!$user instanceof \App\Entity\User) {
-            throw $this->createAccessDeniedException();
-        }
+        $this->denyAccessUnlessGranted('role.view');
 
+        $scope = $this->scope();
+        $user = $this->actor(); // Utilise de manière sécurisée ton raccourci d'authentification unifiée
         $isAgency = (Scope::Agency === $scope);
 
         $qb = $em->getRepository(RolePermission::class)->createQueryBuilder('rp')
@@ -102,23 +103,27 @@ abstract class AbstractRoleAdminController extends AbstractController
         Request $request,
         PermissionRepository $permissionRepository,
         EntityManagerInterface $em,
+        PermissionResolver $permissionResolver,
         ?Role $role = null
     ): Response {
-        $isEdit = ($role !== null);
-        $user = $this->getUser();
-        if (!$user instanceof \App\Entity\User) {
-            throw $this->createAccessDeniedException();
-        }
+        $isEdit = ($role !== null && $role->getId() !== null);
+        $user = $this->actor(); // Utilise de manière sécurisée ton raccourci d'authentification unifiée
 
         $scope = $this->scope();
         $isAgency = (Scope::Agency === $scope);
 
-        if (!$isEdit) {
+        if (!$role) {
             $role = new Role();
             $role->setScope($scope);
             $role->setIsActive(true);
-        } else {
-            $this->denyAccessUnlessGranted(RoleVoter::EDIT, $role);
+        }
+
+        if ($isEdit) {
+            $this->denyAccessUnlessGranted('role.write');
+
+            if ($isAgency && $user->getParent() !== null) {
+                throw $this->createAccessDeniedException('Seul l’administrateur racine peut modifier l’organigramme.');
+            }
         }
 
         if ($request->isMethod('POST')) {
@@ -146,7 +151,6 @@ abstract class AbstractRoleAdminController extends AbstractController
             $allowedAccessModes = ['none', 'read', 'write', 'read_write'];
 
             if ($isEdit) {
-                // Pour l'agence, on nettoie uniquement les lignes spécifiques de cette agence lors d'une modification locale
                 $criteria = ['role' => $role];
                 if ($isAgency) {
                     $criteria['agency'] = $user->getAgency();
@@ -175,7 +179,9 @@ abstract class AbstractRoleAdminController extends AbstractController
                 ]);
 
                 foreach ($allModulePermissions as $permission) {
-                    $code = strtolower((string) $permission->getCode());
+                    $rawCode = (string) $permission->getCode();
+                    $code = str_contains($rawCode, ':') ? explode(':', $rawCode)[1] : $rawCode;
+                    $code = strtolower($code);
                     $shouldSave = false;
 
                     if ($accessValue === 'read') {
@@ -204,20 +210,40 @@ abstract class AbstractRoleAdminController extends AbstractController
             }
 
             $em->flush();
+
+            // Purge chirurgicale du cache en mémoire via le résolveur injecté directement
+            $assignedUserRoles = $em->getRepository(UserRole::class)->findBy(['role' => $role, 'revokedAt' => null]);
+            foreach ($assignedUserRoles as $ur) {
+                if ($targetUser = $ur->getUser()) {
+                    $permissionResolver->resetCacheForUser($targetUser);
+                }
+            }
+
+            $hasThisRole = false;
+            foreach ($user->getUserRoles() as $ur) {
+                if ($ur->getRole() && $ur->getRole()->getId() === $role->getId() && $ur->getRevokedAt() === null) {
+                    $hasThisRole = true;
+                    break;
+                }
+            }
+
+            if ($hasThisRole) {
+                $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+                $this->container->get('security.token_storage')->setToken($token);
+                $request->getSession()->set('_security_main', serialize($token));
+            }
+
             $this->addFlash('success', 'Habilitations enregistrées de manière sécurisée.');
 
             return $this->redirectToRoute($isAgency ? 'admin_agency_role_index' : 'admin_platform_role_index');
         }
-
         $availablePermissions = $permissionRepository->findBy(['scope' => $scope->value]);
-
         $matrixRows = [];
         foreach ($availablePermissions as $perm) {
             $moduleKey = (string) $perm->getModule();
             if (empty($moduleKey)) {
                 continue;
             }
-
             if (!isset($matrixRows[$moduleKey])) {
                 $meta = AccessCatalog::moduleMeta($scope, $moduleKey);
                 $matrixRows[$moduleKey] = [
@@ -229,9 +255,7 @@ abstract class AbstractRoleAdminController extends AbstractController
                     'has_write'   => false,
                 ];
             }
-
             if ($isEdit) {
-                // 🟢 LE FIX CRUCIAL : On cherche si le lien existe globalement (NULL) OU au niveau de l'agence connectée
                 $qbCheck = $em->getRepository(RolePermission::class)->createQueryBuilder('rp')
                     ->andWhere('rp.role = :role')
                     ->andWhere('rp.permission = :perm')
@@ -246,7 +270,9 @@ abstract class AbstractRoleAdminController extends AbstractController
                 }
                 $hasLink = $qbCheck->setMaxResults(1)->getQuery()->getOneOrNullResult();
                 if ($hasLink !== null) {
-                    $code = strtolower((string) $perm->getCode());
+                    $rawCode = (string) $perm->getCode();
+                    $code = str_contains($rawCode, ':') ? explode(':', $rawCode)[1] : $rawCode;
+                    $code = strtolower($code);
                     if (str_contains($code, 'view') || str_contains($code, 'index') || str_contains($code, 'show') || str_contains($code, 'read')) {
                         $matrixRows[$moduleKey]['has_view'] = true;
                     }

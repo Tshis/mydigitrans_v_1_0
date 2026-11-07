@@ -65,34 +65,58 @@ final class AccessCatalog
         'notification' => ['Notifications', 'fa-bell', ['view', 'write']],
         'report' => ['Rapports', 'fa-chart-line', ['view']],
         'user' => ['Utilisateurs', 'fa-users', ['view', 'write', 'activate']],
-        'role' => ['Fonctions et droits', 'fa-user-shield', ['view']],
+        'role' => ['Fonctions et droits', 'fa-user-shield', ['view', 'write']],
     ];
 
     /** code du rôle => [libellé, description, motifs de permissions : '*', 'module.*' ou 'module.action'] */
     private const AGENCY_ROLES = [
         self::AGENCY_ADMIN => ['Administrateur d\'agence', 'Gestion complète de l\'agence et de son personnel.', ['*']],
         self::GENERAL_MANAGER => ['General Manager', 'Tous les accès de l\'administrateur, sans pouvoir gérer les administrateurs.', ['*']],
-        'ROLE_MANAGER' => ['Gestionnaire', 'Pilotage de l\'exploitation : flotte, lignes, voyages, tarifs, ventes et dépenses.',
-            ['dashboard.view', 'branch.view', 'bus.*', 'route.*', 'trip.*', 'fare.*', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'expense.*', 'report.view', 'user.view', 'user.write', 'role.view']],
-        'ROLE_CASHIER' => ['Caissier / Guichetier', 'Vente de billets, encaissement des colis et tenue de la caisse.',
-            ['dashboard.view', 'trip.view', 'reservation.*', 'ticket.view', 'ticket.write', 'ticket.print', 'shipment.*', 'payment.*', 'cash.*']],
-        'ROLE_CONTROLLER' => ['Contrôleur de bord', 'Vérification des billets et des places à l\'embarquement.',
-            ['trip.view', 'reservation.view', 'ticket.view']],
-        'ROLE_ACCOUNTANT' => ['Comptable d\'agence', 'Audit financier : paiements, caisse, dépenses et rapports.',
-            ['dashboard.view', 'payment.view', 'cash.view', 'expense.*', 'report.view', 'ticket.view', 'shipment.view']],
-        'ROLE_DISPATCHER' => ['Dispatcheur', 'Planification des voyages et affectation des bus.',
-            ['dashboard.view', 'bus.view', 'route.view', 'trip.*', 'fare.view', 'reservation.view']],
+        'ROLE_MANAGER' => [
+            'Gestionnaire',
+            'Pilotage de l\'exploitation : flotte, lignes, voyages, tarifs, ventes et dépenses.',
+            ['dashboard.view', 'branch.view', 'bus.*', 'route.*', 'trip.*', 'fare.*', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'expense.*', 'report.view', 'user.view', 'user.write', 'role.view']
+        ],
+        'ROLE_CASHIER' => [
+            'Caissier / Guichetier',
+            'Vente de billets, encaissement des colis et tenue de la caisse.',
+            ['dashboard.view', 'trip.view', 'reservation.*', 'ticket.view', 'ticket.write', 'ticket.print', 'shipment.*', 'payment.*', 'cash.*']
+        ],
+        'ROLE_CONTROLLER' => [
+            'Contrôleur de bord',
+            'Vérification des billets et des places à l\'embarquement.',
+            ['trip.view', 'reservation.view', 'ticket.view']
+        ],
+        'ROLE_ACCOUNTANT' => [
+            'Comptable d\'agence',
+            'Audit financier : paiements, caisse, dépenses et rapports.',
+            ['dashboard.view', 'payment.view', 'cash.view', 'expense.*', 'report.view', 'ticket.view', 'shipment.view']
+        ],
+        'ROLE_DISPATCHER' => [
+            'Dispatcheur',
+            'Planification des voyages et affectation des bus.',
+            ['dashboard.view', 'bus.view', 'route.view', 'trip.*', 'fare.view', 'reservation.view']
+        ],
         'ROLE_DRIVER' => ['Chauffeur', 'Conduite des voyages : consultation du planning.', ['trip.view']],
     ];
 
     private const PLATFORM_ROLES = [
         self::SUPER_ADMIN => ['Super administrateur', 'Gestion complète de la plateforme.', ['*']],
-        'ROLE_PLATFORM_ACCOUNTANT' => ['Comptable plateforme', 'Facturation, commissions, caisse et dépenses de la plateforme.',
-            ['dashboard.view', 'agency.view', 'partner.view', 'plan.view', 'invoice.*', 'commission.*', 'cash.*', 'expense.*', 'report.view']],
-        'ROLE_PLATFORM_CASHIER' => ['Caissier plateforme', 'Encaissement des abonnements et tenue de la caisse plateforme.',
-            ['dashboard.view', 'invoice.view', 'cash.*', 'expense.view']],
-        'ROLE_PLATFORM_SUPPORT' => ['Support plateforme', 'Accompagnement des agences et des partenaires.',
-            ['dashboard.view', 'agency.*', 'partner.view', 'notification.*', 'user.view']],
+        'ROLE_PLATFORM_ACCOUNTANT' => [
+            'Comptable plateforme',
+            'Facturation, commissions, caisse et dépenses de la plateforme.',
+            ['dashboard.view', 'agency.view', 'partner.view', 'plan.view', 'invoice.*', 'commission.*', 'cash.*', 'expense.*', 'report.view']
+        ],
+        'ROLE_PLATFORM_CASHIER' => [
+            'Caissier plateforme',
+            'Encaissement des abonnements et tenue de la caisse plateforme.',
+            ['dashboard.view', 'invoice.view', 'cash.*', 'expense.view']
+        ],
+        'ROLE_PLATFORM_SUPPORT' => [
+            'Support plateforme',
+            'Accompagnement des agences et des partenaires.',
+            ['dashboard.view', 'agency.*', 'partner.view', 'notification.*', 'user.view']
+        ],
     ];
 
     /**
@@ -140,8 +164,8 @@ final class AccessCatalog
         foreach (self::modules($scope) as $module => [$label, $icon, $actions]) {
             foreach ($actions as $action) {
                 $actionLabel = self::ACTION_LABELS[$action] ?? $action;
-                $out[$module.'.'.$action] = [
-                    'name' => $label.' : '.$actionLabel,
+                $out[$module . '.' . $action] = [
+                    'name' => $label . ' : ' . $actionLabel,
                     'module' => $module,
                     'icon' => $icon,
                     'description' => sprintf('%s — %s.', $actionLabel, mb_strtolower($label)),
@@ -169,7 +193,7 @@ final class AccessCatalog
                     $matches = $all;
                 } elseif (str_ends_with($pattern, '.*')) {
                     $prefix = substr($pattern, 0, -1);
-                    $matches = array_values(array_filter($all, static fn (string $c): bool => str_starts_with($c, $prefix)));
+                    $matches = array_values(array_filter($all, static fn(string $c): bool => str_starts_with($c, $prefix)));
                 } else {
                     $matches = \in_array($pattern, $all, true) ? [$pattern] : [];
                 }

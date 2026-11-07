@@ -1,25 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\web\admin;
 
 use App\Dto\admin\AgentData;
 use App\Enum\Scope;
 use App\Exception\AgentManagementException;
 use App\Form\AgentType;
-use App\Security\Voter\UserManagementVoter;
+use App\Security\PermissionResolver;
 use App\Service\UserManagementService;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
  * Contrôleur d'administration pour la gestion des collaborateurs (générique).
  */
 abstract class AbstractUserAdminController extends AbstractAdminController
 {
+    // Injection implicite du PermissionResolver par Symfony
+    public function __construct(
+        protected readonly PermissionResolver $permissionResolver
+    ) {}
+
+    abstract protected function scope(): Scope;
+
     protected function listAction(Request $request, UserManagementService $users): Response
     {
-        $this->denyAccessUnlessGranted(UserManagementVoter::VIEW);
+        // 🟢 Utilisation de la permission universelle pointée
+        $this->denyAccessUnlessGranted('user.view');
         $actor = $this->actor();
 
         $canFilterBranch = Scope::Agency === $this->scope() && null === UserManagementService::actorBranch($actor);
@@ -30,7 +41,7 @@ abstract class AbstractUserAdminController extends AbstractAdminController
         ];
 
         return $this->render('admin/agent/index.html.twig', [
-            'page' => 'agent',
+            'page' => 'user management', // Synchronisé avec la sidebar
             'route_prefix' => $this->routePrefix(),
             'is_agency_scope' => Scope::Agency === $this->scope(),
             'users' => $users->listAgents($actor, $filters),
@@ -48,14 +59,17 @@ abstract class AbstractUserAdminController extends AbstractAdminController
 
         if ($isEdit) {
             $agent = $users->findAgent($actor, $code) ?? throw $this->createNotFoundException('Utilisateur introuvable.');
-            $this->denyAccessUnlessGranted(UserManagementVoter::WRITE, $agent);
+            // 🟢 Utilisation de la permission universelle pointée
+            $this->denyAccessUnlessGranted('user.write', $agent);
             $users->fill($data, $agent);
         } else {
-            $this->denyAccessUnlessGranted(UserManagementVoter::WRITE, $data);
+            // 🟢 Utilisation de la permission universelle pointée
+            $this->denyAccessUnlessGranted('user.write', $data);
             $data->branchCode = UserManagementService::actorBranch($actor)?->getCode();
         }
 
-        $canActivate = $this->isGranted(UserManagementVoter::ACTIVATE, $agent ?? $data);
+        // 🟢 Utilisation de la permission universelle pointée
+        $canActivate = $this->isGranted('user.activate', $agent ?? $data);
         if (!$isEdit) {
             $data->isActive = $canActivate ? '1' : '0';
         }
@@ -77,9 +91,20 @@ abstract class AbstractUserAdminController extends AbstractAdminController
             try {
                 if ($isEdit) {
                     $users->update($actor, $agent, $data);
+
+                    // 🟢 VIDAGE DU CACHE : On réinitialise la mémoire RBAC de l'agent modifié
+                    $this->permissionResolver->resetCacheForUser($agent);
+
+                    // 🟢 AUTO-RAFRAÎCHISSEMENT : Si l'admin a modifié son propre compte, on re-sérialise son Token immédiatement
+                    if ($isSelf) {
+                        $token = new UsernamePasswordToken($agent, 'main', $agent->getRoles());
+                        $this->container->get('security.token_storage')->setToken($token);
+                        $request->getSession()->set('_security_main', serialize($token));
+                    }
+
                     $this->addFlash('success', sprintf('Le compte de %s %s a été mis à jour.', $data->firstname, $data->lastname));
                 } else {
-                    $this->denyAccessUnlessGranted(UserManagementVoter::WRITE, $data);
+                    $this->denyAccessUnlessGranted('user.write', $data);
                     $users->create($actor, $data);
                     $this->addFlash('success', sprintf('Le compte de %s %s a été déployé.', $data->firstname, $data->lastname));
                 }
@@ -93,7 +118,7 @@ abstract class AbstractUserAdminController extends AbstractAdminController
         }
 
         return $this->render('admin/agent/form.html.twig', [
-            'page' => 'agent',
+            'page' => 'user management', // Synchronisé avec la sidebar
             'isEdit' => $isEdit,
             'identity_only' => $isSelf,
             'form' => $form->createView(),
@@ -104,16 +129,18 @@ abstract class AbstractUserAdminController extends AbstractAdminController
 
     protected function showAction(UserManagementService $users, string $code): Response
     {
-        $this->denyAccessUnlessGranted(UserManagementVoter::VIEW);
+        // 🟢 Utilisation de la permission universelle pointée
+        $this->denyAccessUnlessGranted('user.view');
         $actor = $this->actor();
 
         $agent = $users->findAgent($actor, $code) ?? throw $this->createNotFoundException('Utilisateur introuvable.');
 
         return $this->render('admin/agent/show.html.twig', [
-            'page' => 'agent',
+            'page' => 'user management', // Synchronisé avec la sidebar
             'route_prefix' => $this->routePrefix(),
             'agent' => $users->agentView($agent),
-            'can_manage' => $this->isGranted(UserManagementVoter::WRITE, $agent),
+            // 🟢 Utilisation de la permission universelle pointée
+            'can_manage' => $this->isGranted('user.write', $agent),
         ]);
     }
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\AgencyRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AgencyRepository::class)]
@@ -78,9 +80,16 @@ class Agency
     #[ORM\JoinColumn(name: 'parent_id', nullable: true, onDelete: 'SET NULL')]
     private ?User $parent = null;
 
+    /**
+     * @var Collection<int, Role>
+     */
+    #[ORM\OneToMany(targetEntity: Role::class, mappedBy: 'agency')]
+    private Collection $roles;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->roles = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -299,5 +308,35 @@ class Agency
     public function __toString(): string
     {
         return (string) $this->name;
+    }
+
+    /**
+     * @return Collection<int, Role>
+     */
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    public function addRole(Role $role): static
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
+            $role->setAgency($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRole(Role $role): static
+    {
+        if ($this->roles->removeElement($role)) {
+            // set the owning side to null (unless already changed)
+            if ($role->getAgency() === $this) {
+                $role->setAgency(null);
+            }
+        }
+
+        return $this;
     }
 }

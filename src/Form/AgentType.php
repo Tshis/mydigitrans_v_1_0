@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Dto\admin\AgentData;
+use App\Entity\Role; // 🟢 Importation de l'entité Role
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -53,13 +54,11 @@ class AgentType extends AbstractType
                 'attr' => ['class' => self::INPUT . ' font-bold', 'placeholder' => '+243...', 'maxlength' => 20],
             ]);
 
-        // src/Form/AgentType.php -> dans la méthode buildForm()
-
         // Le champ est toujours présent, mais requis uniquement à la création
         $builder->add('password', PasswordType::class, [
             'label' => $options['is_edit'] ? 'Nouveau mot de passe (laisser vide pour inchangé)' : 'Mot de passe initial *',
             'label_attr' => self::LABEL,
-            'required' => !$options['is_edit'], // Obligatoire seulement si c'est un nouveau compte
+            'required' => !$options['is_edit'],
             'attr' => [
                 'class' => self::INPUT,
                 'placeholder' => $options['is_edit'] ? 'Laisser vide si inchangé' : '••••••••',
@@ -71,6 +70,7 @@ class AgentType extends AbstractType
         if ($options['with_branch']) {
             $branches = [];
             foreach ($options['branches'] as $branch) {
+                // $options['branches'] reste pour l'instant un tableau associatif brut d'options de tri
                 $branches[sprintf('%s (#%s)', $branch['name'], $branch['code'])] = $branch['code'];
             }
 
@@ -88,9 +88,12 @@ class AgentType extends AbstractType
         // Chargement des rôles
         $rolesChoices = [];
         $descriptions = [];
+
+        /** @var Role $role */
         foreach ($options['roles'] as $role) {
-            $rolesChoices[$role['name']] = $role['code'];
-            $descriptions[$role['code']] = $role['description'];
+            // 🟢 FIX : Utilisation des méthodes get de l'objet d'entité Role
+            $rolesChoices[$role->getName()] = $role->getCode();
+            $descriptions[$role->getCode()] = $role->getDescription();
         }
 
         $builder->add('role_code', ChoiceType::class, [
@@ -103,8 +106,7 @@ class AgentType extends AbstractType
             'attr' => ['class' => self::SELECT],
         ]);
 
-        // ✅ CORRECTION DU STATUT : Affichage garanti si autorisé par le contrôleur
-        // OU si l'acteur connecté possède un rôle de hiérarchie d'agence
+        // Affichage garanti du statut si autorisé par le contrôleur ou hiérarchie d'agence
         $isAgencyManager = $this->security->isGranted('ROLE_AGENCY_ADMIN') || $this->security->isGranted('ROLE_GENERAL_MANAGER');
 
         if ($options['can_activate'] || $isAgencyManager) {

@@ -1,19 +1,16 @@
+{# templates/admin/partials/_topbar.html.twig #}
 <header class="topbar">
 
 	<div class="topbar-left">
 		<button id="mobileToggle" class="btn-icon mobile-toggle" aria-label="Menu">
 			<i class="fa-solid fa-bars-staggered"></i>
 		</button>
-		<!-- Optionnel : Titre de la page ou fil d'ariane ici -->
-		<h1 class="page-title">{{ page is same as('dashboard') ? 'Tableau de bord' : 'Administration'}}</h1>
+		<h1 class="page-title">{{ page is same as('dashboard') ? 'Tableau de bord' : 'Administration' }}</h1>
 	</div>
 	<!--topbar-left-->
 
 	<div class="topbar-right">
-		<div
-			class="actions-group">
-			{# {% include 'admin/partials/_notifications.html.twig' %}
-			 #}
+		<div class="actions-group">
 			<button id="darkToggle" class="btn-icon dark-toggle" title="Changer de mode">
 				<span class="moon">
 					<i class="fa-solid fa-moon"></i>
@@ -26,8 +23,19 @@
 
 		<div class="user-profile">
 			<div class="user-text">
-				<span class="user-name">Daniel LUKONU</span>
-				<span class="user-role">Administrateur</span>
+				{# Dynamisation du nom de l'utilisateur connecté #}
+				<span class="user-name">{{ app.user.firstname }} {{ app.user.lastname|upper }}</span>
+				
+				<span class="user-role">
+					{% if app.user.userType.value is same as('partner') %}
+						Partenaire Externe
+					{% elseif app.user.userType.value is same as('client') %}
+						Client Voyageur
+					{% else %}
+						{# 🟢 extraction brute et directe du vrai nom du rôle depuis la base de données #}
+						{{ app.user.userRoles|map(ur => ur.role.name)|join(', ')|default('Agent Opérationnel') }}
+					{% endif %}
+				</span>
 			</div>
 			<!-- Remplacement par l'icône -->
 			<div class="user-icon-wrapper">

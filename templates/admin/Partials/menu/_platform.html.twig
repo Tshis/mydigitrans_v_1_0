@@ -1,3 +1,5 @@
+{# templates/admin/partials/menu/_platform.html.twig #}
+
 {# 1. SUPERVISION ET MACRO #}
 <a href="{{ path('admin_platform_dashboard') }}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Vue globale de la plateforme">
 	<span class="icon">
@@ -7,22 +9,26 @@
 </a>
 
 {# 2. PARTENAIRES ET AGENCES COMPAGNIES #}
-<a href="{{path('admin_platform_agency_index')}}" class="menu-link {{ page is same as('agency') ? 'active' : '' }}" data-tooltip="Gestion des Compagnies & Agences Partenaires">
-	<span class="icon">
-		<i class="fa-solid fa-building-shield"></i>
-	</span>
-	<span class="text">Compagnies / Agences</span>
-</a>
+{% if is_granted('agency.view') %}
+	<a href="{{ path('admin_platform_agency_index') }}" class="menu-link {{ page is same as('agency') ? 'active' : '' }}" data-tooltip="Gestion des Compagnies & Agences Partenaires">
+		<span class="icon">
+			<i class="fa-solid fa-building-shield"></i>
+		</span>
+		<span class="text">Compagnies / Agences</span>
+	</a>
+{% endif %}
 
-{# 3. ABONNEMENT & LICENCES #}
-<a href="{{path('admin_platform_subscription_index')}}" class="menu-link {{ page is same as('subscription') ? 'active' : '' }}" data-tooltip="Suivi des abonnements SaaS et Licences">
-	<span class="icon">
-		<i class="fa-solid fa-credit-card"></i>
-	</span>
-	<span class="text">Abonnements & Licences</span>
-</a>
+{# 3. ABONNEMENT & LICENCES (Mappé sur le module 'plan' du catalogue) #}
+{% if is_granted('plan.view') %}
+	<a href="{{ path('admin_platform_subscription_index') }}" class="menu-link {{ page is same as('subscription') ? 'active' : '' }}" data-tooltip="Suivi des abonnements SaaS et Licences">
+		<span class="icon">
+			<i class="fa-solid fa-credit-card"></i>
+		</span>
+		<span class="text">Abonnements & Licences</span>
+	</a>
+{% endif %}
 
-{# 3. RÉFÉRENTIELS USINE (FLOTTE GLOBALE) #}
+{# Modèles d'usines / Gabarits de bus réutilisables (Non soumis aux restrictions RBAC) #}
 <a href="{{ path('admin_platform_bus_layout_index') }}" class="menu-link {{ page is same as('bus_layout') ? 'active' : '' }}" data-tooltip="Modèles d'usines / Gabarits de bus réutilisables">
 	<span class="icon">
 		<i class="fa-solid fa-compass-drafting"></i>
@@ -31,79 +37,96 @@
 </a>
 
 {# 4. CONTRÔLE GLOBAUX & MONÉTAIRE #}
-<a href="{{path('admin_platform_commission_index')}}" class="menu-link {{ page is same as('commission') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises">
-	<span class="icon">
-		<i class="fa-solid fa-money-bill-trend-up"></i>
-	</span>
-	<span class="text">Commissions & References</span>
-</a>
+{% if is_granted('commission.view') %}
+	<a href="{{ path('admin_platform_commission_index') }}" class="menu-link {{ page is same as('commission') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises">
+		<span class="icon">
+			<i class="fa-solid fa-money-bill-trend-up"></i>
+		</span>
+		<span class="text">Commissions & References</span>
+	</a>
+{% endif %}
 
-
-<a href="{{path('admin_platform_currency_index')}}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises">
-	<span class="icon">
-		<i class="fa-solid fa-earth-africa"></i>
-	</span>
-	<span class="text">Catalogue Devises</span>
-</a>
+{# Catalogue Devises (Rattaché à la portée monétaire et de caisse de la plateforme) #}
+{% if is_granted('cash.view') %}
+	<a href="{{ path('admin_platform_currency_index') }}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises">
+		<span class="icon">
+			<i class="fa-solid fa-earth-africa"></i>
+		</span>
+		<span class="text">Catalogue Devises</span>
+	</a>
+{% endif %}
 
 {# 5. FLUX FINANCIER #}
-<a href="{{path('admin_platform_finance_index')}}" class="menu-link {{ page is same as('finance') ? 'active' : '' }}" data-tooltip="Caisse & journal des opérations financieres">
-	<span class="icon">
-		<i class="fa-solid fa-sack-dollar"></i>
-	</span>
-	<span class="text">Flux financiers</span>
-</a>
+{% if is_granted('cash.view') %}
+	<a href="{{ path('admin_platform_finance_index') }}" class="menu-link {{ page is same as('finance') ? 'active' : '' }}" data-tooltip="Caisse & journal des opérations financieres">
+		<span class="icon">
+			<i class="fa-solid fa-sack-dollar"></i>
+		</span>
+		<span class="text">Flux financiers</span>
+	</a>
+{% endif %}
 
+{# 6. FACTURATION #}
+{% if is_granted('invoice.view') %}
+	<a href="{{ path('admin_platform_invoice_index') }}" class="menu-link {{ page is same as('invoice') ? 'active' : '' }}" data-tooltip="Facturation">
+		<span class="icon">
+			<i class="fa-solid fa-file-lines"></i>
+		</span>
+		<span class="text">Factures</span>
+	</a>
+{% endif %}
 
-{# 5. FACTURATION #}
-<a href="{{path('admin_platform_invoice_index')}}" class="menu-link {{ page is same as('invoice') ? 'active' : '' }}" data-tooltip="Facturation">
-	<span class="icon">
-		<i class="fa-solid fa-file-lines"></i>
-	</span>
-	<span class="text">Factures</span>
-</a>
+{# AGENT / COLLABORATEURS #}
+{% if is_granted('user.view') %}
+	<a href="{{ path('admin_platform_agent_index') }}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
+		<span class="icon">
+			<i class="fa-solid fa-users"></i>
+		</span>
+		<span class="text">Utilisateurs</span>
+	</a>
+{% endif %}
 
-{# AGENT #}
-<a href="{{path('admin_platform_agent_index')}}" class="menu-link {{ page is same as('agent') ? 'active' : '' }}" data-tooltip="Gestion des utilisateurs">
-	<span class="icon">
-		<i class="fa-solid fa-users"></i>
-	</span>
-	<span class="text">Utilisateurs</span>
-</a>
-
-{# ROLE #}
-<a href="{{path('admin_platform_role_index')}}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
-	<span class="icon">
-		<i class="fa-solid fa-id-card-clip"></i>
-	</span>
-	<span class="text">Fonctions du Personnel</span>
-</a>
+{# ROLE / ORGANIGRAMME #}
+{% if is_granted('role.view') %}
+	<a href="{{ path('admin_platform_role_index') }}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
+		<span class="icon">
+			<i class="fa-solid fa-id-card-clip"></i>
+		</span>
+		<span class="text">Fonctions du Personnel</span>
+	</a>
+{% endif %}
 
 {# PARTNER #}
-<a href="{{path('admin_platform_partner_index')}}" class="menu-link {{ page is same as('partner') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
-	<span class="icon">
-		<i class="fa-solid fa-user-tie"></i>
-	</span>
-	<span class="text">Partenaires</span>
-</a>
+{% if is_granted('partner.view') %}
+	<a href="{{ path('admin_platform_partner_index') }}" class="menu-link {{ page is same as('partner') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
+		<span class="icon">
+			<i class="fa-solid fa-user-tie"></i>
+		</span>
+		<span class="text">Partenaires</span>
+	</a>
+{% endif %}
 
-<a href="{{path('admin_platform_audit_index')}}" class="menu-link {{ page is same as('audit') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
-	<span class="icon">
-		<i class="fa-solid fa-shield-halved"></i>
-	</span>
-	<span class="text">Logs & Audit Sécurité</span>
-</a>
+{# TRAÇABILITÉ GLOBALE : Notifications & Audit #}
+{% if is_granted('notification.view') %}
+	<a href="{{ path('admin_platform_audit_index') }}" class="menu-link {{ page is same as('audit') ? 'active' : '' }}" data-tooltip="Journal des logs d'audits et sécurité">
+		<span class="icon">
+			<i class="fa-solid fa-shield-halved"></i>
+		</span>
+		<span class="text">Logs & Audit Sécurité</span>
+	</a>
+{% endif %}
 
-{# 5. PILOTAGE #}
-<a href="{{path('admin_platform_report_finance')}}" class="menu-link {{ page is same as('report') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
-	<span class="icon">
-		<i class="fa-solid fa-newspaper"></i>
-	</span>
-	<span class="text">Rapports Financiers</span>
-</a>
+{# 7. PILOTAGE BI #}
+{% if is_granted('report.view') %}
+	<a href="{{ path('admin_platform_report_finance') }}" class="menu-link {{ page is same as('report') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
+		<span class="icon">
+			<i class="fa-solid fa-newspaper"></i>
+		</span>
+		<span class="text">Rapports Financiers</span>
+	</a>
+{% endif %}
 
-
-<a href="{{path('admin_password_change')}}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
+<a href="{{ path('admin_password_change') }}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
 	<span class="icon">
 		<i class="fa-solid fa-gear"></i>
 	</span>

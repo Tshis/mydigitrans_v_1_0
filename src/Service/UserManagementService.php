@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Service;
 
 use App\Dto\admin\AgentData;
@@ -14,12 +12,14 @@ use App\Enum\Scope;
 use App\Enum\UserType;
 use App\Exception\AgentManagementException;
 use App\Security\PermissionResolver;
+use App\Service\AgencyRegistrationService;
+use App\Service\SystemActor;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
- * Service de gestion des agents - Partie 1 : Déclaration et Dépendances.
+ * Service de gestion des agents conforme à l'infrastructure 100% DB et au MCD.
  */
 final class UserManagementService
 {
@@ -128,61 +128,37 @@ final class UserManagementService
         return $options;
     }
 
-        // Dans src/Service/UserManagementService.php
-
     /**
-     * @return list<array{code: string, name: string, description: string}>
+     * Retourne la liste des rôles qu'un administrateur a le droit d'attribuer à un collaborateur.
+     *
+     * @return list<Role>
      */
     public function assignableRoles(User $actor): array
     {
-        $scope = self::scopeOf($actor);
-        $protectedRole = \App\Security\AccessCatalog::protectedRole($scope);
+        $scope = PermissionResolver::scopeOf($actor);
+        if (null === $scope) {
+            return [];
+        }
 
-        // Vérifie si l'acteur est l'administrateur suprême de sa portée
-        $isSouverain = \in_array($protectedRole, $actor->getRoles(), true)
-            || \in_array('ROLE_GENERAL_MANAGER', $actor->getRoles(), true);
-
-        // Récupération de tous les rôles du catalogue pour la portée actuelle
-        /** @var list<Role> $roles */
-        $roles = $this->em->createQueryBuilder()
+        $qb = $this->em->createQueryBuilder()
             ->select('r')
             ->from(Role::class, 'r')
             ->andWhere('r.scope = :scope')
-            ->andWhere('r.isActive = :yes')
+            ->andWhere('r.isActive = :active')
+            ->andWhere('r.code NOT IN (:excludedRoles)')
             ->setParameter('scope', $scope->value)
-            ->setParameter('yes', true)
-            ->orderBy('r.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->setParameter('active', true)
+            ->setParameter('excludedRoles', ['ROLE_SUPER_ADMIN', 'ROLE_AGENCY_ADMIN']);
 
-        $out = [];
-        $mine = $this->permissions->permissionsOf($actor);
-
-        foreach ($roles as $role) {
-            // Règle d'or : On ne peut jamais ré-attribuer le rôle d'administration suprême via cet écran
-            if (\App\Security\AccessCatalog::isAdminRole($role->getCode())) {
-                continue;
-            }
-
-            // Si l'acteur est un admin/souverain, on lui donne accès à tous les rôles inférieurs d'office.
-            // Sinon (ex: ROLE_MANAGER), on applique le contrôle strict anti-élévation de privilèges.
-            if (!$isSouverain) {
-                $rolePermissions = $this->permissions->permissionsOfRole($role);
-                if ([] !== array_diff($rolePermissions, $mine)) {
-                    continue;
-                }
-            }
-
-            $out[] = [
-                'code' => (string) $role->getCode(),
-                'name' => (string) $role->getName(),
-                'description' => (string) $role->getDescription()
-            ];
+        if (Scope::Agency === $scope) {
+            $qb->andWhere('r.agency IS NULL OR r.agency = :currentAgency')
+                ->setParameter('currentAgency', $actor->getAgency());
+        } else {
+            $qb->andWhere('r.agency IS NULL');
         }
 
-        return $out;
+        return $qb->orderBy('r.name', 'ASC')->getQuery()->getResult();
     }
-
 
     // ------------------------------------------------------------------ BLOC 3 : ÉCRITURE & MUTATIONS
 
@@ -207,7 +183,6 @@ final class UserManagementService
                 throw new AgentManagementException($errors);
             }
 
-            // Confiance absolue au Voter qui a validé le droit d'activation en amont
             $agent = (new User())
                 ->setFirstname(trim((string) $data->firstname))
                 ->setLastname(trim((string) $data->lastname))
@@ -226,7 +201,7 @@ final class UserManagementService
 
             return $agent;
         });
-    }//create
+    }
 
     /**
      * @throws AgentManagementException
@@ -261,11 +236,9 @@ final class UserManagementService
                 ->setPhone($this->normalizePhone((string) $data->phone))
                 ->setEmail($email);
 
-            // ✅ AJOUT : Si l'administrateur a saisi un nouveau mot de passe, on le écrase
             if (null !== $data->password && '' !== trim((string) $data->password)) {
                 $agent->setPassword($this->passwordHasher->hashPassword($agent, (string) $data->password));
             }
-
 
             if ($isSelf) {
                 return;
@@ -282,11 +255,10 @@ final class UserManagementService
                 $this->assign($agent, $role, $branch, $actor);
             }
         });
-    } //update
+    }
 
 
     // ------------------------------------------------------------------ BLOC 4 : UTILITAIRES INTERNES
-
     public function findAgent(User $actor, string $code): ?User
     {
         return $this->perimeter($actor)
@@ -297,12 +269,10 @@ final class UserManagementService
             ->getQuery()
             ->getOneOrNullResult();
     }
-
     public function currentAssignment(User $agent): ?UserRole
     {
         return $this->currentAssignments([$agent])[(int) $agent->getId()] ?? null;
     }
-
     public function fill(AgentData $data, User $agent): void
     {
         $data->firstname = $agent->getFirstname();
@@ -313,12 +283,10 @@ final class UserManagementService
         $data->roleCode = $this->currentAssignment($agent)?->getRole()?->getCode();
         $data->isActive = $agent->isActive() ? '1' : '0';
     }
-
     public function agentView(User $agent): array
     {
         $role = $this->currentAssignment($agent)?->getRole();
-
-        /** @var list<UserRole> $rows */
+        /** @var list $rows */
         $rows = $this->em->createQueryBuilder()
             ->select('ur', 'r', 'rb', 'ab', 'rv')
             ->from(UserRole::class, 'ur')
@@ -331,7 +299,6 @@ final class UserManagementService
             ->orderBy('ur.assignedAt', 'DESC')
             ->getQuery()
             ->getResult();
-
         return [
             'firstname' => (string) $agent->getFirstname(),
             'lastname' => (string) $agent->getLastname(),
@@ -357,35 +324,29 @@ final class UserManagementService
             ], $rows),
         ];
     }
-
     private function perimeter(User $actor): QueryBuilder
     {
         $scope = self::scopeOf($actor);
-
         $qb = $this->em->createQueryBuilder()
             ->from(User::class, 'u')
             ->andWhere('u.userType = :type')
             ->andWhere('u.email <> :system')
             ->setParameter('type', (Scope::Platform === $scope ? UserType::Platform : UserType::Agency)->value)
             ->setParameter('system', SystemActor::EMAIL);
-
         if (Scope::Agency === $scope) {
             $qb->andWhere('u.agency = :agency')->setParameter('agency', $actor->getAgency());
             if (null !== ($branch = self::actorBranch($actor))) {
                 $qb->andWhere('u.branch = :actorBranch')->setParameter('actorBranch', $branch);
             }
         }
-
         return $qb;
     }
-
     private function currentAssignments(array $users): array
     {
         if ([] === $users) {
             return [];
         }
-
-        /** @var list<UserRole> $rows */
+        /** @var list $rows */
         $rows = $this->em->createQueryBuilder()
             ->select('ur', 'r', 'rb')
             ->from(UserRole::class, 'ur')
@@ -397,15 +358,12 @@ final class UserManagementService
             ->orderBy('ur.assignedAt', 'DESC')
             ->getQuery()
             ->getResult();
-
         $map = [];
         foreach ($rows as $row) {
             $map[(int) $row->getUser()?->getId()] ??= $row;
         }
-
         return $map;
     }
-
     private function assign(User $agent, ?Role $role, ?Branch $branch, User $actor): void
     {
         if (null === $role) {
@@ -418,7 +376,6 @@ final class UserManagementService
             ->setBranch($branch)
             ->setAssignedBy($actor));
     }
-
     private function resolveRole(User $actor, Scope $scope, ?string $code, ?string $currentCode, array &$errors): ?Role
     {
         $role = null === $code || '' === $code ? null : $this->em->getRepository(Role::class)->findOneBy(['code' => $code]);
@@ -426,13 +383,19 @@ final class UserManagementService
             $errors['role_code'] = 'Cette fonction n\'est pas disponible.';
             return null;
         }
-        if ($code !== $currentCode && !\in_array($code, array_column($this->assignableRoles($actor), 'code'), true)) {
-            $errors['role_code'] = 'Vous ne pouvez pas attribuer cette fonction.';
-            return null;
+        if ($code !== $currentCode) {
+            // 🟢 FIX 100% DB : Extraction manuelle et sécurisée des codes d'entités valides
+            $allowedRoleCodes = [];
+            foreach ($this->assignableRoles($actor) as $allowedRole) {
+                $allowedRoleCodes[] = $allowedRole->getCode();
+            }
+            if (!\in_array($code, $allowedRoleCodes, true)) {
+                $errors['role_code'] = 'Vous ne pouvez pas attribuer cette fonction.';
+                return null;
+            }
         }
         return $role;
     }
-
     private function resolveBranch(User $actor, ?string $code, array &$errors): ?Branch
     {
         $own = self::actorBranch($actor);
@@ -453,7 +416,6 @@ final class UserManagementService
         }
         return $branch;
     }
-
     private function emailTaken(string $email, ?User $except): bool
     {
         $qb = $this->em->createQueryBuilder()
@@ -461,24 +423,19 @@ final class UserManagementService
             ->from(User::class, 'u')
             ->andWhere('LOWER(u.email) = :email')
             ->setParameter('email', $email);
-
         if (null !== $except) {
             $qb->andWhere('u.id <> :except')->setParameter('except', $except->getId());
         }
-
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
-
     private function normalizePhone(string $phone): string
     {
         return substr((string) preg_replace('/[^\d+]/', '', $phone), 0, 30);
     }
-
     private function uniqueCode(): string
     {
         $alphabet = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
         $repository = $this->em->getRepository(User::class);
-
         for ($attempt = 0; $attempt < 10; ++$attempt) {
             $code = 'USR-';
             for ($i = 0; $i < 8; ++$i) {
@@ -490,4 +447,4 @@ final class UserManagementService
         }
         throw new AgentManagementException(['global' => 'Erreur lors de la génération du code unique.']);
     }
-} // Fin de la classe
+}

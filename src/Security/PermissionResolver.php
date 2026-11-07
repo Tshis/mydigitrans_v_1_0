@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Service central de résolution des permissions réelles d'un utilisateur et d'un rôle.
- * Centralise les accès pour l'ensemble du système RBAC de MyDigitrans.
+ * Centralise les accès en parfaite conformité avec les codes préfixés du Seed MyDigitrans.
  */
 final class PermissionResolver
 {
@@ -41,11 +41,34 @@ final class PermissionResolver
     }
 
     /**
-     * Vérifie si un utilisateur possède une permission spécifique.
+     * Vérifie si un utilisateur possède une permission spécifique (brute ou par héritage).
      */
     public function has(User $user, string $permission): bool
     {
-        return isset($this->forUser($user)[$permission]);
+        $scope = self::scopeOf($user);
+        if (null === $scope) {
+            return false;
+        }
+
+        // 🟢 HARMONISATION : On ajoute le préfixe de portée exigé par le Seed (ex: "agency:trip.view")
+        $uniqueDbPermissionCode = $scope->value . ':' . $permission;
+
+        $permissions = $this->forUser($user);
+
+        // 1. Accès direct si la permission exacte préfixée est présente en base
+        if (isset($permissions[$uniqueDbPermissionCode])) {
+            return true;
+        }
+
+        // 2. Implication hiérarchique : Détenir l'écriture (.write) octroie automatiquement la lecture (.view)
+        if (\str_ends_with($permission, '.view')) {
+            $module = \substr($permission, 0, -\strlen('.view'));
+            $writeEquivalentCode = $scope->value . ':' . $module . '.write';
+
+            return isset($permissions[$writeEquivalentCode]);
+        }
+
+        return false;
     }
 
     /**
@@ -59,10 +82,7 @@ final class PermissionResolver
     }
 
     /**
-     * Extrait les permissions par défaut associées à un rôle système (sans distinction d'agence).
-     * Requis par le Voter pour analyser les droits hiérarchiques.
-     *
-     * @return list<string>
+     * Extrait les permissions associées à un rôle système en lisant la table physique RolePermission.
      */
     public function permissionsOfRole(Role $role): array
     {
@@ -89,7 +109,7 @@ final class PermissionResolver
     }
 
     /**
-     * Construit la carte complète des permissions actives d'un utilisateur.
+     * Construit la carte complète des permissions actives d'un utilisateur depuis la DB.
      *
      * @return array<string, true>
      */
@@ -104,22 +124,22 @@ final class PermissionResolver
         $scope = self::scopeOf($user);
         $agency = $user->getAgency();
 
-        // Garde-fou : si pas de scope, compte inactif ou scope agence sans agence liée, aucun droit.
         if (null === $scope || !$user->isActive() || (Scope::Agency === $scope && null === $agency)) {
             return $this->cache[$id] = [];
         }
 
-        // 👑 COURT-CIRCUIT ADMINISTRATIF : Les rôles d'administration système possèdent structurellement tout.
+        // COURT-CIRCUIT ADMINISTRATIF : Rôles protégés (SuperAdmin, Admin d'Agence)
         $protectedRole = AccessCatalog::protectedRole($scope);
         if (\in_array($protectedRole, $user->getRoles(), true)) {
             $allPermissions = [];
             foreach (array_keys(AccessCatalog::permissions($scope)) as $code) {
-                $allPermissions[$code] = true;
+                // On préfixe aussi les clés dans le court-circuit administratif pour être uniforme
+                $allPermissions[$scope->value . ':' . $code] = true;
             }
             return $this->cache[$id] = $allPermissions;
         }
 
-        // Extraction SQL/Doctrine classique via la table d'attribution physique UserRole
+        // Extraction SQL via la table d'attribution physique UserRole
         $qb = $this->em->createQueryBuilder()
             ->select('DISTINCT p.code AS code')
             ->from(RolePermission::class, 'rp')
@@ -151,5 +171,10 @@ final class PermissionResolver
         }
 
         return $this->cache[$id] = $codes;
+    }
+
+    public function resetCacheForUser(User $user): void
+    {
+        unset($this->cache[(int) $user->getId()]);
     }
 }

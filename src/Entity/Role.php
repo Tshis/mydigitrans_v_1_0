@@ -33,6 +33,9 @@ class Role
     #[ORM\Column]
     private bool $isActive = true;
 
+    #[ORM\ManyToOne(inversedBy: 'roles')]
+    private ?Agency $agency = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -101,5 +104,17 @@ class Role
     public function __toString(): string
     {
         return (string) $this->name;
+    }
+
+    public function getAgency(): ?Agency
+    {
+        return $this->agency;
+    }
+
+    public function setAgency(?Agency $agency): static
+    {
+        $this->agency = $agency;
+
+        return $this;
     }
 }
