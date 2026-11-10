@@ -18,8 +18,8 @@ final class PermissionVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        // Intercepte les actions pointées du catalogue d'accès
-        return 1 === \preg_match('/^[a-z_]+\.(view|write|refund|print|confirm|activate)$/', $attribute);
+        // 🟢 FIX CHIRURGICAL : Ajout de 'configure' dans la regex d'interception du catalogue d'accès
+        return 1 === \preg_match('/^[a-z_]+\.(view|write|configure|refund|print|confirm|activate)$/', $attribute);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool

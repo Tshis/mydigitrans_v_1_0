@@ -27,6 +27,7 @@ final class AccessCatalog
     private const ACTION_LABELS = [
         'view' => 'Consulter',
         'write' => 'Créer / modifier',
+        'configure' => 'Configurer / Activer', // 🟢 Label sémantique d'agence
         'refund' => 'Rembourser',
         'print' => 'Imprimer',
         'confirm' => 'Confirmer',
@@ -46,6 +47,10 @@ final class AccessCatalog
         'shipment' => ['Colis (Fret)', 'fa-box-open', ['view', 'write']],
         'payment' => ['Paiements', 'fa-money-bill', ['view', 'write', 'confirm']],
         'cash' => ['Caisse', 'fa-cash-register', ['view', 'write']],
+
+        // 🟢 CÔTÉ AGENCE : Uniquement le droit de voir et de configurer / activer localement (Pas de write)
+        'currency' => ['Devises & Taux', 'fa-money-bill-transfer', ['view', 'configure']],
+
         'expense' => ['Dépenses', 'fa-receipt', ['view', 'write']],
         'report' => ['Rapports', 'fa-chart-line', ['view']],
         'user' => ['Utilisateurs', 'fa-users', ['view', 'write', 'activate']],
@@ -61,6 +66,10 @@ final class AccessCatalog
         'invoice' => ['Facturation', 'fa-file-invoice', ['view', 'write']],
         'commission' => ['Commissions', 'fa-percent', ['view', 'write']],
         'cash' => ['Caisse plateforme', 'fa-cash-register', ['view', 'write']],
+
+        // 🟢 CÔTÉ PLATEFORME : Le Super Admin a le droit exclusif de créer les devises usines globales
+        'currency' => ['Catalogue Devises', 'fa-money-bill-transfer', ['view', 'write']],
+
         'expense' => ['Dépenses plateforme', 'fa-receipt', ['view', 'write']],
         'notification' => ['Notifications', 'fa-bell', ['view', 'write']],
         'report' => ['Rapports', 'fa-chart-line', ['view']],
@@ -75,7 +84,7 @@ final class AccessCatalog
         'ROLE_MANAGER' => [
             'Gestionnaire',
             'Pilotage de l\'exploitation : flotte, lignes, voyages, tarifs, ventes et dépenses.',
-            ['dashboard.view', 'branch.view', 'bus.*', 'route.*', 'trip.*', 'fare.*', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'expense.*', 'report.view', 'user.view', 'user.write', 'role.view']
+            ['dashboard.view', 'branch.view', 'bus.*', 'route.*', 'trip.*', 'fare.*', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'currency.view', 'expense.*', 'report.view', 'user.view', 'user.write', 'role.view']
         ],
         'ROLE_CASHIER' => [
             'Caissier / Guichetier',
@@ -90,7 +99,8 @@ final class AccessCatalog
         'ROLE_ACCOUNTANT' => [
             'Comptable d\'agence',
             'Audit financier : paiements, caisse, dépenses et rapports.',
-            ['dashboard.view', 'payment.view', 'cash.view', 'expense.*', 'report.view', 'ticket.view', 'shipment.view']
+            // 🟢 Le comptable d'agence a le droit de voir le catalogue et de configurer / fixer le taux journalier
+            ['dashboard.view', 'payment.view', 'cash.view', 'currency.view', 'currency.configure', 'expense.*', 'report.view', 'ticket.view', 'shipment.view']
         ],
         'ROLE_DISPATCHER' => [
             'Dispatcheur',
@@ -105,7 +115,7 @@ final class AccessCatalog
         'ROLE_PLATFORM_ACCOUNTANT' => [
             'Comptable plateforme',
             'Facturation, commissions, caisse et dépenses de la plateforme.',
-            ['dashboard.view', 'agency.view', 'partner.view', 'plan.view', 'invoice.*', 'commission.*', 'cash.*', 'expense.*', 'report.view']
+            ['dashboard.view', 'agency.view', 'partner.view', 'plan.view', 'invoice.*', 'commission.*', 'cash.*', 'currency.view', 'expense.*', 'report.view']
         ],
         'ROLE_PLATFORM_CASHIER' => [
             'Caissier plateforme',
@@ -115,22 +125,15 @@ final class AccessCatalog
         'ROLE_PLATFORM_SUPPORT' => [
             'Support plateforme',
             'Accompagnement des agences et des partenaires.',
-            ['dashboard.view', 'agency.*', 'partner.view', 'notification.*', 'user.view']
+            ['dashboard.view', 'agency.*', 'partner.view', 'currency.view', 'notification.*', 'user.view']
         ],
     ];
 
-    /**
-     * Les administrateurs ne sont gérés par personne d'autre : aucun écran ne peut les modifier,
-     * les bloquer ni leur attribuer ou retirer ce rôle.
-     */
     public static function isAdminRole(?string $code): bool
     {
         return \in_array($code, [self::AGENCY_ADMIN, self::SUPER_ADMIN], true);
     }
 
-    /**
-     * Rôle protégé de la portée (administrateur).
-     */
     public static function protectedRole(Scope $scope): string
     {
         return Scope::Platform === $scope ? self::SUPER_ADMIN : self::AGENCY_ADMIN;
@@ -207,7 +210,6 @@ final class AccessCatalog
 
             $out[$code] = ['name' => $name, 'description' => $description, 'permissions' => array_values(array_unique($granted))];
         }
-
         return $out;
     }
 }

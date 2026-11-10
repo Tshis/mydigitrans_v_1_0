@@ -19,7 +19,7 @@
 			</div>
 		</header>
 
-		<form action="#" method="POST" class="card control-card">
+		<form action="{{ path('admin_agency_currency_configure_base') }}" method="POST" class="card control-card">
 			<h2 class="card-title-fix">
 				<i class="fa-solid fa-earth-africa text-primary"></i>
 				Sélection de la Monnaie de Base et d'Acceptation</h2>
@@ -29,9 +29,9 @@
 					<label class="admin-bus-layout-add-label">Définir la Devise Pivot Principale *</label>
 					<select name="base_currency" class="admin-bus-layout-add-select" required>
 						{% for currency in system_currencies %}
-							<option value="{{ currency.code }}" {% if agency_config.baseCurrency == currency.code %} selected {% endif %}>{{ currency.code }}
-								-
-								{{ currency.name }}</option>
+							<option value="{{ currency.code }}" {% if agency_config.baseCurrency == currency.code %} selected {% endif %}>
+								{{ currency.code }} - {{ currency.name }}
+							</option>
 						{% endfor %}
 					</select>
 				</div>
@@ -41,11 +41,10 @@
 			<div class="currency-checkbox-group mb-20">
 				{% for currency in system_currencies %}
 					<label class="checkbox-container">
+						{# 🟢 FIX : Conservation du nom sous forme de tableau accepted_currencies[] #}
 						<input type="checkbox" name="accepted_currencies[]" value="{{ currency.code }}" {% if currency.code in agency_config.acceptedCurrencies %} checked {% endif %}>
 						<span class="checkmark"></span>
-						{{ currency.code }}
-						-
-						{{ currency.name }}
+						{{ currency.code }} - {{ currency.name }}
 					</label>
 				{% endfor %}
 			</div>
@@ -54,7 +53,8 @@
 				<a href="{{ path('admin_agency_currency_index') }}" class="btn-refined btn-gray-gradient">Annuler</a>
 				<button type="submit" class="btn-refined btn-success-gradient">
 					<i class="fa-solid fa-circle-check"></i>
-					Sauvegarder l'acceptation</button>
+					Sauvegarder l'acceptation
+				</button>
 			</div>
 		</form>
 	</div>

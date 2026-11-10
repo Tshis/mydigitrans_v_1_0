@@ -70,6 +70,16 @@
 	</a>
 {% endif %}
 
+{# 🟢 POSITIONNEMENT STRATÉGIQUE : Devises & Taux de Trésorerie #}
+{% if is_granted('currency.view') %}
+	<a href="{{ path('admin_agency_currency_index') }}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Configuration monétaire et taux d'échange">
+		<span class="icon">
+			<i class="fa-solid fa-money-bill-transfer"></i>
+		</span>
+		<span class="text">Devises & Taux</span>
+	</a>
+{% endif %}
+
 {# Tarifs #}
 {% if is_granted('fare.view') %}
 	<a href="{{ path('admin_agency_fare_add') }}" class="menu-link {{ page is same as('fare') ? 'active' : '' }}" data-tooltip="Grille Tarifaire">

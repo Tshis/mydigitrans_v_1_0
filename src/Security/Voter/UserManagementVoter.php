@@ -21,8 +21,8 @@ final class UserManagementVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        // 🟢 UNIVERSEL : Intercepte toutes les chaînes pointées (ex: trip.view, cash_register.view)
-        return \str_contains($attribute, '.view') || \str_contains($attribute, '.write');
+        // 🟢 FIX CHIRURGICAL : Ce Voter ne doit intercepter QUE les actions liées à la gestion des utilisateurs (agents)
+        return $attribute === 'user.view' || $attribute === 'user.write' || $attribute === 'user.activate';
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
@@ -50,7 +50,7 @@ final class UserManagementVoter extends Voter
         if (!\in_array(AccessCatalog::SUPER_ADMIN, $actor->getRoles(), true)) {
             return false;
         }
-        if (($attribute === 'user.write' || \str_contains($attribute, '.write')) && $subject instanceof User && $subject->getId() === $actor->getId()) {
+        if ($attribute === 'user.write' && $subject instanceof User && $subject->getId() === $actor->getId()) {
             return false;
         }
         return true;
@@ -61,7 +61,7 @@ final class UserManagementVoter extends Voter
         $isManager = \in_array('ROLE_MANAGER', $actor->getRoles(), true);
 
         if ($subject instanceof AgentData) {
-            if (!\str_contains($attribute, '.write')) {
+            if ($attribute !== 'user.write') {
                 return false;
             }
             if ($isManager) {
@@ -79,13 +79,13 @@ final class UserManagementVoter extends Voter
             if ($subject->getAgency()?->getId() !== $actor->getAgency()?->getId()) {
                 return false;
             }
-            if (\str_contains($attribute, '.write') && $subject->getId() === $actor->getId()) {
+            if ($attribute === 'user.write' && $subject->getId() === $actor->getId()) {
                 return false;
             }
             if ($isManager && $subject->getBranch()?->getId() !== $actor->getBranch()?->getId()) {
                 return false;
             }
-            if (\str_contains($attribute, '.write') && $isManager) {
+            if ($attribute === 'user.write' && $isManager) {
                 $targetRoles = $subject->getRoles();
                 if (\in_array(AccessCatalog::AGENCY_ADMIN, $targetRoles, true) || \in_array(AccessCatalog::GENERAL_MANAGER, $targetRoles, true)) {
                     return false;

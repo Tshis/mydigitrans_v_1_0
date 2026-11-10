@@ -8,9 +8,8 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-currency-scope container">
-		{# --- HEADER AVEC TES DEUX BOUTONS D'ACTION (A et B) --- #}
+	<div class="admin-agency-currency-scope container">
+		{# --- HEADER AVEC LES DEUX BOUTONS D'ACTION (A et B) --- #}
 		<header class="header mb-25">
 			<div class="header-main-info">
 				<div class="title">
@@ -22,26 +21,25 @@
 					<h1 class="mt-5">Monnaies & Taux Actifs</h1>
 				</div>
 			</div>
-			<div
-				class="header-actions">
-				{# BOUTON A : Paramétrage structurel #}
-				<a href="{{ path('admin_agency_currency_configure_base') }}" class="btn-refined btn-primary-gradient">
-					<i class="fa-solid fa-gears"></i>
-					<span>A / Configuration Devises</span>
-				</a>
-				{# BOUTON B : Ajustement quotidien du matin #}
-				<a href="{{ path('admin_agency_currency_configure_rate') }}" class="btn-refined btn-success-gradient">
-					<i class="fa-solid fa-sun"></i>
-					<span>B / Fixer Taux Journalier</span>
-				</a>
-			</div>
+			{# 🟢 FIX : Modification de currency.write vers la permission exclusive currency.configure #}
+			{% if is_granted('currency.configure') %}
+				<div class="header-actions">
+					{# BOUTON A : Paramétrage structurel #}
+					<a href="{{ path('admin_agency_currency_configure_base') }}" class="btn-refined btn-primary-gradient">
+						<i class="fa-solid fa-gears"></i>
+						<span>A / Configuration Devises</span>
+					</a>
+					{# BOUTON B : Ajustement quotidien du matin #}
+					<a href="{{ path('admin_agency_currency_configure_rate') }}" class="btn-refined btn-success-gradient">
+						<i class="fa-solid fa-sun"></i>
+						<span>B / Fixer Taux Journalier</span>
+					</a>
+				</div>
+			{% endif %}
 		</header>
 
-		<div
-			class="reports-center-grid-layout">
-			{# PANNEAU PRINCIPAL #}
-			<div
-				class="main-form-panel">
+		<div class="reports-center-grid-layout">
+			<div class="main-form-panel">
 
 				{# BLOC INFO : LA DEVISE DE BASE DE L'AGENCE #}
 				<div class="card control-card mb-20">
@@ -52,7 +50,7 @@
 					<div class="direct-pricing-row">
 						<div class="field">
 							<label class="admin-bus-layout-add-label">Unité de consolidation comptable de votre SaaS</label>
-							<div class="admin-bus-layout-add-input text-disabled font-bold" style="font-size: 15px; color: var(--primary);">
+							<div class="admin-bus-layout-add-input text-disabled font-bold">
 								<i class="fa-solid fa-circle-check text-success"></i>
 								{{ agency_config.baseCurrency }}
 								-
@@ -62,12 +60,11 @@
 					</div>
 				</div>
 
-				{# TABLEAU DES DEVISES ACTIVES ET LEURS RAPPORTS DE TAUX CROISÉS #}
+				{# TABLEAU DES DEVISES ACTIVES ET LEURS RAPPORTS DE TUX CROISÉS #}
 				<div class="table-responsive-wrapper mb-25">
 					<h2 class="card-title-fix text-size-14 py-10">
 						<i class="fa-solid fa-money-bill-transfer text-primary"></i>
-						Matrice des Taux en Cours (Par rapport au
-						{{ agency_config.baseCurrency }})
+						Matrice des Taux en Cours (Par rapport au {{ agency_config.baseCurrency }})
 					</h2>
 					<table class="table table-scrollable table-striped">
 						<thead>
@@ -89,16 +86,12 @@
 										{% if currency.code == agency_config.baseCurrency %}
 											<span class="text-gray">1.00 (Pivot)</span>
 										{% else %}
-											<span class="text-success-mode">1
-												{{ currency.code }}
-												=
-												{{ currency.current_rate|number_format(0, ',', ' ') }}
-												{{ agency_config.baseCurrency }}</span>
+											<span class="text-success-mode">1 {{ currency.code }} = {{ currency.current_rate|number_format(4, ',', ' ') }} {{ agency_config.baseCurrency }}</span>
 										{% endif %}
 									</td>
 									<td class="text-center">
-										<span class="pill-report-audit {{ currency.code == agency_config.baseCurrency ? 'closed' : 'open' }}">
-											{{ currency.code == agency_config.baseCurrency ? 'Base unique' : 'Acceptée' }}
+										<span class="pill-report-audit {{ currency.isBase ? 'closed' : 'open' }}">
+											{{ currency.isBase ? 'Base unique' : 'Acceptée' }}
 										</span>
 									</td>
 								</tr>
@@ -107,7 +100,7 @@
 					</table>
 				</div>
 
-				{# --- NOUVEAU TABLEAU : JOURNAL HISTORIQUE DES VARIATIONS DE TAUX --- #}
+				{# --- JOURNAL HISTORIQUE DES VARIATIONS DE TAUX --- #}
 				<div class="table-responsive-wrapper">
 					<h2 class="card-title-fix text-size-14 py-10">
 						<i class="fa-solid fa-clock-rotate-left text-primary"></i>
@@ -119,40 +112,30 @@
 								<th>Date d'Application</th>
 								<th>Heure de Fixation</th>
 								<th>Taux d'Échange Enregistré</th>
-								<th>Opérateur Responsable
-								</th>
 								<th class="text-center">Statut du Taux</th>
 							</tr>
 						</thead>
 						<tbody>
-							{% for history in rate_history %}
+							{% for group in rate_history %}
 								<tr>
 									<td>
-										<strong>{{ history.effectiveFrom|date('d/m/Y') }}</strong>
+										<strong>{{ group.effectiveFrom|date('d/m/Y') }}</strong>
 									</td>
-									<td class="monospace">{{ history.effectiveFrom|date('H:i:s') }}</td>
+									<td class="monospace">{{ group.effectiveFrom|date('H:i:s') }}</td>
 									<td class="font-bold text-primary-mode">
-										1
-										{{ history.targetCurrency }}
-										=
-										{{ history.rate|number_format(0, ',', ' ') }}
-										{{ agency_config.baseCurrency }}
+										{# 🟢 Affiche toutes les devises fixées à cette heure précise sur la même ligne #}
+										{% for item in group.rates %}
+											<div class="mb-5">1 {{ item.targetCurrency }} = {{ item.rate|number_format(4, ',', ' ') }} {{ item.baseCurrency }}</div>
+										{% endfor %}
 									</td>
-									<td>
-										<small>
-											<i class="fa-solid fa-user-shield text-gray"></i>
-											{{ history.createdBy }}</small>
-									</td>
-									<td
-										class="text-center">
-										{# La toute première ligne du tableau représente toujours le taux actuel en cours #}
+									<td class="text-center">
+										{# 🟢 Le statut s'applique maintenant logiquement à toute la grille horaire #}
 										{% if loop.first %}
-											<span class="pill-report-audit open">
-												<i class="fa-solid fa-circle-check"></i>
-												Actif
+											<span class="pill-report-audit closed">
+												<i class="fa-solid fa-circle-check"></i> Actif
 											</span>
 										{% else %}
-											<span class="pill-report-audit open" style="background: rgba(0,0,0,0.04); color: #7f8c8d;">
+											<span class="pill-report-audit open">
 												Archivé
 											</span>
 										{% endif %}
@@ -160,12 +143,13 @@
 								</tr>
 							{% else %}
 								<tr>
-									<td colspan="5" class="text-center text-gray italic padding-20">
+									<td colspan="4" class="text-center text-gray italic padding-20">
 										Aucun historique de taux enregistré dans la table ExchangeRate.
 									</td>
 								</tr>
 							{% endfor %}
 						</tbody>
+
 					</table>
 				</div>
 

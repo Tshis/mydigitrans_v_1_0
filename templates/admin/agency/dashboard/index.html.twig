@@ -19,7 +19,17 @@
             </div>
             <div class="text-weight-600 text-danger">
                 <span class="label">Devise Pivot :</span>
-                <span class="value font-bold monospace text-size-28 ">{{ agency_currency_settings.base_currency }}</span>
+                {% if agency_currency_settings.base_currency is same as('Non configurée') %}
+                    <small>
+                        {{ agency_currency_settings.base_currency }}
+                    </small>
+                {% else %}
+                    <span class="value font-bold monospace text-size-28 ">
+                        {{ agency_currency_settings.base_currency }}
+                    </span>                    
+                {% endif %}
+                    
+                
             </div>
         </header>
 

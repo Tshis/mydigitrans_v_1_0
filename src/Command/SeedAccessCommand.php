@@ -8,7 +8,8 @@ use App\Entity\Permission;
 use App\Entity\Role;
 use App\Entity\RolePermission;
 use App\Enum\Scope;
-use App\Service\SystemActor; // <-- Votre service d'acteur système virtuel
+use App\Security\AccessCatalog;
+use App\Service\SystemActor;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -22,13 +23,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 final class SeedAccessCommand extends Command
 {
-    // Constantes de portée propres à votre architecture
-    public const SCOPE_AGENCY = Scope::Agency;
-    public const SCOPE_PLATFORM =  Scope::Platform;
-
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly SystemActor $systemActor // <-- Injection de votre service ici
+        private readonly SystemActor $systemActor
     ) {
         parent::__construct();
     }
@@ -38,382 +35,87 @@ final class SeedAccessCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Synchronisation du catalogue AccessCatalog MyDigitrans');
 
-        // 1. Récupération ou création immédiate du compte robot système
         $robot = $this->systemActor->get();
         $io->text(sprintf('✓ Traçabilité signée par l\'acteur : <info>%s</info>', $robot->getEmail()));
 
-        // =========================================================================
-        // CATALOGUE DES PERMISSIONS ET MATRICE DES RÔLES FIXÉS PAR L'USINE
-        // =========================================================================
-
-        // Portée Agence : 32 permissions [MCD 6. Permission]
-        $agencyPermissions = [
-            'dashboard.view',
-            'branch.view',
-            'branch.write',
-            'bus.view',
-            'bus.write',
-            'route.view',
-            'route.write',
-            'trip.view',
-            'trip.write',
-            'fare.view',
-            'fare.write',
-            'reservation.view',
-            'reservation.write',
-            'ticket.view',
-            'ticket.write',
-            'ticket.refund',
-            'ticket.print',
-            'shipment.view',
-            'shipment.write',
-            'payment.view',
-            'payment.write',
-            'payment.confirm',
-            'cash.view',
-            'cash.write',
-            'expense.view',
-            'expense.write',
-            'report.view',
-            'user.view',
-            'user.write',
-            'role.view',
-            'subscription.view',
-            'subscription.write'
-        ];
-
-        // Portée Plateforme : 21 permissions [MCD 6. Permission]
-        $platformPermissions = [
-            'dashboard.view',
-            'agency.view',
-            'agency.write',
-            'partner.view',
-            'partner.write',
-            'plan.view',
-            'plan.write',
-            'invoice.view',
-            'invoice.write',
-            'commission.view',
-            'commission.write',
-            'cash.view',
-            'cash.write',
-            'expense.view',
-            'expense.write',
-            'notification.view',
-            'notification.write',
-            'report.view',
-            'user.view',
-            'user.write',
-            'role.view'
-        ];
-
-        // Matrice d'usine globale des fonctions applicatives
-        $rolesCatalog = [
-            'ROLE_AGENCY_ADMIN' => [
-                'scope' => self::SCOPE_AGENCY,
-                'description' => 'Gestion complète de l\'agence et de son personnel.',
-                'permissions' => $agencyPermissions
-            ],
-            'ROLE_GENERAL_MANAGER' => [
-                'scope' => self::SCOPE_AGENCY,
-                'description' => 'Directeur Général Adjoint / Directeur d\'Exploitation. Supervision globale sans modification de l\'administrateur.',
-                'permissions' => [
-                    'dashboard.view',
-                    'branch.view',
-                    'branch.write',
-                    'bus.view',
-                    'bus.write',
-                    'route.view',
-                    'route.write',
-                    'trip.view',
-                    'trip.write',
-                    'fare.view',
-                    'fare.write',
-                    'reservation.view',
-                    'reservation.write',
-                    'ticket.view',
-                    'ticket.write',
-                    'ticket.refund',
-                    'ticket.print',
-                    'shipment.view',
-                    'shipment.write',
-                    'payment.view',
-                    'payment.write',
-                    'payment.confirm',
-                    'cash.view',
-                    'cash.write',
-                    'expense.view',
-                    'expense.write',
-                    'report.view',
-                    'user.view',
-                    'user.write',
-                    'role.view',
-                    'subscription.view',
-                    'subscription.write'
-                ]
-            ],
-            'ROLE_MANAGER' => [
-                'scope' => self::SCOPE_AGENCY,
-                'description' => 'Pilotage de l\'exploitation : flotte, lignes, voyages, tarifs, ventes et dépenses.',
-                'permissions' => [
-                    'dashboard.view',
-                    'branch.view',
-                    'bus.view',
-                    'bus.write',
-                    'route.view',
-                    'route.write',
-                    'trip.view',
-                    'trip.write',
-                    'fare.view',
-                    'reservation.view',
-                    'reservation.write',
-                    'ticket.view',
-                    'ticket.write',
-                    'ticket.refund',
-                    'ticket.print',
-                    'shipment.view',
-                    'shipment.write',
-                    'payment.view',
-                    'payment.write',
-                    'payment.confirm',
-                    'cash.view',
-                    'cash.write',
-                    'expense.view',
-                    'expense.write',
-                    'report.view',
-                    'user.view',
-                    'role.view'
-                ]
-            ],
-            'ROLE_CASHIER' => [
-                'scope' => self::SCOPE_AGENCY,
-                'description' => 'Vente de billets, encaissement des colis et tenue de la caisse.',
-                'permissions' => [
-                    'dashboard.view',
-                    'trip.view',
-                    'reservation.view',
-                    'reservation.write',
-                    'ticket.view',
-                    'ticket.write',
-                    'ticket.print',
-                    'shipment.view',
-                    'shipment.write',
-                    'payment.view',
-                    'payment.write',
-                    'payment.confirm',
-                    'cash.view',
-                    'cash.write'
-                ]
-            ],
-            'ROLE_CONTROLLER' => [
-                'scope' => self::SCOPE_AGENCY,
-                'description' => 'Vérification des billets et des places à l\'embarquement.',
-                'permissions' => ['trip.view', 'reservation.view', 'ticket.view']
-            ],
-            'ROLE_ACCOUNTANT' => [
-                'scope' => self::SCOPE_AGENCY,
-                'description' => 'Audit financier : paiements, caisse, dépenses et rapports.',
-                'permissions' => [
-                    'dashboard.view',
-                    'payment.view',
-                    'cash.view',
-                    'expense.view',
-                    'expense.write',
-                    'report.view',
-                    'ticket.view',
-                    'shipment.view'
-                ]
-            ],
-            'ROLE_DISPATCHER' => [
-                'scope' => self::SCOPE_AGENCY,
-                'description' => 'Planification des voyages et affectation des bus.',
-                'permissions' => ['dashboard.view', 'bus.view', 'route.view', 'trip.view', 'trip.write', 'fare.view', 'reservation.view']
-            ],
-            'ROLE_DRIVER' => [
-                'scope' => self::SCOPE_AGENCY,
-                'description' => 'Conduite des voyages : consultation du planning.',
-                'permissions' => ['trip.view']
-            ],
-            'ROLE_SUPER_ADMIN' => [
-                'scope' => self::SCOPE_PLATFORM,
-                'description' => 'Gestion complète de la plateforme SaaS MyDigitrans.',
-                'permissions' => $platformPermissions
-            ],
-            'ROLE_PLATFORM_ACCOUNTANT' => [
-                'scope' => self::SCOPE_PLATFORM,
-                'description' => 'Facturation, commissions, caisse et dépenses de la plateforme.',
-                'permissions' => [
-                    'dashboard.view',
-                    'agency.view',
-                    'partner.view',
-                    'plan.view',
-                    'invoice.view',
-                    'invoice.write',
-                    'commission.view',
-                    'commission.write',
-                    'cash.view',
-                    'cash.write',
-                    'expense.view',
-                    'expense.write',
-                    'report.view'
-                ]
-            ],
-            'ROLE_PLATFORM_CASHIER' => [
-                'scope' => self::SCOPE_PLATFORM,
-                'description' => 'Encaissement des abonnements et tenue de la caisse plateforme.',
-                'permissions' => ['dashboard.view', 'invoice.view', 'cash.view', 'cash.write', 'expense.view']
-            ],
-            'ROLE_PLATFORM_SUPPORT' => [
-                'scope' => self::SCOPE_PLATFORM,
-                'description' => 'Accompagnement applicatif des agences et des partenaires.',
-                'permissions' => ['dashboard.view', 'agency.view', 'agency.write', 'partner.view', 'notification.view', 'notification.write', 'user.view']
-            ],
-        ];
-
-        // Catalogue d'iconographie d'usine par module applicatif
-        $moduleIcons = [
-            'dashboard'    => 'fa-chart-pie',
-            'branch'       => 'fa-code-branch',
-            'bus'          => 'fa-bus-simple',
-            'route'        => 'fa-route',
-            'trip'         => 'fa-calendar-days',
-            'fare'         => 'fa-tags',
-            'reservation'  => 'fa-receipt',
-            'ticket'       => 'fa-ticket',
-            'shipment'     => 'fa-box',
-            'payment'      => 'fa-credit-card',
-            'cash'         => 'fa-cash-register',
-            'expense'      => 'fa-wallet',
-            'report'       => 'fa-file-invoice-dollar',
-            'user'         => 'fa-users',
-            'role'         => 'fa-shield-halved',
-            'subscription' => 'fa-key',
-            'agency'       => 'fa-building',
-            'partner'      => 'fa-handshake',
-            'plan'         => 'fa-cubes',
-            'invoice'      => 'fa-file-invoice',
-            'commission'   => 'fa-percent',
-            'notification' => 'fa-bell',
-        ];
-
-
-        // =========================================================================
-        // 2. SYNCHRONISATION DE LA TABLE "6. Permission (system)"
-        // =========================================================================
         $io->section('1. Synchronisation des permissions system (MCD Table 6)');
         $permissionEntities = [];
 
-        // Traitement de la portée Agence
-        foreach ($agencyPermissions as $code) {
-            // Le code stocké en BDD devient unique en combinant le scope et l'action
-            $uniqueDbCode = self::SCOPE_AGENCY->value . ':' . $code;
+        foreach ([Scope::Agency, Scope::Platform] as $scope) {
+            $catalogPermissions = AccessCatalog::permissions($scope);
 
-            $permission = $this->em->getRepository(Permission::class)->findOneBy(['code' => $uniqueDbCode]);
-            if (!$permission) {
-                $moduleName = explode('.', $code)[0];
-                $icon = $moduleIcons[$moduleName] ?? 'fa-circle-dot';
+            foreach (array_keys($catalogPermissions) as $permissionKey) {
+                $uniqueDbCode = $scope->value . ':' . $permissionKey;
 
-                $permission = new Permission();
-                $permission->setCode($uniqueDbCode); // <-- Stockage sécurisé et unique (ex: agency:dashboard.view)
-                $permission->setScope(self::SCOPE_AGENCY);
-                $permission->setModule($moduleName);
-                $permission->setIcon($icon);
-                $permission->setName(sprintf('Action %s [Agence]', $code));
-                $permission->setCreatedBy($robot);
-                $this->em->persist($permission);
-            }
-            $permissionEntities['agency_' . $code] = $permission;
-        }
+                $permission = $this->em->getRepository(Permission::class)->findOneBy(['code' => $uniqueDbCode]);
+                if (!$permission) {
+                    // 🟢 FIX PROTOCOLE : On isole la chaîne brute du module (ex: "currency")
+                    $parts = explode('.', $permissionKey);
+                    $moduleName = $parts[0] ?? $permissionKey;
 
-        // Traitement de la portée Plateforme
-        foreach ($platformPermissions as $code) {
-            // Le code stocké en BDD devient unique en combinant le scope et l'action
-            $uniqueDbCode = self::SCOPE_PLATFORM->value . ':' . $code;
+                    $meta = AccessCatalog::moduleMeta($scope, $moduleName);
 
-            $permission = $this->em->getRepository(Permission::class)->findOneBy(['code' => $uniqueDbCode]);
-            if (!$permission) {
-                $moduleName = explode('.', $code)[0];
-                $icon = $moduleIcons[$moduleName] ?? 'fa-circle-dot';
-
-                $permission = new Permission();
-                $permission->setCode($uniqueDbCode); // <-- Stockage sécurisé et unique (ex: platform:dashboard.view)
-                $permission->setScope(self::SCOPE_PLATFORM);
-                $permission->setModule($moduleName);
-                $permission->setIcon($icon);
-                $permission->setName(sprintf('Action %s [Plateforme]', $code));
-                $permission->setCreatedBy($robot);
-                $this->em->persist($permission);
-            }
-            $permissionEntities['platform_' . $code] = $permission;
-        }
-        $this->em->flush();
-        $io->writeln('✓ Permissions système synchronisées de manière unique.');
-
-        //============================================
-        //ROLE NAMES
-        //============================================
-        $roleNames = [
-            // --- PORTÉE PLATEFORME SAAS ---
-            'ROLE_SUPER_ADMIN'         => 'Super administrateur',
-            'ROLE_PLATFORM_ACCOUNTANT' => 'Comptable plateforme',
-            'ROLE_PLATFORM_CASHIER'    => 'Caissier plateforme',
-            'ROLE_PLATFORM_SUPPORT'    => 'Support plateforme',
-
-            // --- PORTÉE MULTI-AGENCE ---
-            'ROLE_AGENCY_ADMIN'        => 'Administrateur d\'agence',
-            'ROLE_GENERAL_MANAGER'     => 'Directeur Général',
-            'ROLE_MANAGER'             => 'Gestionnaire',
-            'ROLE_CASHIER'             => 'Caissier / Guichetier',
-            'ROLE_CONTROLLER'          => 'Contrôleur de bord',
-            'ROLE_ACCOUNTANT'          => 'Comptable d\'agence',
-            'ROLE_DISPATCHER'          => 'Dispatcheur',
-            'ROLE_DRIVER'              => 'Chauffeur',
-        ];
-
-
-
-
-        // =========================================================================
-        // 3. SYNCHRONISATION DE LA TABLE ASSOCIATIVE "7. rolePermission"
-        // =========================================================================
-        $io->section('2. Synchronisation de la matrice des droits (MCD Table 4 et 7)');
-        foreach ($rolesCatalog as $currentRoleCode => $meta) {
-            $role = $this->em->getRepository(Role::class)->findOneBy([
-                'code' => $currentRoleCode,
-                'scope' => $meta['scope']
-            ]);
-            if (!$role) {
-                $role = new Role();
-                $role->setCode($currentRoleCode);
-                $role->setScope($meta['scope']);
-                $role->setIsActive(true);
-            }
-            $role->setName($roleNames[$currentRoleCode]);
-            $role->setDescription($meta['description']);
-            $this->em->persist($role);
-            $this->em->flush();
-            // Nettoyage complet des anciennes liaisons d'usine pour reconstruire la matrice
-            $oldRelations = $this->em->getRepository(RolePermission::class)->findBy(['role' => $role]);
-            foreach ($oldRelations as $oldRelation) {
-                $this->em->remove($oldRelation);
-            }
-            $this->em->flush();
-            // Affectation des liaisons fraîches
-            foreach ($meta['permissions'] as $permCode) {
-                $permKey = ($meta['scope'] === self::SCOPE_AGENCY ? 'agency_' : 'platform_') . $permCode;
-                if (isset($permissionEntities[$permKey])) {
-                    $rolePermission = new RolePermission();
-                    $rolePermission->setRole($role);
-                    $rolePermission->setPermission($permissionEntities[$permKey]);
-                    $rolePermission->setAssignedBy($robot); // <-- Renseigne la colonne obligatoire 'assignedBy' avec le robot ! [MCD 7]
-                    $rolePermission->setAgency(null);
-                    $rolePermission->setBranch(null);
-                    $this->em->persist($rolePermission);
+                    $permission = new Permission();
+                    $permission->setCode($uniqueDbCode);
+                    $permission->setScope($scope);
+                    $permission->setModule($moduleName); // Transmet désormais une chaîne de caractères valide
+                    $permission->setIcon($meta['icon'] ?? 'fa-circle-dot');
+                    $permission->setName(sprintf('Action %s [%s]', $permissionKey, ucfirst($scope->value)));
+                    $permission->setCreatedBy($robot);
+                    $this->em->persist($permission);
                 }
+                $permissionEntities[$scope->value . '_' . $permissionKey] = $permission;
             }
-            $this->em->flush();
         }
-        $io->success('Félicitations Daniel ! La matrice des rôles et des droits d\'usine est initialisée à 100 % sous la signature de votre SystemActor.');
+
+        $this->em->flush();
+        $io->writeln('✓ Permissions système synchronisées de manière unique en base de données.');
+
+        $io->section('2. Synchronisation de la matrice des droits (MCD Table 4 et 7)');
+
+        foreach ([Scope::Agency, Scope::Platform] as $scope) {
+            $rolesDefinitions = AccessCatalog::roles($scope);
+
+            foreach ($rolesDefinitions as $roleCode => $meta) {
+                $role = $this->em->getRepository(Role::class)->findOneBy([
+                    'code' => $roleCode,
+                    'scope' => $scope->value
+                ]);
+
+                if (!$role) {
+                    $role = new Role();
+                    $role->setCode($roleCode);
+                    $role->setScope($scope);
+                    $role->setIsActive(true);
+                }
+                $role->setName($meta['name']);
+                $role->setDescription($meta['description']);
+                $this->em->persist($role);
+                $this->em->flush();
+
+                $oldRelations = $this->em->getRepository(RolePermission::class)->findBy(['role' => $role]);
+                foreach ($oldRelations as $oldRelation) {
+                    $this->em->remove($oldRelation);
+                }
+                $this->em->flush();
+
+                foreach ($meta['permissions'] as $permCode) {
+                    $entityKey = $scope->value . '_' . $permCode;
+                    if (isset($permissionEntities[$entityKey])) {
+                        $rolePermission = new RolePermission();
+                        $rolePermission->setRole($role);
+                        $rolePermission->setPermission($permissionEntities[$entityKey]);
+                        $rolePermission->setAssignedBy($robot);
+                        $rolePermission->setAgency(null);
+                        $rolePermission->setBranch(null);
+                        $this->em->persist($rolePermission);
+                    }
+                }
+                $this->em->flush();
+            }
+        }
+
+        $io->success('Succès ! L\'administrateur d\'agence possède désormais l\'intégralité des privilèges de sa bulle SaaS.');
         return Command::SUCCESS;
     }
 }
