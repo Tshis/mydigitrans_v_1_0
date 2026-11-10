@@ -31,55 +31,41 @@ final class PlatformSeedCurrenciesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Initialisation des Devises Système MyDigitrans');
 
-        // 1. Récupération du robot système pour signer les écritures d'usine [MCD 18]
+        // 1. Récupération du robot système pour signer les écritures d'usine
         $robot = $this->systemActor->get();
         $io->text(sprintf('✓ Traçabilité signée par l\'acteur : <info>%s</info>', $robot->getEmail()));
 
-        // =========================================================================
-        // 2. CATALOGUE DE CONFIGURATION DES DEVISES (Table 18 du MCD)
-        // =========================================================================
         $currenciesCatalog = [
-            'USD' => [
-                'name' => 'Dollar Américain'
-            ],
-            'CDF' => [
-                'name' => 'Franc Congolais'
-            ],
-            'EUR' => [
-                'name' => 'Euro'
-            ],
-            'XAF' => [
-                'name' => 'Franc CFA (BEAC)' // Zone d'Afrique Centrale (Congo-Brazza, Gabon, etc.)
-            ],
-            'XOF' => [
-                'name' => 'Franc CFA (BCEAO)' // Zone d'Afrique de l'Ouest
-            ]
+            'USD' => ['name' => 'Dollar Américain'],
+            'CDF' => ['name' => 'Franc Congolais'],
+            'EUR' => ['name' => 'Euro'],
+            'XAF' => ['name' => 'Franc CFA (BEAC)'],
+            'XOF' => ['name' => 'Franc CFA (BCEAO)']
         ];
 
         $io->section('Synchronisation des devises de tarification [MCD Table 18]');
 
-        foreach ($currenciesCatalog as $code => $meta) {
-            // Recherche si la devise existe déjà sous ce code de clé unique [MCD 18]
-            $currency = $this->em->getRepository(Currency::class)->findOneBy(['code' => $code]);
+        // 🟢 LE FIX : On force l'ouverture d'une transaction isolée et dédiée pour blinder l'écriture PostgreSQL
+        $this->em->wrapInTransaction(function () use ($currenciesCatalog, $robot, $io) {
+            foreach ($currenciesCatalog as $code => $meta) {
+                $currency = $this->em->getRepository(Currency::class)->findOneBy(['code' => $code]);
 
-            if (!$currency) {
-                $currency = new Currency();
-                $currency->setCode($code); // Clé unique (USD, CDF, EUR, XAF, XOF)
-                $currency->setCreatedBy($robot); // Attribue la création à l'acteur robot système [MCD 18]
+                if (!$currency) {
+                    $currency = new Currency();
+                    $currency->setCode($code);
+                    $currency->setCreatedBy($robot);
 
-                $io->writeln(sprintf(' <info>[CRÉATION]</info> Devise : <comment>%s</comment> (%s)', $code, $meta['name']));
-            } else {
-                $io->writeln(sprintf(' <info>[ALIGNEMENT]</info> Devise : <info>%s</info> (%s)', $code, $meta['name']));
+                    $io->writeln(sprintf(' <info>[CRÉATION]</info> Devise : <comment>%s</comment> (%s)', $code, $meta['name']));
+                } else {
+                    $io->writeln(sprintf(' <info>[ALIGNEMENT]</info> Devise : <info>%s</info> (%s)', $code, $meta['name']));
+                }
+
+                $currency->setName($meta['name']);
+                $this->em->persist($currency);
             }
+        }); // 🟢 Le commit physique est forcé ici de manière étanche par Doctrine
 
-            $currency->setName($meta['name']);
-            $this->em->persist($currency);
-        }
-
-        // Sauvegarde et exécution définitive de la transaction SQL
-        $this->em->flush();
-
-        $io->success('Succès ! Le dictionnaire d\'usine des devises internationales est opérationnel.');
+        $io->success('Succès réel ! Le dictionnaire d\'usine des devises internationales est opérationnel en base de données.');
 
         return Command::SUCCESS;
     }

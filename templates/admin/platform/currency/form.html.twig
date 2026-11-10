@@ -2,8 +2,7 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-	<div
-		class="admin-platform-scope container">
+	<div class="admin-platform-scope container">
 
 		{# --- EN-TÊTE CONFIGURABLE --- #}
 		<header class="header-refined my-25">
@@ -23,50 +22,24 @@
 		</header>
 
 		{# --- FORMULAIRE UNIQUE --- #}
-		<form action="#" method="POST" class="settings-form-layout">
-			<div
-				class="settings-container-grid">
+		<form action="{{ is_edit ? path('admin_platform_currency_edit', {'code' : currency.code}) : path('admin_platform_currency_add') }}" method="POST" class="settings-form-layout">
+			<div class="settings-container-grid" style="grid-template-columns: 1fr;">
 
-				{# COLONNE GAUCHE : STATUT OPÉRATIONNEL #}
-				<aside class="sidebar-action-panel">
-					<div class="card sticky-aside-card">
-						<h2 class="card-title-fix">
-							<i class="fa-solid fa-toggle-on text-primary"></i>
-							Statut Catalogue</h2>
-
-						<div class="currency-checkbox-group">
-							<label class="checkbox-container">
-								<input type="checkbox" name="isActive" value="1" {{ (not is_edit) or currency.isActive ? 'checked' : '' }}>
-								<span class="checkmark"></span>
-								Devise Activée à l'Usine
-							</label>
-						</div>
-
-						<div class="notice-box-info">
-							<p>
-								<strong>
-									<i class="fa-solid fa-circle-info"></i>
-									Comportement Réseau :</strong>
-								Déclarer une devise ici l'ajoute au catalogue mondial de MyDigitrans. Elle deviendra instantanément sélectionnable par les gares et compagnies d'Afrique Centrale pour leurs grilles de taux de change journalières.</p>
-						</div>
-					</div>
-				</aside>
-
-				{# COLONNE DROITE : SÉMANTIQUE DE LA MONNAIE #}
+				{# COLONNE UNIQUE : SÉMANTIQUE DE LA MONNAIE #}
 				<div class="main-form-panel">
 					<div class="card control-card mb-20">
 						<h2 class="card-title-fix">
 							<i class="fa-solid fa-coins text-primary"></i>
-							1. Identité de la Devise</h2>
+							Spécifications de la Devise</h2>
 
-						<div class="field-group mb-20">
+						<div class="field-group mb-20" style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
 							<div class="field">
 								<label class="admin-bus-layout-add-label">Code ISO International *</label>
-								<input type="text" name="code" class="admin-bus-layout-add-input font-monospace-code" placeholder="Ex: USD, CDF, XAF, XOF" maxlength="3" value="{{ is_edit ? currency.code : '' }}" {{ is_edit ? 'readonly' : '' }} required>
+								<input type="text" name="code" class="admin-bus-layout-add-input font-monospace-code" placeholder="Ex: USD, CDF, XAF" style="text-transform: uppercase;" minlength="3" maxlength="10" value="{{ is_edit ? currency.code : '' }}" {{ is_edit ? 'readonly' : '' }} required>
 							</div>
 							<div class="field">
 								<label class="admin-bus-layout-add-label">Nom Complet de la Monnaie *</label>
-								<input type="text" name="name" class="admin-bus-layout-add-input" placeholder="Ex: Franc CFA (BEAC), Franc Congolais" value="{{ is_edit ? currency.name : '' }}" required>
+								<input type="text" name="name" class="admin-bus-layout-add-input" placeholder="Ex: Dollar Américain, Franc Congolais" value="{{ is_edit ? currency.name : '' }}" required>
 							</div>
 						</div>
 
@@ -79,7 +52,6 @@
 						</div>
 					</div>
 				</div>
-
 
 			</div>
 		</form>
