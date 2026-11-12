@@ -12,14 +12,16 @@
 					<div class="sub-header-flex">
 						<span class="text-gray text-size-13">Spécifications Usine</span>
 						<span class="arrow-divider">•</span>
-						<span class="text-primary text-size-13 text-highlight">Édition Libellé</span>
+						<span class="text-primary text-size-13 text-highlight">Édition Libellé ({{ layout.code }})</span>
 					</div>
 					<h1 class="mt-5">Modifier le Gabarit</h1>
 				</div>
 			</div>
 		</header>
 
-		<form action="#" method="POST" class="card control-card">
+		<form action="{{ path('admin_platform_bus_layout_edit', {'code': layout.code}) }}" method="POST" class="card control-card">
+			<input type="hidden" name="_token" value="{{ csrf_token('bus_layout_edit_' ~ layout.code) }}">
+
 			<h2 class="card-title-fix">
 				<i class="fa-solid fa-sliders text-primary"></i>
 				Ajustement du Nom Commercial</h2>

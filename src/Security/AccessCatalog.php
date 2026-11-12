@@ -51,6 +51,8 @@ final class AccessCatalog
         // 🟢 CÔTÉ AGENCE : Uniquement le droit de voir et de configurer / activer localement (Pas de write)
         'currency' => ['Devises & Taux', 'fa-money-bill-transfer', ['view', 'configure']],
 
+        'bus_layout'   => ['Gabarits de Bus', 'fa-compass-drafting', ['view']], // 🟢 AJOUTÉ
+
         'expense' => ['Dépenses', 'fa-receipt', ['view', 'write']],
         'report' => ['Rapports', 'fa-chart-line', ['view']],
         'user' => ['Utilisateurs', 'fa-users', ['view', 'write', 'activate']],
@@ -66,6 +68,8 @@ final class AccessCatalog
         'invoice' => ['Facturation', 'fa-file-invoice', ['view', 'write']],
         'commission' => ['Commissions', 'fa-percent', ['view', 'write']],
         'cash' => ['Caisse plateforme', 'fa-cash-register', ['view', 'write']],
+
+        'bus_layout'   => ['Gabarits de Bus', 'fa-compass-drafting', ['view', 'write']], // 🟢 AJOUTÉ
 
         // 🟢 CÔTÉ PLATEFORME : Le Super Admin a le droit exclusif de créer les devises usines globales
         'currency' => ['Catalogue Devises', 'fa-money-bill-transfer', ['view', 'write']],

@@ -28,13 +28,17 @@
 	</a>
 {% endif %}
 
-{# Modèles d'usines / Gabarits de bus réutilisables (Non soumis aux restrictions RBAC) #}
-<a href="{{ path('admin_platform_bus_layout_index') }}" class="menu-link {{ page is same as('bus_layout') ? 'active' : '' }}" data-tooltip="Modèles d'usines / Gabarits de bus réutilisables">
-	<span class="icon">
-		<i class="fa-solid fa-compass-drafting"></i>
-	</span>
-	<span class="text">Modèles de Gabarits</span>
-</a>
+
+{# Modèles d'usines / Gabarits de bus réutilisables #}
+{% if is_granted('bus_layout.view') %}
+	<a href="{{ path('admin_platform_bus_layout_index') }}" class="menu-link {{ page is same as('bus_layout') ? 'active' : '' }}" data-tooltip="Modèles d'usines / Gabarits de bus réutilisables">
+		<span class="icon">
+			<i class="fa-solid fa-compass-drafting"></i>
+		</span>
+		<span class="text">Modèles de Gabarits</span>
+	</a>
+{% endif %}
+
 
 {# 4. CONTRÔLE GLOBAUX & MONÉTAIRE #}
 {% if is_granted('commission.view') %}
@@ -47,7 +51,7 @@
 {% endif %}
 
 {# Catalogue Devises (Rattaché à la portée monétaire et de caisse de la plateforme) #}
-{% if is_granted('cash.view') %}
+{% if is_granted('currency.view') %}
 	<a href="{{ path('admin_platform_currency_index') }}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Référentiel International des Devises">
 		<span class="icon">
 			<i class="fa-solid fa-earth-africa"></i>

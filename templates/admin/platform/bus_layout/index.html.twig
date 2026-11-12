@@ -1,0 +1,90 @@
+{# templates/admin/platform/bus_layout/index.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
+{% endblock %}
+
+{% block body %}
+	<div class="admin-platform-layout-index-scope container">
+
+		<header class="header-refined my-25">
+			<div class="header-main-info">
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">Spécifications Flotte</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-size-13 text-highlight">Catalogue d'Usine</span>
+					</div>
+					<h1 class="mt-5">Modèles de Gabarits</h1>
+				</div>
+			</div>
+			{% if is_granted('bus_layout.write') %}
+				<div class="header-actions">
+					<a href="{{ path('admin_platform_bus_layout_add') }}" class="btn-refined btn-success-gradient">
+						<i class="fa-solid fa-compass-drafting"></i>
+						Nouveau Gabarit d'Usine
+					</a>
+				</div>
+			{% endif %}
+		</header>
+
+		<div class="table-responsive-wrapper">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Code</th>
+						<th>Désignation du Gabarit / Modèle</th>
+						<th class="text-center">Rangées × Colonnes</th>
+						<th>Allée(s)</th>
+						<th class="text-center">Banquette Fond</th>
+						<th class="text-center">Statut</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for layout in layouts_list %}
+						<tr>
+							<td class="monospace font-bold text-primary-mode">{{ layout.code }}</td>
+							<td><strong>{{ layout.name }}</strong></td>
+							<td class="monospace font-bold text-center">{{ layout.rows }} × {{ layout.columns }}</td>
+							<td>
+								<span class="text-gray">
+									{{ layout.aisles is not empty ? 'Après col. ' ~ layout.aisles|join(', ') : 'Aucune' }}
+								</span>
+							</td>
+							<td class="text-center">
+								<span class="pill-report-audit {{ layout.hasBackExtraSeat ? 'closed' : 'open' }}">
+									{{ layout.hasBackExtraSeat ? 'Complète' : 'Standard' }}
+								</span>
+							</td>
+							<td class="text-center">
+								<span class="pill-report-audit {{ layout.validated ? 'closed' : 'open' }}">
+									{{ layout.validated ? 'Actif' : 'Désactivé' }}
+								</span>
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									{% if is_granted('bus_layout.write') %}
+										<a href="{{ path('admin_platform_bus_layout_edit', {'code': layout.code}) }}" class="action-link edit" title="Modifier le libellé">
+											<i class="fa-solid fa-file-pen"></i>
+										</a>
+									{% endif %}
+									<a href="{{ path('admin_platform_bus_layout_show', {'code': layout.code}) }}" class="action-link details" title="Voir le modèle d'usine">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="7" class="text-center text-gray italic padding-20">Aucun modèle de gabarit configuré dans le référentiel système.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+{% endblock %}
