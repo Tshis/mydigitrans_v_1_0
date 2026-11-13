@@ -1,124 +1,116 @@
-{# templates/admin/platform/bus_layout/add.html.twig #}
+{# templates/admin/agency/bus/add.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
 	{{ parent() }}
-	<script src="/js/admin/layout_builderOld.js" defer></script>
+	<script src="/js/admin/bus_add.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div class="admin-bus-layout-add-scope container">
+	<div class="admin-agency-bus-add-container container">
 
-		<header class="header-refined my-30">
+		{# --- EN-TÊTE --- #}
+		<header class="header-refined mb-30">
 			<div class="header-main-info">
-				<a href="{{ path('admin_platform_bus_layout_index') }}" class="agency-back-action">
+				<a href="{{ path('admin_agency_bus_index') }}" class="agency-back-action">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
-				<div class="agency-profile-meta">
-					<h2 class="admin-bus-layout-add-title">
-						<i class="fa-solid fa-compass-drafting"></i>
-						Concepteur de Gabarits
-					</h2>
-					<p class="text-gray text-size-13">Créez des plans de sièges réutilisables pour la flotte des agences.</p>
+				<div class="header-left">
+					<div class="breadcrumb-mini">
+						<span>Logistique</span>
+						<i class="fa-solid fa-chevron-right"></i>
+						<strong>Flotte</strong>
+					</div>
+					<h1>
+						<i class="fa-solid fa-bus"></i>
+						Enregistrer un Véhicule
+					</h1>
+					<p class="subtitle">Enregistrement administratif d'une unité et contrôle visuel du gabarit d'affectation.</p>
 				</div>
 			</div>
 		</header>
 
-		<form action="{{ path('admin_platform_bus_layout_add') }}" class="admin-bus-layout-add-grid-layout" id="bus_layout_add_form" method="post">
-			<input type="hidden" name="_token" value="{{ csrf_token('bus_layout_add') }}">
+		{# --- LE FORMULAIRE UNIQUE ET LÉGER --- #}
+		<form id="agency-add-bus-form" class="agency-bus-add-form" method="POST" action="{{ path('admin_agency_bus_add') }}">
+			<input type="hidden" name="_token" value="{{ csrf_token('agency_bus_add') }}">
 
-			<div class="admin-bus-layout-add-column">
-				<div class="admin-bus-layout-add-card">
-					<h3 class="card-inner-title mb-20">
-						<i class="fa-solid fa-sliders"></i>
-						Configuration Technique
-					</h3>
+			<div class="agency-bus-setup-layout">
 
-					<div class="admin-bus-layout-add-form">
-						<div class="field mb-20">
-							<label class="admin-bus-layout-add-label">Nom du modèle / Gabarit *</label>
-							<input type="text" id="layout-name" class="admin-bus-layout-add-input" placeholder="Ex: Yutong 55 places standard" required name="name">
-						</div>
+				{# --- COMPOSANT GAUCHE : FORMULAIRE ADMINISTRATIF --- #}
+				<div class="agency-bus-add-card">
+					<div class="agency-bus-add-form-wrapper">
+						<div class="agency-bus-add-form-layout">
 
-						<div class="field-group mb-20">
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Nombre de Rangées *</label>
-								<input type="number" id="layout-main-rows" class="admin-bus-layout-add-input" min="2" max="22" placeholder="Ex: 12" required name="rows">
+							<div class="field mb-20">
+								<label class="agency-bus-add-form-label">Code Interne du Bus (Optionnel)</label>
+								<input type="text" name="bus_code" class="agency-bus-add-form-input" placeholder="Ex: BUS-012 (généré automatiquement si vide)">
 							</div>
-							<div class="field">
-								<label class="admin-bus-layout-add-label">Colonnes de Sièges *</label>
-								<input type="number" id="layout-main-cols" class="admin-bus-layout-add-input" min="2" max="7" placeholder="Ex: 4" required name="columns">
+							<div class="field mb-20">
+								<label class="agency-bus-add-form-label">Nom commercial (Optionnel)</label>
+								<input type="text" name="bus_name" class="agency-bus-add-form-input" placeholder="Ex: Marcopolo VIP">
 							</div>
-						</div>
+							<div class="field mb-20">
+								<label class="agency-bus-add-form-label">Numéro de Plaque d'Immatriculation *</label>
+								<input type="text" name="plate_number" class="agency-bus-add-form-input" placeholder="Ex: 5412AB/01" required>
+							</div>
+							<div class="field-group">
+								<div class="field mb-20">
+									<label class="agency-bus-add-form-label">Marque *</label>
+									<input type="text" name="brand" class="agency-bus-add-form-input" placeholder="Ex: Toyota" required>
+								</div>
+								<div class="field mb-20">
+									<label class="agency-bus-add-form-label">Modèle *</label>
+									<input type="text" name="model" class="agency-bus-add-form-input" placeholder="Ex: Coaster" required>
+								</div>
+							</div>
+							<div class="field-group">
+								<div class="field mb-20">
+									<label class="agency-bus-add-form-label">Année de fabrication *</label>
+									<input type="number" name="year" class="agency-bus-add-form-input" placeholder="Ex: 2022" min="1990" max="2027" required>
+								</div>
+								<div class="field mb-20">
+									<label class="agency-bus-add-form-label">Kilométrage *</label>
+									<input type="number" name="mileage" class="agency-bus-add-form-input" placeholder="0" min="0" required>
+								</div>
+							</div>
 
-						<div class="field mb-20 toggle-field">
-							<label class="checkbox-container">
-								<input type="checkbox" id="layout-back-extra" checked name="backExtraSeat">
-								<span class="checkmark"></span>
-								Banquette complète au fond
-							</label>
-						</div>
+							{# SÉLECTEUR DE GABARITS SYSTÈME #}
+							<div class="field mb-20">
+								<label class="agency-bus-add-form-label">Modèle de configuration (Gabarit d'Usine) *</label>
+								<select id="bus-layout-selector" name="bus_layout_id" class="agency-bus-add-form-select" required>
+									<option value="" disabled selected>Choisir la disposition d'usine...</option>
+									{% for layout in layouts %}
+										<option value="{{ layout.id }}">{{ layout.name }}</option>
+									{% endfor %}
+								</select>
+							</div>
 
-						<h3 class="card-inner-title mb-20">
-							<i class="fa-solid fa-chair"></i>
-							Configuration Cellules spéciales (wc, chauffeur, etc)
-						</h3>
-
-						<div class="js-special-cell-wrapper mb-20">
-							<div id="special-cells-container"></div>
-							<div class="button-right">
-								<button type="button" id="btn-add-special-cell" class="agency-layout-btn">
-									<i class="fa-solid fa-plus"></i>
-									une autre cellule
+							<div class="agency-bus-add-action-zone">
+								<a href="{{ path('admin_agency_bus_index') }}" class="btn-refined btn-danger-gradient">Annuler</a>
+								<button type="submit" class="btn-refined btn-success-gradient">
+									<i class="fa-solid fa-circle-check"></i>
+									Finaliser l'enregistrement
 								</button>
 							</div>
 						</div>
+					</div>
+				</div>
 
-						<div class="field mb-20 toggle-field">
-							<label class="checkbox-container">
-								<input type="checkbox" id="layout-aisle-toggle" checked>
-								<span class="checkmark"></span>
-								Présence d'un ou plusieurs couloirs
-							</label>
+				{# --- COMPOSANT DROITE : RÉCEPTEUR INTERACTIF AJAX --- #}
+				<div class="seatmap-section">
+					<div class="seatmap-zone" id="ajax-seatmap-container">
+						<div class="seatmap-section-header">
+							<h4 class="seatmap-section-title" id="seatmap-live-title">En attente de configuration</h4>
 						</div>
 
-						<div class="js-aisle mb-20" id="aisle-logic-block">
-							<div id="aisles-container"></div>
-							<div class="button-right">
-								<button type="button" id="btn-add-aisle" class="agency-layout-btn">
-									<i class="fa-solid fa-plus"></i>
-									un autre couloir
-								</button>
+						<div id="seatmap-html-receiver">
+							<div class="text-center text-gray italic">
+								Veuillez sélectionner un gabarit à gauche pour charger l'aperçu du plan de sièges officiel.
 							</div>
 						</div>
-
-						<button type="button" id="btn-generate-matrix" class="btn-refined btn-success-gradient btn-full">
-							<i class="fa-solid fa-arrows-rotate"></i>
-							Générer la Grille de Dessin
-						</button>
 					</div>
 				</div>
-			</div>
 
-			<div class="admin-bus-layout-add-column">
-				<div class="admin-bus-layout-add-card card-highlight">
-					<h3 class="card-inner-title text-center">
-						<i class="fa-solid fa-bus"></i>
-						Carrosserie & Aménagement
-					</h3>
-
-					<div class="seatmap-card">
-						<div class="bus-head">Avant du véhicule</div>
-						<div id="layout-interactive-grid" class="seatmap-matrix"></div>
-					</div>
-
-					<div class="admin-bus-layout-add-action-zone">
-						<button type="submit" id="btn-submit-layout" class="btn-refined btn-success-gradient btn-full">
-							<i class="fa-solid fa-cloud-arrow-up"></i>
-							Enregistrer ce Modèle d'Usine
-						</button>
-					</div>
-				</div>
 			</div>
 		</form>
 

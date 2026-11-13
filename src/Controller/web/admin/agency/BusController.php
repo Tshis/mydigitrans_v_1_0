@@ -1,314 +1,206 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\web\admin\agency;
 
-use App\Service\BusLayoutGridBuilder;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Controller\web\admin\AbstractAdminController;
+use App\Dto\admin\agency\BusData;
+use App\Entity\Bus;
+use App\Entity\BusLayout;
+use App\Enum\BusStatus;
+use App\Enum\Scope;
+use App\Form\admin\agency\BusType;
+use App\Service\FleetService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-
-
-final class BusController extends AbstractController
+final class BusController extends AbstractAdminController
 {
-    #[Route('/admin/agency/bus/list', name: 'admin_agency_bus_index')]
+    public function __construct(
+        private readonly FleetService $fleetService,
+    ) {}
+
+    protected function scope(): Scope
+    {
+        return Scope::Agency;
+    }
+
+    #[Route('/admin/agency/bus/list', name: 'admin_agency_bus_index', methods: ['GET'])]
     public function index(): Response
     {
-
-        $fleet = [
-            [
-                'brand' => 'Mercedes-Benz',
-                'model' => 'Sprinter 316',
-                'type' => 'Minibus',
-                'plateNumber' => 'A-1234-BC',
-                'capacity' => 19,
-                'mileage' => 142050,
-                'docStatus' => 'up-to-date',
-                'status' => 'available',
-                'statusLabel' => 'Disponible'
-            ],
-            [
-                'brand' => 'Toyota',
-                'model' => 'Coaster',
-                'type' => 'Bus Interurbain',
-                'plateNumber' => 'A-5678-DE',
-                'capacity' => 30,
-                'mileage' => 89400,
-                'docStatus' => 'up-to-date',
-                'status' => 'on_road',
-                'statusLabel' => 'En Voyage'
-            ],
-            [
-                'brand' => 'Scania',
-                'model' => 'K410',
-                'type' => 'Autocar Grand Confort',
-                'plateNumber' => 'A-9012-FG',
-                'capacity' => 54,
-                'mileage' => 310200,
-                'docStatus' => 'expired',
-                'status' => 'broken',
-                'statusLabel' => 'En Panne'
-            ]
-        ];
-
-
-
+        $this->denyAccessUnlessGranted('bus.view');
+        $agency = $this->actor()->getAgency();
 
         return $this->render('admin/agency/bus/index.html.twig', [
             'page' => 'bus',
-            'fleet' => $fleet
-        ]);
-    } //index
-
-
-
+        ] + $this->fleetService->listAgencyFleet($agency));
+    }
 
     #[Route('/admin/agency/bus/add', name: 'admin_agency_bus_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
-        $session = $request->getSession();
+        $this->denyAccessUnlessGranted('bus.write');
+        $actor = $this->actor();
 
-        $layouts = $session->get('bus_layout', []);
+        $dto = new BusData();
+        $form = $this->createForm(BusType::class, $dto, [
+            'is_edit' => false,
+            'layouts' => $this->fleetService->availableFactoryLayouts(),
+        ]);
+        $form->handleRequest($request);
 
-        if ($request->isMethod('POST')) {
-            /**
-             * A SUPPRIMER : INSERTION DU DANS LA SESSION
-             */
-            //A supprimer : insertion dans la session :
-            //Insertion dans la session => A SUPPRIMER UNE FOIS LA BD Mise en place
-            // Récupérer TOUTES les données sous forme de tableau
-            $allData = $request->request->all();
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $bus = $this->fleetService->createBus($actor, $dto);
 
-            // Construction des Special Position
-            $specialPositions = [];
+                $this->addFlash('success', sprintf(
+                    'Le véhicule %s %s (%s) a été enregistré avec %d places configurées.',
+                    $bus->getBrand(),
+                    $bus->getModel(),
+                    $bus->getPlateNumber(),
+                    $bus->getSeats()->count()
+                ));
 
-
-            if ($allData) {
-
-
-                $types = $allData['specialPositionType'] ?? [];
-                $rows = $allData['specialPositionRow'] ?? [];
-                $cols = $allData['specialPositionCol'] ?? [];
-
-                foreach ($types as $index => $type) {
-                    $specialPositions[] = [
-                        'type' => $type,
-                        'row'  => (int) ($rows[$index] ?? 0),
-                        'col'  => (int) ($cols[$index] ?? 0),
-                    ];
-                }
+                return $this->redirectToRoute('admin_agency_bus_show', ['code' => $bus->getCode()]);
+            } catch (\DomainException $e) {
+                $this->addFlash('error', $e->getMessage());
             }
-
-
-            $layouts = $session->get('bus_layout', []);
-
-
-            $newId = empty($layouts)  ? 1 : max(array_keys($layouts)) + 1;
-
-            $codebus = 'bus-0' . (strlen($newId) < 2 ? "0" . $newId : $newId);
-
-
-            //==============================================================//
-
-            //Construction de Bus Layout
-            $busLayout = [
-                'id' => $newId,
-                'name' => 'Bus de l\'agence ',
-                'agency' => 1,
-                'rows' => (int) $rows,
-                'columns' => (int) $cols,
-                'aisles' => array_map('intval', $allData['aisles'] ?? []),
-                'specialPositions' => $specialPositions,
-                'hasBackExtraSeat' => isset($allData['backExtraSeat']),
-                'isValided' => false,
-                'createdAt' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
-                'resolvedAt' => null,
-            ];
-
-            dd($layouts);
-
-
-            //Insertion dans la session => A SUPPRIMER UNE FOIS LA BD Mise en place
-            // ajout du nouveau layout
-            $layouts[$newId] = $busLayout;
-
-            // sauvegarde en session
-            $session->set('bus_layout', $layouts);
-            //==============================================================//
-            return $this->redirectToRoute('admin_agency_bus_show', ['code' =>  $codebus]);
         }
 
         return $this->render('admin/agency/bus/add.html.twig', [
             'page' => 'bus',
-            'layouts' => $layouts
-
+            'form' => $form,
         ]);
-    } //add
+    }
 
-
-    #[Route('/admin/agency/bus/preview-layout/{id}')]
-    public function seatmap_render(Request $request, int $id, BusLayoutGridBuilder $busLayoutGridBuilder): Response
+    #[Route('/admin/agency/bus/preview-layout/{id}', name: 'admin_agency_bus_preview_layout', methods: ['GET'])]
+    public function seatmapRender(int $id): Response
     {
-        $session = $request->getSession();
+        $this->denyAccessUnlessGranted('bus.view');
+        $this->actor();
 
-        $layouts = $session->get('bus_layout', []);
-
-        $seatmapData = $layouts[$id];
-
-        // dd($seatmapData);
-
-        // RENDU EXCLUSIF DU FRAGMENT : Symfony ne compile que le morceau HTML du partial !
-        return $this->render('system/seatmap.html.twig', [
-            'seatmap' =>  $busLayoutGridBuilder->build($seatmapData)
-        ]);
-    } //seatmap_render
-
-
-
-
-    #[Route('/admin/agency/bus/{code}/details', name: 'admin_agency_bus_show')]
-    public function show(string $code, Request $request, BusLayoutGridBuilder $busLayoutGridBuilder): Response
-    {
-        $session = $request->getSession();
-
-        $layouts = $session->get('bus_layout', []);
-
-        // simulation bus -> layout
-        $busToLayoutMap = [
-            'bus-001' => 1,
-            'bus-002' => 2,
-            'bus-003' => 3,
-            'bus-004' => 4,
-            'bus-005' => 5,
-            'bus-006' => 6,
-            'bus-007' => 7,
-            'bus-008' => 8,
-            'bus-010' => 10,
-            'bus-011' => 11,
-            'bus-012' => 12,
-        ];
-
-        $layoutId = $busToLayoutMap[$code] ?? null;
-
-        $busLayout = $layouts[$layoutId] ?? null;
-
-        if (!$busLayout) {
-            throw $this->createNotFoundException('Bus layout introuvable');
+        $layout = $this->fleetService->findValidatedFactoryLayout($id);
+        if (!$layout instanceof BusLayout) {
+            throw $this->createNotFoundException('Gabarit introuvable.');
         }
 
-        $bus = [
-            'id' => 1002,
-            'brand' => 'Toyota',
-            'model' => 'Coaster',
-            'plateNumber' => 'A-5678-DE',
-            'capacity' => 30,
-            'mileage' => 89400,
-            'vin' => 'JT153JA0004912',
-            'status' => 'maintenance',
-            'statusLabel' => 'Au Garage',
-            'currency' => 'CDF',
-            'code' => 'bus-001',
+        return $this->render('system/seatmap.html.twig', [
+            'seatmap' => $this->fleetService->buildSeatmap($layout),
+        ]);
+    }
 
-            // Simulation de la table historique des incidents techniques
-            'maintenance_history' => [
-                [
-                    'id' => 4021,
-                    'reportedAt' => new \DateTime('2026-08-10'),
-                    'issue' => 'Surchauffe moteur sur la route de Matadi',
-                    'solution' => 'Remplacement du joint de culasse et purge du radiateur',
-                    'reportedBy' => 'Maitre Kabeya',
-                    'status' => 'resolved',
-                    'resolvedAt' => new \DateTime('2026-08-15'),
-                    'updatedBy' => 'Kalonji Beya',
-                ],
-                [
-                    'id' => 4156,
-                    'reportedAt' => new \DateTime('2026-08-25'),
-                    'issue' => 'Amortisseurs arrières usés (RN1)',
-                    'solution' => '',
-                    'status' => 'in_progress',
-                    'reportedBy' => 'Maitre Kabeya',
-                    'resolvedAt' => null,
-                    'updatedBy' => null,
-                ]
-            ],
+    #[Route('/admin/agency/bus/{code}/details', name: 'admin_agency_bus_show', methods: ['GET', 'POST'])]
+    public function show(string $code, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('bus.view');
+        $bus = $this->requireAgencyBus($code);
 
+        $isEditable = $this->isGranted('bus.write') && BusStatus::Inactive !== $bus->getStatus();
 
-            // --- NOUVEAU : PORTFOLIO ADMINISTRATIF DU BUS ---
-            'documents' => [
-                [
-                    'type' => 'Assurance Obligatoire SONAS',
-                    'referenceNumber' => 'AS-SON-2026-884',
-                    'issuedAt' => new \DateTime('2025-09-01'),
-                    'expiredAt' => new \DateTime('2026-09-01'), // Expire bientôt par rapport au 29 août 2026
-                    'status' => 'warning',
-                ],
-                [
-                    'type' => 'Contrôle Technique (Feuille Jaune)',
-                    'referenceNumber' => 'CT-CTCE-9942',
-                    'issuedAt' => new \DateTime('2026-03-15'),
-                    'expiredAt' => new \DateTime('2026-09-15'),
-                    'status' => 'valid',
-                ],
-                [
-                    'type' => 'Autorisation de Transport Interurbain',
-                    'referenceNumber' => 'AT-MIN-00482',
-                    'issuedAt' => new \DateTime('2025-01-10'),
-                    'expiredAt' => new \DateTime('2026-01-10'), // Déjà expiré !
-                    'status' => 'expired',
-                ]
-            ],
+        $dto = $this->fleetService->createDtoFromBus($bus);
+        $form = $this->createForm(BusType::class, $dto, [
+            'is_edit'     => true,
+            'min_mileage' => $bus->getMileage(),
+            'disabled'    => !$isEditable,
+        ]);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('bus.write');
 
+            try {
+                $this->fleetService->updateBus($bus, $dto);
+                $this->addFlash('success', 'Les informations techniques du véhicule ont été mises à jour.');
 
-        ];
-
-        // Simulation des pièces administratives selon ton entité 10. BusDocuments
-        $documents = [
-            [
-
-                'type' => 'Assurance',
-                'referenceNumber' => 'POL-SON-99824',
-                'issuedAt' => new \DateTime('2025-09-10'),
-                'expiredAt' => new \DateTime('2026-09-10'),
-                'status' => 'valid',
-                'url' => null,
-                'code' => 123,
-                'updatedBy' => 'Kalonji Beya'
-            ],
-            [
-                'type' => 'contrôle technique',
-                'referenceNumber' => 'CT-CE-4482',
-                'issuedAt' => new \DateTime('2026-04-01'),
-                'expiredAt' => new \DateTime('2026-10-01'),
-                'status' => 'valid',
-                'url' => '/uploads/documents/auth-003.pdf',
-                'code' => 1234,
-                'updatedBy' => 'Daniel Lukonu'
-            ],
-            [
-                'type' => 'Autorisation de transport',
-                'referenceNumber' => null, // Nullable dans ton MCD
-                'issuedAt' => new \DateTime('2025-01-15'),
-                'expiredAt' => new \DateTime('2026-01-15'), // Déjà expiré !
-                'status' => 'expired',
-                'url' => '/uploads/documents/auth-003.pdf',
-                'code' => 12345,
-                'updatedBy' => 'Kalonji Beya'
-            ]
-        ];
-
+                return $this->redirectToRoute('admin_agency_bus_show', ['code' => $bus->getCode()]);
+            } catch (\DomainException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
+        }
 
         return $this->render('admin/agency/bus/show.html.twig', [
             'page' => 'bus',
-            'bus_code' => $code,
-            'bus' => $bus,
-            'seatmap' => $busLayoutGridBuilder->build($busLayout),
-            'documents' => $documents
-        ]);
-    } ////show()
+            'form' => $form,
+        ] + $this->fleetService->getBusProfile($bus));
+    }
 
+    #[Route('/admin/agency/bus/{code}/decommission', name: 'admin_agency_bus_decommission', methods: ['POST'])]
+    public function decommission(string $code, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('bus.write');
+        $bus = $this->requireAgencyBus($code);
 
+        if (!$this->isCsrfTokenValid('bus_decommission_' . $bus->getCode(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
 
+        try {
+            $this->fleetService->decommissionBus($bus, (string) $request->request->get('inactive_reason'));
+            $this->addFlash('success', sprintf('Le véhicule %s a été déclassé définitivement.', $bus->getPlateNumber()));
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_bus_show', ['code' => $bus->getCode()]);
+    }
+
+    #[Route('/admin/agency/bus/{code}/report-fault', name: 'admin_agency_bus_report_fault', methods: ['POST'])]
+    public function reportFault(string $code, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('bus.write');
+        $actor = $this->actor();
+        $bus = $this->requireAgencyBus($code);
+
+        if (!$this->isCsrfTokenValid('bus_fault_' . $bus->getCode(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
+
+        try {
+            $this->fleetService->reportFault(
+                $bus,
+                $actor,
+                (string) $request->request->get('issue'),
+                (string) $request->request->get('severity', 'medium')
+            );
+            $this->addFlash('success', 'Panne enregistrée. Le véhicule est passé au statut Au Garage.');
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_bus_show', ['code' => $bus->getCode()]);
+    }
+
+    #[Route('/admin/agency/bus/{code}/resolve-fault', name: 'admin_agency_bus_resolve_fault', methods: ['POST'])]
+    public function resolveFault(string $code, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('bus.write');
+        $actor = $this->actor();
+        $bus = $this->requireAgencyBus($code);
+
+        if (!$this->isCsrfTokenValid('bus_resolve_' . $bus->getCode(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
+
+        try {
+            $this->fleetService->resolveFault($bus, $actor, (string) $request->request->get('resolution'));
+            $this->addFlash('success', 'Réparation validée. Le véhicule est de nouveau en service.');
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_bus_show', ['code' => $bus->getCode()]);
+    }
+
+    private function requireAgencyBus(string $code): Bus
+    {
+        $bus = $this->fleetService->findBusByCode($this->actor()->getAgency(), $code);
+        if (!$bus instanceof Bus) {
+            throw $this->createNotFoundException('Véhicule introuvable dans votre agence.');
+        }
+
+        return $bus;
+    }
 }

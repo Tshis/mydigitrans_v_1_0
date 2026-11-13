@@ -1,182 +1,147 @@
-{# templates/admin/agency/fleet/index.html.twig #}
+{# templates/admin/agency/maintenance/index.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/datatable.js" defer></script>
-<script src="/js/admin/maintenance.js" defer></script>
+	{{ parent() }}
+	<script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-agency-maintenance-index-scope container">
-	{# --- HEADER --- #}
-	<header class="header-refined mb-30">
-		<div class="header-left">
-			<div class="breadcrumb-mini">
-				<span>Logistique</span>
-				<i class="fa-solid fa-chevron-right"></i>
-				<strong>Atelier Central</strong>
+	<div class="admin-agency-fleet-index-scope container">
+		{# --- HEADER --- #}
+		<header class="header-refined mb-30">
+			<div class="header-left">
+				<div class="breadcrumb-mini">
+					<span>Logistique</span>
+					<i class="fa-solid fa-chevron-right"></i>
+					<strong>Atelier & Maintenance</strong>
+				</div>
+				<h1>Maintenance & Pannes</h1>
+				<p class="subtitle">Suivi des immobilisations techniques, diagnostics et remises en service de la flotte.</p>
 			</div>
-			<h1>Maintenance & Carnet de Pannes</h1>
-			<p class="subtitle">Suivi technique et opérationnel de vos bus.</p>
+			{% if is_granted('bus.write') %}
+				<div class="header-right">
+					<a href="{{ path('admin_agency_maintenance_declare') }}" class="btn-refined btn-danger-gradient">
+						<i class="fa-solid fa-triangle-exclamation"></i>
+						<span>Déclarer une panne</span>
+					</a>
+				</div>
+			{% endif %}
+		</header>
+
+		{# --- STATS RAPIDES DE L'ATELIER --- #}
+		<div class="fleet-stats-grid mb-25">
+			<div class="stat-card card-refined total">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-clipboard-list"></i>
+				</div>
+				<div class="info">
+					<h3>{{ stats.total }}</h3>
+					<span>Total Interventions</span>
+				</div>
+			</div>
+			<div class="stat-card card-refined maintenance">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-screwdriver-wrench"></i>
+				</div>
+				<div class="info">
+					<h3>{{ stats.broken }}</h3>
+					<span>En Panne (Garage)</span>
+				</div>
+			</div>
+			<div class="stat-card card-refined active">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-circle-check"></i>
+				</div>
+				<div class="info">
+					<h3>{{ stats.resolved }}</h3>
+					<span>Résolues</span>
+				</div>
+			</div>
+			<div class="stat-card card-refined alert">
+				<div class="icon-wrap">
+					<i class="fa-solid fa-ban"></i>
+				</div>
+				<div class="info">
+					<h3>{{ stats.cancelled }}</h3>
+					<span>Annulées</span>
+				</div>
+			</div>
 		</div>
-		<div class="header-right">
-			<a href="{{path('admin_agency_maintenance_declare')}}" class="btn-refined btn-danger-gradient">
-				<i class="fa-solid fa-plus"></i>
-				<span>Déclarer une panne</span>
-			</a>
-		</div>
-	</header>
 
-	{# --- STATS RAPIDES --- #}
-	<div class="fleet-stats-grid mb-25">
-		<div class="stat-card card-refined alert">
-			<div class="icon-wrap">
-				<i class="fa-solid fa-screwdriver-wrench"></i>
-			</div>
-			<div class="info">
-				<h3>2</h3>
-				<span>Au Garage</span>
-			</div>
-		</div>
-		<div class="stat-card card-refined total">
-			<div class="icon-wrap">
-				<i class="fa-solid fa-bus"></i>
-			</div>
-			<div class="info">
-				<h3>12</h3>
-				<span>Total Flotte</span>
-			</div>
-		</div>
-		<div class="stat-card card-refined active">
-			<div class="icon-wrap">
-				<i class="fa-solid fa-circle-check"></i>
-			</div>
-			<div class="info">
-				<h3>8</h3>
-				<span>En Service</span>
-			</div>
-		</div>
-
-	</div>
-
-	{# --- ZONE DE FILTRES AVANCÉS --- #}
-	<div class="trip-filters-card mb-20">
-		<form action="#" method="GET" class="field-group">
-			<div class="field">
-				<label class="admin-bus-layout-add-label">Numéro de plaque</label>
-				<input type="text" name="search_query" class="admin-bus-layout-add-input"
-					placeholder="Ex: TCK-2607-001">
-			</div>
-			<div class="field">
-				<label class="admin-bus-layout-add-label">Statut</label>
-				<select name="ticket_status" class="admin-bus-layout-add-select">
-					<option value="">-- Tous les statuts --</option>
-					<option value="resolu">Résolu</option>
-					<option value="broken">En panne</option>
-				</select>
-			</div>
-			<div class="field">
-				<label class="admin-bus-layout-add-label">Date de la panne</label>
-				<input type="date" name="search_query" class="admin-bus-layout-add-input"
-					placeholder="Ex: TCK-2607-001">
-			</div>
-			<div class="field-actions">
-				<button type="submit" class="btn btn-reset">
-					<i class="fa-solid fa-filter"></i>
-					Filtrer
-				</button>
-			</div>
-		</form>
-	</div>
-
-	{# --- LISTE DE LA FLOTTE --- #}
-	<div class="table-responsive-wrappe">
-		<table class="table table-scrollable table-striped js-datatable">
-			<thead>
-				<tr>
-					<th>Véhicule</th>
-					<th>Date de la panne</th>
-					<th class="text-center">Details de la panne</th>
-					<th class="text-center">Solutions</th>
-					<th class="text-center">Date de la solution</th>
-					<th class="text-center">Status</th>
-					<th class="text-right">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for bus in fleet %}
-				<tr>
-					<td>
-						<div class="bus-cell">
-
-							<div class="info">
-								<span class="model">{{ bus.brand }}
-									{{ bus.model }}</span>
-								<span class="type-badge">{{ bus.plateNumber }}</span>
-							</div>
-						</div>
-					</td>
-					<td>
-						28/09/2026
-					</td>
-					<td class="{{ bus.status == 'broken' ? 'text-danger text-weight-700' : '' }}">
-						{{ bus.issue }}
-					</td>
-					<td class="text-success {{ bus.status == 'resolved' ? 'text-weight-700' : '' }}">
-						{{ bus.solution|default('En attente de diagnostic...') }}
-					</td>
-					<td>
-						Non définie
-					</td>
-					<td class="text-center">
-						<span class="status-pill-fleet {{ bus.status }}">
-							{{ bus.statusLabel }}
-						</span>
-					</td>
-					<td class="text-right">
-						<div class="action-group-refined">
-
-							{% if bus.status == 'broken' %}
-							<a href="{{path('admin_agency_maintenance_resolve',{'bus':'212'})}}"
-								class="action-link config" title="Reparer la panne">
-								<i class="fa-solid fa-screwdriver-wrench"></i>
-							</a>
-							<a data-href="{{path('admin_agency_maintenance_cancel',{'bus':'212'})}}"
-								class="action-link config text-danger js-modal" title="Annuler la panne">
-								<i class="fa-solid fa-trash-can"></i>
-							</a>
-							{% else %}
-							<a href="" class="action-link config" title="Reparer la panne">
-								<span class="text-success">
-									<i class="fa-solid fa-square-check"></i>
+		{# --- REGISTRE DES INTERVENTIONS --- #}
+		<div class="table-responsive-wrapper">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Véhicule</th>
+						<th>Signalé le</th>
+						<th>Gravité</th>
+						<th>Diagnostic / Rapport</th>
+						<th>Déclarant</th>
+						<th class="text-center">Statut</th>
+						<th>Résolu le</th>
+						<th class="text-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for log in fleet %}
+						<tr>
+							<td>
+								<div class="bus-cell">
+									<div class="info">
+										<a href="{{ path('admin_agency_bus_show', {'code': log.busCode}) }}" class="model font-bold text-primary-mode">
+											{{ log.brand }} {{ log.model }}
+										</a>
+										<span class="plate-tag">{{ log.plateNumber }}</span>
+									</div>
+								</div>
+							</td>
+							<td class="text-size-13">{{ log.reportedAt|date('d/m/Y H:i') }}</td>
+							<td>
+								<span class="monospace font-bold {{ log.severity == 'critical' ? 'text-danger' : (log.severity == 'medium' ? 'text-warning' : 'text-gray') }}">
+									{{ log.severity|upper }}
 								</span>
-							</a>
-							{% endif %}
-						</div>
-					</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
-
-	{# ---MODAL QUESTION --- #}
-	<div class="wrapper-modal" id="wrapper-modal">
-		<div class="card-modal">
-
-			<div class="text-center">
-				<span class="text-danger text-size-18"><i class="fa-solid fa-triangle-exclamation"></i></span>
-				<span class="message">Voulez-vous vraiment effectuer cette opération</span>
-				<p><small>Cette operation est irreversible</small></p>
-			</div>
-
-			<div class="actions">
-				<a href="" class="btn-refined btn-success-gradient">Annuler</a>
-				<a href="" class="btn-refined btn-danger-gradient" id="confirm">confirmer</a>
-			</div>
+							</td>
+							<td>{{ log.solution|default('Aucun détail')|nl2br }}</td>
+							<td class="text-size-13">{{ log.reportedBy }}</td>
+							<td class="text-center">
+								<span class="pill-maintenance {{ log.status == 'broken' ? 'in_progress' : 'resolved' }}">
+									{{ log.statusLabel }}
+								</span>
+							</td>
+							<td class="text-size-13">
+								{{ log.resolvedAt ? log.resolvedAt|date('d/m/Y H:i') : 'En attente...' }}
+							</td>
+							<td class="text-right">
+								<div class="action-group-refined">
+									{% if is_granted('bus.write') and log.status == 'broken' %}
+										<a href="{{ path('admin_agency_maintenance_resolve', {'id': log.id}) }}" class="action-link edit" title="Clôturer / Résoudre la panne">
+											<i class="fa-solid fa-circle-check"></i>
+										</a>
+										<form method="POST" action="{{ path('admin_agency_maintenance_cancel', {'id': log.id}) }}" style="display:inline;" onsubmit="return confirm('Annuler ce ticket de panne et remettre le bus en service ?');">
+											<input type="hidden" name="_token" value="{{ csrf_token('maintenance_cancel_' ~ log.id) }}">
+											<button type="submit" class="action-link" style="border:none; background:transparent; cursor:pointer; color: var(--danger);" title="Annuler le ticket">
+												<i class="fa-solid fa-xmark"></i>
+											</button>
+										</form>
+									{% else %}
+										<a href="{{ path('admin_agency_bus_show', {'code': log.busCode}) }}" class="action-link details" title="Voir la fiche du bus">
+											<i class="fa-solid fa-eye"></i>
+										</a>
+									{% endif %}
+								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="8" class="text-center text-gray italic padding-20">
+								Aucune intervention technique enregistrée dans l'atelier.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
 	</div>
-
-</div>
 {% endblock %}

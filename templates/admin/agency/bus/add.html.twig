@@ -2,125 +2,125 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/admin/bus_add.js" defer></script>
+    {{ parent() }}
+    <script src="/js/admin/bus_add.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-agency-bus-add-container container">
+    <div class="admin-agency-bus-add-container container">
 
-    {# --- EN-TÊTE --- #}
-    <header class="header-refined mb-30">
-        <div class="header-main-info">
-            <a href="{{ path('admin_agency_bus_index') }}" class="agency-back-action">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <div class="header-left">
-                <div class="breadcrumb-mini">
-                    <span>Logistique</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                    <strong>Flotte</strong>
+        {# --- EN-TÊTE --- #}
+        <header class="header-refined mb-30">
+            <div class="header-main-info">
+                <a href="{{ path('admin_agency_bus_index') }}" class="agency-back-action">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="header-left">
+                    <div class="breadcrumb-mini">
+                        <span>Logistique</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                        <strong>Flotte</strong>
+                    </div>
+                    <h1>
+                        <i class="fa-solid fa-bus"></i>
+                        Enregistrer un Véhicule
+                    </h1>
+                    <p class="subtitle">Enregistrement administratif d'une unité et contrôle visuel du gabarit d'affectation.</p>
                 </div>
-                <h1>
-                    <i class="fa-solid fa-bus"></i>
-                    Enregistrer un Véhicule
-                </h1>
-                <p class="subtitle">Enregistrement administratif d'une unité et contrôle visuel du gabarit
-                    d'affectation.</p>
             </div>
-        </div>
-    </header>
+        </header>
 
-    {# --- LE FORMULAIRE UNIQUE ET LÉGER --- #}
-    <form id="agency-add-bus-form" class="agency-bus-add-form" method="POST" action="#">
-        <div class="agency-bus-setup-layout">
+        {# --- FORMULAIRE SYMFONY LIÉ AU DTO BusData --- #}
+        {{ form_start(form, {'attr': {'id': 'agency-add-bus-form', 'class': 'agency-bus-add-form', 'novalidate': 'novalidate'}}) }}
 
-            {# --- COMPOSANT GAUCHE : FORMULAIRE ADMINISTRATIF --- #}
-            <div class="agency-bus-add-card">
-                <div class="agency-bus-add-form-wrapper">
-                    <div class="agency-bus-add-form-layout">
+            <div class="agency-bus-setup-layout">
 
-                        <div class="field mb-20">
-                            <label class="agency-bus-add-form-label">Code Interne du Bus (Optionnel)</label>
-                            <input type="text" name="bus_code" class="agency-bus-add-form-input"
-                                placeholder="Ex: BUS-012">
-                        </div>
-                        <div class="field mb-20">
-                            <label class="agency-bus-add-form-label">Nom commercial (Optionnel)</label>
-                            <input type="text" name="bus_name" class="agency-bus-add-form-input"
-                                placeholder="Ex: Marcopolo VIP">
-                        </div>
-                        <div class="field mb-20">
-                            <label class="agency-bus-add-form-label">Numéro de Plaque d'Immatriculation *</label>
-                            <input type="text" name="plate_number" class="agency-bus-add-form-input"
-                                placeholder="Ex: 5412AB/01" required>
-                        </div>
-                        <div class="field-group">
+                {# --- COMPOSANT GAUCHE : FORMULAIRE ADMINISTRATIF --- #}
+                <div class="agency-bus-add-card">
+                    <div class="agency-bus-add-form-wrapper">
+                        <div class="agency-bus-add-form-layout">
+
+                            {{ form_errors(form) }}
+
                             <div class="field mb-20">
-                                <label class="agency-bus-add-form-label">Marque *</label>
-                                <input type="text" name="brand" class="agency-bus-add-form-input"
-                                    placeholder="Ex: Toyota" required>
+                                {{ form_label(form.code, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                {{ form_widget(form.code, {'attr': {'class': 'agency-bus-add-form-input'}}) }}
+                                <div class="text-danger text-size-12 mt-5">{{ form_errors(form.code) }}</div>
                             </div>
-                            <div class="field mb-20">
-                                <label class="agency-bus-add-form-label">Modèle *</label>
-                                <input type="text" name="model" class="agency-bus-add-form-input"
-                                    placeholder="Ex: Coaster" required>
-                            </div>
-                        </div>
-                        <div class="field-group">
-                            <div class="field mb-20">
-                                <label class="agency-bus-add-form-label">Année de fabrication *</label>
-                                <input type="number" name="year" class="agency-bus-add-form-input"
-                                    placeholder="Ex: 2022" min="1990" max="2027" required>
-                            </div>
-                            <div class="field mb-20">
-                                <label class="agency-bus-add-form-label">Kilométrage *</label>
-                                <input type="number" name="mileage" class="agency-bus-add-form-input" placeholder="000"
-                                    min="0" required>
-                            </div>
-                        </div>
 
-                        {# SÉLECTEUR DE GABARITS SYSTÈME #}
-                        <div class="field mb-20">
-                            <label class="agency-bus-add-form-label">Modèle de configuration (Gabarit d'Usine) *</label>
-                            <select id="bus-layout-selector" name="bus_layout_id" class="agency-bus-add-form-select"
-                                required>
-                                <option value="" disabled selected>Choisir la disposition d'usine...</option>
-                                {% for layout in layouts %}
-                                <option value="{{layout.id}}">{{layout.name|capitalize}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                            <div class="field mb-20">
+                                {{ form_label(form.name, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                {{ form_widget(form.name, {'attr': {'class': 'agency-bus-add-form-input'}}) }}
+                                <div class="text-danger text-size-12 mt-5">{{ form_errors(form.name) }}</div>
+                            </div>
 
-                        <div class="agency-bus-add-action-zone">
-                            <a href="{{ path('admin_agency_bus_index') }}"
-                                class="btn-refined btn-danger-gradient">Annuler</a>
-                            <button type="submit" class="btn-refined btn-success-gradient">
-                                <i class="fa-solid fa-circle-check"></i>
-                                Finaliser l'enregistrement
-                            </button>
+                            <div class="field mb-20">
+                                {{ form_label(form.plateNumber, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                {{ form_widget(form.plateNumber, {'attr': {'class': 'agency-bus-add-form-input'}}) }}
+                                <div class="text-danger text-size-12 mt-5">{{ form_errors(form.plateNumber) }}</div>
+                            </div>
+
+                            <div class="field-group">
+                                <div class="field mb-20">
+                                    {{ form_label(form.brand, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                    {{ form_widget(form.brand, {'attr': {'class': 'agency-bus-add-form-input'}}) }}
+                                    <div class="text-danger text-size-12 mt-5">{{ form_errors(form.brand) }}</div>
+                                </div>
+                                <div class="field mb-20">
+                                    {{ form_label(form.model, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                    {{ form_widget(form.model, {'attr': {'class': 'agency-bus-add-form-input'}}) }}
+                                    <div class="text-danger text-size-12 mt-5">{{ form_errors(form.model) }}</div>
+                                </div>
+                            </div>
+
+                            <div class="field-group">
+                                <div class="field mb-20">
+                                    {{ form_label(form.year, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                    {{ form_widget(form.year, {'attr': {'class': 'agency-bus-add-form-input'}}) }}
+                                    <div class="text-danger text-size-12 mt-5">{{ form_errors(form.year) }}</div>
+                                </div>
+                                <div class="field mb-20">
+                                    {{ form_label(form.mileage, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                    {{ form_widget(form.mileage, {'attr': {'class': 'agency-bus-add-form-input'}}) }}
+                                    <div class="text-danger text-size-12 mt-5">{{ form_errors(form.mileage) }}</div>
+                                </div>
+                            </div>
+
+                            {# SÉLECTEUR DE GABARITS SYSTÈME (conserve l'id bus-layout-selector) #}
+                            <div class="field mb-20">
+                                {{ form_label(form.busLayoutId, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                {{ form_widget(form.busLayoutId, {'id': 'bus-layout-selector', 'attr': {'class': 'agency-bus-add-form-select'}}) }}
+                                <div class="text-danger text-size-12 mt-5">{{ form_errors(form.busLayoutId) }}</div>
+                            </div>
+
+                            <div class="agency-bus-add-action-zone">
+                                <a href="{{ path('admin_agency_bus_index') }}" class="btn-refined btn-danger-gradient">Annuler</a>
+                                <button type="submit" class="btn-refined btn-success-gradient">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    Finaliser l'enregistrement
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {# --- COMPOSANT DROITE : RÉCEPTEUR INTERACTIF AJAX --- #}
-            <div class="seatmap-section">
-                <div class="seatmap-zone" id="ajax-seatmap-container">
-                    <div class="seatmap-section-header">
-                        <h4 class="seatmap-section-title" id="seatmap-live-title">En attente de configuration</h4>
-                    </div>
+                {# --- COMPOSANT DROITE : RÉCEPTEUR INTERACTIF AJAX --- #}
+                <div class="seatmap-section">
+                    <div class="seatmap-zone" id="ajax-seatmap-container">
+                        <div class="seatmap-section-header">
+                            <h4 class="seatmap-section-title" id="seatmap-live-title">En attente de configuration</h4>
+                        </div>
 
-                    <div id="seatmap-html-receiver">
-                        <div class="text-center text-gray italic">
-                            Veuillez sélectionner un gabarit à gauche pour charger l'aperçu du plan de sièges officiel.
+                        <div id="seatmap-html-receiver">
+                            <div class="text-center text-gray italic">
+                                Veuillez sélectionner un gabarit à gauche pour charger l'aperçu du plan de sièges officiel.
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
+        {{ form_end(form) }}
 
-        </div>
-    </form>
-
-</div>
+    </div>
 {% endblock %}

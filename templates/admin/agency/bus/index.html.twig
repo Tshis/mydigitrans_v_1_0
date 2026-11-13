@@ -1,4 +1,4 @@
-{# templates/admin/agency/fleet/index.html.twig #}
+{# templates/admin/agency/bus/index.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
@@ -7,8 +7,7 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-fleet-index-scope container">
+	<div class="admin-agency-fleet-index-scope container">
 		{# --- HEADER --- #}
 		<header class="header-refined mb-30">
 			<div class="header-left">
@@ -20,22 +19,24 @@
 				<h1>Gestion de la Flotte</h1>
 				<p class="subtitle">Suivi technique, administratif et opérationnel de vos bus.</p>
 			</div>
-			<div class="header-right">
-				<a href="{{path('admin_agency_bus_add')}}" class="btn-refined btn-primary-gradient">
-					<i class="fa-solid fa-plus"></i>
-					<span>Ajouter un véhicule</span>
-				</a>
-			</div>
+			{% if is_granted('bus.write') %}
+				<div class="header-right">
+					<a href="{{ path('admin_agency_bus_add') }}" class="btn-refined btn-primary-gradient">
+						<i class="fa-solid fa-plus"></i>
+						<span>Ajouter un véhicule</span>
+					</a>
+				</div>
+			{% endif %}
 		</header>
 
-		{# --- STATS RAPIDES --- #}
+		{# --- STATS RAPIDES DYNAMIQUES --- #}
 		<div class="fleet-stats-grid mb-25">
 			<div class="stat-card card-refined total">
 				<div class="icon-wrap">
 					<i class="fa-solid fa-bus"></i>
 				</div>
 				<div class="info">
-					<h3>12</h3>
+					<h3>{{ stats.total }}</h3>
 					<span>Total Flotte</span>
 				</div>
 			</div>
@@ -44,7 +45,7 @@
 					<i class="fa-solid fa-circle-check"></i>
 				</div>
 				<div class="info">
-					<h3>8</h3>
+					<h3>{{ stats.active }}</h3>
 					<span>En Service</span>
 				</div>
 			</div>
@@ -53,7 +54,7 @@
 					<i class="fa-solid fa-screwdriver-wrench"></i>
 				</div>
 				<div class="info">
-					<h3>2</h3>
+					<h3>{{ stats.maintenance }}</h3>
 					<span>Au Garage</span>
 				</div>
 			</div>
@@ -62,7 +63,7 @@
 					<i class="fa-solid fa-triangle-exclamation"></i>
 				</div>
 				<div class="info">
-					<h3>2</h3>
+					<h3>{{ stats.expiredDocs }}</h3>
 					<span>Doc. Expirés</span>
 				</div>
 			</div>
@@ -87,11 +88,12 @@
 						<tr>
 							<td>
 								<div class="bus-cell">
-
 									<div class="info">
-										<span class="model">{{ bus.brand }}
-											{{ bus.model }}</span>
-										<span class="type-badge">{{ bus.type }}</span>
+										<span class="model">
+											{{ bus.brand }} {{ bus.model }}
+											{% if bus.name %}<small class="text-gray">({{ bus.name }})</small>{% endif %}
+										</span>
+										<span class="type-badge">{{ bus.layoutName }}</span>
 									</div>
 								</div>
 							</td>
@@ -101,12 +103,11 @@
 							<td>
 								<span class="seat-count-badge">
 									<i class="fa-solid fa-chair"></i>
-									{{ bus.capacity }}
-									places</span>
+									{{ bus.capacity }} places
+								</span>
 							</td>
 							<td>
-								<strong>{{ bus.mileage|number_format(0, ',', ' ') }}
-									km</strong>
+								<strong>{{ bus.mileage|number_format(0, ',', ' ') }} km</strong>
 							</td>
 							<td class="text-center">
 								<span class="doc-status-pill {{ bus.docStatus }}">
@@ -115,18 +116,24 @@
 								</span>
 							</td>
 							<td class="text-center">
-								<span class="status-pill-fleet {{ bus.status }}">
+								{# Mapping exact sur tes classes CSS originales (available, broken, expired) #}
+								{% set statusCss = bus.status == 'active' ? 'available' : (bus.status == 'maintenance' ? 'broken' : 'expired') %}
+								<span class="status-pill-fleet {{ statusCss }}">
 									{{ bus.statusLabel }}
 								</span>
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									<a href="{{path('admin_agency_bus_show',{code:'bus-001'})}}" class="action-link edit" title="Fiche technique">
+									<a href="{{ path('admin_agency_bus_show', {'code': bus.code}) }}" class="action-link edit" title="Fiche technique">
 										<i class="fa-solid fa-eye"></i>
 									</a>
-									{# <a href="#" class="action-link config" title="Éditer"><i class="fa-solid fa-pen"></i></a>
-																																													                            #}
 								</div>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="7" class="text-center text-gray italic padding-20">
+								Aucun véhicule enregistré dans la flotte de votre agence.
 							</td>
 						</tr>
 					{% endfor %}

@@ -1,153 +1,140 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\web\admin\agency;
 
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Controller\web\admin\AbstractAdminController;
+use App\Dto\admin\agency\BusMaintenanceDeclareData;
+use App\Dto\admin\agency\BusMaintenanceResolveData;
+use App\Entity\BusMaintenance;
+use App\Enum\Scope;
+use App\Form\admin\agency\BusMaintenanceDeclareType;
+use App\Form\admin\agency\BusMaintenanceResolveType;
+use App\Service\BusMaintenanceService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class MaintenanceController extends AbstractController
+final class MaintenanceController extends AbstractAdminController
 {
-    #[Route('/admin/agency/maintenance/list', name: 'admin_agency_maintenance_index')]
+    public function __construct(
+        private readonly BusMaintenanceService $maintenanceService,
+    ) {}
+
+    protected function scope(): Scope
+    {
+        return Scope::Agency;
+    }
+
+    #[Route('/admin/agency/maintenance/list', name: 'admin_agency_maintenance_index', methods: ['GET'])]
     public function index(): Response
     {
-
-        // Données simulées de l'historique de l'Atelier Central
-        // On respecte tes deux états : 'resolved' et 'broken'
-        $fleetLogs = [
-            [
-                'brand' => 'Mercedes-Benz',
-                'model' => 'Sprinter 316',
-                'plateNumber' => 'A-1234-BC',
-                'reportedAt' => new \DateTime('2026-08-20'),
-                'issue' => 'Surchauffe moteur sur la route de Kenge',
-                'solution' => 'Remplacement du joint de culasse et purge du radiateur',
-                'resolvedAt' => new \DateTime('2026-08-24'),
-                'status' => 'resolved',
-                'statusLabel' => 'Résolu',
-                'code' => 'bus-001'
-            ],
-            [
-                'brand' => 'Toyota',
-                'model' => 'Coaster',
-                'plateNumber' => 'A-5678-DE',
-                'reportedAt' => new \DateTime('2026-08-28'),
-                'issue' => 'Réchauffement du radiateur et fuite de liquide',
-                'solution' => null, // Pas encore de solution
-                'resolvedAt' => null,
-                'status' => 'broken',
-                'statusLabel' => 'Panne',
-                'code' => 'bus-002'
-            ],
-            [
-                'brand' => 'Scania',
-                'model' => 'K410',
-                'plateNumber' => 'A-9012-FG',
-                'reportedAt' => new \DateTime('2026-08-15'),
-                'issue' => 'Amortisseurs arrières usés sur la RN1',
-                'solution' => 'Changement complet des kits de suspension arrière',
-                'resolvedAt' => new \DateTime('2026-08-18'),
-                'status' => 'resolved',
-                'statusLabel' => 'Résolu',
-                'code' => 'bus-003'
-            ]
-        ];
+        $this->denyAccessUnlessGranted('bus.view');
+        $agency = $this->actor()->getAgency();
 
         return $this->render('admin/agency/maintenance/index.html.twig', [
             'page' => 'maintenance',
-            'fleet' => $fleetLogs // Envoi du tableau au Twig
-        ]);
-    } //index
+        ] + $this->maintenanceService->listAgencyMaintenances($agency));
+    }
 
-    #[Route('/admin/agency/maintenance/declare', name: 'admin_agency_maintenance_declare')]
+    #[Route('/admin/agency/maintenance/declare', name: 'admin_agency_maintenance_declare', methods: ['GET', 'POST'])]
     public function declare(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('bus.write');
+        $actor = $this->actor();
 
+        $dto = new BusMaintenanceDeclareData();
+        $form = $this->createForm(BusMaintenanceDeclareType::class, $dto, [
+            'active_buses' => $this->maintenanceService->operationalBuses($actor->getAgency()),
+        ]);
+        $form->handleRequest($request);
 
-        // Simulation des véhicules de l'agence pour le select
-        $activeBuses = [
-            ['code' => 'bus-001', 'brand' => 'Mercedes-Benz', 'model' => 'Sprinter', 'plateNumber' => 'A-1234-BC'],
-            ['code' => 'bus-002', 'brand' => 'Toyota', 'model' => 'Coaster', 'plateNumber' => 'A-5678-DE'],
-            ['code' => 'bus-003', 'brand' => 'Scanya', 'model' => 'K410', 'plateNumber' => 'A-9012-FG'],
-        ];
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $maintenance = $this->maintenanceService->declareFault($actor, $dto);
 
-        // Traitement de la soumission
-        if ($request->isMethod('POST')) {
-            $busCode = $request->request->get('bus_code');
-            $issue = $request->request->get('issue_description');
+                $this->addFlash('success', sprintf(
+                    'Panne enregistrée avec succès pour le véhicule %s (%s). Statut basculé au garage.',
+                    $maintenance->getBus()?->getPlateNumber(),
+                    $maintenance->getBus()?->getCode()
+                ));
 
-            // Flash message simulant la mise en panne automatique
-            $this->addFlash('success', sprintf(
-                'Panne enregistrée avec succès pour le véhicule %s. Statut basculé en BROKEN.',
-                strtoupper($busCode)
-            ));
-
-            return $this->redirectToRoute('admin_agency_maintenance_index');
+                return $this->redirectToRoute('admin_agency_maintenance_index');
+            } catch (\DomainException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
         }
-
-
 
         return $this->render('admin/agency/maintenance/declare.html.twig', [
             'page' => 'maintenance',
-            'active_buses' => $activeBuses
+            'form' => $form,
         ]);
-    } //declare
+    }
 
-
-    #[Route('/admin/agency/maintenance/{bus}/resolve', name: 'admin_agency_maintenance_resolve')]
-    public function resolve(int $bus, Request $request): Response
+    #[Route('/admin/agency/maintenance/{id}/resolve', name: 'admin_agency_maintenance_resolve', methods: ['GET', 'POST'])]
+    public function resolve(int $id, Request $request): Response
     {
-        // 1. Simulation du Véhicule (bus) lié au ticket d'incident
-        $bus = [
-            'brand' => 'Toyota',
-            'model' => 'Coaster',
-            'plateNumber' => 'A-5678-DE',
-            'capacity' => 30,
-            'mileage' => 89400,
-            'currency' => 'CDF' // Devise appelée par ton tableau : {{ bus.currency }}
-        ];
+        $this->denyAccessUnlessGranted('bus.write');
+        $actor = $this->actor();
+        $maintenance = $this->requireAgencyMaintenance($id);
 
-        // 2. Simulation de l'Incident courant (log) à clore
-        // Le statut de départ est impérativement 'broken'
-        $log = [
-            'id' => $bus,
-            'issue' => 'Réchauffement du radiateur et fuite de liquide sur la RN1',
-            'status' => 'broken',
-            'reportedAt' => new \DateTime('2026-08-25')
-        ];
+        $dto = new BusMaintenanceResolveData();
+        $form = $this->createForm(BusMaintenanceResolveType::class, $dto);
+        $form->handleRequest($request);
 
-        // 3. Traitement de la clôture lors de la soumission du formulaire
-        if ($request->isMethod('POST')) {
-            // Récupération des données de ton formulaire (solution, mécanicien, date)
-            $solutionDescription = $request->request->get('solution_description');
-            $updatedBy = $request->request->get('updated_by');
-            $resolvedAt = $request->request->get('resolved_at');
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $this->maintenanceService->resolveFault($maintenance, $actor, $dto);
 
-            // Ici, ton code Doctrine fera basculer le statut à 'resolved' en base de données
-            $this->addFlash('success', sprintf(
-                'La panne du bus %s a été résolue par %s. Le véhicule repasse au statut RESOLVED.',
-                $bus['plateNumber'],
-                $updatedBy
-            ));
+                $this->addFlash('success', sprintf(
+                    'La panne du bus %s a été résolue. Le véhicule est de nouveau en service.',
+                    $maintenance->getBus()?->getPlateNumber()
+                ));
 
-            // Redirection vers le registre central de l'Atelier
-            return $this->redirectToRoute('admin_agency_maintenance_index');
+                return $this->redirectToRoute('admin_agency_maintenance_index');
+            } catch (\DomainException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
         }
 
-        // 4. Envoi des variables exactes requises par ton architecture HTML Twig
         return $this->render('admin/agency/maintenance/resolve.html.twig', [
             'page' => 'maintenance',
-            'bus' => $bus,
-            'log' => $log
+            'form' => $form,
+            'bus'  => $maintenance->getBus(),
+            'log'  => $maintenance,
         ]);
-    } //resolve
+    }
 
-    #[Route('/admin/agency/maintenance/{bus}/cancel', name: 'admin_agency_maintenance_cancel')]
-    public function cancel(int $bus, Request $request): Response
+    #[Route('/admin/agency/maintenance/{id}/cancel', name: 'admin_agency_maintenance_cancel', methods: ['POST'])]
+    public function cancel(int $id, Request $request): Response
     {
-        return $this->redirectToRoute('admin_agency_maintenance_index');
-    } //cancel
+        $this->denyAccessUnlessGranted('bus.write');
+        $actor = $this->actor();
+        $maintenance = $this->requireAgencyMaintenance($id);
 
+        if (!$this->isCsrfTokenValid('maintenance_cancel_' . $maintenance->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
+
+        try {
+            $this->maintenanceService->cancelFault($maintenance, $actor);
+            $this->addFlash('success', 'Le ticket de maintenance a été annulé et le bus remis en service.');
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_maintenance_index');
+    }
+
+    private function requireAgencyMaintenance(int $id): BusMaintenance
+    {
+        $maintenance = $this->maintenanceService->findAgencyMaintenance($this->actor()->getAgency(), $id);
+        if (!$maintenance instanceof BusMaintenance) {
+            throw $this->createNotFoundException('Ticket de maintenance introuvable dans votre agence.');
+        }
+
+        return $maintenance;
+    }
 }

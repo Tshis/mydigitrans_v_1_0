@@ -1,0 +1,75 @@
+{# templates/admin/platform/bus_layout/show.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block body %}
+    <div class="admin-platform-scope container">
+
+        <header class="header-refined my-25">
+            <div class="header-main-info">
+                <a href="{{ path('admin_platform_bus_layout_index') }}" class="agency-back-action">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="title">
+                    <div class="sub-header-flex">
+                        <span class="text-gray text-size-13">Vérification Technique</span>
+                        <span class="arrow-divider">•</span>
+                        <span class="text-primary text-size-13 text-highlight">Fiche d'Architecture</span>
+                    </div>
+                    <h1 class="mt-5">{{ layout.name }}</h1>
+                </div>
+            </div>
+        </header>
+
+        <div class="settings-container-grid">
+
+            <div class="main-form-panel">
+                <div class="card control-card mb-20">
+                    <h2 class="card-title-fix">
+                        <i class="fa-solid fa-circle-info text-primary"></i>
+                        Registre Structurel
+                    </h2>
+                    <div class="direct-pricing-row mb-15">
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Code Unique</label>
+                            <div class="text-disabled font-bold technical-id-badge monospace">{{ layout.code }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="admin-bus-layout-add-label">Date de Naissance Usine</label>
+                            <div class="text-disabled font-bold technical-id-badge">{{ layout.createdAt|date('d/m/Y à H:i') }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if is_granted('bus_layout.write') %}
+                    <div class="card control-card mb-20">
+                        <form action="{{ path('admin_platform_bus_layout_toggle', {'code': layout.code}) }}" method="POST" class="text-center">
+                            <input type="hidden" name="_token" value="{{ csrf_token('bus_layout_toggle_' ~ layout.code) }}">
+
+                            {% if layout.validated %}
+                                <button type="submit" class="btn-refined btn-danger-gradient" title="Désactiver le modèle d'usine">
+                                    <i class="fa-solid fa-lock"></i> Désactiver ce modèle
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn-refined btn-success-gradient" title="Activer le modèle d'usine">
+                                    <i class="fa-solid fa-lock-open"></i> Réactiver le modèle
+                                </button>
+                            {% endif %}
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+
+            <aside class="sidebar-action-panel specialized-seatmap-sidebar mb-25">
+                <div class="card control-card card-highlight">
+                    <h2 class="card-title-fix">
+                        <i class="fa-solid fa-bus text-success"></i>
+                        Aménagement de la Carrosserie
+                    </h2>
+
+                    {{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
+                </div>
+            </aside>
+
+        </div>
+    </div>
+{% endblock %}

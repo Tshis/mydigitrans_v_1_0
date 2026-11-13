@@ -1,81 +1,111 @@
-{# templates/admin/agency/bus/resolve.html.twig #}
+{# templates/admin/agency/maintenance/resolve.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-<div class="admin-agency-maintenance-resolve-scope container">
-    {# --- HEADER DE LA CONSOLE --- #}
-    <header class="header mb-25">
-        <a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-        <div class="title">
-            <div class="sub-header-flex">
-                <span class="text-gray text-size-13">Logistique</span>
-                <span class="arrow-divider">•</span>
-                <span class="text-size-13 text-primary">Atelier Central</span>
-            </div>
-            <h1 class="mt-5">Résolution & Clôture de Panne</h1>
-        </div>
-    </header>
-
-    {# --- LAYOUT DOUBLE COLONNE --- #}
-    <form id="maintenance-resolve-form" action="#" method="POST" class="maintenance-form-layout">
-        <div class="maintenance-container-grid">
-
-            {# COLONNE GAUCHE : ACTION DE REPARATION #}
-            <div class="card control-card success-accent">
-                <h2 class="card-title-fix">
-                    <i class="fa-solid fa-screwdriver-wrench text-success"></i>
-                    Solution & Intervention mécanique
-                </h2>
-                <div class="field mb-20">
-                    <label class="admin-bus-layout-add-label">Date de résolution *</label>
-                    <input type="date" name="resolved_at" class="admin-bus-layout-add-input" value="{{ "
-                        now"|date("Y-m-d") }}" required>
-                </div>
-                <div class="direct-pricing-row">
-                    <div class="field">
-                        <label class="admin-bus-layout-add-label">Description des réparations effectuées *</label>
-                        <textarea name="solution_description" class="matrix-textarea"
-                            placeholder="Renseignez ici les actions correctives apportées..." required></textarea>
+    <div class="admin-agency-fleet-document-add-scope container">
+        {# --- HEADER --- #}
+        <header class="header mb-25">
+            <div class="header-main-info">
+                <a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action" title="Retour à l'atelier">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="title">
+                    <div class="sub-header-flex">
+                        <span class="text-gray text-size-13">Logistique & Atelier</span>
+                        <span class="arrow-divider">•</span>
+                        <span class="text-success text-size-13 text-highlight">Clôture d'Intervention</span>
                     </div>
-                </div>
-                <div class="field-button-right mt-20">
-                    <button type="submit" form="maintenance-resolve-form" class="btn btn-success">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>Clôturer & Libérer le bus</span>
-                    </button>
+                    <h1 class="mt-5">Résoudre la Panne & Remettre en Service</h1>
                 </div>
             </div>
+        </header>
 
-            {# COLONNE DROITE : RAPPEL DE L'INCIDENT #}
-            <aside class="sidebar-action-panel">
-                <div class="card control-card mb-20 error-accent">
-                    <h2 class="card-title-fix">
-                        <i class="fa-solid fa-triangle-exclamation text-danger"></i>
-                        Panne active sur le véhicule
-                    </h2>
-                    <div class="direct-pricing-row">
-                        <div class="field">
-                            <label class="admin-bus-layout-add-label">Bus concerné</label>
-                            <div class="info-value">
-                                <strong>{{ bus.brand }}
-                                    {{ bus.model }}</strong>
-                                ({{ bus.plateNumber }})
+        {# --- FORMULAIRE SYMFONY LIÉ AU DTO BusMaintenanceResolveData --- #}
+        {{ form_start(form, {'attr': {'class': 'document-form-layout', 'novalidate': 'novalidate'}}) }}
+
+            <div class="document-container-grid">
+                {# COLONNE GAUCHE : FORMULAIRE DE CLÔTURE #}
+                <div class="main-form-panel">
+
+                    {{ form_errors(form) }}
+
+                    {# CARD 1 : RAPPEL DE L'INCIDENT #}
+                    <div class="card control-card mb-20">
+                        <div class="direct-pricing-row renew mb-15">
+                            <div class="field info">
+                                <i class="fa-solid fa-bus text-danger"></i>
+                                <div>
+                                    {{ bus.brand }} {{ bus.model }} ({{ bus.code }})
+                                    <p class="text-gray text-size-14 mt-5">Plaque : {{ bus.plateNumber }} • {{ bus.mileage|number_format(0, ',', ' ') }} km</p>
+                                </div>
+                            </div>
+                            <div class="field info">
+                                <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                                <div>
+                                    Gravité : {{ log.severity.value|upper }}
+                                    <p class="text-gray text-size-14 mt-5">Signalé le {{ log.reportedAt|date('d/m/Y à H:i') }}</p>
+                                </div>
                             </div>
                         </div>
+
                         <div class="field">
-                            <label class="admin-bus-layout-add-label">Détails du problème signalé</label>
-                            <div class="info-value text-danger">
-                                <strong>{{ log.issue }}</strong>
-                            </div>
+                            <label class="admin-bus-layout-add-label">Diagnostic / Avarie signalée</label>
+                            <div class="admin-bus-layout-add-input text-disabled" style="height:auto; white-space:pre-line;">{{ log.solution|default('Aucun détail renseigné') }}</div>
                         </div>
                     </div>
 
-                </div>
-            </aside>
+                    {# CARD 2 : RAPPORT DE RÉPARATION #}
+                    <div class="card control-card success-accent">
+                        <h2 class="card-title-fix">
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                            Rapport d'Intervention Technique
+                        </h2>
 
-        </div>
-    </form>
-</div>
+                        <div class="direct-pricing-row mb-20">
+                            <div class="field">
+                                {{ form_label(form.resolvedAt, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                                {{ form_widget(form.resolvedAt, {'attr': {'class': 'admin-bus-layout-add-input'}}) }}
+                                <div class="text-danger text-size-12 mt-5">{{ form_errors(form.resolvedAt) }}</div>
+                            </div>
+                            <div class="field">
+                                <label class="admin-bus-layout-add-label">Agent responsable de la validation</label>
+                                <input type="text" class="admin-bus-layout-add-input text-disabled" value="{{ app.user.fullName|default(app.user.email) }}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="field mb-20">
+                            {{ form_label(form.solutionDescription, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                            {{ form_widget(form.solutionDescription, {'attr': {'class': 'admin-bus-layout-add-input'}}) }}
+                            <div class="text-danger text-size-12 mt-5">{{ form_errors(form.solutionDescription) }}</div>
+                        </div>
+
+                        <hr class="section-divider mb-15">
+                        <div class="field-button-right">
+                            <a href="{{ path('admin_agency_maintenance_index') }}" class="btn-refined btn-gray-gradient mr-10">Annuler</a>
+                            <button type="submit" class="btn-refined btn-success-gradient">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Valider la sortie du garage
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {# COLONNE DROITE : INFORMATION #}
+                <aside class="sidebar-action-panel">
+                    <div class="card sticky-aside-card">
+                        <h2 class="card-title-fix">
+                            <i class="fa-solid fa-shield-halved text-success"></i>
+                            Remise en Service
+                        </h2>
+                        <div class="notice-box-info">
+                            <p>
+                                <i class="fa-solid fa-bus"></i>
+                                La validation de ce rapport clôture le ticket de maintenance et fait repasser automatiquement le véhicule au statut <strong>En Service</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        {{ form_end(form) }}
+    </div>
 {% endblock %}
