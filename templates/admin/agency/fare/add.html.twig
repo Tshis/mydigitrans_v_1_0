@@ -1,3 +1,4 @@
+{# templates/admin/agency/fare/add.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
@@ -6,9 +7,7 @@
 {% endblock %}
 
 {% block body %}
-
-	<div
-		class="admin-fare-matrix-scope container">
+	<div class="admin-fare-matrix-scope container">
 		{# --- HEADER STICKY --- #}
 		<header class="header header-sticky mb-25">
 			<div class="header-main-info">
@@ -32,53 +31,69 @@
 			</div>
 		</header>
 
-		<form
-			id="bulk-fare-form" action="#" method="POST">
-			{# --- ZONE DE CONTRÔLE SUPÉRIEURE (Alignement parfait) --- #}
+		{# --- FORMULAIRE SYMFONY LIÉ AU DTO FareMatrixData --- #}
+		{{ form_start(form, {'attr': {'id': 'bulk-fare-form', 'novalidate': 'novalidate'}}) }}
+
+			{{ form_errors(form) }}
+
+			{# --- ZONE DE CONTRÔLE SUPÉRIEURE --- #}
 			<div class="matrix-top-control-grid mb-25">
 				<div class="card control-card">
-					<div class="field">
+					<div class="field mb-15">
 						<label class="admin-bus-layout-add-label">
 							<i class="fa-solid fa-map-location-dot"></i>
-							Choisir un itinéraire :</label>
-						<select id="js-master-route-picker" class="admin-bus-layout-add-select">
+							Choisir un itinéraire :
+						</label>
+						<select
+							id="js-master-route-picker"
+							class="admin-bus-layout-add-select"
+							onchange="window.location.href = '{{ path('admin_agency_fare_line_add', {'slug': '__SLUG__'}) }}'.replace('__SLUG__', this.value);"
+						>
 							{% for r in all_routes %}
-								<option value="{{ r.slug }}" {% if r.slug==route.slug %} selected {% endif %}>{{ r.code }}
-									:
-									{{ r.name }}</option>
+								<option value="{{ r.slug }}" {% if r.slug == route.slug %}selected{% endif %}>
+									{{ r.code }} : {{ r.name }}
+								</option>
 							{% endfor %}
 						</select>
+					</div>
+
+					<div class="field">
+						{{ form_label(form.fareType, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+						{{ form_widget(form.fareType, {
+							'attr': {
+								'class': 'admin-bus-layout-add-select',
+								'onchange': "window.location.href = '" ~ path('admin_agency_fare_line_add', {'slug': route.slug}) ~ "?fareType=' + this.value;"
+							}
+						}) }}
+						<div class="text-danger text-size-12 mt-5">{{ form_errors(form.fareType) }}</div>
 					</div>
 				</div>
 
 				<div class="card control-card success-accent">
 					<div class="direct-pricing-row">
 						<div class="field">
-							<label>Prix Billet Direct
-								<small>({{ route.start_city }}
-									➔
-									{{ route.end_city }})</small>
+							<label>
+								Prix Billet Direct
+								<small>({{ route.start_city }} ➔ {{ route.end_city }})</small>
 							</label>
-							<input type="number" name="direct_amount" class="matrix-input main-price" value="{{ route.direct_amount }}">
+							{{ form_widget(form.directAmount) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.directAmount) }}</div>
 						</div>
 						<div class="field">
 							<label>Prix Fret / Kg</label>
-							<input type="number" name="direct_fret" class="matrix-input main-price" value="{{ route.price_per_kg }}">
+							{{ form_widget(form.directFret) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.directFret) }}</div>
 						</div>
 						<div class="field currency-field">
 							<label>Devise</label>
-							<select name="matrix_currency" class="matrix-select">
-								{% for curr in active_currencies %}
-									<option value="{{ curr.code }}" {% if route.currency==curr.code %} selected {% endif %}>{{
-                                curr.code }}</option>
-								{% endfor %}
-							</select>
+							{{ form_widget(form.currencyCode) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.currencyCode) }}</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			{# --- GRILLE DES TRONÇONS (Design en boîtes avec scroll responsive) --- #}
+			{# --- GRILLE DES TRONÇONS --- #}
 			<div class="matrix-table-wrapper">
 				<div class="matrix-toolbar">
 					<h3>
@@ -99,35 +114,45 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for segment in segments %}
+							{% for segmentForm in form.segments %}
+								{% set segData = segmentForm.vars.data %}
 								<tr class="matrix-row">
 									<td class="segment-cell">
 										<div class="segment-path">
-											<span class="city">{{ segment.from_city|default(route.start_city) }}</span>
+											<span class="city">{{ segData.fromCity }}</span>
 											<i class="fa-solid fa-arrow-right"></i>
-											<span class="city">{{ segment.to_city }}</span>
+											<span class="city">{{ segData.toCity }}</span>
 										</div>
-										<input type="hidden" name="fares[{{ loop.index }}][to_id]" value="{{ segment.to_id }}">
+										{{ form_widget(segmentForm.fromStopId) }}
+										{{ form_widget(segmentForm.toStopId) }}
 									</td>
 									<td class="dist-cell">
-										<strong>{{ segment.distance }}</strong>
+										<strong>{{ segData.distance|number_format(0, ',', ' ') }}</strong>
 										<small>Km</small>
 									</td>
 									<td>
 										<div class="input-with-icon">
-											<input type="number" name="fares[{{ loop.index }}][amount]" class="matrix-input" value="{{ segment.current_amount }}" step="0.01">
+											{{ form_widget(segmentForm.amount) }}
 										</div>
+										<div class="text-danger text-size-11 mt-5">{{ form_errors(segmentForm.amount) }}</div>
 									</td>
 									<td>
 										<div class="input-with-icon">
-											<input type="number" name="fares[{{ loop.index }}][price_per_kg]" class="matrix-input" value="{{ segment.current_fret }}" step="0.01">
+											{{ form_widget(segmentForm.pricePerKg) }}
 										</div>
+										<div class="text-danger text-size-11 mt-5">{{ form_errors(segmentForm.pricePerKg) }}</div>
 									</td>
 									<td class="text-center">
 										<label class="switch-ios">
-											<input type="checkbox" name="fares[{{ loop.index }}][is_active]" checked>
+											{{ form_widget(segmentForm.isActive) }}
 											<span class="slider"></span>
 										</label>
+									</td>
+								</tr>
+							{% else %}
+								<tr>
+									<td colspan="5" class="text-center text-gray italic padding-20">
+										Cette ligne est un trajet direct sans escales intermédiaires. Configurez uniquement le tarif direct ci-dessus.
 									</td>
 								</tr>
 							{% endfor %}
@@ -135,8 +160,9 @@
 					</table>
 				</div>
 			</div>
-		</form>
+
+			{% do form.segments.setRendered %}
+
+		{{ form_end(form) }}
 	</div>
-
-
 {% endblock %}
