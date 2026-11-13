@@ -1,133 +1,129 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\web\admin\agency;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Controller\web\admin\AbstractAdminController;
+use App\Dto\admin\agency\RouteData;
+use App\Entity\Route as RouteEntity;
+use App\Enum\Scope;
+use App\Form\agency\RouteType;
+use App\Service\RouteService;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-class LineController extends AbstractController
+final class LineController extends AbstractAdminController
 {
-    #[Route('/admin/agency/lines', name: 'admin_agency_line_index')]
+    public function __construct(
+        private readonly RouteService $routeService,
+    ) {}
+
+    protected function scope(): Scope
+    {
+        return Scope::Agency;
+    }
+
+    #[Route('/admin/agency/lines', name: 'admin_agency_line_index', methods: ['GET'])]
     public function index(): Response
     {
+        $this->denyAccessUnlessGranted('route.view');
+        $agency = $this->actor()->getAgency();
+
         return $this->render('admin/agency/line/index.html.twig', [
             'page' => 'line',
-        ]);
-    } //index
+        ] + $this->routeService->listAgencyRoutes($agency));
+    }
 
-
-    #[Route('/admin/agency/line/add', name: 'admin_agency_line_add')]
-    public function add(): Response
+    #[Route('/admin/agency/line/add', name: 'admin_agency_line_add', methods: ['GET', 'POST'])]
+    public function add(Request $request): Response
     {
-        // Devises autorisées pour le calcul de fret sur le réseau Mydigitrans
-        $activeCurrencies = [
-            ['code' => 'CDF'],
-            ['code' => 'USD'],
-        ];
+        $this->denyAccessUnlessGranted('route.write');
+        $actor = $this->actor();
+        $agency = $actor->getAgency();
+
+        $dto = new RouteData();
+        $form = $this->createForm(RouteType::class, $dto, [
+            'currency_choices' => $this->routeService->getAgencyCurrencyChoices($agency),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $route = $this->routeService->createRoute($actor, $dto);
+                $this->addFlash('success', sprintf('La ligne « %s » (%s) a été créée avec %d arrêts.', $route->getName(), $route->getCode(), $route->getRouteStops()->count()));
+
+                return $this->redirectToRoute('admin_agency_line_show', ['slug' => $route->getSlug()]);
+            } catch (\DomainException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
+        }
 
         return $this->render('admin/agency/line/add.html.twig', [
             'page' => 'line',
-            'active_currencies' => $activeCurrencies,
+            'form' => $form,
         ]);
-    } //add
+    }
 
-
-    #[Route('/admin/agency/line/{slug}/details', name: 'admin_agency_line_show')]
+    #[Route('/admin/agency/line/{slug}/details', name: 'admin_agency_line_show', methods: ['GET'])]
     public function show(string $slug): Response
     {
-        // 1. Simulation des données consolidées de la Route (MCD 11) et de ses Arrêts (MCD 12)
-        $route = [
-            'id' => 1,
-            'name' => 'Kinshasa - Muanda',
-            'code' => 'KIN-MUA',
-            'slug' => $slug,
-            'distance' => 650,
-            'duration' => '11h30',
-            'pricePerKg' => 500,
-            'currency' => 'CDF',
-            'isAvailable' => false,
-            'reservationExpirationDelay' => 120,
-            'createdAt' => new \DateTime('2026-01-15'),
-            'createdBy' => 'Daniel Lukonu',
-            'lastUpdatAt' => null,
-            'stops' => [
-                [
-                    'id' => 101, // ID ajouté pour l'option 1
-                    'stopOrder' => 1,
-                    'city' => 'Kinshasa',
-                    'country' => 'RDC',
-                    'distanceFromDeparture' => 0,
-                    'durationFromDeparture' => '0h00',
-                    'isActive' => true
-                ],
-                [
-                    'id' => 102, // ID ajouté
-                    'stopOrder' => 2,
-                    'city' => 'Mbanza-Ngungu',
-                    'country' => 'RDC',
-                    'distanceFromDeparture' => 150,
-                    'durationFromDeparture' => '2h30',
-                    'isActive' => true
-                ],
-                [
-                    'id' => 103, // ID ajouté
-                    'stopOrder' => 3,
-                    'city' => 'Matadi',
-                    'country' => 'RDC',
-                    'distanceFromDeparture' => 350,
-                    'durationFromDeparture' => '6h00',
-                    'isActive' => false
-                ],
-                [
-                    'id' => 104, // ID ajouté
-                    'stopOrder' => 4,
-                    'city' => 'Muanda',
-                    'country' => 'RDC',
-                    'distanceFromDeparture' => 650,
-                    'durationFromDeparture' => '11h30',
-                    'isActive' => true
-                ]
-            ]
-        ];
-
-        // 2. Simulation des tarifs par segments pour la ligne (MCD 17 - Fare)
-        $route['fares'] = [
-            [
-                'id' => 501, // ID ajouté pour l'option 1
-                'departureCity' => 'Kinshasa',
-                'arrivalCity' => 'Kisantu',
-                'type' => 'Standard',
-                'amount' => 15000,
-                'pricePerKg' => 200,
-                'currency' => 'CDF',
-                'validFrom' => new \DateTime('2026-01-01')
-            ],
-            [
-                'id' => 502, // ID ajouté
-                'departureCity' => 'Kinshasa',
-                'arrivalCity' => 'Matadi',
-                'type' => 'Standard',
-                'amount' => 35000,
-                'pricePerKg' => 400,
-                'currency' => 'CDF',
-                'validFrom' => new \DateTime('2026-01-01')
-            ],
-            [
-                'id' => 503, // ID ajouté
-                'departureCity' => 'Kinshasa',
-                'arrivalCity' => 'Muanda',
-                'type' => 'VIP',
-                'amount' => 65000,
-                'pricePerKg' => 500,
-                'currency' => 'CDF',
-                'validFrom' => new \DateTime('2026-01-01')
-            ]
-        ];
+        $this->denyAccessUnlessGranted('route.view');
+        $route = $this->requireAgencyRoute($slug);
 
         return $this->render('admin/agency/line/show.html.twig', [
             'page' => 'line',
-            'route' => $route
-        ]);
-    } //show
+        ] + $this->routeService->getRouteProfile($route));
+    }
+
+    #[Route('/admin/agency/line/{slug}/toggle', name: 'admin_agency_line_toggle', methods: ['POST'])]
+    public function toggle(string $slug, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('route.write');
+        $route = $this->requireAgencyRoute($slug);
+
+        if (!$this->isCsrfTokenValid('route_toggle_' . $route->getSlug(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
+
+        $isNowAvailable = $this->routeService->toggleRouteAvailability($route);
+        $this->addFlash(
+            'success',
+            $isNowAvailable ? 'La ligne est désormais opérationnelle.' : 'La ligne a été suspendue.'
+        );
+
+        return $this->redirectToRoute('admin_agency_line_show', ['slug' => $route->getSlug()]);
+    }
+
+    #[Route('/admin/agency/line/{slug}/stop/{id}/toggle', name: 'admin_agency_line_stop_toggle', methods: ['POST'])]
+    public function toggleStop(string $slug, int $id, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('route.write');
+        $route = $this->requireAgencyRoute($slug);
+
+        if (!$this->isCsrfTokenValid('route_stop_toggle_' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
+
+        try {
+            $isActive = $this->routeService->toggleStopAvailability($route, $id);
+            $this->addFlash('success', $isActive ? 'Escale réactivée.' : 'Escale suspendue.');
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_line_show', ['slug' => $route->getSlug()]);
+    }
+
+    private function requireAgencyRoute(string $slug): RouteEntity
+    {
+        $route = $this->routeService->findAgencyRouteBySlug($this->actor()->getAgency(), $slug);
+        if (!$route instanceof RouteEntity) {
+            throw $this->createNotFoundException('Ligne introuvable dans votre agence.');
+        }
+
+        return $route;
+    }
 }

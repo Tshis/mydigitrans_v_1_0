@@ -1,4 +1,4 @@
-{# templates/admin/agency/route/new.html.twig #}
+{# templates/admin/agency/line/add.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
@@ -18,24 +18,29 @@
 			</div>
 		</header>
 
-		<form action="#" method="POST" id="route-creation-form" class="reservation-form">
-			<div class="route-create-container">
-				<div
-					class="layout-main-panel">
+		{{ form_start(form, {'attr': {'id': 'route-creation-form', 'class': 'reservation-form', 'novalidate': 'novalidate'}}) }}
 
-					{# SECTION 1 : AXE PRINCIPAL (Alignement Nom/Code Fixé) #}
+			<div class="route-create-container">
+				<div class="layout-main-panel">
+
+					{{ form_errors(form) }}
+
+					{# SECTION 1 : AXE PRINCIPAL #}
 					<div class="card mb-20">
 						<h2>
 							<i class="fa-solid fa-map-location-dot"></i>
-							Informations de la Route</h2>
+							Informations de la Route
+						</h2>
 						<div class="main-route-header-grid">
 							<div class="field">
-								<label>Nom Commercial de la Ligne *</label>
-								<input type="text" name="name" id="route-name-input" placeholder="Ex : Kinshasa - Muanda" required>
+								{{ form_label(form.name) }}
+								{{ form_widget(form.name, {'id': 'route-name-input'}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.name) }}</div>
 							</div>
 							<div class="field">
-								<label>Code Ligne (Unique) *</label>
-								<input type="text" name="code" placeholder="Ex : KIN-MUA" required>
+								{{ form_label(form.code) }}
+								{{ form_widget(form.code) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.code) }}</div>
 							</div>
 						</div>
 					</div>
@@ -45,28 +50,70 @@
 						<div class="card-header-row mb-15">
 							<h2>
 								<i class="fa-solid fa-list-ol"></i>
-								Tracé des Arrêts</h2>
+								Tracé des Arrêts
+							</h2>
 						</div>
 
-						<div
-							class="route-stops-timeline-container" id="stops-dynamic-container">
-							{# DEPART FIXE #}
+						<div class="route-stops-timeline-container" id="stops-dynamic-container">
+							{# DÉPART #}
 							<div class="stop-node-row" data-order="1">
 								<div class="stop-badge-marker start">Départ</div>
 								<div class="stop-fields-stack">
 									<div class="field-row">
 										<div class="field">
-											<label>Ville d'Origine</label><input type="text" value="Kinshasa" readonly></div>
+											{{ form_label(form.departureCity) }}
+											{{ form_widget(form.departureCity) }}
+											<div class="text-danger text-size-12 mt-5">{{ form_errors(form.departureCity) }}</div>
+										</div>
 										<div class="field">
-											<label>Pays</label><input type="text" value="RDC" readonly></div>
+											{{ form_label(form.departureCountry) }}
+											{{ form_widget(form.departureCountry) }}
+											<div class="text-danger text-size-12 mt-5">{{ form_errors(form.departureCountry) }}</div>
+										</div>
 									</div>
 								</div>
 							</div>
 
 							{# ZONE D'INJECTION DES ARRÊTS INTERMÉDIAIRES #}
-							<div id="js-stops-wrapper"></div>
+							<div id="js-stops-wrapper" data-index="{{ form.stops|length }}">
+								{% for stopForm in form.stops %}
+									<div class="stop-node-row intermediate">
+										<div class="stop-id-indicator">#{{ loop.index }}</div>
+										<div class="stop-badge-marker intermediate">Arrêt</div>
+										<div class="stop-fields-stack">
+											<div class="field-row">
+												<div class="field">
+													{{ form_label(stopForm.city) }}
+													{{ form_widget(stopForm.city) }}
+													<div class="text-danger text-size-12 mt-5">{{ form_errors(stopForm.city) }}</div>
+												</div>
+												<div class="field">
+													{{ form_label(stopForm.country) }}
+													{{ form_widget(stopForm.country) }}
+													<div class="text-danger text-size-12 mt-5">{{ form_errors(stopForm.country) }}</div>
+												</div>
+											</div>
+											<div class="field-row">
+												<div class="field">
+													{{ form_label(stopForm.distance) }}
+													{{ form_widget(stopForm.distance) }}
+													<div class="text-danger text-size-12 mt-5">{{ form_errors(stopForm.distance) }}</div>
+												</div>
+												<div class="field">
+													{{ form_label(stopForm.duration) }}
+													{{ form_widget(stopForm.duration) }}
+													<div class="text-danger text-size-12 mt-5">{{ form_errors(stopForm.duration) }}</div>
+												</div>
+												<button type="button" class="btn-remove-row js-remove-row">
+													<i class="fa-solid fa-trash-can"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
 
-							{# ZONE D'ACTION : BOUTON AJOUTER (Placé avant le terminus) #}
+							{# ZONE D'ACTION : BOUTON AJOUTER #}
 							<div class="stop-action-row-on-timeline">
 								<div class="timeline-line-connector"></div>
 								<button type="button" class="btn-add-on-timeline" id="js-add-stop-row">
@@ -75,43 +122,55 @@
 								</button>
 							</div>
 
-							{# TERMINUS FIXE #}
+							{# TERMINUS #}
 							<div class="stop-node-row last" id="js-terminus-row">
 								<div class="stop-badge-marker end">Fin</div>
 								<div class="stop-fields-stack">
 									<div class="field-row">
 										<div class="field">
-											<label>Ville Terminus</label><input type="text" name="terminus_city" placeholder="Ville..." required></div>
+											{{ form_label(form.terminusCity) }}
+											{{ form_widget(form.terminusCity) }}
+											<div class="text-danger text-size-12 mt-5">{{ form_errors(form.terminusCity) }}</div>
+										</div>
 										<div class="field">
-											<label>Pays</label><input type="text" name="terminus_country" value="RDC" required></div>
+											{{ form_label(form.terminusCountry) }}
+											{{ form_widget(form.terminusCountry) }}
+											<div class="text-danger text-size-12 mt-5">{{ form_errors(form.terminusCountry) }}</div>
+										</div>
 									</div>
 									<div class="field-row">
 										<div class="field">
-											<label>Distance Totale (Km)</label><input type="number" name="distance" placeholder="650" required></div>
+											{{ form_label(form.distance) }}
+											{{ form_widget(form.distance) }}
+											<div class="text-danger text-size-12 mt-5">{{ form_errors(form.distance) }}</div>
+										</div>
 										<div class="field">
-											<label>Durée Totale</label><input type="text" name="duration" placeholder="11h00" required></div>
+											{{ form_label(form.duration) }}
+											{{ form_widget(form.duration) }}
+											<div class="text-danger text-size-12 mt-5">{{ form_errors(form.duration) }}</div>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					{# SECTION 3 : TARIFICATION #}
+					{# SECTION 3 : TARIFICATION FRET #}
 					<div class="card">
 						<h2>
 							<i class="fa-solid fa-hand-holding-dollar"></i>
-							Fret & Tarification</h2>
+							Fret & Tarification
+						</h2>
 						<div class="main-route-header-grid">
 							<div class="field">
-								<label>Prix par Kilo *</label>
-								<input type="number" name="price_per_kg" step="0.01" required>
+								{{ form_label(form.pricePerKg) }}
+								{{ form_widget(form.pricePerKg) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.pricePerKg) }}</div>
 							</div>
 							<div class="field">
-								<label>Devise *</label>
-								<select name="route_currency">
-									<option value="CDF">CDF (Franc Congolais)</option>
-									<option value="USD">USD (Dollar)</option>
-								</select>
+								{{ form_label(form.currencyCode) }}
+								{{ form_widget(form.currencyCode) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.currencyCode) }}</div>
 							</div>
 						</div>
 					</div>
@@ -121,13 +180,17 @@
 					<div class="card summary-sticky-card">
 						<h2>
 							<i class="fa-solid fa-globe"></i>
-							Publication</h2>
+							Publication
+						</h2>
 						<div class="field mb-20">
-							<label>Statut de la ligne</label>
-							<select name="isAvailable">
-								<option value="1">Disponible / Actif</option>
-								<option value="0">Désactivé</option>
-							</select>
+							{{ form_label(form.reservationExpirationDelay) }}
+							{{ form_widget(form.reservationExpirationDelay) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.reservationExpirationDelay) }}</div>
+						</div>
+						<div class="field mb-20">
+							{{ form_label(form.isAvailable) }}
+							{{ form_widget(form.isAvailable) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.isAvailable) }}</div>
 						</div>
 						<button type="submit" class="btn btn-primary btn-full">
 							<i class="fa-solid fa-map-pin"></i>
@@ -136,10 +199,15 @@
 					</div>
 				</aside>
 			</div>
-		</form>
+
+			{# Empêche le rendu automatique en double du prototype vide de form.stops #}
+			{% do form.stops.setRendered %}
+
+		{{ form_end(form) }}
 	</div>
 
-	{# TEMPLATE JS #}
+	{# TEMPLATE JS AVEC PROTOTYPE SYMFONY (__name__) #}
+	{% set proto = form.stops.vars.prototype %}
 	<template id="stop-row-template">
 		<div class="stop-node-row intermediate">
 			<div class="stop-id-indicator">#</div>
@@ -147,16 +215,23 @@
 			<div class="stop-fields-stack">
 				<div class="field-row">
 					<div class="field">
-						<label>Ville d'Escale</label><input type="text" name="stops[__][city]" placeholder="Ex: Mbanza-Ngungu" required></div>
+						{{ form_label(proto.city) }}
+						{{ form_widget(proto.city) }}
+					</div>
 					<div class="field">
-						<label>Pays</label><input type="text" name="stops[__][country]" value="RDC" required>
+						{{ form_label(proto.country) }}
+						{{ form_widget(proto.country) }}
 					</div>
 				</div>
 				<div class="field-row">
 					<div class="field">
-						<label>Distance (Km)</label><input type="number" name="stops[__][distance]" placeholder="150" required></div>
+						{{ form_label(proto.distance) }}
+						{{ form_widget(proto.distance) }}
+					</div>
 					<div class="field">
-						<label>Durée</label><input type="text" name="stops[__][duration]" placeholder="2h15" required></div>
+						{{ form_label(proto.duration) }}
+						{{ form_widget(proto.duration) }}
+					</div>
 					<button type="button" class="btn-remove-row js-remove-row">
 						<i class="fa-solid fa-trash-can"></i>
 					</button>

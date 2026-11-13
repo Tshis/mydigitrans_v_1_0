@@ -1,259 +1,262 @@
-{# templates/admin/agency/route/show.html.twig #}
+{# templates/admin/agency/line/show.html.twig #}
 {% extends "admin/base.html.twig" %}
 
-
 {% block body %}
-<div class="admin-route-show-scope container">
-	{# --- EN-TÊTE --- #}
-	<header class="header-refined my-30">
-		<div class="header-main-info">
-			<a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
-				<i class="fa-solid fa-arrow-left"></i>
-			</a>
-			<div class="title">
-				<h1>Fiche d'Audit Trajet</h1>
-				<p class="subtitle">
-					<span class="text-gray">Itinéraires</span>
-					<span class="arrow-divider">•</span>
-					<span class="text-primary text-highlight">Fiche Technique Ligne</span>
-			</div>
-		</div>
-
-		<div class="header-actions">
-			{% if route.isAvailable %}
-			<a href="" class="btn-refined btn-danger-gradient text-size-12">
-				<i class="fa-solid fa-ban"></i>
-				Suspendre la ligne
-			</a>
-			{% else %}
-			<a href="" class="btn-refined btn-success-gradient text-size-12">
-				<i class="fa-regular fa-circle-check"></i>
-				Activer la ligne
-			</a>
-			{% endif %}
-
-		</div>
-	</header>
-
-	<div class="route-show-container">
-		{# COLONNE GAUCHE : DÉTAILS ET TIMELINE #}
-		<div class="layout-main-panel">
-
-			{# CARD 1 : RÉSUMÉ DE LA ROUTE #}
-			<div class="card mb-20">
-				<h2 class="card-title-fix">
-					<i class="fa-solid fa-circle-info"></i>
-					Identité de la Route
-				</h2>
-				<div class="route-info-banner">
-					<div class="main-details">
-						<h1>{{ route.name }}</h1>
-						{% if route.isAvailable %}
-						<span class="route-code-badge available">
-							<i class="fa-regular fa-circle-check"></i>
-							Operationnelle
-						</span>
-						{% else %}
-						<span class="route-code-badge unavailable">
-							<i class="fa-solid fa-ban"></i>
-							Suspendu
-						</span>
-
-						{% endif %}
-
-					</div>
-					<div class="route-meta-grid">
-						<div class="meta-item">
-							<span class="label">Distance Totale</span>
-							<strong>{{ route.distance }}
-								Km</strong>
-						</div>
-						<div class="meta-item">
-							<span class="label">Durée Estimée</span>
-							<strong>{{ route.duration }}</strong>
-						</div>
-						<div class="meta-item">
-							<span class="label">Prix Fret / Kg</span>
-							<strong class="text-success text-size-13">{{ route.pricePerKg|number_format(0, '.', ' ')
-								}}
-								{{
-								route.currency }}</strong>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			{# CARD 2 : Section Tarification par Tronçons (Segments) #}
-			<div class="card mb-20">
-				<div class="card-header-action-row mb-15">
-					<h2 class="card-title-fix">
-						<i class="fa-solid fa-layer-group"></i>
-						Matrice des Tarifs par Segment
-					</h2>
-					<div class="add-line-fare-btn-box">
-						<a href="{{path('admin_agency_fare_line_add',{'slug':route.slug})}}"
-							class="btn btn-success text-size-12">
-							<i class="fa-solid fa-plus-circle"></i>
-							Configurer un nouveau tarif
-						</a>
-					</div>
-				</div>
-
-				<div class="table-responsive-wrapper">
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Segment (De ➔ À)</th>
-								<th class="text-right">Tarif Billet</th>
-								<th class="text-right">Fret / Kg</th>
-								<th>Validité</th>
-								<th>Fin</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for fare in route.fares %}
-							<tr>
-								<td>
-									<strong>{{ fare.departureCity }}
-										➔
-										{{ fare.arrivalCity }}</strong>
-								</td>
-								<td class="text-right font-bold">{{ fare.amount|number_format(0, '.', ' ') }}
-									{{
-									fare.currency }}</td>
-								<td class="text-right">{{ fare.pricePerKg }}
-									{{ fare.currency }}</td>
-								<td class="text-size-11">Du
-									{{ fare.validFrom|date('d/m/y') }}</td>
-								<td>Indéfini</td>
-
-							</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			</div>
-
-
-			{# CARD 3 : TRACÉ DÉTAILLÉ DES ARRÊTS (MCD 12) #}
-			<div class="card mb-20">
-				<h2 class="card-title-fix">
-					<i class="fa-solid fa-map-location-dot"></i>
-					Itinéraire & Escales
-				</h2>
-				<div class="route-timeline-display">
-
-					{% for stop in route.stops %}
-					<div class="timeline-stop-item">
-						<div class="timeline-visual">
-							<div
-								class="marker {% if loop.first %}start{% elseif loop.last %}end{% else %}intermediate{% endif %}">
-								{% if loop.first %}
-								<i class="fa-solid fa-bus"></i>
-								{% elseif loop.last %}
-								<i class="fa-solid fa-flag-checkered"></i>
-								{% else %}
-								{{ stop.stopOrder }}
-								{% endif %}
-							</div>
-							{% if not loop.last %}
-							<div class="connector"></div>
-							{% endif %}
-						</div>
-						<div class="timeline-content">
-							<div class="stop-header">
-								<h3>{{ stop.city }}
-									<small>({{ stop.country }})</small>
-								</h3>
-								<span class="stop-km">+
-									{{ stop.distanceFromDeparture }}
-									Km</span>
-							</div>
-							<div class="stop-details">
-								<span>
-									<i class="fa-solid fa-clock"></i>
-									Arrivée estimée à
-									<strong>T +
-										{{
-										stop.durationFromDeparture }}</strong>
-								</span>
-								{% if stop.isActive %}
-								<span class="badge-status-active">Gare Active</span>
-								{% else %}
-								<span class="badge-status-inactive">Arrêt Suspendu</span>
-								{% endif %}
-							</div>
-						</div>
-					</div>
-					{% endfor %}
-
-				</div>
-			</div>
-		</div>
-
-		{# COLONNE DROITE : STATUT ET AUDIT #}
-		<aside class="summary">
-			<div class="card summary-sticky-card">
-				<h2 class="card-title-fix">Exploitation</h2>
-
-				<div class="audit-stack">
-					<div class="audit-line">
-						<span class="label">Statut :</span>
-						{% if route.isAvailable %}
-						<span class="text-success text-weight-800">
-							<i class="fa-regular fa-circle-check"></i>
-							Operationnelle
-						</span>
-						{% else %}
-						<span class="text-danger text-weight-800">
-							<i class="fa-solid fa-ban"></i>
-							Suspendu
-						</span>
-						{% endif %}
-					</div>
-					<div class="audit-line">
-						<span class="label">Délai Expiration Reservation:</span>
-						<strong>{{ route.reservationExpirationDelay ?? '120' }}
-							minutes</strong>
-					</div>
-					{% if not route.isAvailable %}
-					<div class="audit-line">
-						<span class="label">Suspendu depuis le :</span>
-						<strong>
-							{{ route.lastUpdatAt ? route.lastUpdatAt|date('d/m/Y') ~ ' à '~route.lastUpdatAt|date('H:i')
-							: 'Indéfini' }}
-						</strong>
-					</div>
-					{% endif %}
-				</div>
-
-				<hr class="summary-divider">
-
-				<div class="audit-stack small">
-					<div class="audit-line">
-						<span>Créé le :</span>
-						<span>{{ route.createdAt|date('d/m/Y') }}</span>
-					</div>
-					<div class="audit-line">
-						<span>Par :</span>
-						<span>{{ route.createdBy }}</span>
-					</div>
-				</div>
-
-				<div class="notice-box mt-20">
-					<p>
-						<i class="fa-solid fa-lightbulb"></i>
-						<strong>Note :</strong>
-						Cette configuration définit les
-						options de billetterie pour les voyageurs souhaitant descendre en cours de route.
+	<div class="admin-route-show-scope container">
+		{# --- EN-TÊTE --- #}
+		<header class="header-refined my-30">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_line_index') }}" class="agency-back-action" title="Retour à la liste">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<h1>Fiche d'Audit Trajet</h1>
+					<p class="subtitle">
+						<span class="text-gray">Itinéraires</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-primary text-highlight">Fiche Technique Ligne ({{ route.code }})</span>
 					</p>
 				</div>
 			</div>
-		</aside>
+
+			{% if is_granted('route.write') %}
+				<div class="header-actions">
+					<form method="POST" action="{{ path('admin_agency_line_toggle', {'slug': route.slug}) }}" style="display:inline;">
+						<input type="hidden" name="_token" value="{{ csrf_token('route_toggle_' ~ route.slug) }}">
+						{% if route.isAvailable %}
+							<button type="submit" class="btn-refined btn-danger-gradient text-size-12">
+								<i class="fa-solid fa-ban"></i>
+								Suspendre la ligne
+							</button>
+						{% else %}
+							<button type="submit" class="btn-refined btn-success-gradient text-size-12">
+								<i class="fa-regular fa-circle-check"></i>
+								Activer la ligne
+							</button>
+						{% endif %}
+					</form>
+				</div>
+			{% endif %}
+		</header>
+
+		<div class="route-show-container">
+			{# COLONNE GAUCHE : DÉTAILS ET TIMELINE #}
+			<div class="layout-main-panel">
+
+				{# CARD 1 : RÉSUMÉ DE LA ROUTE #}
+				<div class="card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-circle-info"></i>
+						Identité de la Route
+					</h2>
+					<div class="route-info-banner">
+						<div class="main-details">
+							<h1>{{ route.name }}</h1>
+							{% if route.isAvailable %}
+								<span class="route-code-badge available">
+									<i class="fa-regular fa-circle-check"></i>
+									Opérationnelle
+								</span>
+							{% else %}
+								<span class="route-code-badge unavailable">
+									<i class="fa-solid fa-ban"></i>
+									Suspendue
+								</span>
+							{% endif %}
+						</div>
+						<div class="route-meta-grid">
+							<div class="meta-item">
+								<span class="label">Distance Totale</span>
+								<strong>{{ route.distance|number_format(0, ',', ' ') }} Km</strong>
+							</div>
+							<div class="meta-item">
+								<span class="label">Durée Estimée</span>
+								<strong>{{ route.duration }}</strong>
+							</div>
+							<div class="meta-item">
+								<span class="label">Prix Fret / Kg</span>
+								<strong class="text-success text-size-13">
+									{{ route.pricePerKg|number_format(0, '.', ' ') }} {{ route.currency }}
+								</strong>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				{# CARD 2 : TARIFICATION PAR TRONÇONS (SEGMENTS) #}
+				<div class="card mb-20">
+					<div class="card-header-action-row mb-15">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-layer-group"></i>
+							Matrice des Tarifs par Segment
+						</h2>
+						{% if is_granted('fare.write') %}
+							<div class="add-line-fare-btn-box">
+								<a href="{{ path('admin_agency_fare_line_add', {'slug': route.slug}) }}" class="btn btn-success text-size-12">
+									<i class="fa-solid fa-plus-circle"></i>
+									Configurer un nouveau tarif
+								</a>
+							</div>
+						{% endif %}
+					</div>
+
+					<div class="table-responsive-wrapper">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Segment (De ➔ À)</th>
+									<th class="text-right">Tarif Billet</th>
+									<th class="text-right">Fret / Kg</th>
+									<th>Validité</th>
+									<th>Fin</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for fare in route.fares %}
+									<tr>
+										<td>
+											<strong>{{ fare.departureCity }} ➔ {{ fare.arrivalCity }}</strong>
+										</td>
+										<td class="text-right font-bold">
+											{{ fare.amount|number_format(0, '.', ' ') }} {{ fare.currency }}
+										</td>
+										<td class="text-right">
+											{{ fare.pricePerKg is not null ? (fare.pricePerKg|number_format(0, '.', ' ') ~ ' ' ~ fare.currency) : '-' }}
+										</td>
+										<td class="text-size-11">
+											{{ fare.validFrom ? 'Du ' ~ fare.validFrom|date('d/m/y') : '-' }}
+										</td>
+										<td class="text-size-11">
+											{{ fare.validUntil ? fare.validUntil|date('d/m/y') : 'Indéfini' }}
+										</td>
+									</tr>
+								{% else %}
+									<tr>
+										<td colspan="5" class="text-center text-gray italic padding-20">
+											Aucun tarif par segment configuré pour cette ligne.
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				{# CARD 3 : TRACÉ DÉTAILLÉ DES ARRÊTS (RouteStop) #}
+				<div class="card mb-20">
+					<h2 class="card-title-fix">
+						<i class="fa-solid fa-map-location-dot"></i>
+						Itinéraire & Escales
+					</h2>
+					<div class="route-timeline-display">
+
+						{% for stop in route.stops %}
+							<div class="timeline-stop-item">
+								<div class="timeline-visual">
+									<div class="marker {% if loop.first %}start{% elseif loop.last %}end{% else %}intermediate{% endif %}">
+										{% if loop.first %}
+											<i class="fa-solid fa-bus"></i>
+										{% elseif loop.last %}
+											<i class="fa-solid fa-flag-checkered"></i>
+										{% else %}
+											{{ stop.stopOrder }}
+										{% endif %}
+									</div>
+									{% if not loop.last %}
+										<div class="connector"></div>
+									{% endif %}
+								</div>
+								<div class="timeline-content">
+									<div class="stop-header">
+										<h3>{{ stop.city }} <small>({{ stop.country }})</small></h3>
+										<span class="stop-km">+ {{ stop.distanceFromDeparture|number_format(0, ',', ' ') }} Km</span>
+									</div>
+									<div class="stop-details">
+										<span>
+											<i class="fa-solid fa-clock"></i>
+											Arrivée estimée à <strong>T + {{ stop.durationFromDeparture }}</strong>
+										</span>
+
+										{% if stop.isActive %}
+											<span class="badge-status-active">Gare Active</span>
+										{% else %}
+											<span class="badge-status-inactive">Arrêt Suspendu</span>
+										{% endif %}
+
+										{% if is_granted('route.write') and not loop.first and not loop.last %}
+											<form method="POST" action="{{ path('admin_agency_line_stop_toggle', {'slug': route.slug, 'id': stop.id}) }}" style="display:inline; margin-left: 10px;">
+												<input type="hidden" name="_token" value="{{ csrf_token('route_stop_toggle_' ~ stop.id) }}">
+												<button type="submit" class="btn-refined {{ stop.isActive ? 'btn-danger-gradient' : 'btn-success-gradient' }} text-size-11" style="padding: 3px 8px;">
+													{{ stop.isActive ? 'Suspendre' : 'Activer' }}
+												</button>
+											</form>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+
+					</div>
+				</div>
+			</div>
+
+			{# COLONNE DROITE : STATUT ET AUDIT #}
+			<aside class="summary">
+				<div class="card summary-sticky-card">
+					<h2 class="card-title-fix">Exploitation</h2>
+
+					<div class="audit-stack">
+						<div class="audit-line">
+							<span class="label">Statut :</span>
+							{% if route.isAvailable %}
+								<span class="text-success text-weight-800">
+									<i class="fa-regular fa-circle-check"></i>
+									Opérationnelle
+								</span>
+							{% else %}
+								<span class="text-danger text-weight-800">
+									<i class="fa-solid fa-ban"></i>
+									Suspendue
+								</span>
+							{% endif %}
+						</div>
+						<div class="audit-line">
+							<span class="label">Délai Expiration Réservation :</span>
+							<strong>{{ route.reservationExpirationDelay }} minutes</strong>
+						</div>
+						{% if not route.isAvailable %}
+							<div class="audit-line">
+								<span class="label">Suspendue depuis le :</span>
+								<strong>
+									{{ route.lastUpdatedAt ? route.lastUpdatedAt|date('d/m/Y à H:i') : 'Indéfini' }}
+								</strong>
+							</div>
+						{% endif %}
+					</div>
+
+					<hr class="summary-divider">
+
+					<div class="audit-stack small">
+						<div class="audit-line">
+							<span>Créée le :</span>
+							<span>{{ route.createdAt|date('d/m/Y') }}</span>
+						</div>
+						<div class="audit-line">
+							<span>Par :</span>
+							<span>{{ route.createdBy }}</span>
+						</div>
+					</div>
+
+					<div class="notice-box mt-20">
+						<p>
+							<i class="fa-solid fa-lightbulb"></i>
+							<strong>Note :</strong>
+							Cette configuration définit les options de billetterie pour les voyageurs souhaitant descendre en cours de route.
+						</p>
+					</div>
+				</div>
+			</aside>
+		</div>
+
 	</div>
-
-
-</div>
-
-
 {% endblock %}

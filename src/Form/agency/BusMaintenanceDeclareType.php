@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Form\admin\agency;
+namespace App\Form\agency;
 
 use App\Dto\admin\agency\BusMaintenanceDeclareData;
 use App\Entity\Bus;
