@@ -7,6 +7,7 @@ namespace App\Form;
 use App\Dto\public\agency\AgencyRegistrationData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -19,6 +20,7 @@ class AgencyRegistrationType extends AbstractType
 {
     private const LABEL = ['class' => 'admin-bus-layout-add-label'];
     private const INPUT = 'admin-bus-layout-add-input';
+    private const SELECT = 'admin-bus-layout-add-select';
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -55,11 +57,19 @@ class AgencyRegistrationType extends AbstractType
                 'label_attr' => self::LABEL,
                 'attr' => ['class' => self::INPUT, 'placeholder' => 'Ex: Kinshasa', 'maxlength' => 100],
             ])
-            ->add('country', TextType::class, [
-                'label' => 'Pays *',
-                'label_attr' => self::LABEL,
-                'attr' => ['class' => self::INPUT, 'placeholder' => 'Ex: RDC', 'maxlength' => 100],
+            ->add('country', CountryType::class, [
+                'label'             => 'Pays *',
+                'label_attr'        => self::LABEL,
+                'preferred_choices' => ['CD', 'CG', 'AO', 'ZM', 'UG', 'RW', 'BI', 'TZ'],
+                'placeholder'       => '-- Choisir un pays --',
+                'attr'              => ['class' => self::SELECT],
+                'autocomplete'      => true,
+                'tom_select_options' => [
+                    'plugins'     => ['dropdown_input'],
+                    'placeholder' => 'Rechercher un pays...',
+                ],
             ])
+
             ->add('address', TextType::class, [
                 'label' => 'Adresse *',
                 'label_attr' => self::LABEL,
@@ -102,7 +112,6 @@ class AgencyRegistrationType extends AbstractType
                 'attr' => ['class' => self::INPUT, 'placeholder' => '••••••••', 'autocomplete' => 'new-password'],
             ])
             ->add('acceptLegal', CheckboxType::class, ['label' => false])
-            // Mémorise que le parrain vient du lien d'invitation (champ verrouillé à l'écran, pour l'affichage seulement).
             ->add('sponsorLocked', HiddenType::class, ['mapped' => false, 'required' => false]);
     }
 

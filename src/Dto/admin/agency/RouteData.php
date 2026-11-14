@@ -27,17 +27,17 @@ final class RouteData
     #[Assert\Length(min: 2, max: 100)]
     public ?string $departureCity = 'Kinshasa';
 
-    #[Assert\NotBlank(message: 'Indiquez le pays de départ.')]
-    #[Assert\Length(min: 2, max: 100)]
-    public ?string $departureCountry = 'RDC';
+    #[Assert\NotBlank(message: 'Choisissez le pays de départ.')]
+    #[Assert\Country(message: 'Le pays de départ sélectionné est invalide.')]
+    public ?string $departureCountry = 'CD';
 
     #[Assert\NotBlank(message: 'Indiquez la ville terminus.')]
     #[Assert\Length(min: 2, max: 100)]
     public ?string $terminusCity = null;
 
-    #[Assert\NotBlank(message: 'Indiquez le pays terminus.')]
-    #[Assert\Length(min: 2, max: 100)]
-    public ?string $terminusCountry = 'RDC';
+    #[Assert\NotBlank(message: 'Choisissez le pays terminus.')]
+    #[Assert\Country(message: 'Le pays terminus sélectionné est invalide.')]
+    public ?string $terminusCountry = 'CD';
 
     #[Assert\NotNull(message: 'Indiquez la distance totale en Km.')]
     #[Assert\Positive(message: 'La distance totale doit être supérieure à 0 Km.')]

@@ -168,7 +168,8 @@
 								</div>
 								<div class="timeline-content">
 									<div class="stop-header">
-										<h3>{{ stop.city }} <small>({{ stop.country }})</small></h3>
+										<h3>{{ stop.city }} <small>({{ stop.country|length == 2 ? stop.country|country_name('fr') : stop.country }})</small></h3>
+
 										<span class="stop-km">+ {{ stop.distanceFromDeparture|number_format(0, ',', ' ') }} Km</span>
 									</div>
 									<div class="stop-details">

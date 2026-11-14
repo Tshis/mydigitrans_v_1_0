@@ -73,99 +73,111 @@ form{
     }//label
 
     /* --- INTEGRATION SYMFONY UX AUTOCOMPLETE (TOM SELECT) --- */
-    // 1. La boîte globale du champ
-    .ts-wrapper.single .ts-control {
-        border: 1px solid rgba($color: $dark, $alpha: .35) !important;
-        border-radius: .5rem !important;
-        padding: 1rem !important;
-        color: $dark !important;
-        background: transparent !important;
-        height: 4rem !important; // Aligné sur votre .field input
-        display: flex !important;
-        align-items: center !important;
-        box-shadow: none !important;
-        font-size: 1.4rem !important;
-        font-weight: 500 !important;
+        /* --- INTEGRATION SYMFONY UX AUTOCOMPLETE (TOM SELECT) --- */
+    .ts-wrapper {
+        width: 100%;
+        position: relative;
+        height: 4rem; // Verrouille la hauteur identique aux autres inputs/selects
 
-        &.focus {
-            border-width: .16rem !important;
-            border-color: rgba($color: $dark, $alpha: .65) !important;
-        }
-
-        // Le texte saisi ou le pays sélectionné
-        .item, input {
-            font-size: 1.4rem !important;
+        .ts-control {
+            height: 4rem !important;
+            min-height: 4rem !important;
+            max-height: 4rem !important;
+            padding: 0 14px !important;
+            border: 1px solid $mute !important;
+            border-radius: $radius-input !important;
+            background: $white !important;
             color: $dark !important;
-            padding: 0 !important;
-            background: transparent !important;
-        }
-
-        display: flex !important;
-        align-items: center !important; // Centre verticalement tout le contenu
-        padding-top: 0 !important;      // Supprime les paddings verticaux qui cassent l'alignement
-        padding-bottom: 0 !important;
-
-        // --- LE CORRECTIF D'ALIGNEMENT ---
-        &::after {
-            // Centre la petite flèche de sélection à droite
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            margin-top: 0 !important;
-        }
-
-        // Aligner le pays sélectionné (.item) et la zone de saisie (input)
-        .item, input, .dropdown-input {
-            line-height: 4rem !important; // Aligné exactement sur la hauteur du champ
-            height: 4rem !important;      // Force la même hauteur partout
-            display: inline-flex !important;
+            font-size: 1.3rem !important;
+            display: flex !important;
             align-items: center !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
+            flex-wrap: nowrap !important;
+            overflow: hidden !important;
+            box-shadow: none !important;
 
-        // Ajustement spécifique pour l'input de recherche de Tom Select
-        input {
-            opacity: 1 !important;
-            position: relative !important;
-        }
+            // Annule la règle globale ".field input { height: 4rem; width: 100%; }" sur l'input caché
+            > input {
+                height: auto !important;
+                width: 0 !important;
+                min-width: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                position: absolute !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
 
-    }//.ts-wrapper.single .ts-control
-
-    // 2. Le menu déroulant des pays
-    .ts-wrapper .ts-dropdown {
-        border: 1px solid rgba($color: $dark, $alpha: .2) !important;
-        border-radius: .5rem !important;
-        background: $white !important;
-        box-shadow: 0 10px 26px rgba($dark, 0.08) !important;
-        font-size: 1.4rem !important;
-        margin-top: 5px !important;
-
-        // Les lignes de pays
-        .option {
-            padding: 1rem !important;
-            color: $dark !important;
-
-            // Au survol de la souris
-            &.active {
-                background: rgba($color: $dark, $alpha: 0.05) !important;
-                color: $dark !important;
+            .item {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                color: $dark;
             }
         }
-    }//.ts-wrapper .ts-dropdown
 
-    // 3. Gestion de l'état d'erreur (.has-error)
-    &.has-error .ts-wrapper .ts-control,
-    .ts-wrapper.has-error .ts-control {
-        border-color: $danger !important;
+        &.focus .ts-control {
+            border-color: $success !important;
+            border-width: .16rem !important;
+        }
+
+        &.has-error .ts-control {
+            border-color: $danger !important;
+        }
     }
 
-    .ts-wrapper .theme-colors, .ts-wrapper.single .item .remove {
-        border-left: 1px solid rgba($dark, 0.15) !important;
-        color: $danger !important;
-        margin-left: 5px !important;
-        display: inline-flex;
-        align-items: center;
+    // Menu déroulant + barre de recherche tout en haut (plugin dropdown_input)
+    .ts-dropdown {
+        z-index: 9999 !important;
+        background: $white !important;
+        border: 1px solid $mute !important;
+        border-radius: $radius-input !important;
+        margin-top: 4px !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+        overflow: hidden !important;
+
+        // Barre de recherche en haut du dropdown
+        .dropdown-input-wrap {
+            padding: 8px !important;
+            border-bottom: 1px solid rgba($mute, 0.4) !important;
+            background: $white !important;
+
+            input.dropdown-input {
+                width: 100% !important;
+                height: 3.4rem !important;
+                padding: 6px 12px !important;
+                border: 1px solid $mute !important;
+                border-radius: $radius-input !important;
+                font-size: 1.3rem !important;
+                color: $dark !important;
+                background: $white !important;
+
+                &:focus {
+                    border-color: $primary !important;
+                    outline: none !important;
+                }
+            }
+        }
+
+        .ts-dropdown-content {
+            max-height: 220px !important;
+            overflow-y: auto !important;
+        }
+
+        .option {
+            padding: 8px 14px !important;
+            font-size: 1.3rem !important;
+            color: $dark !important;
+            cursor: pointer;
+
+            &.active,
+            &:hover {
+                background-color: rgba($primary, 0.1) !important;
+                color: $primary !important;
+            }
+        }
     }
+  
 
 
     //===================================
@@ -354,35 +366,42 @@ form{
             color: lighten($success, 20%) !important; 
         }//label
 
-        .ts-wrapper.single .ts-control {
-           
-            border-color: $mute !important;
-            color: lighten($color: $success, $amount: 45%) !important;
-            // Le texte saisi ou le pays sélectionné
-            .item, input {
-                color: lighten($color: $success, $amount: 45%) !important;
-            }      
+               .ts-wrapper .ts-control {
+            background: darken($dm-bg, 4%) !important;
+            border-color: rgba($mute, 0.2) !important;
+            color: $mute !important;
 
-    }//.ts-wrapper.single .ts-control
-
-    // 2. Le menu déroulant des pays
-    .ts-wrapper .ts-dropdown {
-        border-color: $mute !important;
-        background: $dm-bg !important;
-      
-
-        // Les lignes de pays
-        .option {
-            color: lighten($color: $success, $amount: 45%) !important;
-
-            // Au survol de la souris
-            &.active {
-                background: rgba($dark, 0.05%) !important;
-                color: $success !important;
-                z-index: -1;
+            .item {
+                color: $mute !important;
             }
         }
-    }//.ts-wrapper .ts-dropdown
+
+        .ts-dropdown {
+            border-color: rgba($mute, 0.2) !important;
+            background: $dm-bg !important;
+
+            .dropdown-input-wrap {
+                background: $dm-bg !important;
+                border-bottom-color: rgba($mute, 0.2) !important;
+
+                input.dropdown-input {
+                    background: darken($dm-bg, 4%) !important;
+                    border-color: rgba($mute, 0.2) !important;
+                    color: $mute !important;
+                }
+            }
+
+            .option {
+                color: $mute !important;
+
+                &.active,
+                &:hover {
+                    background: rgba($primary, 0.15) !important;
+                    color: $primary !important;
+                }
+            }
+        }
+
 
 
 

@@ -38,9 +38,10 @@ final class AgencyRegistrationData
     #[Assert\Length(max: 100, maxMessage: 'Le nom de la ville est trop long.')]
     public ?string $mainCity = null;
 
-    #[Assert\NotBlank(message: 'Indiquez le pays.')]
-    #[Assert\Length(max: 100, maxMessage: 'Le nom du pays est trop long.')]
-    public ?string $country = null;
+    #[Assert\NotBlank(message: 'Choisissez le pays.')]
+    #[Assert\Country(message: 'Le pays sélectionné est invalide.')]
+    public ?string $country = 'CD';
+
 
     #[Assert\NotBlank(message: 'Indiquez l\'adresse du siège.')]
     #[Assert\Length(max: 255, maxMessage: 'L\'adresse est trop longue.')]

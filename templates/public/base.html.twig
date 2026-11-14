@@ -12,6 +12,11 @@
 		<meta name="theme-color" content="#ef6e17">
 		<script src="/js/pwa-register.js" defer></script>
 
+		{# <link href="https://jsdelivr.net" rel="stylesheet">
+		<script src="https://jsdelivr.net" defer></script> #}
+		{# <script src="/js/country-autocomplete.js" defer></script> #}
+
+
 
 		<title>
 			{% block title %}My DigiTrans |
@@ -27,6 +32,9 @@
 			<script src="/js/public/app.js" defer></script>
 			<script src="/js/public/backtotop.js" defer></script>
 		{% endblock %}
+
+		{% block importmap %}{{ importmap('app') }}{% endblock %}
+
 	</head>
 
 	<body>

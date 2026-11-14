@@ -8,6 +8,7 @@ use App\Dto\admin\agency\RouteData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -16,6 +17,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class RouteType extends AbstractType
 {
+    private const PREFERRED_COUNTRIES = ['CD', 'CG', 'AO', 'ZM', 'UG', 'RW', 'BI', 'TZ'];
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var array<string, string> $currencyChoices */
@@ -41,22 +44,32 @@ final class RouteType extends AbstractType
                     'placeholder' => 'Ex : Kinshasa',
                 ],
             ])
-            ->add('departureCountry', TextType::class, [
-                'label' => 'Pays *',
-                'attr'  => [
-                    'placeholder' => 'RDC',
+            ->add('departureCountry', CountryType::class, [
+                'label'              => 'Pays *',
+                'preferred_choices'  => self::PREFERRED_COUNTRIES,
+                'placeholder'        => '-- Choisir un pays --',
+                'autocomplete'       => true,
+                'tom_select_options' => [
+                    'plugins'     => ['dropdown_input'],
+                    'placeholder' => 'Rechercher un pays...',
                 ],
             ])
+
+
             ->add('terminusCity', TextType::class, [
                 'label' => 'Ville Terminus *',
                 'attr'  => [
                     'placeholder' => 'Ex : Muanda',
                 ],
             ])
-            ->add('terminusCountry', TextType::class, [
-                'label' => 'Pays *',
-                'attr'  => [
-                    'placeholder' => 'RDC',
+            ->add('terminusCountry', CountryType::class, [
+                'label'             => 'Pays *',
+                'preferred_choices' => self::PREFERRED_COUNTRIES,
+                'placeholder'       => '-- Choisir un pays --',
+                'autocomplete'      => true,
+                'tom_select_options' => [
+                    'plugins'     => ['dropdown_input'],
+                    'placeholder' => 'Rechercher un pays...',
                 ],
             ])
             ->add('distance', NumberType::class, [

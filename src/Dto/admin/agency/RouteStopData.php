@@ -15,9 +15,9 @@ final class RouteStopData
     #[Assert\Length(min: 2, max: 100, minMessage: 'Nom de ville trop court.', maxMessage: 'Nom de ville trop long.')]
     public ?string $city = null;
 
-    #[Assert\NotBlank(message: 'Indiquez le pays.')]
-    #[Assert\Length(min: 2, max: 100)]
-    public ?string $country = 'RDC';
+    #[Assert\NotBlank(message: 'Choisissez le pays.')]
+    #[Assert\Country(message: 'Le pays sélectionné est invalide.')]
+    public ?string $country = 'CD';
 
     #[Assert\NotNull(message: 'Indiquez la distance depuis le départ.')]
     #[Assert\Positive(message: 'La distance doit être supérieure à 0 km.')]
