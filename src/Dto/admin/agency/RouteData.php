@@ -15,13 +15,13 @@ final class RouteData
     #[Assert\Length(min: 3, max: 150, minMessage: 'Le nom de la ligne est trop court.', maxMessage: 'Le nom de la ligne est trop long.')]
     public ?string $name = null;
 
-    #[Assert\NotBlank(message: 'Indiquez le code unique de la ligne.')]
-    #[Assert\Length(min: 2, max: 50, maxMessage: 'Le code ligne est trop long.')]
+    #[Assert\Length(max: 50, maxMessage: 'Le code ligne est trop long (50 caractères maximum).')]
     #[Assert\Regex(
-        pattern: '/^[A-Za-z0-9_-]+$/',
+        pattern: '/^[A-Za-z0-9_-]*$/',
         message: 'Le code ligne ne peut contenir que des lettres, chiffres, tirets ou underscores.'
     )]
     public ?string $code = null;
+
 
     #[Assert\NotBlank(message: 'Indiquez la ville de départ.')]
     #[Assert\Length(min: 2, max: 100)]

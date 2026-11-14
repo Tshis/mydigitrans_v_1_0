@@ -33,9 +33,10 @@ final class RouteType extends AbstractType
                 ],
             ])
             ->add('code', TextType::class, [
-                'label' => 'Code Ligne (Unique) *',
-                'attr'  => [
-                    'placeholder' => 'Ex : KIN-MUA',
+                'label'    => 'Code Ligne (Optionnel)',
+                'required' => false,
+                'attr'     => [
+                    'placeholder' => 'Généré automatiquement si vide (Ex : KIN-MUA)',
                 ],
             ])
             ->add('departureCity', TextType::class, [

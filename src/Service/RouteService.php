@@ -167,7 +167,16 @@ final class RouteService
         $agency = $actor->getAgency() ?? throw new \LogicException('Agence introuvable.');
 
         $name = trim((string) $data->name);
-        $code = strtoupper(trim((string) $data->code));
+
+        $rawCode = strtoupper(trim((string) $data->code));
+        $code = '' !== $rawCode
+            ? $rawCode
+            : $this->generateUniqueRouteCode($agency, (string) $data->departureCity, (string) $data->terminusCity);
+
+        if (null !== $this->em->getRepository(Route::class)->findOneBy(['agency' => $agency, 'code' => $code])) {
+            throw new \DomainException(sprintf('Le code ligne [%s] existe déjà dans votre agence.', $code));
+        }
+
 
         if (null !== $this->em->getRepository(Route::class)->findOneBy(['agency' => $agency, 'code' => $code])) {
             throw new \DomainException(sprintf('Le code ligne [%s] existe déjà dans votre agence.', $code));
@@ -431,6 +440,7 @@ final class RouteService
         $mins  = $minutes % 60;
         return sprintf('%dh%02d', $hours, $mins);
     }
+
     private function generateUniqueSlug(Agency $agency, string $name): string
     {
         $slugger = new AsciiSlugger('fr');
@@ -445,5 +455,28 @@ final class RouteService
             ++$counter;
         }
         return $slug;
+    }
+
+    private function generateUniqueRouteCode(Agency $agency, string $departureCity, string $terminusCity): string
+    {
+        $slugger = new AsciiSlugger('fr');
+        $depPrefix = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $slugger->slug($departureCity)->toString()) ?: 'DEP', 0, 3));
+        $arrPrefix = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $slugger->slug($terminusCity)->toString()) ?: 'ARR', 0, 3));
+
+        $baseCode = sprintf('%s-%s', str_pad($depPrefix, 3, 'X'), str_pad($arrPrefix, 3, 'X'));
+        $repo = $this->em->getRepository(Route::class);
+
+        if (null === $repo->findOneBy(['agency' => $agency, 'code' => $baseCode])) {
+            return $baseCode;
+        }
+
+        for ($i = 2; $i < 500; ++$i) {
+            $candidate = sprintf('%s-%d', $baseCode, $i);
+            if (null === $repo->findOneBy(['agency' => $agency, 'code' => $candidate])) {
+                return $candidate;
+            }
+        }
+
+        return $baseCode . '-' . strtoupper(bin2hex(random_bytes(2)));
     }
 }
