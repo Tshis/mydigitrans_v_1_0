@@ -1,56 +1,84 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('stops-container');
-    const addButton = document.getElementById('add-stop-btn');
-    const template = document.getElementById('stop-template');
-    const terminusCard = document.getElementById('terminus-card');
+(() => {
+    function initRouteAddForm() {
+        const wrapper = document.getElementById('js-stops-wrapper');
+        const addButton = document.getElementById('js-add-stop-row');
+        const template = document.getElementById('stop-row-template');
 
-    // Fonction globale pour recalculer les numéros d'ordre (1, 2, 3...)
-    function updateOrderNumbers() {
-        const allCards = container.querySelectorAll('.stop-row-card');
-        
-        allCards.forEach((card, index) => {
-            const indicator = card.querySelector('.stop-order-indicator');
-            if (indicator) {
-                indicator.textContent = index + 1;
+        if (!wrapper || !addButton || !template) {
+            return;
+        }
+
+        // Évite la double initialisation si Turbo recharge le script
+        if (wrapper.dataset.initialized === 'true') {
+            return;
+        }
+        wrapper.dataset.initialized = 'true';
+
+        // Recalcule les numéros (#1, #2...) et synchronise les attributs name/id/for pour Symfony
+        function reindexStops() {
+            const rows = wrapper.querySelectorAll('.stop-node-row.intermediate');
+
+            rows.forEach((row, idx) => {
+                const indicator = row.querySelector('.stop-id-indicator');
+                if (indicator) {
+                    indicator.textContent = `#${idx + 1}`;
+                }
+
+                row.querySelectorAll('input, select, textarea').forEach((field) => {
+                    if (field.name) {
+                        field.name = field.name.replace(/\[stops\]\[\d+\]/, `[stops][${idx}]`);
+                    }
+                    if (field.id) {
+                        field.id = field.id.replace(/_stops_\d+_/, `_stops_${idx}_`);
+                    }
+                });
+
+                row.querySelectorAll('label').forEach((label) => {
+                    const htmlFor = label.getAttribute('for');
+                    if (htmlFor) {
+                        label.setAttribute('for', htmlFor.replace(/_stops_\d+_/, `_stops_${idx}_`));
+                    }
+                });
+            });
+
+            wrapper.dataset.index = String(rows.length);
+        }
+
+        // Ajout d'une nouvelle escale intermédiaire depuis le prototype Symfony (__name__)
+        addButton.addEventListener('click', () => {
+            const currentIndex = parseInt(wrapper.dataset.index || '0', 10);
+            const html = template.innerHTML.replace(/__name__/g, String(currentIndex));
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html.trim();
+            const newRow = tempDiv.firstElementChild;
+
+            if (!newRow) {
+                return;
             }
 
-            // Met à jour les index PHP (name="stops[X][city]") pour que Symfony reçoive un tableau propre
-            if (card.classList.contains('intermediate-stop')) {
-                const inputs = card.querySelectorAll('input');
-                inputs.forEach(input => {
-                    input.name = input.name.replace(/stops\[\d+\]/, `stops[${index}]`);
-                });
+            wrapper.appendChild(newRow);
+            reindexStops();
+        });
+
+        // Délégation d'événement pour la suppression (fonctionne avant ET après erreur de validation)
+        wrapper.addEventListener('click', (event) => {
+            const removeBtn = event.target.closest('.js-remove-row');
+            if (!removeBtn) {
+                return;
+            }
+
+            const row = removeBtn.closest('.stop-node-row.intermediate');
+            if (row) {
+                row.remove();
+                reindexStops();
             }
         });
+
+        // Recalage initial au chargement (y compris après un réaffichage avec erreurs Symfony)
+        reindexStops();
     }
 
-    // Gestion de l'ajout d'une escale
-    addButton.addEventListener('click', () => {
-        // Cloner le gabarit template
-        const clone = template.content.cloneNode(true);
-        const card = clone.querySelector('.stop-row-card');
-
-        // Ajouter l'événement de suppression sur le nouveau bouton poubelle
-        card.querySelector('.remove-stop-btn').addEventListener('click', () => {
-            card.remove();
-            updateOrderNumbers(); // Recalculer après suppression
-        });
-
-        // Insérer la nouvelle escale juste AVANT le terminus final
-        container.insertBefore(card, terminusCard);
-
-        // Mettre à jour les numéros
-        updateOrderNumbers();
-    });
-
-    // Écouter la suppression sur les éléments initiaux si présents
-    container.querySelectorAll('.remove-stop-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.target.closest('.stop-row-card').remove();
-            updateOrderNumbers();
-        });
-    });
-
-    // Lancement initial pour caler les numéros de départ
-    updateOrderNumbers();
-});
+    document.addEventListener('DOMContentLoaded', initRouteAddForm);
+    document.addEventListener('turbo:load', initRouteAddForm);
+})();
