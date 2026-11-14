@@ -9,7 +9,7 @@ use App\Dto\admin\agency\BusDocumentData;
 use App\Entity\Bus;
 use App\Entity\BusDocument;
 use App\Enum\Scope;
-use App\Form\admin\agency\BusDocumentType;
+use App\Form\agency\BusDocumentType;
 use App\Service\BusDocumentService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;

@@ -10,7 +10,7 @@ use App\Entity\Bus;
 use App\Entity\BusLayout;
 use App\Enum\BusStatus;
 use App\Enum\Scope;
-use App\Form\admin\agency\BusType;
+use App\Form\agency\BusType;
 use App\Service\FleetService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
