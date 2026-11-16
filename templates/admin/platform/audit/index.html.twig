@@ -7,8 +7,7 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-platform-scope container">
+	<div class="admin-platform-scope container">
 
 		{# --- EN-TÊTE --- #}
 		<header class="header-refined my-25">
@@ -47,31 +46,35 @@
 						<tr>
 							<td>
 								<strong>{{ log.user_name }}</strong>
+								<div class="text-gray text-size-11">{{ log.user_email }}</div>
 							</td>
 							<td>
-								{# Sémantique exacte de ton champ action  #}
 								<span class="pill-action-type status-{{ log.action }}">
 									{{ log.action|upper }}
 								</span>
 							</td>
 							<td>
 								<span class="font-bold text-primary-mode">{{ log.entityName }}</span><br>
-								<small class="monospace text-gray">ID: #{{ log.entityId }}</small>
+								<small class="monospace text-gray">ID: {{ log.entityId ? '#' ~ log.entityId : '-' }}</small>
 							</td>
 							<td>
-								{# Décodage des structures JSON oldValues / newValue de ton MCD  #}
 								<div class="json-history-diff-box">
-									<span class="json-state-label text-danger-color">Avant :</span>
-									<code class="monospace">{{ log.oldValues|json_encode }}</code>
-									<br>
-									<span class="json-state-label text-success-color">Après :</span>
-									<code class="monospace">{{ log.newValue|json_encode }}</code>
+									{% if log.oldValues is not empty %}
+										<span class="json-state-label text-danger-color">Avant :</span>
+										<code class="monospace">{{ log.oldValues|json_encode }}</code>
+										<br>
+									{% endif %}
+									{% if log.newValue is not empty %}
+										<span class="json-state-label text-success-color">Après :</span>
+										<code class="monospace">{{ log.newValue|json_encode }}</code>
+									{% else %}
+										<span class="text-gray italic text-size-11">Aucune donnée</span>
+									{% endif %}
 								</div>
 							</td>
 							<td>
-								{# Sémantique exacte de ton champ device_type (mobile, POS, Desktop)  #}
 								<span class="device-badge">
-									{% if log.device_type == 'POS' %}
+									{% if log.device_type == 'pos' %}
 										<i class="fa-solid fa-cash-register"></i>
 										Terminal POS
 									{% elseif log.device_type == 'mobile' %}
