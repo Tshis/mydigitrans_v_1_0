@@ -64,6 +64,14 @@ final class TripPlanningService
                 $errors['bus_id'] ??= 'Ce bus n\'a aucun siège : le gabarit du bus doit d\'abord générer ses sièges.';
             }
 
+            if (null !== $data->departureBranch && $data->departureBranch->getAgency()?->getId() !== $agency->getId()) {
+                $errors['departureBranch'] = 'Cette gare d\'embarquement n\'appartient pas à votre agence.';
+            }
+            if (null !== $data->arrivalBranch && $data->arrivalBranch->getAgency()?->getId() !== $agency->getId()) {
+                $errors['arrivalBranch'] = 'Cette gare de débarquement n\'appartient pas à votre agence.';
+            }
+
+
             if ([] !== $errors) {
                 throw new TripPlanningException($errors);
             }
@@ -77,10 +85,13 @@ final class TripPlanningService
                 ->setArrivalTime($data->arrivalTime)
                 ->setDriver($driver)
                 ->setCoDriver($data->coDriver)
+                ->setDepartureBranch($data->departureBranch)
+                ->setArrivalBranch($data->arrivalBranch)
                 ->setStatus(TripStatus::Scheduled)
                 ->setCode($this->nextCode($agency, $departureAt))
                 ->setSlug($this->uniqueSlug((string) $route->getName(), $departureAt))
                 ->setCreatedBy($creator);
+
             $this->em->persist($trip);
 
             // Génération en cascade : un siège de voyage par siège du bus, jamais deux fois le même (unicité trip + seat).

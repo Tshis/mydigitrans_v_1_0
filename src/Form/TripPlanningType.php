@@ -6,11 +6,13 @@ namespace App\Form;
 
 use App\Dto\admin\agency\TripPlanningData;
 use App\Entity\Agency;
+use App\Entity\Branch;
 use App\Entity\Bus;
 use App\Entity\BusMaintenance;
 use App\Entity\Route;
 use App\Entity\User;
 use App\Entity\UserRole;
+use App\Enum\BranchStatus;
 use App\Enum\BusStatus;
 use App\Enum\MaintenanceStatus;
 use App\Enum\UserType;
@@ -27,9 +29,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Planification d'un voyage. Les listes ne proposent que ce qui appartient à l'agence : un identifiant
  * d'une autre agence envoyé à la main est refusé par le formulaire.
- *
- * Les noms des champs (route_id, bus_id, driver_id, codriver_id, departureDate…) sont ceux du template d'origine,
- * pour que trip-add.js continue de fonctionner ; property_path les relie aux propriétés du DTO.
  */
 class TripPlanningType extends AbstractType
 {
@@ -40,7 +39,7 @@ class TripPlanningType extends AbstractType
         /** @var Agency $agency */
         $agency = $options['agency'];
 
-        $drivers = static fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('u')
+        $drivers = static fn(EntityRepository $er): QueryBuilder => $er->createQueryBuilder('u')
             ->andWhere('u.agency = :agency')
             ->andWhere('u.userType = :type')
             ->andWhere('u.isActive = :yes')
@@ -55,15 +54,23 @@ class TripPlanningType extends AbstractType
             ->orderBy('u.lastname', 'ASC')
             ->addOrderBy('u.firstname', 'ASC');
 
+        $openedBranches = static fn(EntityRepository $er): QueryBuilder => $er->createQueryBuilder('br')
+            ->andWhere('br.agency = :agency')
+            ->andWhere('br.status = :opened')
+            ->setParameter('agency', $agency)
+            ->setParameter('opened', BranchStatus::Opened->value)
+            ->orderBy('br.city', 'ASC')
+            ->addOrderBy('br.name', 'ASC');
+
         $builder
             ->add('route_id', EntityType::class, [
                 'property_path' => 'route',
-                'class' => Route::class,
-                'label' => 'Ligne / Route Réseau',
-                'label_attr' => self::LABEL,
-                'placeholder' => '-- Choisir la ligne --',
-                'choice_label' => static fn (Route $r): string => $r->getCode().' : '.$r->getName(),
-                'query_builder' => static fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('r')
+                'class'         => Route::class,
+                'label'         => 'Ligne / Route Réseau',
+                'label_attr'    => self::LABEL,
+                'placeholder'   => '-- Choisir la ligne --',
+                'choice_label'  => static fn(Route $r): string => $r->getCode() . ' : ' . $r->getName(),
+                'query_builder' => static fn(EntityRepository $er): QueryBuilder => $er->createQueryBuilder('r')
                     ->andWhere('r.agency = :agency')
                     ->andWhere('r.isAvailable = :yes')
                     ->setParameter('agency', $agency)
@@ -73,14 +80,13 @@ class TripPlanningType extends AbstractType
             ])
             ->add('bus_id', EntityType::class, [
                 'property_path' => 'bus',
-                'class' => Bus::class,
-                'label' => 'Bus Assigné',
-                'label_attr' => self::LABEL,
-                'placeholder' => '-- Choisir un véhicule --',
-                'choice_label' => static fn (Bus $b): string => $b->getPlateNumber().' — '.trim($b->getBrand().' '.$b->getModel())
-                    .($b->getBusLayout() ? ' · '.$b->getBusLayout()->getName() : ''),
-                // Bus actifs de l'agence, sans panne ouverte (statut « broken »).
-                'query_builder' => static fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('b')
+                'class'         => Bus::class,
+                'label'         => 'Bus Assigné',
+                'label_attr'    => self::LABEL,
+                'placeholder'   => '-- Choisir un véhicule --',
+                'choice_label'  => static fn(Bus $b): string => $b->getPlateNumber() . ' — ' . trim($b->getBrand() . ' ' . $b->getModel())
+                    . ($b->getBusLayout() ? ' · ' . $b->getBusLayout()->getName() : ''),
+                'query_builder' => static fn(EntityRepository $er): QueryBuilder => $er->createQueryBuilder('b')
                     ->andWhere('b.agency = :agency')
                     ->andWhere('b.status = :active')
                     ->andWhere(sprintf('NOT EXISTS (SELECT m.id FROM %s m WHERE m.bus = b AND m.status = :broken)', BusMaintenance::class))
@@ -92,52 +98,72 @@ class TripPlanningType extends AbstractType
             ])
             ->add('driver_id', EntityType::class, [
                 'property_path' => 'driver',
-                'class' => User::class,
-                'label' => 'Chauffeur Titulaire',
-                'label_attr' => self::LABEL,
-                'placeholder' => '-- Sélectionner le conducteur --',
-                'choice_label' => static fn (User $u): string => $u->getFullName(),
+                'class'         => User::class,
+                'label'         => 'Chauffeur Titulaire',
+                'label_attr'    => self::LABEL,
+                'placeholder'   => '-- Sélectionner le conducteur --',
+                'choice_label'  => static fn(User $u): string => $u->getFullName(),
                 'query_builder' => $drivers,
-                'attr' => ['class' => 'admin-bus-layout-add-select'],
+                'attr'          => ['class' => 'admin-bus-layout-add-select'],
             ])
             ->add('codriver_id', EntityType::class, [
                 'property_path' => 'coDriver',
-                'class' => User::class,
-                'label' => 'Convoyeur / Co-Chauffeur',
-                'label_attr' => self::LABEL,
-                'required' => false,
-                'placeholder' => '-- Aucun convoyeur --',
-                'choice_label' => static fn (User $u): string => $u->getFullName(),
+                'class'         => User::class,
+                'label'         => 'Convoyeur / Co-Chauffeur',
+                'label_attr'    => self::LABEL,
+                'required'      => false,
+                'placeholder'   => '-- Aucun convoyeur --',
+                'choice_label'  => static fn(User $u): string => $u->getFullName(),
                 'query_builder' => $drivers,
-                'attr' => ['class' => 'admin-bus-layout-add-select'],
+                'attr'          => ['class' => 'admin-bus-layout-add-select'],
+            ])
+            ->add('departureBranch', EntityType::class, [
+                'class'         => Branch::class,
+                'label'         => 'Gare d\'Embarquement (Départ)',
+                'label_attr'    => self::LABEL,
+                'required'      => false,
+                'placeholder'   => '-- Toute gare de la ville de départ --',
+                'choice_label'  => static fn(Branch $br): string => sprintf('%s (%s)', $br->getName(), $br->getCity()),
+                'query_builder' => $openedBranches,
+                'attr'          => ['class' => 'admin-bus-layout-add-select'],
+            ])
+            ->add('arrivalBranch', EntityType::class, [
+                'class'         => Branch::class,
+                'label'         => 'Gare de Débarquement (Arrivée finale)',
+                'label_attr'    => self::LABEL,
+                'required'      => false,
+                'placeholder'   => '-- Terminus standard de la ville d\'arrivée --',
+                'choice_label'  => static fn(Branch $br): string => sprintf('%s (%s)', $br->getName(), $br->getCity()),
+                'query_builder' => $openedBranches,
+                'attr'          => ['class' => 'admin-bus-layout-add-select'],
             ])
             ->add('departureDate', DateType::class, [
-                'label' => 'Date de Départ',
+                'label'      => 'Date de Départ',
                 'label_attr' => self::LABEL,
-                'widget' => 'single_text',
-                'input' => 'datetime_immutable',
-                'attr' => ['class' => 'matrix-input', 'min' => (new \DateTimeImmutable('today'))->format('Y-m-d')],
+                'widget'     => 'single_text',
+                'input'      => 'datetime_immutable',
+                'attr'       => ['class' => 'matrix-input', 'min' => (new \DateTimeImmutable('today'))->format('Y-m-d')],
             ])
             ->add('departureTime', TimeType::class, [
-                'label' => 'Heure de Départ',
+                'label'      => 'Heure de Départ',
                 'label_attr' => self::LABEL,
-                'widget' => 'single_text',
-                'input' => 'datetime_immutable',
-                'attr' => ['class' => 'matrix-input'],
+                'widget'     => 'single_text',
+                'input'      => 'datetime_immutable',
+                'attr'       => ['class' => 'matrix-input'],
             ])
             ->add('arrivalDate', DateType::class, [
-                'label' => 'Date d\'Arrivée Estimée',
+                'label'      => 'Date d\'Arrivée Estimée',
                 'label_attr' => self::LABEL,
-                'widget' => 'single_text',
-                'input' => 'datetime_immutable',
-                'attr' => ['class' => 'matrix-input', 'min' => (new \DateTimeImmutable('today'))->format('Y-m-d')],
+                'widget'     => 'single_text',
+                'input'      => 'datetime_immutable',
+                'attr'       => ['class' => 'matrix-input', 'min' => (new \DateTimeImmutable('today'))->format('Y-m-d')],
             ])
             ->add('arrivalTime', TimeType::class, [
-                'label' => 'Heure d\'Arrivée Estimée',
+                'label'      => 'Heure d\'Arrivée Estimée',
                 'label_attr' => self::LABEL,
-                'widget' => 'single_text',
-                'input' => 'datetime_immutable',
-                'attr' => ['class' => 'matrix-input'],
+                'widget'     => 'single_text',
+                'input'      => 'datetime_immutable',
+                'attr'       => ['class' => 'matrix-input'],
             ]);
     }
 

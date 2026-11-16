@@ -2,162 +2,177 @@
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/admin/trip-add.js" defer></script>
+	{{ parent() }}
+	<script src="/js/admin/trip-add.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-agency-trip-add-scope container">
-	{# --- HEADER DE LA CONSOLE OPERATIONNELLE --- #}
-	<header class="header mb-25">
-		<div class="header-main-info">
-			<a href="{{ path('admin_agency_trip_index') }}" class="agency-back-action">
-				<i class="fa-solid fa-arrow-left"></i>
-			</a>
-			<div class="title">
-				<div class="sub-header-flex">
-					<span class="text-gray text-size-13">MyDigitrans Opérations</span>
-					<span class="arrow-divider">•</span>
-					<span class="text-gray text-size-13 text-highlight">Planification</span>
-				</div>
-				<h1 class="mt-5">Programmer un Voyage</h1>
-			</div>
-		</div>
-
-	</header>
-
-	{# --- LAYOUT A DEUX COLONNES STANDARDISÉ --- #}
-	{# Formulaire Symfony : les champs gardent les noms d'origine (route_id, bus_id, driver_id, codriver_id, departureDate...) #}
-	{{ form_start(form, {attr: {id: 'trip-plan-form', class: 'agency-trip-add-form'}}) }}
-		{% if form.vars.errors|length > 0 %}
-			<div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
-		{% endif %}
-
-		<div class="agency-trip-add-container">
-
-			{# COLONNE GAUCHE : FORMULAIRE DE SAISIE #}
-			<div class="layout-main-panel">
-
-				{# COMPOSANT 1 : AFFECTATION DU MATÉRIEL #}
-				<div class="card control-card mb-20">
-					<h2 class="card-title-fix">
-						<i class="fa-solid fa-bus text-primary"></i>
-						Affectation du Matériel &
-						Trajet
-					</h2>
-
-					<div class="direct-pricing-row">
-						<div class="field">
-							{{ form_label(form.route_id) }}
-							{{ form_widget(form.route_id) }}
-							{{ form_errors(form.route_id) }}
-						</div>
-
-						<div class="field">
-							{{ form_label(form.bus_id) }}
-							{{ form_widget(form.bus_id) }}
-							{{ form_errors(form.bus_id) }}
-						</div>
+	<div class="admin-agency-trip-add-scope container">
+		{# --- HEADER DE LA CONSOLE OPERATIONNELLE --- #}
+		<header class="header mb-25">
+			<div class="header-main-info">
+				<a href="{{ path('admin_agency_trip_index') }}" class="agency-back-action">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<div class="title">
+					<div class="sub-header-flex">
+						<span class="text-gray text-size-13">MyDigitrans Opérations</span>
+						<span class="arrow-divider">•</span>
+						<span class="text-gray text-size-13 text-highlight">Planification</span>
 					</div>
-				</div>
-
-				{# COMPOSANT 2 : ÉQUIPAGE DE BORD #}
-				<div class="card control-card mb-20 success-accent">
-					<h2 class="card-title-fix">
-						<i class="fa-solid fa-id-card text-success"></i>
-						Équipage de Bord
-					</h2>
-
-					<div class="direct-pricing-row">
-						<div class="field">
-							{{ form_label(form.driver_id) }}
-							{{ form_widget(form.driver_id) }}
-							{{ form_errors(form.driver_id) }}
-						</div>
-
-						<div class="field">
-							{{ form_label(form.codriver_id) }}
-							{{ form_widget(form.codriver_id) }}
-							{{ form_errors(form.codriver_id) }}
-						</div>
-					</div>
-				</div>
-
-				{# COMPOSANT 3 : CALENDRIER ET HORAIRES #}
-				<div class="card control-card mb-20">
-					<h2 class="card-title-fix">
-						<i class="fa-solid fa-clock text-warning"></i>
-						Calendrier et Horaires
-					</h2>
-
-					<div class="direct-pricing-row mb-20">
-						<div class="field">
-							{{ form_label(form.departureDate) }}
-							{{ form_widget(form.departureDate) }}
-							{{ form_errors(form.departureDate) }}
-						</div>
-						<div class="field">
-							{{ form_label(form.departureTime) }}
-							{{ form_widget(form.departureTime) }}
-							{{ form_errors(form.departureTime) }}
-						</div>
-					</div>
-
-					<div class="direct-pricing-row">
-						<div class="field">
-							{{ form_label(form.arrivalDate) }}
-							{{ form_widget(form.arrivalDate) }}
-							{{ form_errors(form.arrivalDate) }}
-						</div>
-						<div class="field">
-							{{ form_label(form.arrivalTime) }}
-							{{ form_widget(form.arrivalTime) }}
-							{{ form_errors(form.arrivalTime) }}
-						</div>
-					</div>
+					<h1 class="mt-5">Programmer un Voyage</h1>
 				</div>
 			</div>
 
-			{# COLONNE DROITE : RÉSUMÉ & AUTOMATISMES SAAS #}
-			<aside class="summary">
-				<div class="card summary-sticky-card">
-					<h2 class="card-title-fix">
-						<i class="fa-solid fa-gears"></i>
-						Traitement Réseau
-					</h2>
+		</header>
 
-					<div class="notice-box mb-15">
-						<p>
-							<strong>
-								<i class="fa-solid fa-bolt"></i>
-								Génération en cascade :</strong>
-							La validation va
-							créer automatiquement l'ensemble des enregistrements
-							correspondants au gabarit du bus.
-						</p>
+		{# --- LAYOUT A DEUX COLONNES STANDARDISÉ --- #}
+		{# Formulaire Symfony : les champs gardent les noms d'origine (route_id, bus_id, driver_id, codriver_id, departureDate...) #}
+		{{ form_start(form, {attr: {id: 'trip-plan-form', class: 'agency-trip-add-form'}}) }}
+			{% if form.vars.errors|length > 0 %}
+				<div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
+			{% endif %}
+
+			<div class="agency-trip-add-container">
+
+				{# COLONNE GAUCHE : FORMULAIRE DE SAISIE #}
+				<div class="layout-main-panel">
+
+					{# COMPOSANT 1 : AFFECTATION DU MATÉRIEL #}
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-bus text-primary"></i>
+							Affectation du Matériel &
+							Trajet
+						</h2>
+
+						<div class="direct-pricing-row mt-15">
+							<div class="field">
+								{{ form_label(form.departureBranch) }}
+								{{ form_widget(form.departureBranch) }}
+								{{ form_errors(form.departureBranch) }}
+							</div>
+
+							<div class="field">
+								{{ form_label(form.arrivalBranch) }}
+								{{ form_widget(form.arrivalBranch) }}
+								{{ form_errors(form.arrivalBranch) }}
+							</div>
+						</div>
+
+
+						<div class="direct-pricing-row">
+							<div class="field">
+								{{ form_label(form.route_id) }}
+								{{ form_widget(form.route_id) }}
+								{{ form_errors(form.route_id) }}
+							</div>
+
+							<div class="field">
+								{{ form_label(form.bus_id) }}
+								{{ form_widget(form.bus_id) }}
+								{{ form_errors(form.bus_id) }}
+							</div>
+						</div>
 					</div>
 
-					<div class="notice-box mb-20">
-						<p>
-							<strong>
-								<i class="fa-solid fa-shield-halved"></i>
-								Protection Caisse :</strong>
-							La contrainte
-							d'unicité sur les couples sièges empêchera tout doublon lors des ventes simultanées.
-						</p>
+					{# COMPOSANT 2 : ÉQUIPAGE DE BORD #}
+					<div class="card control-card mb-20 success-accent">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-id-card text-success"></i>
+							Équipage de Bord
+						</h2>
+
+						<div class="direct-pricing-row">
+							<div class="field">
+								{{ form_label(form.driver_id) }}
+								{{ form_widget(form.driver_id) }}
+								{{ form_errors(form.driver_id) }}
+							</div>
+
+							<div class="field">
+								{{ form_label(form.codriver_id) }}
+								{{ form_widget(form.codriver_id) }}
+								{{ form_errors(form.codriver_id) }}
+							</div>
+						</div>
 					</div>
 
-					<hr class="summary-divider">
+					{# COMPOSANT 3 : CALENDRIER ET HORAIRES #}
+					<div class="card control-card mb-20">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-clock text-warning"></i>
+							Calendrier et Horaires
+						</h2>
 
-					<button type="submit" class="btn-refined btn-success-gradient btn-full py-12 mt-20">
-						<i class="fa-solid fa-calendar-check"></i>
-						Planifier le Départ
-					</button>
+						<div class="direct-pricing-row mb-20">
+							<div class="field">
+								{{ form_label(form.departureDate) }}
+								{{ form_widget(form.departureDate) }}
+								{{ form_errors(form.departureDate) }}
+							</div>
+							<div class="field">
+								{{ form_label(form.departureTime) }}
+								{{ form_widget(form.departureTime) }}
+								{{ form_errors(form.departureTime) }}
+							</div>
+						</div>
+
+						<div class="direct-pricing-row">
+							<div class="field">
+								{{ form_label(form.arrivalDate) }}
+								{{ form_widget(form.arrivalDate) }}
+								{{ form_errors(form.arrivalDate) }}
+							</div>
+							<div class="field">
+								{{ form_label(form.arrivalTime) }}
+								{{ form_widget(form.arrivalTime) }}
+								{{ form_errors(form.arrivalTime) }}
+							</div>
+						</div>
+					</div>
 				</div>
-			</aside>
 
-		</div>
-		{{ form_widget(form._token) }}
-	{{ form_end(form, {render_rest: false}) }}
-</div>
+				{# COLONNE DROITE : RÉSUMÉ & AUTOMATISMES SAAS #}
+				<aside class="summary">
+					<div class="card summary-sticky-card">
+						<h2 class="card-title-fix">
+							<i class="fa-solid fa-gears"></i>
+							Traitement Réseau
+						</h2>
+
+						<div class="notice-box mb-15">
+							<p>
+								<strong>
+									<i class="fa-solid fa-bolt"></i>
+									Génération en cascade :</strong>
+								La validation va
+								créer automatiquement l'ensemble des enregistrements
+								correspondants au gabarit du bus.
+							</p>
+						</div>
+
+						<div class="notice-box mb-20">
+							<p>
+								<strong>
+									<i class="fa-solid fa-shield-halved"></i>
+									Protection Caisse :</strong>
+								La contrainte
+								d'unicité sur les couples sièges empêchera tout doublon lors des ventes simultanées.
+							</p>
+						</div>
+
+						<hr class="summary-divider">
+
+						<button type="submit" class="btn-refined btn-success-gradient btn-full py-12 mt-20">
+							<i class="fa-solid fa-calendar-check"></i>
+							Planifier le Départ
+						</button>
+					</div>
+				</aside>
+
+			</div>
+			{{ form_widget(form._token) }}
+		{{ form_end(form, {render_rest: false}) }}
+	</div>
 {% endblock %}

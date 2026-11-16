@@ -71,6 +71,15 @@ class Trip
     #[ORM\OneToMany(targetEntity: TripSeat::class, mappedBy: 'trip')]
     private Collection $tripSeats;
 
+    #[ORM\ManyToOne(targetEntity: Branch::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Branch $departureBranch = null;
+
+    #[ORM\ManyToOne(targetEntity: Branch::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Branch $arrivalBranch = null;
+
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -250,6 +259,30 @@ class Trip
     public function removeTripSeat(TripSeat $tripSeat): static
     {
         $this->tripSeats->removeElement($tripSeat);
+
+        return $this;
+    }
+
+    public function getDepartureBranch(): ?Branch
+    {
+        return $this->departureBranch;
+    }
+
+    public function setDepartureBranch(?Branch $departureBranch): static
+    {
+        $this->departureBranch = $departureBranch;
+
+        return $this;
+    }
+
+    public function getArrivalBranch(): ?Branch
+    {
+        return $this->arrivalBranch;
+    }
+
+    public function setArrivalBranch(?Branch $arrivalBranch): static
+    {
+        $this->arrivalBranch = $arrivalBranch;
 
         return $this;
     }

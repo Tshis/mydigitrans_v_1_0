@@ -48,8 +48,7 @@ final class AgencyTripListing
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly TripOccupancy $occupancy,
-    ) {
-    }
+    ) {}
 
     /**
      * Succursale à laquelle limiter la vue ; null (siège) = toute l'agence.
@@ -66,7 +65,7 @@ final class AgencyTripListing
      */
     public function stats(Agency $agency, ?Branch $branch, \DateTimeImmutable $now): array
     {
-        $count = fn (QueryBuilder $qb): int => (int) $qb->select('COUNT(t.id)')->getQuery()->getSingleScalarResult();
+        $count = fn(QueryBuilder $qb): int => (int) $qb->select('COUNT(t.id)')->getQuery()->getSingleScalarResult();
 
         $today = $now->setTime(0, 0);
 
@@ -109,7 +108,7 @@ final class AgencyTripListing
             ->getResult();
 
         return array_map(
-            static fn (Route $r): array => ['id' => (int) $r->getId(), 'label' => (string) $r->getName()],
+            static fn(Route $r): array => ['id' => (int) $r->getId(), 'label' => (string) $r->getName()],
             $routes,
         );
     }
@@ -136,9 +135,14 @@ final class AgencyTripListing
         if (null !== $filters['status']) {
             $qb->andWhere('t.status IN (:statuses)')->setParameter(
                 'statuses',
-                array_map(static fn (TripStatus $s): string => $s->value, self::STATUS_FILTERS[$filters['status']]),
+                array_map(static fn(TripStatus $s): string => $s->value, self::STATUS_FILTERS[$filters['status']]),
             );
+        } else {
+            // Par défaut, les voyages annulés sont masqués de l'index principal
+            $qb->andWhere('t.status <> :excludedCancelled')
+                ->setParameter('excludedCancelled', TripStatus::Cancelled->value);
         }
+
         if (!$hasFilter) {
             $today = $now->setTime(0, 0);
             $qb->andWhere('t.departureDate >= :from')->andWhere('t.departureDate <= :to')
@@ -155,7 +159,7 @@ final class AgencyTripListing
         /** @var list<Trip> $trips */
         $trips = $qb->getQuery()->getResult();
 
-        $seats = $this->occupancy->forTrips(array_map(static fn (Trip $t): int => (int) $t->getId(), $trips), $now);
+        $seats = $this->occupancy->forTrips(array_map(static fn(Trip $t): int => (int) $t->getId(), $trips), $now);
 
         $rows = [];
 
@@ -168,19 +172,20 @@ final class AgencyTripListing
             [$label, $badge] = self::STATUS_VIEW[$trip->getStatus()->value] ?? [$trip->getStatus()->value, 'badge-info-status'];
 
             $rows[] = [
-                'code' => (string) $trip->getCode(),
-                'date' => $date,
-                'time' => $time?->format('H\hi'),
-                'route' => (string) $route?->getName(),
-                'via' => $this->via($route),
-                'bus' => (string) ($bus?->getName() ?: $bus?->getCode() ?: $bus?->getPlateNumber()),
-                'bus_model' => (string) $bus?->getBrand(),
-                'driver' => (string) $trip->getDriver()?->getFullName(),
-                'taken' => $count['taken'],
-                'capacity' => $count['capacity'],
-                'percent' => $count['capacity'] > 0 ? (int) round($count['taken'] / $count['capacity'] * 100) : 0,
+                'code'         => (string) $trip->getCode(),
+                'status'       => $trip->getStatus()->value,
+                'date'         => $date,
+                'time'         => $time?->format('H\hi'),
+                'route'        => (string) $route?->getName(),
+                'via'          => $this->via($route),
+                'bus'          => (string) ($bus?->getName() ?: $bus?->getCode() ?: $bus?->getPlateNumber()),
+                'bus_model'    => (string) $bus?->getBrand(),
+                'driver'       => (string) $trip->getDriver()?->getFullName(),
+                'taken'        => $count['taken'],
+                'capacity'     => $count['capacity'],
+                'percent'      => $count['capacity'] > 0 ? (int) round($count['taken'] / $count['capacity'] * 100) : 0,
                 'status_label' => $label,
-                'badge' => 'badge '.$badge,
+                'badge'        => 'badge ' . $badge,
             ];
         }
 
@@ -221,8 +226,8 @@ final class AgencyTripListing
             return null;
         }
 
-        $stops = $route->getRouteStops()->filter(static fn (RouteStop $s): bool => $s->isActive())->getValues();
-        $cities = array_map(static fn (RouteStop $s): string => (string) $s->getCity(), \array_slice($stops, 1, -1));
+        $stops = $route->getRouteStops()->filter(static fn(RouteStop $s): bool => $s->isActive())->getValues();
+        $cities = array_map(static fn(RouteStop $s): string => (string) $s->getCity(), \array_slice($stops, 1, -1));
 
         return [] === $cities ? null : implode(', ', $cities);
     }

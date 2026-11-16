@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dto\admin\agency;
 
+use App\Entity\Branch;
 use App\Entity\Bus;
 use App\Entity\Route;
 use App\Entity\User;
@@ -37,6 +38,11 @@ final class TripPlanningData
 
     #[Assert\NotNull(message: 'Indiquez l\'heure d\'arrivée.')]
     public ?\DateTimeImmutable $arrivalTime = null;
+
+    public ?Branch $departureBranch = null;
+
+    public ?Branch $arrivalBranch = null;
+
 
     /** Départ complet (date + heure), null tant que l'un des deux manque. */
     public function departureAt(): ?\DateTimeImmutable

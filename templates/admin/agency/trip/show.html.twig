@@ -7,9 +7,7 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-trip-show-scope container"
-	>
+	<div class="admin-agency-trip-show-scope container">
 
 		{# --- EN-TÊTE DE LA PAGE DÉTAILS --- #}
 		<header class="header mb-25">
@@ -18,31 +16,36 @@
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
-					<h2>Voyage N° TRP-2026-0042</h2>
+					<h2>Voyage N° {{ trip.tripNumber }}</h2>
 					<div class="mt-5 sub-header-flex">
-						<span class="badge badge-warning-status">Embarquement en cours</span>
-						<span class="text-gray text-size-13">Ligne : Kinshasa - Kikwit via Kenge</span>
+						<span class="badge {{ trip.badgeClass }}">{{ trip.statusLabel }}</span>
+						<span class="text-gray text-size-13">
+							Ligne : {{ trip.route }}
+							{% if trip.via %}via {{ trip.via }}{% endif %}
+						</span>
 					</div>
 				</div>
 			</div>
 
-			{# --- NOUVELLE ZONE : BILLETTERIE DIRECTE AU GUICHET --- #}
-			<div
-				class="admin-action-zone ticket-booking-actions"
-			>
-				{# Bouton Achat Direct #}
-				<a href="{{ path('admin_agency_trip_direct_purchase', {'code': 311}) }}" class="btn-refined btn-success-gradient">
-					<i class="fa-solid fa-cart-shopping"></i>
-					Achat Direct (Billet)
-				</a>
+			{# --- ZONE D'ACTION BILLETTERIE & MANIFESTE --- #}
+			<div class="admin-action-zone ticket-booking-actions">
+				{% if trip.status in ['scheduled', 'boarding'] %}
+					{% if is_granted('ticket.write') %}
+						<a href="{{ path('admin_agency_trip_direct_purchase', {'code': trip.code}) }}" class="btn-refined btn-success-gradient">
+							<i class="fa-solid fa-cart-shopping"></i>
+							Achat Direct (Billet)
+						</a>
+					{% endif %}
 
-				{# Bouton Réservation Pure #}
-				<a href="{{ path('admin_agency_reservation_add', {'code': 'trip-07-26-0001-01'}) }}" class="btn-refined  btn-primary-gradient">
-					<i class="fa-solid fa-file-invoice"></i>
-					Faire une Réservation
-				</a>
+					{% if is_granted('reservation.write') %}
+						<a href="{{ path('admin_agency_reservation_add', {'code': trip.code}) }}" class="btn-refined btn-primary-gradient">
+							<i class="fa-solid fa-file-invoice"></i>
+							Faire une Réservation
+						</a>
+					{% endif %}
+				{% endif %}
 
-				<a href="{{ path('admin_agency_trip_manifest_pdf', {'code': 311}) }}" type="button" class="btn-refined btn-dark-gradient">
+				<a href="{{ path('admin_agency_trip_manifest_pdf', {'code': trip.code}) }}" class="btn-refined btn-dark-gradient" target="_blank">
 					<i class="fa-solid fa-print"></i>
 					Imprimer le Manifeste
 				</a>
@@ -50,92 +53,148 @@
 		</header>
 
 		{# --- BARRE DE PILOTAGE DU STATUT (WORKFLOW) --- #}
+		{% set stepOrder = {'scheduled': 1, 'boarding': 2, 'departed': 3, 'arrived': 4, 'cancelled': 0} %}
+		{% set currentStep = stepOrder[trip.status]|default(0) %}
+
 		<div class="trip-workflow-card mb-25">
 			<div class="workflow-steps-indicator">
-				<div class="step-item step-item--passed">
+				<div class="step-item {{ currentStep > 1 ? 'step-item--passed' : (currentStep == 1 ? 'step-item--active' : '') }}">
 					<span class="step-badge">1</span>
 					<span class="step-label">Planifié</span>
 				</div>
 				<i class="fa-solid fa-chevron-right arrow-divider"></i>
 
-				<div class="step-item step-item--active">
+				<div class="step-item {{ currentStep > 2 ? 'step-item--passed' : (currentStep == 2 ? 'step-item--active' : '') }}">
 					<span class="step-badge">2</span>
 					<span class="step-label">Embarquement</span>
 				</div>
 				<i class="fa-solid fa-chevron-right arrow-divider"></i>
 
-				<div class="step-item">
+				<div class="step-item {{ currentStep > 3 ? 'step-item--passed' : (currentStep == 3 ? 'step-item--active' : '') }}">
 					<span class="step-badge">3</span>
 					<span class="step-label">En Route</span>
 				</div>
 				<i class="fa-solid fa-chevron-right arrow-divider"></i>
 
-				<div class="step-item">
+				<div class="step-item {{ currentStep == 4 ? 'step-item--active' : '' }}">
 					<span class="step-badge">4</span>
 					<span class="step-label">Arrivé</span>
 				</div>
 			</div>
 
-			<div class="workflow-actions-buttons">
-				<button type="button" class="btn btn-success-action">
-					<i class="fa-solid fa-bus"></i>
-					Clôturer & Faire partir
-				</button>
-				<button type="button" class="btn btn-danger-action" onclick="return confirm('Annuler définitivement ce départ ?');">
-					<i class="fa-solid fa-rectangle-xmark"></i>
-					Annuler
-				</button>
-			</div>
+			{% if is_granted('trip.write') and trip.status not in ['arrived', 'cancelled'] %}
+				<div class="workflow-actions-buttons">
+					{% if trip.status == 'scheduled' %}
+						<form method="POST" action="{{ path('admin_agency_trip_status', {'code': trip.code}) }}" style="display:inline;">
+							<input type="hidden" name="_token" value="{{ csrf_token('trip_status_' ~ trip.code) }}">
+							<input type="hidden" name="target_status" value="boarding">
+							<button type="submit" class="btn btn-success-action">
+								<i class="fa-solid fa-door-open"></i>
+								Ouvrir l'Embarquement
+							</button>
+						</form>
+					{% elseif trip.status == 'boarding' %}
+						<form method="POST" action="{{ path('admin_agency_trip_status', {'code': trip.code}) }}" style="display:inline;">
+							<input type="hidden" name="_token" value="{{ csrf_token('trip_status_' ~ trip.code) }}">
+							<input type="hidden" name="target_status" value="departed">
+							<button type="submit" class="btn btn-success-action">
+								<i class="fa-solid fa-bus"></i>
+								Clôturer & Faire partir
+							</button>
+						</form>
+					{% elseif trip.status == 'departed' %}
+						<form method="POST" action="{{ path('admin_agency_trip_status', {'code': trip.code}) }}" style="display:inline;">
+							<input type="hidden" name="_token" value="{{ csrf_token('trip_status_' ~ trip.code) }}">
+							<input type="hidden" name="target_status" value="arrived">
+							<button type="submit" class="btn btn-success-action">
+								<i class="fa-solid fa-flag-checkered"></i>
+								Confirmer l'Arrivée
+							</button>
+						</form>
+					{% endif %}
+
+					{% if trip.status in ['scheduled', 'boarding'] %}
+						<form method="POST" action="{{ path('admin_agency_trip_status', {'code': trip.code}) }}" style="display:inline;" onsubmit="return confirm('Annuler définitivement ce départ ?');">
+							<input type="hidden" name="_token" value="{{ csrf_token('trip_status_' ~ trip.code) }}">
+							<input type="hidden" name="target_status" value="cancelled">
+							<button type="submit" class="btn btn-danger-action">
+								<i class="fa-solid fa-rectangle-xmark"></i>
+								Annuler
+							</button>
+						</form>
+					{% endif %}
+				</div>
+			{% endif %}
 		</div>
 
 		{# --- LAYOUT DEUX COLONNES --- #}
-		<div
-			class="trip-dashboard-layout"
-		>
+		<div class="trip-dashboard-layout">
 
 			{# BLOC LOGISTIQUE #}
 			<div class="layout-sidebar-card">
 				<div class="card-inner-box">
 					<h3 class="box-title">
 						<i class="fa-solid fa-circle-info"></i>
-						Détails Logistiques</h3>
+						Détails Logistiques
+					</h3>
 					<div class="info-section-row">
 						<label class="section-micro-label">PLANIFICATION HORAIRE</label>
 						<p class="info-text">
 							<strong>Départ :</strong>
-							14/07/2026 à 14h30</p>
+							{{ trip.departureDate|date('d/m/Y') }} à {{ trip.departureTime }}
+						</p>
+						<p class="info-text">
+							<strong>Embarquement :</strong>
+							{{ trip.departureBranch }}
+						</p>
 						<p class="info-text">
 							<strong>Arrivée estimée :</strong>
-							14/07/2026 à 22h30</p>
+							{{ trip.arrivalDate|date('d/m/Y') }} à {{ trip.arrivalTime }}
+						</p>
+						<p class="info-text">
+							<strong>Débarquement :</strong>
+							{{ trip.arrivalBranch }}
+						</p>
 					</div>
+
+					
 					<div class="info-section-row bordered-divider">
 						<label class="section-micro-label">AFFECTATION MATÉRIELLE</label>
 						<p class="info-text">
 							<strong>Bus :</strong>
-							N°01 (Mercedes Marcopolo)</p>
+							{{ trip.bus }}
+						</p>
+						<p class="info-text">
+							<strong>Immatriculation :</strong>
+							<span class="monospace font-bold">{{ trip.plate }}</span>
+						</p>
 						<p class="info-text">
 							<strong>Capacité :</strong>
-							54 Sièges configurés</p>
+							{{ trip.capacity }} Sièges vendables
+						</p>
 					</div>
 					<div class="info-section-row bordered-divider">
 						<label class="section-micro-label">ÉQUIPAGE EN MISSION</label>
 						<p class="info-text">
 							<strong>Chauffeur :</strong>
-							Jean Mukendi</p>
+							{{ trip.driver }}
+						</p>
 						<p class="info-text">
 							<strong>Co-Chauffeur :</strong>
-							Dummy Tshimanga</p>
+							{{ trip.coDriver }}
+						</p>
 					</div>
 				</div>
 			</div>
 
-			{# BLOC MANIFESTE (DEPEND DU COMPOSANT GLOBAL) #}
+			{# BLOC MANIFESTE #}
 			<div class="layout-main-card">
 				<div class="card-inner-box">
 					<div class="box-header-title mb-15">
 						<h3 class="box-title">
 							<i class="fa-solid fa-users"></i>
-							Manifeste des Voyageurs</h3>
+							Manifeste des Voyageurs ({{ passengers_list|length }} / {{ trip.capacity }})
+						</h3>
 						<p class="text-gray text-size-12">Liste nominative des passagers enregistrés sur ce départ.</p>
 					</div>
 
@@ -150,34 +209,32 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>
-									<strong>01</strong>
-									<span class="sub-meta-text">(VIP)</span>
-								</td>
-								<td>
-									<strong>Kabila Dieudonné</strong>
-								</td>
-								<td>Kinshasa → Kikwit</td>
-								<td>+243 812 345 678</td>
-								<td class="text-right">
-									<span class="badge-status-confirmed">Confirmé</span>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<strong>03</strong>
-									<span class="sub-meta-text">(Std)</span>
-								</td>
-								<td>
-									<strong>Ilunga Christian</strong>
-								</td>
-								<td>Kenge → Kikwit</td>
-								<td>+243 824 556 677</td>
-								<td class="text-right">
-									<span class="badge-status-pending">Réservé</span>
-								</td>
-							</tr>
+							{% for passenger in passengers_list %}
+								<tr>
+									<td>
+										<strong>{{ passenger.seat }}</strong>
+										<span class="sub-meta-text">({{ passenger.category }})</span>
+									</td>
+									<td>
+										<strong>{{ passenger.name }}</strong>
+									</td>
+									<td>{{ passenger.route_segment }}</td>
+									<td>{{ passenger.phone }}</td>
+									<td class="text-right">
+										{% if passenger.status == 'confirmed' %}
+											<span class="badge-status-confirmed">Confirmé</span>
+										{% else %}
+											<span class="badge-status-pending">Réservé</span>
+										{% endif %}
+									</td>
+								</tr>
+							{% else %}
+								<tr>
+									<td colspan="5" class="text-center text-gray italic padding-20">
+										Aucun voyageur enregistré sur ce départ pour le moment.
+									</td>
+								</tr>
+							{% endfor %}
 						</tbody>
 					</table>
 				</div>
