@@ -1,109 +1,97 @@
+{# templates/admin/agency/branch/add.html.twig #}
 {% extends "admin/base.html.twig" %}
 
-{% block javascripts %}
-{# Conserve vos scripts globaux existants #}
-{{ parent() }}
-
-{# Active AssetMapper et l'écosystème Symfony UX UNIQUEMENT sur ce layout #}
-{{ importmap('app') }}
-{% endblock %}
-
 {% block body %}
-<div class="admin-agency-branch-add-scope branch-scope container">
+	<div class="admin-agency-branch-add-scope branch-scope container">
 
-	{# --- HEADER DE LA CONSOLE --- #}
-	<header class="header-refined mb-30">
-		<div class="header-left">
-			<div class="breadcrumb-mini">
-				<span>Paramètres Réseau</span>
-				<i class="fa-solid fa-chevron-right"></i>
-				<strong>Points de Vente</strong>
+		{# --- HEADER DE LA CONSOLE --- #}
+		<header class="header-refined mb-30">
+			<div class="header-left">
+				<div class="breadcrumb-mini">
+					<span>Paramètres Réseau</span>
+					<i class="fa-solid fa-chevron-right"></i>
+					<strong>Points de Vente</strong>
+				</div>
+				<h1>Ouverture de Succursale</h1>
+				<p class="subtitle">Ajouter une nouvelle succursale à votre réseau</p>
 			</div>
-			<h1>Ouverture de Succursale</h1>
-			<p class="subtitle">Ajouter une nouvelle succursale à votre réseau</p>
-		</div>
-		<div class="header-right">
-			<a href="{{path('admin_agency_branch_index')}}" class="btn-refined btn-success-gradient">
-				<i class="fa-solid fa-arrow-left"></i>
-				<span>Retour aux succursales</span>
-			</a>
-		</div>
-	</header>
-
-	{# 2. LE FORMULAIRE DÉDIÉ #}
-	<div class="c-form-card my-20">
-
-		{{ form_start(form, {'method': 'POST','attr': {'class': 'c-form-card_form'} }) }}
-
-		{# Section : Informations Générales #}
-		<div class="c-form-card_section">
-			<h3 class="c-form-card_section-title">
-				<i class="fas fa-info-circle"></i>
-				Informations de la succursale
-			</h3>
-
-			<div class="field-group mb-20">
-				<div class="field">
-					<label for="">Nom de la succursale</label>
-					<input type="text" placeholder="Ex: Agence de limete">
-				</div>
-
-				<div class="field">
-					<label for="">Code de la succursale (Facultatif)</label>
-					<input type="text" placeholder="Ex: Ag-001">
-				</div>
+			<div class="header-right">
+				<a href="{{ path('admin_agency_branch_index') }}" class="btn-refined btn-success-gradient">
+					<i class="fa-solid fa-arrow-left"></i>
+					<span>Retour aux succursales</span>
+				</a>
 			</div>
+		</header>
 
+		{# --- FORMULAIRE SYMFONY LIÉ AU DTO BranchData --- #}
+		<div class="c-form-card my-20">
 
+			{{ form_start(form, {'attr': {'class': 'c-form-card_form', 'novalidate': 'novalidate'}}) }}
 
-			<div class="field-group">
-				<div class="field">
-					<label for="">Ville de la succursale</label>
-					<input type="text" placeholder="Ex: Kinshasa">
+				{{ form_errors(form) }}
+
+				{# Section : Informations Générales #}
+				<div class="c-form-card_section">
+					<h3 class="c-form-card_section-title">
+						<i class="fas fa-info-circle"></i>
+						Informations de la succursale
+					</h3>
+
+					<div class="field-group mb-20">
+						<div class="field">
+							{{ form_label(form.name) }}
+							{{ form_widget(form.name) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.name) }}</div>
+						</div>
+
+						<div class="field">
+							{{ form_label(form.code) }}
+							{{ form_widget(form.code) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.code) }}</div>
+						</div>
+					</div>
+
+					<div class="field-group">
+						<div class="field">
+							{{ form_label(form.city) }}
+							{{ form_widget(form.city) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.city) }}</div>
+						</div>
+						<div class="field">
+							{{ form_label(form.country) }}
+							{{ form_widget(form.country) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.country) }}</div>
+						</div>
+					</div>
 				</div>
-				<div class="field">
-					<label for="">Pays de la succursale</label>
-					{# <input type="text" placeholder="Ex: RDCongo"> #}
-					{{ form_widget(form.pays) }}
+
+				{# Section : Responsable #}
+				<div class="c-form-card_section">
+					<h3 class="c-form-card_section-title">
+						<i class="fas fa-user-circle"></i>
+						Gestionnaire
+					</h3>
+
+					<div class="field mb-20">
+						<div class="c-form-card_group">
+							{{ form_label(form.managerId) }}
+							{{ form_widget(form.managerId) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.managerId) }}</div>
+						</div>
+					</div>
 				</div>
-			</div>
+
+				{# Actions du formulaire #}
+				<div class="c-form-card_actions">
+					<a href="{{ path('admin_agency_branch_index') }}" class="btn-refined btn-danger-gradient border-radius-5">Annuler</a>
+					<button type="submit" class="btn-refined btn-success-gradient border-radius-5">
+						<i class="fas fa-check"></i>
+						Créer la succursale
+					</button>
+				</div>
+
+			{{ form_end(form) }}
 		</div>
 
-		{# Section :Responsable #}
-		<div class="c-form-card_section">
-			<h3 class="c-form-card_section-title">
-				<i class="fas fa-user-circle"></i>
-				Gestionnaire
-			</h3>
-
-			<div class="field mb-20">
-				<div class="c-form-card_group">
-					<label for="branch_city">
-						Gerant (Directeur d'agence)
-					</label>
-					<select id="branch_city" required>
-						<option value="">Billy Branham</option>
-						<option value="kinshasa">Dieudonné Okito</option>
-					</select>
-				</div>
-
-			</div>
-
-
-		</div>
-
-		{# 3. ACTIONS DU FORMULAIRE #}
-		<div class="c-form-card_actions">
-			<a href="{{path('admin_agency_branch_index')}}"
-				class="btn-refined btn-danger-gradient border-radius-5">Annuler</a>
-			<button type="button" class="btn-refined btn-success-gradient border-radius-5">
-				<i class="fas fa-check"></i>
-				Créer la succursale
-			</button>
-		</div>
-
-		{{ form_end(form) }}
 	</div>
-
-</div>
 {% endblock %}

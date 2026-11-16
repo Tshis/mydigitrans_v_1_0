@@ -7,8 +7,7 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-agency-branch-index-scope branch-scope container">
+	<div class="admin-agency-branch-index-scope branch-scope container">
 		{# --- HEADER DE LA CONSOLE --- #}
 		<header class="header-refined mb-30">
 			<div class="header-left">
@@ -20,12 +19,14 @@
 				<h1>Gestion des Succursales</h1>
 				<p class="subtitle">Registre et suivi opérationnel de vos agences de quartier et guichets.</p>
 			</div>
-			<div class="header-right">
-				<a href="{{path('admin_agency_branch_add')}}" class="btn-refined btn-primary-gradient">
-					<i class="fa-solid fa-plus"></i>
-					<span>Ouvrir une succursale</span>
-				</a>
-			</div>
+			{% if is_granted('branch.write') %}
+				<div class="header-right">
+					<a href="{{ path('admin_agency_branch_add') }}" class="btn-refined btn-primary-gradient">
+						<i class="fa-solid fa-plus"></i>
+						<span>Ouvrir une succursale</span>
+					</a>
+				</div>
+			{% endif %}
 		</header>
 
 		{# --- STATS RAPIDES --- #}
@@ -35,7 +36,7 @@
 					<i class="fas fa-network-wired"></i>
 				</div>
 				<div class="info">
-					<h3>12</h3>
+					<h3>{{ stats.total }}</h3>
 					<span>Total Succursales</span>
 				</div>
 			</div>
@@ -44,7 +45,7 @@
 					<i class="fa-solid fa-circle-check"></i>
 				</div>
 				<div class="info">
-					<h3>8</h3>
+					<h3>{{ stats.active }}</h3>
 					<span>Actives</span>
 				</div>
 			</div>
@@ -53,24 +54,22 @@
 					<i class="fa-solid fa-building-lock"></i>
 				</div>
 				<div class="info">
-					<h3>4</h3>
+					<h3>{{ stats.suspended }}</h3>
 					<span>Suspendues</span>
 				</div>
 			</div>
 		</div>
 
-
 		{# --- LISTE DES SUCCURSALES --- #}
-		<div class="table-responsive-wrappe">
+		<div class="table-responsive-wrapper">
 			<table class="table table-scrollable table-striped js-datatable">
 				<thead>
 					<tr>
 						<th>Code & Nom</th>
-						<th>Ville / Province</th>
-						<th>Adresse Physique</th>
-						<th>Gérant Responsable</th>
-						<th>Status</th>
-						<th>Actions</th>
+						<th>Ville / Pays</th>
+						<th>Gérant / Personnel</th>
+						<th>Statut</th>
+						<th class="text-right">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -83,30 +82,30 @@
 								</div>
 							</td>
 							<td>
-								{{ branch.city }}
-							</td>
-							<td>
-								{{ branch.address|default('Non spécifiée') }}
+								<strong>{{ branch.city }}</strong>
+								<div class="text-gray text-size-12">{{ branch.country }}</div>
 							</td>
 							<td>
 								<i class="fa-solid fa-user-tie text-gray"></i>
 								{{ branch.managerName }}
+								{% if branch.staffCount > 1 %}
+									<small class="text-gray">(+{{ branch.staffCount - 1 }})</small>
+								{% endif %}
 							</td>
 							<td>
 								<span class="pill-branch-status {{ branch.status }}">
-									{{branch.status == 'active' ? 'Active' : 'Suspendue'}}
+									{{ branch.statusLabel }}
 								</span>
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									<a href="{{path('admin_agency_branch_show',{code:'trans-david-kinshasa-001'})}}" class="action-link" title="Fiche de la succursale">
+									<a href="{{ path('admin_agency_branch_show', {'code': branch.code}) }}" class="action-link" title="Fiche de la succursale">
 										<i class="fa-solid fa-eye"></i>
 									</a>
-									{% if branch.status === 'active' %}
-										<a href="{{path('admin_agency_branch_edit',{code:'agcLMT-001'})}}" class="action-link" title="Modification">
+									{% if is_granted('branch.write') and branch.status == 'active' %}
+										<a href="{{ path('admin_agency_branch_edit', {'code': branch.code}) }}" class="action-link" title="Modification">
 											<i class="fa-solid fa-edit"></i>
 										</a>
-
 									{% endif %}
 								</div>
 							</td>
@@ -121,7 +120,5 @@
 				</tbody>
 			</table>
 		</div>
-
-
 	</div>
 {% endblock %}
