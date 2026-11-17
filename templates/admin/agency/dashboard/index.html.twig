@@ -218,8 +218,9 @@
                                 <td class="monospace font-bold text-primary-mode">{{ currency.code }}</td>
                                 <td class="text-center font-bold monospace text-live-rate">
                                     {% if currency.exchange_rate is not null %}
+                                        {% set clean_rate = currency.exchange_rate|replace({',': '.'}) %}
                                         1 {{ currency.code }} = 
-                                        {{ currency.exchange_rate|number_format(currency.exchange_rate >= 100 ? 0 : 2, ',', ' ') }} {{ agency_currency_settings.base_currency }}
+                                        {{ clean_rate|number_format(2, ',', ' ') }} {{ agency_currency_settings.base_currency }}
                                     {% else %}
                                         <span class="text-gray">Taux non défini</span>
                                     {% endif %}
