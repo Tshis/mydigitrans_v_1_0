@@ -182,7 +182,7 @@ final class TripOperationService
     }
 
     /**
-     * Fait évoluer le statut du voyage (boarding, departed, arrived, cancelled) avec traçabilité AuditLog.
+     * Fait évoluer le statut du voyage (boarding, departed, arrived, cancelled) avec protections métier et AuditLog.
      *
      * @throws \DomainException
      */
@@ -196,6 +196,10 @@ final class TripOperationService
 
         if (\in_array($current, [TripStatus::Arrived, TripStatus::Cancelled], true)) {
             throw new \DomainException('Ce voyage est déjà clôturé ou annulé.');
+        }
+
+        if (TripStatus::Boarding === $targetStatus) {
+            $this->assertCanOpenBoarding($trip, $actor);
         }
 
         $oldStatusValue = $current->value;
@@ -214,5 +218,43 @@ final class TripOperationService
         );
 
         $this->em->flush();
+    }
+
+    /**
+     * Vérifie les conditions temporelles et de succursale avant d'ouvrir l'embarquement.
+     *
+     * @throws \DomainException
+     */
+    private function assertCanOpenBoarding(Trip $trip, User $actor): void
+    {
+        // 1. Contrôle de la gare d'embarquement si elle est définie sur le voyage
+        $departureBranch = $trip->getDepartureBranch();
+        if (null !== $departureBranch) {
+            $actorBranch = $actor->getBranch();
+            $isHeadquarters = null === $actorBranch
+                || AgencyRegistrationService::HEADQUARTERS_CODE === $actorBranch->getCode();
+
+            if (!$isHeadquarters && $actorBranch->getId() !== $departureBranch->getId()) {
+                throw new \DomainException(sprintf(
+                    'Seul un responsable de la gare d\'embarquement « %s » (ou du siège) peut ouvrir l\'embarquement de ce voyage.',
+                    $departureBranch->getName()
+                ));
+            }
+        }
+        // 2. Contrôle temporel : au plus tôt 6 heures avant l'heure prévue de départ
+        $depDate = $trip->getDepartureDate();
+        $depTime = $trip->getDepartureTime();
+        if (null !== $depDate && null !== $depTime) {
+            $departureAt = \DateTimeImmutable::createFromInterface($depDate)
+                ->setTime((int) $depTime->format('H'), (int) $depTime->format('i'));
+            $earliestBoarding = $departureAt->modify('-6 hours');
+            $now = new \DateTimeImmutable();
+            if ($now < $earliestBoarding) {
+                throw new \DomainException(sprintf(
+                    'L\'embarquement ne peut pas être ouvert avant le %s (6 heures avant le départ).',
+                    $earliestBoarding->format('d/m/Y à H\hi')
+                ));
+            }
+        }
     }
 }
