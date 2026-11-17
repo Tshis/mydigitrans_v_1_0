@@ -48,7 +48,7 @@
             
             {# --- FORMULAIRE DOUBLE COLONNE INVERSÉ --- #}
             {# Sans action : le formulaire est envoyé à cette même adresse, qui enregistre la réservation. #}
-            {{ form_start(form, {attr: {class: 'settings-form-layout'}}) }}
+            {{ form_start(form, {attr: {class: 'settings-form-layout', 'data-turbo': 'false'}}) }}
 
             {{ form_widget(form.departureStop) }}
             {{ form_widget(form.arrivalStop) }}

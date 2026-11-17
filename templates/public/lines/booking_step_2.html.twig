@@ -28,7 +28,7 @@
 			{% endfor %}
 
 			{# --- FORMULAIRE DOUBLE COLONNE INVERSÉ --- #}
-			<form action="{{ path('public_lines_booking_finalize', {'reference': booking.reference}) }}" method="POST" class="settings-form-layout">
+			<form action="{{ path('public_lines_booking_finalize', {'reference': booking.reference}) }}" method="POST" class="settings-form-layout" data-turbo="false">
 				<input type="hidden" name="_token" value="{{ csrf_token('finalize' ~ booking.reference) }}">
 
 				<div class="settings-container-grid">

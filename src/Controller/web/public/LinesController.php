@@ -82,10 +82,10 @@ final class LinesController extends AbstractController
     /**
      * TUNNEL RESERVATION ÉTAPE 1 : Coordonnées du passager & sièges
      *
-     * - Ouverture (depuis la page des résultats, en POST ou en GET) : departure_stop_id, arrival_stop_id
-     *   et passengers_count servent à préparer le formulaire.
+     * - Ouverture (depuis la page des résultats, en POST) : sauvegarde departure_stop_id,
+     *   arrival_stop_id et passengers_count en session puis redirige en 303 (PRG pour Turbo Drive).
      * - Soumission du formulaire (champ « booking ») : crée la réservation « pending », retient les sièges
-     *   (TripSeat « held ») puis redirige vers l'étape 2.
+     *   (TripSeat « held ») puis redirige vers l'impression du bon de réservation.
      */
     #[Route('/public/lines/trip/{slug}/booking', name: 'public_lines_booking', methods: ['GET', 'POST'])]
     public function booking(
@@ -99,7 +99,7 @@ final class LinesController extends AbstractController
 
         if (!$trip) {
             $this->addFlash('danger', 'Voyage introuvable.');
-            return $this->redirectToRoute('public_lines_index');
+            return $this->redirectToRoute('public_lines_index', [], Response::HTTP_SEE_OTHER);
         }
 
         $now = new \DateTimeImmutable();
@@ -108,16 +108,31 @@ final class LinesController extends AbstractController
             $booking->assertBookable($trip, $now);
         } catch (BookingException $e) {
             $this->addFlash('danger', $e->getMessage());
-            return $this->redirectToRoute('public_lines_index');
+            return $this->redirectToRoute('public_lines_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $sessionKey = 'booking_init_' . $slug;
+
+        // 1. Réception du formulaire POST venant de results.html.twig (pas encore le formulaire "booking")
+        if ($request->isMethod('POST') && !$request->request->has('booking')) {
+            $request->getSession()->set($sessionKey, [
+                'departure_stop_id' => $this->input($request, 'departure_stop_id'),
+                'arrival_stop_id'   => $this->input($request, 'arrival_stop_id'),
+                'passengers_count'  => $this->input($request, 'passengers_count') ?? '1',
+            ]);
+
+            // Redirection 303 obligatoire pour Turbo Drive après tout POST
+            return $this->redirectToRoute('public_lines_booking', ['slug' => $slug], Response::HTTP_SEE_OTHER);
+        }
+
+        $initData = $request->getSession()->get($sessionKey, []);
         $data = new BookingData();
 
+        // 2. Préparation du formulaire (en GET après redirection, ou accès direct)
         if (!$request->request->has('booking')) {
-            // Ouverture de l'étape 1 : arrêts choisis et nombre de places viennent de la page des résultats.
-            $data->departureStop = $this->input($request, 'departure_stop_id');
-            $data->arrivalStop = $this->input($request, 'arrival_stop_id');
-            $count = max(1, min(BookingData::MAX_SEATS, (int) ($this->input($request, 'passengers_count') ?? 1)));
+            $data->departureStop = $initData['departure_stop_id'] ?? $this->input($request, 'departure_stop_id');
+            $data->arrivalStop   = $initData['arrival_stop_id'] ?? $this->input($request, 'arrival_stop_id');
+            $count = max(1, min(BookingData::MAX_SEATS, (int) ($initData['passengers_count'] ?? $this->input($request, 'passengers_count') ?? 1)));
             $data->seats = array_fill(0, $count, null);
 
             $user = $this->getUser();
@@ -130,12 +145,16 @@ final class LinesController extends AbstractController
         $form = $this->createForm(BookingType::class, $data);
         $form->handleRequest($request);
 
+        // Filet de sécurité : restaure les arrêts depuis la session si les champs cachés ont été soumis vides
+        $data->departureStop ??= $initData['departure_stop_id'] ?? null;
+        $data->arrivalStop   ??= $initData['arrival_stop_id'] ?? null;
+
         // Les arrêts sont vérifiés côté serveur : ils doivent appartenir à la route de ce voyage, dans le bon ordre.
         try {
             [$departureStop, $arrivalStop] = $booking->resolveSegment($trip, $data->departureStop, $data->arrivalStop);
         } catch (BookingException $e) {
             $this->addFlash('danger', $e->getMessage());
-            return $this->redirectToRoute('public_lines_index');
+            return $this->redirectToRoute('public_lines_index', [], Response::HTTP_SEE_OTHER);
         }
 
         /**
@@ -145,14 +164,9 @@ final class LinesController extends AbstractController
             try {
                 $reservation = $booking->createPendingReservation($trip, $departureStop, $arrivalStop, $data, $this->getUser(), $now);
 
-                /**
-                 * CETTE LIGNE SERA REACTIVEE LORSQU'ON AJOUTERA L'OPTION PAIEMENT EN LIGNE 
-                 */
-                //return $this->redirectToRoute('public_lines_booking_step_2', ['reference' => $reservation->getReference()]);
+                // NE PAS faire $request->getSession()->remove($sessionKey) ici,
+                // car window.location.reload() recharge cette page juste après pour afficher le message Flash !
 
-                /**
-                 * ces lignes seront supprimées après activation du paiement en ligne
-                 */
                 $reference = $reservation->getReference();
                 $deadline = $reservation->getExpiresAt();
 
@@ -161,18 +175,13 @@ final class LinesController extends AbstractController
                     $deadline?->format('d/m/Y à H:i')
                 ));
 
-                // Route Symfony d'impression Dompdf du bon de réservation
-                return $this->redirectToRoute('public_reservation_print_voucher', ['reference' => $reference]);
-                //supprimée jusqu'à celle ci au dessus
+                return $this->redirectToRoute('public_reservation_print_voucher', ['reference' => $reference], Response::HTTP_SEE_OTHER);
             } catch (BookingException $e) {
                 $this->addFlash('danger', $e->getMessage());
 
-                // 3. ◄ ON FORCE LE RETOUR SUR LA MÊME PAGE DE RÉSERVATION (Garde l'utilisateur sur le seatmap)
                 return $this->redirectToRoute('public_lines_booking', [
                     'slug' => $trip->getSlug(),
-                    'departure_stop_id' => $departureStop->getId(),
-                    'arrival_stop_id' => $arrivalStop->getId()
-                ]);
+                ], Response::HTTP_SEE_OTHER);
             }
         }
 
@@ -202,6 +211,7 @@ final class LinesController extends AbstractController
             'seat_info' => $booking->seatInfo($trip, $departureStop, $arrivalStop, $now),
         ], new Response(status: $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK));
     } //booking
+
 
 
     /**
