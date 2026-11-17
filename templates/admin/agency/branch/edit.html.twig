@@ -1,6 +1,8 @@
 {# templates/admin/agency/branch/edit.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+{% block ux_assets %}{{ importmap('app') }}{% endblock %}
+
 {% block body %}
 	<div class="admin-agency-branch-edit-scope branch-scope container">
 
