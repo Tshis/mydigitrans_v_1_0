@@ -7,12 +7,15 @@ namespace App\Service;
 use App\Dto\public\package\PackageSearchData;
 use App\Dto\public\package\PackageSearchResult;
 use App\Entity\Branch;
+use App\Entity\CurrencyAgency;
+use App\Entity\Fare;
 use App\Entity\Route;
 use App\Entity\RouteStop;
 use App\Entity\Shipment;
 use App\Entity\Trip;
 use App\Enum\BranchStatus;
 use App\Enum\BusStatus;
+use App\Enum\FareTargetType;
 use App\Enum\PackageWeightRange;
 use App\Enum\ShipmentStatus;
 use App\Enum\TripStatus;
@@ -61,6 +64,7 @@ final class PackageSearcher
 
         $usedKg = $this->usedCapacity(array_map(static fn(Trip $trip): int => (int) $trip->getId(), $trips));
         $branches = $this->findBranches($trips);
+        $baseCurrencies = $this->findAgencyBaseCurrencies($trips);
         $cutoff = $now->modify(self::DROP_OFF_DELAY);
         $needKg = $criteria->weightRange->requiredCapacityKg();
 
@@ -82,12 +86,16 @@ final class PackageSearcher
                 continue;
             }
 
-            // Heure de départ de la route, puis décalage arithmétique d'intervalles jusqu'aux gares demandées.
             $baseDate = \DateTimeImmutable::createFromInterface($date);
             $origin = $baseDate->setTime((int) $time->format('H'), (int) $time->format('i'), 0);
 
             $departureAt = $origin->add(new \DateInterval(sprintf('PT%dM', $segment['departureOffset'])));
             $arrivalAt = $origin->add(new \DateInterval(sprintf('PT%dM', $segment['arrivalOffset'])));
+
+            if (0 === $segment['arrivalOffset'] && null !== $trip->getArrivalDate() && null !== $trip->getArrivalTime()) {
+                $arrivalAt = \DateTimeImmutable::createFromInterface($trip->getArrivalDate())
+                    ->setTime((int) $trip->getArrivalTime()->format('H'), (int) $trip->getArrivalTime()->format('i'), 0);
+            }
 
             if ($departureAt < $cutoff) {
                 continue;
@@ -99,13 +107,25 @@ final class PackageSearcher
             }
 
             $agencyBranches = $branches[(int) $agency->getId()] ?? [];
-            $departureBranch = $agencyBranches[$this->normalize($segment['departureCity'])] ?? null;
-            $arrivalBranch = $agencyBranches[$this->normalize($segment['arrivalCity'])] ?? null;
-            if (null === $departureBranch || null === $arrivalBranch) {
-                continue;
-            }
 
-            [$minFare, $maxFare] = $this->estimateFare($route, $criteria->weightRange);
+            $tripDepBranch = $trip->getDepartureBranch();
+            $departureBranch = (null !== $tripDepBranch && $this->normalize((string) $tripDepBranch->getCity()) === $this->normalize($segment['departureCity']))
+                ? $tripDepBranch
+                : ($agencyBranches[$this->normalize($segment['departureCity'])] ?? (new Branch())->setName('Gare ' . $segment['departureCity'])->setCity($segment['departureCity']));
+
+            $tripArrBranch = $trip->getArrivalBranch();
+            $arrivalBranch = (null !== $tripArrBranch && $this->normalize((string) $tripArrBranch->getCity()) === $this->normalize($segment['arrivalCity']))
+                ? $tripArrBranch
+                : ($agencyBranches[$this->normalize($segment['arrivalCity'])] ?? (new Branch())->setName('Gare ' . $segment['arrivalCity'])->setCity($segment['arrivalCity']));
+
+            $fallbackCurrency = $baseCurrencies[(int) $agency->getId()] ?? 'CDF';
+            [$minFare, $maxFare, $currencyCode] = $this->estimateFare(
+                $route,
+                $segment['departureStopId'],
+                $segment['arrivalStopId'],
+                $criteria->weightRange,
+                $fallbackCurrency
+            );
 
             $results[] = new PackageSearchResult(
                 trip: $trip,
@@ -118,7 +138,7 @@ final class PackageSearcher
                 remainingCapacityKg: $remainingKg,
                 minFare: $minFare,
                 maxFare: $maxFare,
-                currency: null === $minFare ? null : ($agency->getDefaultCurrency()?->getCode() ?? 'USD'), // CORRECTION : Accès via la devise par défaut de l'agence du MCD
+                currency: null === $minFare ? null : $currencyCode,
             );
         }
 
@@ -126,7 +146,6 @@ final class PackageSearcher
 
         return array_slice($results, 0, self::MAX_RESULTS);
     }
-
     /**
      * Routes qui desservent les deux villes dans le bon sens.
      *
@@ -134,12 +153,13 @@ final class PackageSearcher
      */
     private function findSegments(string $departure, string $arrival): array
     {
-        // CORRECTION : Extraction directe depuis la propriété string 'city' de RouteStop, en conformité avec ton entité
         $rows = $this->em->createQueryBuilder()
             ->select(
                 'IDENTITY(ds.route) AS routeId',
+                'ds.id AS departureStopId',
                 'ds.city AS departureCity',
                 'ds.durationFromDeparture AS departureOffset',
+                'ars.id AS arrivalStopId',
                 'ars.city AS arrivalCity',
                 'ars.durationFromDeparture AS arrivalOffset',
             )
@@ -162,11 +182,13 @@ final class PackageSearcher
 
         foreach ($rows as $row) {
             $routeId = (int) $row['routeId'];
-            $segments[$routeId] = [
-                'departureCity' => (string) $row['departureCity'],
-                'arrivalCity' => (string) $row['arrivalCity'],
+            $segments[$routeId] ??= [
+                'departureStopId' => (int) $row['departureStopId'],
+                'departureCity'   => (string) $row['departureCity'],
+                'arrivalStopId'   => (int) $row['arrivalStopId'],
+                'arrivalCity'     => (string) $row['arrivalCity'],
                 'departureOffset' => (int) $row['departureOffset'],
-                'arrivalOffset' => (int) $row['arrivalOffset'],
+                'arrivalOffset'   => (int) $row['arrivalOffset'],
             ];
         }
 
@@ -193,8 +215,8 @@ final class PackageSearcher
             ->andWhere('a.isActive = :yes')
             ->andWhere('b.status = :busStatus')
             ->setParameter('routeIds', $routeIds)
-            ->setParameter('from', $from->format('Y-m-d')) // CORRECTION : Passage au format String stable
-            ->setParameter('to', $to->format('Y-m-d'))     // CORRECTION : Passage au format String stable
+            ->setParameter('from', $from, Types::DATE_IMMUTABLE)
+            ->setParameter('to', $to, Types::DATE_IMMUTABLE)
             ->setParameter('tripStatus', TripStatus::Scheduled->value)
             ->setParameter('busStatus', BusStatus::Active->value)
             ->setParameter('yes', true)
@@ -209,7 +231,7 @@ final class PackageSearcher
      * Poids déjà confié par voyage (colis non annulés).
      *
      * @param list<int> $tripIds
-     * @return array<int, float> kilos utilisés, indexés par id de voyage
+     * @return array<int, float>
      */
     private function usedCapacity(array $tripIds): array
     {
@@ -220,7 +242,7 @@ final class PackageSearcher
             ->andWhere('s.status <> :cancelled')
             ->setParameter('tripIds', $tripIds)
             ->setParameter('cancelled', ShipmentStatus::Cancelled->value)
-            ->groupBy('tripId') // CORRECTION : Regroupement sur l'alias DQL pour écarter l'exception de syntaxe
+            ->groupBy('tripId')
             ->getQuery()
             ->getArrayResult();
 
@@ -262,30 +284,119 @@ final class PackageSearcher
             ->setParameter('opened', BranchStatus::Opened->value)
             ->orderBy('b.code', 'ASC')
             ->getQuery()
-
             ->getResult();
+
         $byAgency = [];
         foreach ($branches as $branch) {
             $agencyId = (int) $branch->getAgency()?->getId();
             $byAgency[$agencyId][$this->normalize((string) $branch->getCity())] ??= $branch;
         }
+
         return $byAgency;
     }
+
     /**
-     * Estimation du tarif d'après le prix au kilo de la route.
+     * Devise de base configurée pour chaque agence via CurrencyAgency.
      *
-     * @return array{0: ?string, 1: ?string}
+     * @param list<Trip> $trips
+     * @return array<int, string>
      */
-    private function estimateFare(Route $route, PackageWeightRange $range): array
+    private function findAgencyBaseCurrencies(array $trips): array
     {
-        $perKg = $route->getPricePerKg();
-        if (null === $perKg) {
-            return [null, null];
+        $agencyIds = [];
+        foreach ($trips as $trip) {
+            $id = $trip->getRoute()?->getAgency()?->getId();
+            if (null !== $id) {
+                $agencyIds[$id] = $id;
+            }
         }
-        $min = number_format($range->minKg() * (float) $perKg, 2, '.', '');
-        $max = null === $range->maxKg() ? null : number_format($range->maxKg() * (float) $perKg, 2, '.', '');
-        return [$min, $max];
+
+        if ([] === $agencyIds) {
+            return [];
+        }
+
+        /** @var list<CurrencyAgency> $rows */
+        $rows = $this->em->createQueryBuilder()
+            ->select('ca', 'c')
+            ->from(CurrencyAgency::class, 'ca')
+            ->join('ca.currency', 'c')
+            ->andWhere('IDENTITY(ca.agency) IN (:agencyIds)')
+            ->andWhere('ca.isBase = :yes')
+            ->andWhere('ca.isActive = :yes')
+            ->setParameter('agencyIds', array_values($agencyIds))
+            ->setParameter('yes', true)
+            ->getQuery()
+            ->getResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $agencyId = (int) $row->getAgency()?->getId();
+            $code = $row->getCurrency()?->getCode();
+            if ($agencyId > 0 && null !== $code) {
+                $map[$agencyId] = $code;
+            }
+        }
+
+        return $map;
     }
+
+    /**
+     * Estimation du tarif réel par segment depuis la table Fare (price_per_kg + currency),
+     * avec repli sur Route::pricePerKg si aucun tarif segmentaire n'est défini.
+     *
+     * @return array{0: ?string, 1: ?string, 2: string}
+     */
+    private function estimateFare(
+        Route $route,
+        int $departureStopId,
+        int $arrivalStopId,
+        PackageWeightRange $range,
+        string $fallbackCurrency
+    ): array {
+        /** @var list<Fare> $fares */
+        $fares = $this->em->createQueryBuilder()
+            ->select('f', 'c')
+            ->from(Fare::class, 'f')
+            ->leftJoin('f.currency', 'c')
+            ->andWhere('f.targetType = :targetType')
+            ->andWhere('f.targetId = :routeId')
+            ->andWhere('IDENTITY(f.departureStop) = :depId')
+            ->andWhere('IDENTITY(f.arrivalStop) = :arrId')
+            ->andWhere('f.isActive = :yes')
+            ->andWhere('f.pricePerKg IS NOT NULL')
+            ->setParameter('targetType', FareTargetType::Route)
+            ->setParameter('routeId', (int) $route->getId())
+            ->setParameter('depId', $departureStopId)
+            ->setParameter('arrId', $arrivalStopId)
+            ->setParameter('yes', true)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+
+        $perKg = null;
+        $currency = $fallbackCurrency;
+
+        if ([] !== $fares && null !== $fares[0]->getPricePerKg()) {
+            $perKg = (float) $fares[0]->getPricePerKg();
+            $currency = $fares[0]->getCurrency()?->getCode() ?? $fallbackCurrency;
+        } elseif (null !== $route->getPricePerKg()) {
+            $perKg = (float) $route->getPricePerKg();
+            if (method_exists($route, 'getCurrencyPricePerKg') && null !== $route->getCurrencyPricePerKg()) {
+                $currency = $route->getCurrencyPricePerKg()->getCode() ?? $fallbackCurrency;
+            }
+        }
+
+        if (null === $perKg || $perKg <= 0.0) {
+            return [null, null, $currency];
+        }
+
+        $min = number_format($range->minKg() * $perKg, 2, '.', '');
+        $max = null === $range->maxKg() ? null : number_format($range->maxKg() * $perKg, 2, '.', '');
+
+        return [$min, $max, $currency];
+    }
+
+
     private function normalize(string $city): string
     {
         return mb_strtolower(trim((string) preg_replace('/\s+/', ' ', $city)));
