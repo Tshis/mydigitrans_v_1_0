@@ -3,142 +3,201 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	<script src="/js/admin/reservation_add.js" defer></script>
+	<script src="/js/public/seatmap_selection.js" defer></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const form = document.getElementById("dynamic-booking-form");
+			if (!form) return;
+
+			const pricingMatrix = JSON.parse(form.dataset.pricing || "{}");
+			const fareCategories = JSON.parse(form.dataset.fares || "{}");
+			const currencyCode = form.dataset.currencyCode || "CDF";
+
+			const depSelect = document.getElementById("departure-stop");
+			const arrSelect = document.getElementById("arrival-stop");
+			const summaryFare = document.getElementById("summary-fare-type");
+			const summaryTotal = document.getElementById("summary-total-price");
+
+			function refreshPrice() {
+				const checked = form.querySelector(".js-seat-btn:checked");
+				const labelEl = checked
+					? form.querySelector(`label[for="${checked.id}"]`)
+					: null;
+				const isVip = labelEl && labelEl.dataset.type === "vip";
+
+				if (summaryFare) summaryFare.textContent = isVip ? "VIP" : "Standard";
+
+				const key = `${depSelect.value}-${arrSelect.value}`;
+				const base = parseFloat(pricingMatrix[key] || 0);
+				const extra = isVip ? parseFloat(fareCategories.vip || 0) : 0;
+				const total = checked ? base + extra : 0;
+
+				if (summaryTotal)
+					summaryTotal.textContent = `${total.toLocaleString("fr-FR")} ${currencyCode}`;
+			}
+
+			form.addEventListener("change", (e) => {
+				if (
+					e.target.classList.contains("js-seat-btn") ||
+					e.target === depSelect ||
+					e.target === arrSelect
+				) {
+					refreshPrice();
+				}
+			});
+		});
+	</script>
 {% endblock %}
 
 {% block body %}
 	<div class="admin-booking-creation-scope container">
 
+		{% for message in app.flashes('error') %}
+			<div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+		{% endfor %}
+
 		<header class="header-refined mb-25">
 			<div class="header-main-info">
 				<a
-					href="{{ path('admin_agency_reservation_index') }}"
+					href="{{ path('admin_agency_trip_show', {'code': trip_code}) }}"
 					class="agency-back-action"
-					title="Retour au backoffice"
+					title="Retour au voyage"
 				>
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
 					<h1>Guichet d'Enregistrement & Réservations</h1>
 					<p class="subtitle">Voyage sélectionné :
-						<strong class="text-primary">{{ trip_code }}</strong>
+						<strong class="text-primary">{{ trip_code|upper }}</strong>
 					</p>
 				</div>
-
 			</div>
 		</header>
 
-		{# --- INJECTION DES DONNÉES DU CONTRÔLEUR DANS LES ATTRIBUTS DATA --- #}
-		<form
-			action="#"
-			method="POST"
-			class="reservation-form"
-			id="dynamic-booking-form"
-			data-pricing="{{ pricing_matrix|json_encode }}"
-			data-fares="{{ fare_categories|json_encode }}"
-			data-currency-code="{{ currency_code }}"
-		>
+		{{ form_start(form, {
+			attr: {
+				class: 'reservation-form',
+				id: 'dynamic-booking-form',
+				'data-pricing': pricing_matrix|json_encode,
+				'data-fares': fare_categories|json_encode,
+				'data-currency-code': currency_code
+			}
+		}) }}
 
-			<input type="hidden" name="trip_code" value="{{ trip_code }}">
+		<input type="hidden" name="_token" value="{{ csrf_token('station_reservation_' ~ trip_code) }}">
 
-			<div class="reservation-container">
+		{% if form.vars.errors|length > 0 %}
+			<div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
+		{% endif %}
 
-				<div class="layout-main-panel">
-					{# Étape 1 : Sélection des arrêts #}
-					<div class="card mb-20">
-						<h2>Arrêts & Segment de voyage</h2>
-						<div class="field-group">
-							<div class="field">
-								<label>Arrêt de Montée (Départ)</label>
-								<select name="departure_stop_id" id="departure-stop" required>
-									<option value="1">Kinshasa (Gare Centrale)</option>
-									<option value="2">Kenge (Arrêt Principal)</option>
-								</select>
-							</div>
-							<div class="field">
-								<label>Arrêt de Descente (Arrivée)</label>
-								<select name="arrival_stop_id" id="arrival-stop" required>
-									<option value="3">Kikwit (Terminus)</option>
-									<option value="2">Kenge (Arrêt Principal)</option>
-								</select>
-							</div>
+		<div class="reservation-container">
+
+			<div class="layout-main-panel">
+				{# Étape 1 : Sélection des arrêts réels de la ligne #}
+				<div class="card mb-20">
+					<h2>Arrêts & Segment de voyage</h2>
+					<div class="field-group">
+						<div class="field">
+							<label>Arrêt de Montée (Départ)</label>
+							<select name="departure_stop_id" id="departure-stop" required>
+								{% for stop in stops %}
+									<option value="{{ stop.id }}" {{ loop.first ? 'selected' : '' }}>{{ stop.city }}</option>
+								{% endfor %}
+							</select>
 						</div>
-					</div>
-
-					{# Étape 2 : Plan des sièges #}
-					<div class="card id-seatmap-section">
-						<h2>Choix du siège</h2>
-						{{ include('system/seatmap.html.twig', { 'seatmap': seatmap }) }}
-						<input type="hidden" name="seat_number" id="selected-seat-input-backoffice" required>
+						<div class="field">
+							<label>Arrêt de Descente (Arrivée)</label>
+							<select name="arrival_stop_id" id="arrival-stop" required>
+								{% for stop in stops %}
+									<option value="{{ stop.id }}" {{ loop.last ? 'selected' : '' }}>{{ stop.city }}</option>
+								{% endfor %}
+							</select>
+						</div>
 					</div>
 				</div>
 
-				{# COLONNE DROITE #}
-				<aside class="summary">
-					<div class="card mb-20">
-						<h2>Informations du passager</h2>
-						<div class="field-group">
-							<div class="field">
-								<label>Nom complet</label>
-								<input
-									type="text"
-									name="passenger_name"
-									placeholder="Ex : Jean Mukendi"
-									required
-									autocomplete="off"
-								>
-							</div>
-							<div class="field">
-								<label>Téléphone</label>
-								<input type="tel" name="passenger_phone" placeholder="+243..." required autocomplete="off">
-							</div>
-						</div>
-					</div>
+				{# Étape 2 : Plan des sièges réel #}
+				<div class="card id-seatmap-section">
+					<h2>Choix du siège</h2>
 
-					<div class="card summary-sticky-card">
-						<h2>Bon de Réservation</h2>
-						<div class="reservation-notice-zone mb-20">
-							<p class="notice-title">
-								<i class="fa-solid fa-clock-history"></i>
-								Délai de paiement
-							</p>
-							<p class="notice-text">Ce document temporaire expirera automatiquement
-								<strong>2 heures</strong>
-								avant le départ.
-							</p>
-						</div>
-						<hr class="summary-divider mb-15">
-						<ul class="billing-details-list">
-							<li>
-								<strong>Voyage :</strong>
-								<span>{{ trip_code }}</span>
-							</li>
-							<li>
-								<strong>Siège réservé :</strong>
-								<span id="summary-seat-number">Aucun</span>
-							</li>
-							<li>
-								<strong>Catégorie :</strong>
-								<span id="summary-fare-type">Standard</span>
-							</li>
-						</ul>
-						<div class="total">
-							Tarif indicatif :
-							<strong id="summary-total-price">
-								0
-								{{ currency_code }}</strong>
-						</div>
+					{% for seat in form.seats %}
+						{{ form_widget(seat, {
+								id: loop.first ? 'js-selected-seat-input' : 'js-seat-input-' ~ loop.index0,
+								attr: {'data-seat-input': loop.index0}
+							}) }}
+						{{ form_errors(seat) }}
+					{% endfor %}
+					{{ form_errors(form.seats) }}
 
-						<div class="text-center">
-							<button class="btn-refined btn-primary-gradient">
-								<i class="fa-solid fa-file-invoice"></i>
-								Générer le Bon de Réservation
-							</button>
-						</div>
-					</div>
-				</aside>
-
+					{{ include('system/seatmap.html.twig', {
+							'seatmap': seatmap,
+							'seat_info': seat_info,
+							'max_seats': form.seats|length
+						}) }}
+				</div>
 			</div>
-		</form>
+
+			{# COLONNE DROITE #}
+			<aside class="summary">
+				<div class="card mb-20">
+					<h2>Informations du passager</h2>
+					<div class="field-group">
+						<div class="field">
+							{{ form_label(form.fullName) }}
+							{{ form_widget(form.fullName) }}
+							{{ form_errors(form.fullName) }}
+						</div>
+						<div class="field">
+							{{ form_label(form.phone) }}
+							{{ form_widget(form.phone) }}
+							{{ form_errors(form.phone) }}
+						</div>
+					</div>
+				</div>
+
+				<div class="card summary-sticky-card">
+					<h2>Bon de Réservation</h2>
+					<div class="reservation-notice-zone mb-20">
+						<p class="notice-title">
+							<i class="fa-solid fa-clock-history"></i>
+							Délai de paiement
+						</p>
+						<p class="notice-text">Ce document temporaire expirera automatiquement
+							<strong>2 heures</strong>
+							avant le départ.
+						</p>
+					</div>
+					<hr class="summary-divider mb-15">
+					<ul class="billing-details-list">
+						<li>
+							<strong>Voyage :</strong>
+							<span>{{ trip_code|upper }}</span>
+						</li>
+						<li>
+							<strong>Siège réservé :</strong>
+							<span id="js-summary-seat-badge" class="font-bold text-danger-color">Aucun choisi</span>
+						</li>
+						<li>
+							<strong>Catégorie :</strong>
+							<span id="summary-fare-type">Standard</span>
+						</li>
+					</ul>
+					<div class="total">
+						Tarif indicatif :
+						<strong id="summary-total-price">0 {{ currency_code }}</strong>
+					</div>
+
+					<div class="text-center">
+						<button type="submit" class="btn-refined btn-primary-gradient">
+							<i class="fa-solid fa-file-invoice"></i>
+							Générer le Bon de Réservation
+						</button>
+					</div>
+				</div>
+			</aside>
+
+		</div>
+
+		{{ form_end(form, {render_rest: false}) }}
 	</div>
 {% endblock %}

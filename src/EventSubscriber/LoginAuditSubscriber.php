@@ -41,14 +41,10 @@ final class LoginAuditSubscriber implements EventSubscriberInterface
             action: AuditAction::Login,
             entityName: 'User',
             entityId: $user->getId(),
-            oldValues: null,
-            newValues: [
-                'email'    => $user->getEmail(),
-                'userType' => $user->getUserType()->value,
-            ],
             actor: $user,
             flush: false
         );
+
 
         $this->em->flush();
     }

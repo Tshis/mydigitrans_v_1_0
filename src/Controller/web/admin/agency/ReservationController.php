@@ -1,115 +1,182 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\web\admin\agency;
 
-use App\Service\BusLayoutGridBuilder;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Controller\web\admin\AbstractAdminController;
+use App\Dto\public\line\BookingData;
+use App\Entity\Reservation;
+use App\Entity\Trip;
+use App\Enum\Scope;
+use App\Exception\BookingException;
+use App\Form\BookingType;
+use App\Service\AgencyReservationService;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Encoding\Encoding;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ReservationController extends AbstractController
+final class ReservationController extends AbstractAdminController
 {
+    public function __construct(
+        private readonly AgencyReservationService $reservationService,
+    ) {}
 
-    #[Route('/admin/agency/reservations', name: 'admin_agency_reservation_index')]
+    protected function scope(): Scope
+    {
+        return Scope::Agency;
+    }
+
+    #[Route('/admin/agency/reservations', name: 'admin_agency_reservation_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('reservation.view');
+        $agency = $this->actor()->getAgency();
+
+        $filters = [
+            'query'   => trim((string) $request->query->get('search_query', '')) ?: null,
+            'status'  => trim((string) $request->query->get('ticket_status', '')) ?: null,
+            'routeId' => ctype_digit((string) $request->query->get('route_filter'))
+                ? (int) $request->query->get('route_filter')
+                : null,
+        ];
+
         return $this->render('admin/agency/reservation/index.html.twig', [
-            'page' => 'reservation',
-        ]);
-    } //index
+            'page'    => 'reservation',
+            'filters' => $filters,
+        ] + $this->reservationService->listAgencyReservations($agency, $filters));
+    }
 
-
-    #[Route('/admin/agency/reservation/add/{code}', name: 'admin_agency_reservation_add')]
-    public function add(Request $request, BusLayoutGridBuilder $busLayoutGridBuilder, string $code): Response
+    #[Route('/admin/agency/reservation/add/{code}', name: 'admin_agency_reservation_add', methods: ['GET', 'POST'])]
+    public function add(Request $request, string $code): Response
     {
-        $session = $request->getSession();
-        $layouts = $session->get('bus_layout', []);
+        $this->denyAccessUnlessGranted('reservation.write');
+        $actor  = $this->actor();
+        $agency = $actor->getAgency();
 
-        // Simulation : l'ID du layout dépend du code du voyage / véhicule
-        $layoutId = 1;
-        $busLayout = $layouts[$layoutId] ?? null;
-
-        if (!$busLayout) {
-            throw $this->createNotFoundException('Bus layout introuvable');
+        $trip = $this->reservationService->findAgencyTripByCode($agency, $code);
+        if (!$trip instanceof Trip) {
+            throw $this->createNotFoundException('Voyage introuvable dans votre agence.');
         }
 
-        // --- SIMULATION DES TARIFS PROVENANT DU MCD ---
+        $viewData = $this->reservationService->buildCreateViewData($trip);
+        $stops = $viewData['stops'];
 
-        // La devise peut changer dynamiquement selon le trajet ou la session d'agence
-        $currencyCode = 'CDF'; // Exemples : 'CDF', 'USD', 'XAF'
+        $data = new BookingData();
+        $data->seats = [null];
+        if ([] !== $stops) {
+            $data->departureStop = (string) reset($stops)->getId();
+            $data->arrivalStop   = (string) end($stops)->getId();
+        }
 
-        // Grille tarifaire par segment : "id_depart-id_arrivee" => Prix en CDF
-        $pricingMatrix = [
-            '1-3' => 45000, // Kinshasa -> Kikwit (Complet)
-            '1-2' => 25000, // Kinshasa -> Kenge (Partiel)
-            '2-3' => 30000  // Kenge -> Kikwit (Partiel)
-        ];
+        $form = $this->createForm(BookingType::class, $data, [
+            'csrf_protection' => false,
+        ]);
+        $form->handleRequest($request);
 
-        // Prix par catégorie de place
-        $fareCategories = [
-            'seat' => 0,      // Pas de surplus pour un siège Standard
-            'vip'  => 15000   // +15 000 CDF de majoration pour la classe VIP
-        ];
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->isCsrfTokenValid('station_reservation_' . $trip->getCode(), (string) $request->request->get('_token'))) {
+                $this->addFlash('error', 'Jeton de sécurité expiré. Veuillez réessayer.');
+                return $this->redirectToRoute('admin_agency_reservation_add', ['code' => $trip->getCode()]);
+            }
 
+            try {
+                $depId = (string) ($request->request->get('departure_stop_id') ?: $data->departureStop);
+                $arrId = (string) ($request->request->get('arrival_stop_id') ?: $data->arrivalStop);
+                $seatLabels = implode(',', array_filter(array_map('trim', $data->seats)));
 
-        if ($request->isMethod('POST')) {
-            $reference = "RSV-01-2026";
-            return $this->printVoucherPdf($reference);
+                $reservation = $this->reservationService->createStationReservation(
+                    trip: $trip,
+                    departureStopId: $depId,
+                    arrivalStopId: $arrId,
+                    seatNumber: $seatLabels,
+                    passengerName: (string) $data->fullName,
+                    passengerPhone: (string) $data->phone,
+                    actor: $actor
+                );
+
+                $this->addFlash('success', sprintf('Bon de réservation [%s] généré avec succès.', $reservation->getReference()));
+
+                return $this->redirectToRoute('admin_agency_reservation_show', [
+                    'reference' => $reservation->getReference(),
+                ]);
+            } catch (BookingException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
         }
 
         return $this->render('admin/agency/reservation/add.html.twig', [
             'page' => 'reservation',
-            'trip_code' => $code,
-            'seatmap' => $busLayoutGridBuilder->build($busLayout),
-            'pricing_matrix' => $pricingMatrix,
-            'fare_categories' => $fareCategories,
-            'currency_code' => $currencyCode,
-        ]);
-    } //add
+            'form' => $form->createView(),
+        ] + $viewData);
+    }
 
-    #[Route('/admin/agency/reservation/{reference}', name: 'admin_agency_reservation_show')]
-    public function show(Request $request): Response
+    #[Route('/admin/agency/reservation/{reference}', name: 'admin_agency_reservation_show', methods: ['GET'])]
+    public function show(string $reference): Response
     {
+        $this->denyAccessUnlessGranted('reservation.view');
+        $reservation = $this->requireAgencyReservation($reference);
+
         return $this->render('admin/agency/reservation/show.html.twig', [
             'page' => 'reservation',
-        ]);
-    } //show
+        ] + $this->reservationService->getReservationDetails($reservation));
+    }
 
-    /**
-     * RESERVATION PDF : COMPILATION DU BON TEMPORAIRE VIA DOMPDF
-     */
+    #[Route('/admin/agency/reservation/{reference}/cancel', name: 'admin_agency_reservation_cancel', methods: ['POST'])]
+    public function cancel(string $reference, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('reservation.write');
+        $actor       = $this->actor();
+        $reservation = $this->requireAgencyReservation($reference);
+
+        if (!$this->isCsrfTokenValid('cancel_reservation_' . $reservation->getReference(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
+
+        try {
+            $reason = (string) $request->request->get('cancellation_reason', '');
+            $this->reservationService->cancelReservation($reservation, $reason, $actor);
+            $this->addFlash('success', sprintf('La réservation [%s] a été annulée et les places ont été libérées.', $reservation->getReference()));
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_reservation_show', [
+            'reference' => $reservation->getReference(),
+        ]);
+    }
+
     #[Route('/admin/agency/reservations/{reference}/print-voucher', name: 'admin_agency_reservation_print_voucher', methods: ['GET'])]
     public function printVoucherPdf(string $reference): Response
     {
+        $this->denyAccessUnlessGranted('reservation.view');
+        $actor       = $this->actor();
+        $reservation = $this->requireAgencyReservation($reference);
+        $details     = $this->reservationService->getReservationDetails($reservation)['reservation'];
 
         $voucher = [
-            'id' => 812,
-            'code' => 'RSV-202610-A97F',
-            'reference' => $reference,
-            'trip_code' => 'TRP-2026-0042',
-            'passenger_name' => 'Jean Mukendi',
-            'passenger_phone' => '+243 812 345 678',
-            'departure_stop' => 'Kinshasa (Gare Gombe)',
-            'arrival_stop' => 'Kikwit (Terminus)',
-            'departure_date' => new \DateTime('+1 day'),
-            'departure_time' => '14h30',
-            'seat_number' => '05',
-            'fare_category' => 'Standard',
-            'amount' => 45.00,
-            'currency_code' => 'USD'
+            'id'              => $details['id'],
+            'code'            => $details['reference'],
+            'reference'       => $details['reference'],
+            'trip_code'       => strtoupper($details['tripCode']),
+            'passenger_name'  => $details['passengerName'],
+            'passenger_phone' => $details['passengerPhone'],
+            'departure_stop'  => $details['departureStop'],
+            'arrival_stop'    => $details['arrivalStop'],
+            'departure_date'  => $details['departureDate'],
+            'departure_time'  => $details['departureTime'],
+            'seat_number'     => $details['seatNumber'],
+            'fare_category'   => $details['fareCategory'],
+            'amount'          => $details['amount'],
+            'currency_code'   => $details['currencyCode'],
         ];
 
-        // src/Controller/Guichet/GuichetPosController.php
-
-        // 🚨 LE SEUL ET UNIQUE COMPORTEMENT V5 IMMUABLE VALIDE [Profile]
-        // On injecte absolument tout dans le constructeur natif
         $qrCode = new QrCode(
             data: $voucher['code'],
             encoding: new Encoding('UTF-8'),
@@ -121,15 +188,11 @@ class ReservationController extends AbstractController
         $qrBase64 = null;
 
         try {
-            // Rendu direct sans aucun paramètre nommé conflictuel
-            $result = $writer->write($qrCode);
-            $qrBase64 = $result->getDataUri();
-        } catch (\Exception $e) {
+            $qrBase64 = $writer->write($qrCode)->getDataUri();
+        } catch (\Exception) {
             $qrBase64 = null;
         }
 
-
-        // Configuration Dompdf pour le massicot
         $pdfOptions = new Options();
         $pdfOptions->set('defaultFont', 'Arial');
         $pdfOptions->set('isHtml5ParserEnabled', true);
@@ -137,20 +200,28 @@ class ReservationController extends AbstractController
         $dompdf = new Dompdf($pdfOptions);
 
         $html = $this->renderView('admin/agency/reservation/voucher.html.twig', [
-            'agency_name' => 'TransKin Express',
-            'voucher' => $voucher,
-            'qr_base64' => $qrBase64
+            'agency_name' => (string) $actor->getAgency()?->getName(),
+            'voucher'     => $voucher,
+            'qr_base64'   => $qrBase64,
         ]);
 
         $dompdf->loadHtml($html);
-
-        // Figeage du papier thermique 80mm x 260mm (en points PostScript)
         $dompdf->setPaper([0, 0, 250.00, 737.00], 'portrait');
         $dompdf->render();
 
         return new Response($dompdf->output(), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="Bon_Gare.pdf"'
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => sprintf('inline; filename="Bon_%s.pdf"', $voucher['code']),
         ]);
-    } //printVoucherPdf
+    }
+
+    private function requireAgencyReservation(string $reference): Reservation
+    {
+        $reservation = $this->reservationService->findAgencyReservationByReference($this->actor()->getAgency(), $reference);
+        if (!$reservation instanceof Reservation) {
+            throw $this->createNotFoundException('Réservation introuvable dans votre agence.');
+        }
+
+        return $reservation;
+    }
 }

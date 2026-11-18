@@ -1,19 +1,15 @@
-{# templates/guichet/reservation/ticket_voucher_pdf.html.twig #}
+{# templates/admin/agency/reservation/voucher.html.twig #}
 <!DOCTYPE html>
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
         <title>Bon Réserve {{ voucher.code }}</title>
-    
-        <style>
-            @import url("https://cloudflare.com");
 
-            /* 🚨 CALIBRATION STRICTE CONTRE LA TRONCATURE ET LES COUPURES */
+        <style>
             @page {
                 margin: 0mm;
                 size: 80mm 260mm;
             }
-
             body {
                 font-family: "Helvetica", "Arial", sans-serif;
                 color: #000000;
@@ -23,19 +19,16 @@
                 padding: 6px;
                 margin: 20px 0;
             }
-
-            /* Conteneur bridé en pixels pour l'extrémité droite */
             .ticket-thermal-container {
                 width: 250px;
                 max-width: 250px;
-                border: 1px dashed #d94516; /* Bordure d'alerte orange danger pour le statut temporaire */
+                border: 1px dashed #d94516;
                 padding: 15px 8px 8px 8px;
                 border-radius: 6px;
                 box-sizing: border-box;
                 background: #ffffff;
                 margin: 0 auto;
             }
-
             .text-center {
                 text-align: center;
             }
@@ -45,7 +38,6 @@
             .font-bold {
                 font-weight: bold;
             }
-
             .agency-title {
                 font-size: 13px;
                 font-weight: 900;
@@ -61,7 +53,6 @@
                 border-bottom: 2px solid #d94516;
                 padding-bottom: 4px;
             }
-
             .voucher-title {
                 font-size: 11px;
                 font-weight: 900;
@@ -80,8 +71,6 @@
                 display: inline-block;
                 margin-bottom: 8px;
             }
-
-            /* Alerte Expiration Imprimée */
             .expiration-notice-box {
                 background: rgba(217, 69, 22, 0.06);
                 border: 1px dashed #d94516;
@@ -92,8 +81,6 @@
                 color: #d94516;
                 font-weight: bold;
             }
-
-            /* Grille Technique bloquée à droite */
             .table-ticket-details {
                 width: 100%;
                 border-collapse: collapse;
@@ -120,13 +107,12 @@
                 color: #0c326d;
                 font-weight: bold;
             }
-
             .seat-flash-box {
                 background: rgba(239, 110, 23, 0.06);
                 border: 1px solid #ef6e17;
                 border-radius: 5px;
                 padding: 6px;
-                margin-vertical: 6px;
+                margin: 6px 0;
                 text-align: center;
             }
             .seat-number-massive {
@@ -143,7 +129,6 @@
                 display: block;
                 margin-top: 1px;
             }
-
             .price-total-box {
                 border: 1px solid #1684c5;
                 background: #ffffff;
@@ -155,7 +140,6 @@
                 margin-bottom: 8px;
                 text-align: center;
             }
-
             .qr-code-zone {
                 margin: 8px 0;
                 text-align: center;
@@ -166,7 +150,6 @@
                 height: 75px;
                 display: inline-block;
             }
-
             .barcode-placeholder {
                 border-top: 1px dashed #afd3e7;
                 padding-top: 6px;
@@ -181,13 +164,12 @@
     <body>
 
         <div class="ticket-thermal-container text-center">
-    
+
             <h2 class="agency-title">{{ agency_name }}</h2>
             <div class="agency-subtitle">BON DE RÉSERVATION TEMPORAIRE</div>
 
-            {# ALERTE DE VALIDITÉ #}
             <div class="expiration-notice-box">
-                <i class="fa-solid fa-triangle-exclamation"></i> PAR REGLÈMENT : EXPIRE À H-2 DU DÉPART
+                PAR RÈGLEMENT : EXPIRE À H-2 DU DÉPART
             </div>
 
             <div class="voucher-title">Référence Dossier</div>
@@ -208,11 +190,11 @@
                         <td class="col-value">{{ voucher.trip_code }}</td>
                     </tr>
                     <tr>
-                        <td class="col-label"><i class="fa-solid fa-up-long" style="color: #1684c5;"></i> Arrêt Embarque :</td>
+                        <td class="col-label">Arrêt Embarque :</td>
                         <td class="col-value" style="color: #1684c5;">{{ voucher.departure_stop }}</td>
                     </tr>
                     <tr>
-                        <td class="col-label"><i class="fa-solid fa-down-long" style="color: #d94516;"></i> Arrêt Débarque :</td>
+                        <td class="col-label">Arrêt Débarque :</td>
                         <td class="col-value" style="color: #d94516;">{{ voucher.arrival_stop }}</td>
                     </tr>
                     <tr>
@@ -224,14 +206,13 @@
 
             <div class="seat-flash-box">
                 <span class="seat-number-massive">{{ voucher.seat_number }}</span>
-                <span class="seat-label-sub"><i class="fa-solid fa-chair"></i> Siège Pré-bloqué ({{ voucher.fare_category }})</span>
+                <span class="seat-label-sub">Siège Pré-bloqué ({{ voucher.fare_category }})</span>
             </div>
 
             <div class="price-total-box">
                 TARIF À SOLDER : <span class="monospace">{{ voucher.amount|number_format(2, ',', ' ') }} {{ voucher.currency_code }}</span>
             </div>
 
-            {# QR CODE LOCAL INDÉTRONCABLE #}
             {% if qr_base64 %}
                 <div class="qr-code-zone">
                     <img class="qr-image-frame" src="{{ qr_base64 }}" alt="QR Code Validation">

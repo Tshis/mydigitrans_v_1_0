@@ -114,14 +114,16 @@ final class TripOperationService
     }
 
     /**
-     * Extrait les passagers confirmés (billets émis) et réservés sur ce voyage.
+     * Extrait les passagers confirmés (billets émis) et réservés (guichet + public) sur ce voyage.
      *
      * @return list<array<string, mixed>>
      */
     public function getTripManifest(Trip $trip): array
     {
         $passengers = [];
+        $now = new \DateTimeImmutable();
 
+        // 1. Billets payés/actifs émis sur ce voyage
         /** @var list<Ticket> $tickets */
         $tickets = $this->em->createQueryBuilder()
             ->select('tk', 'ts', 's', 'res', 'dep', 'arr')
@@ -157,13 +159,18 @@ final class TripOperationService
             ];
         }
 
+        // 2. Sièges réservés en attente de paiement (guichet Reserved + retenues publiques Held en cours)
         foreach ($trip->getTripSeats() as $ts) {
             $seat = $ts->getSeat();
             $res  = $ts->getReservation();
             if (null === $seat || isset($coveredSeatIds[$seat->getId()]) || !$res instanceof Reservation) {
                 continue;
             }
-            if (TripSeatStatus::Reserved === $ts->getSeatStatus() && ReservationStatus::Pending === $res->getStatus()) {
+
+            $isActiveHold = TripSeatStatus::Held === $ts->getSeatStatus()
+                && (null === $ts->getHeldUntil() || $ts->getHeldUntil() >= $now);
+
+            if ((TripSeatStatus::Reserved === $ts->getSeatStatus() || $isActiveHold) && ReservationStatus::Pending === $res->getStatus()) {
                 $client = $res->getUser();
                 $passengers[] = [
                     'seat'          => (string) $seat->getSeatLabel(),
@@ -180,6 +187,8 @@ final class TripOperationService
 
         return $passengers;
     }
+
+
 
     /**
      * Fait évoluer le statut du voyage (boarding, departed, arrived, cancelled) avec protections métier et AuditLog.

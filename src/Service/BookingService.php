@@ -158,7 +158,7 @@ final readonly class BookingService
             throw new BookingException('Veuillez choisir au moins un siège sur le plan du bus.');
         }
 
-        // 2. ◄ VÉRIFICATION & EXTRACTION DE TOUS LES TRIPSEATS CONCERNÉS
+        // 2. Vérification et extraction de tous les TripSeats concernés
         $tripSeats = [];
         foreach ($seatsList as $seatLabel) {
             $tripSeat = $this->em->getRepository(TripSeat::class)->createQueryBuilder('ts')
@@ -171,18 +171,14 @@ final readonly class BookingService
                 ->getQuery()
                 ->getOneOrNullResult();
 
-            // SÉCURITÉ CONCURRENCE : Contrôle de disponibilité pour chaque siège de la liste
             if (!$tripSeat || $tripSeat->getSeatStatus() !== TripSeatStatus::Available) {
-
                 throw new BookingException(sprintf('Désolé, le siège %s n\'est plus disponible.', $seatLabel));
             }
-
-
 
             $tripSeats[] = $tripSeat;
         }
 
-        // 3. Gestion anti-doublon de l'identité du voyageur
+        // 3. Gestion de l'identité du voyageur (ne jamais écraser un compte agent ou plateforme connecté)
         $parts = array_filter(explode(' ', trim((string) $data->fullName)));
         $firstname = array_shift($parts) ?? 'Passager';
         $lastname = !empty($parts) ? implode(' ', $parts) : 'Client';
@@ -190,7 +186,10 @@ final readonly class BookingService
         $cleanPhone = preg_replace('/[^0-9]/', '', (string) $data->phone);
         $generatedEmail = sprintf('rsv.%s@mydigitrans.local', $cleanPhone ?: bin2hex(random_bytes(4)));
 
-        $user = $currentUser;
+        $user = ($currentUser instanceof User && UserType::Client === $currentUser->getUserType())
+            ? $currentUser
+            : null;
+
         if (!$user) {
             $user = $this->em->getRepository(User::class)->findOneBy(['email' => $generatedEmail]);
         }
@@ -218,9 +217,9 @@ final readonly class BookingService
         // 4. Calcul du montant cumulé (Prix par siège x Nombre de sièges)
         $quote = $this->quote($trip, $departure, $arrival, SeatType::Normal, $now);
         $unitPrice = (float) $quote['amount'];
-        $totalAmount = $unitPrice * count($tripSeats); // Cumul financier global
+        $totalAmount = $unitPrice * count($tripSeats);
 
-        // 5. Génération de la Réservation unique avec ton timestamp séquentiel
+        // 5. Génération de la Réservation unique
         $reference = $this->generateReference();
 
         $reservation = (new Reservation())
@@ -231,20 +230,20 @@ final readonly class BookingService
             ->setAgency($trip->getRoute()?->getAgency())
             ->setUser($user)
             ->setStatus(ReservationStatus::Pending)
-            ->setTotalAmount((string) $totalAmount) // Enregistre la somme totale (ex: 30 000 CDF pour 2 places)
+            ->setTotalAmount((string) $totalAmount)
             ->setCurrency($quote['currency'])
             ->setCreatedBy($currentUser ?? $user);
 
         $this->em->persist($reservation);
 
-        // 6. ◄ VERROUILLAGE DE TOUS LES SIÈGES RETENUS DANS LA BD
+        // 6. Verrouillage de tous les sièges retenus
         foreach ($tripSeats as $ts) {
             $ts->setSeatStatus(TripSeatStatus::Held);
             $ts->setHeldUntil($now->modify('+15 minutes'));
             $ts->setReservation($reservation);
         }
 
-        // 7. Flush unique de la transaction complète dans PostgreSQL
+        // 7. Flush unique de la transaction
         $this->em->flush();
 
         return $reservation;
@@ -255,15 +254,15 @@ final readonly class BookingService
      */
     public function confirmStationPayment(Reservation $reservation, \DateTimeImmutable $now): void
     {
-        $tripSeat = $this->em->getRepository(TripSeat::class)->findOneBy(['reservation' => $reservation]);
+        $tripSeats = $this->em->getRepository(TripSeat::class)->findBy(['reservation' => $reservation]);
 
         $reservation->setStatus(ReservationStatus::Pending);
         $deadline = $this->stationDeadline($reservation, $now);
         $reservation->setExpiresAt($deadline);
 
-        if ($tripSeat) {
-            $tripSeat->setSeatStatus(TripSeatStatus::Held);
-            $tripSeat->setHeldUntil($deadline);
+        foreach ($tripSeats as $ts) {
+            $ts->setSeatStatus(TripSeatStatus::Reserved);
+            $ts->setHeldUntil($deadline);
         }
 
         $this->em->flush();

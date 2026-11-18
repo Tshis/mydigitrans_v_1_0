@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Service central de traçabilité et d'audit de sécurité (AuditLog).
+ * Service central de traçabilité légère et d'audit de sécurité (AuditLog).
  */
 final class AuditLogger
 {
@@ -26,7 +26,7 @@ final class AuditLogger
     ) {}
 
     /**
-     * Enregistre une entrée immuable dans le journal d'audit.
+     * Enregistre une entrée d'audit compacte (uniquement le delta des champs critiques).
      *
      * @param array<string, mixed>|null $oldValues
      * @param array<string, mixed>|null $newValues
@@ -48,20 +48,35 @@ final class AuditLogger
             }
         }
 
-        $request = $this->requestStack->getCurrentRequest();
-        $userAgent = $request?->headers->get('User-Agent');
+        // Utilise getMainRequest() pour éviter les sous-requêtes internes
+        $request = $this->requestStack->getMainRequest() ?? $this->requestStack->getCurrentRequest();
+        $rawUa = (string) ($request?->headers->get('User-Agent') ?? '');
         $ipAddress = $request?->getClientIp();
+
+        // Ne conserver que les clés qui ont réellement changé
+        if (null !== $oldValues && null !== $newValues) {
+            $diffOld = [];
+            $diffNew = [];
+            foreach ($newValues as $key => $val) {
+                if (!\array_key_exists($key, $oldValues) || $oldValues[$key] !== $val) {
+                    $diffOld[$key] = $oldValues[$key] ?? null;
+                    $diffNew[$key] = $val;
+                }
+            }
+            $oldValues = [] !== $diffOld ? $diffOld : null;
+            $newValues = [] !== $diffNew ? $diffNew : null;
+        }
 
         $audit = new AuditLog();
         $audit->setUser($resolvedUser)
             ->setAction($action)
             ->setEntityName($entityName)
             ->setEntityId($entityId)
-            ->setOldValues($oldValues)
-            ->setNewValues($newValues)
+            ->setOldValues([] !== $oldValues ? $oldValues : null)
+            ->setNewValues([] !== $newValues ? $newValues : null)
             ->setIpAddress(null !== $ipAddress ? mb_substr($ipAddress, 0, 45) : null)
-            ->setDeviceType($this->detectDeviceType($request, $userAgent))
-            ->setUserAgent(null !== $userAgent ? mb_substr($userAgent, 0, 500) : null);
+            ->setDeviceType($this->detectDeviceType($request, $rawUa))
+            ->setUserAgent('' !== $rawUa ? $this->summarizeUserAgent($rawUa) : null);
 
         $this->em->persist($audit);
 
@@ -73,7 +88,7 @@ final class AuditLogger
     }
 
     /**
-     * Retourne les logs d'audit formatés pour la console Plateforme (tout le système).
+     * Retourne les logs d'audit formatés pour la console Plateforme.
      *
      * @return list<array<string, mixed>>
      */
@@ -93,7 +108,7 @@ final class AuditLogger
     }
 
     /**
-     * Retourne les logs d'audit formatés pour une Agence (actions des utilisateurs de l'agence).
+     * Retourne les logs d'audit formatés pour une Agence.
      *
      * @return list<array<string, mixed>>
      */
@@ -142,17 +157,13 @@ final class AuditLogger
         return $out;
     }
 
-    private function detectDeviceType(?Request $request, ?string $userAgent): DeviceType
+    private function detectDeviceType(?Request $request, string $rawUa): DeviceType
     {
         if (null !== $request && 'pos' === strtolower((string) $request->headers->get('X-Device-Type', ''))) {
             return DeviceType::Pos;
         }
 
-        if (null === $userAgent || '' === $userAgent) {
-            return DeviceType::Desktop;
-        }
-
-        $ua = strtolower($userAgent);
+        $ua = strtolower($rawUa);
         if (str_contains($ua, 'pos') || str_contains($ua, 'sunmi') || str_contains($ua, 'pax')) {
             return DeviceType::Pos;
         }
@@ -162,5 +173,32 @@ final class AuditLogger
         }
 
         return DeviceType::Desktop;
+    }
+
+    /**
+     * Compacte la chaîne User-Agent (ex: "Chrome / Windows" ou "Safari / iPhone") pour économiser l'espace DB.
+     */
+    private function summarizeUserAgent(string $rawUa): string
+    {
+        $browser = match (true) {
+            str_contains($rawUa, 'Edg/')     => 'Edge',
+            str_contains($rawUa, 'OPR/'), str_contains($rawUa, 'Opera') => 'Opera',
+            str_contains($rawUa, 'Chrome/')  => 'Chrome',
+            str_contains($rawUa, 'Firefox/') => 'Firefox',
+            str_contains($rawUa, 'Safari/') && !str_contains($rawUa, 'Chrome') => 'Safari',
+            default                          => 'Navigateur',
+        };
+
+        $os = match (true) {
+            str_contains($rawUa, 'Windows') => 'Windows',
+            str_contains($rawUa, 'Android') => 'Android',
+            str_contains($rawUa, 'iPhone')  => 'iPhone',
+            str_contains($rawUa, 'iPad')    => 'iPad',
+            str_contains($rawUa, 'Mac OS')  => 'macOS',
+            str_contains($rawUa, 'Linux')   => 'Linux',
+            default                         => 'Autre OS',
+        };
+
+        return sprintf('%s / %s', $browser, $os);
     }
 }

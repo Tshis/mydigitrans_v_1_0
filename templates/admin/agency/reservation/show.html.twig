@@ -1,4 +1,4 @@
-{# templates/admin/agency/booking/show.html.twig #}
+{# templates/admin/agency/reservation/show.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
@@ -8,6 +8,14 @@
 
 {% block body %}
 	<div class="admin-booking-show-scope container">
+
+		{% for message in app.flashes('success') %}
+			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+		{% endfor %}
+
+		{% for message in app.flashes('error') %}
+			<div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+		{% endfor %}
 
 		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header mb-25">
@@ -20,30 +28,45 @@
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
-					<h2>Bon de Réservation N° RVS-2026-8943</h2>
+					<h2>Bon de Réservation N° {{ reservation.reference }}</h2>
 					<div class="mt-5 sub-header-flex">
-						<span class="badge-status-pending">En attente de paiement</span>
-						<span class="text-gray text-size-13">Émis par : Guichet Kinshasa (Session #12)</span>
+						{% if reservation.status == 'paid' %}
+							<span class="badge-status-confirmed">{{ reservation.statusLabel }}</span>
+						{% elseif reservation.status == 'pending' %}
+							<span class="badge-status-pending">{{ reservation.statusLabel }}</span>
+						{% else %}
+							<span class="badge badge-danger-status">{{ reservation.statusLabel }}</span>
+						{% endif %}
+						<span class="text-gray text-size-13">Émis par : {{ reservation.issuerLabel }}</span>
 					</div>
 				</div>
 			</div>
 			<div class="admin-action-zone">
-				<a href="{{ path('admin_agency_reservation_print_voucher', {'reference': 'RSV-01-002'}) }}" class="btn-refined btn-dark-gradient">
+				<a href="{{ path('admin_agency_reservation_print_voucher', {'reference': reservation.reference}) }}" class="btn-refined btn-dark-gradient" target="_blank">
 					<i class="fa-solid fa-print"></i>
 					Imprimer le Bon
 				</a>
 			</div>
 		</header>
 
-		{# --- BLOC ALERT TEMPOREL D'EXPIRATION --- #}
-		<div class="booking-expiration-alert-bar mb-25">
-			<div class="alert-message">
-				<i class="fa-solid fa-clock-history"></i>
-				<span>Attention : Cette réservation expirera automatiquement le
-					<strong>14/07/2026 à 12h30</strong>
-					(2h avant le départ) si aucun versement n'est enregistré.</span>
+		{# --- BLOC ALERTE TEMPORELLE D'EXPIRATION --- #}
+		{% if reservation.status == 'pending' and reservation.expiresAt %}
+			<div class="booking-expiration-alert-bar mb-25">
+				<div class="alert-message">
+					<i class="fa-solid fa-clock-history"></i>
+					<span>Attention : Cette réservation expirera automatiquement le
+						<strong>{{ reservation.expiresAt|date('d/m/Y à H\\hi') }}</strong>
+						si aucun versement n'est enregistré.</span>
+				</div>
 			</div>
-		</div>
+		{% endif %}
+
+		{# --- MOTIF D'ANNULATION SI ANNULÉE --- #}
+		{% if reservation.status == 'cancelled' and reservation.cancellationReason %}
+			<div class="notice-box-danger-dashboard text-danger mb-25">
+				<p><strong>Motif d'annulation :</strong> {{ reservation.cancellationReason }}</p>
+			</div>
+		{% endif %}
 
 		{# --- LAYOUT DEUX COLONNES RESPONSIVE --- #}
 		<div class="booking-details-layout">
@@ -60,13 +83,12 @@
 					<div class="info-grid-details">
 						<div class="info-item">
 							<span class="info-label">Nom complet</span>
-							<p class="info-value">Mputu Antoinette</p>
+							<p class="info-value">{{ reservation.passengerName }}</p>
 						</div>
 						<div class="info-item">
 							<span class="info-label">Téléphone</span>
-							<p class="info-value">+243 897 112 233</p>
+							<p class="info-value">{{ reservation.passengerPhone }}</p>
 						</div>
-
 					</div>
 				</div>
 
@@ -79,36 +101,36 @@
 					<div class="info-grid-details">
 						<div class="info-item">
 							<span class="info-label">Code Voyage</span>
-							<p class="info-value">TRP-2026-0042</p>
+							<p class="info-value">{{ reservation.tripCode|upper }}</p>
 						</div>
 						<div class="info-item">
 							<span class="info-label">Trajet</span>
-							<p class="info-value">Kinshasa → Kenge</p>
+							<p class="info-value">{{ reservation.segment }}</p>
 						</div>
 						<div class="info-item">
 							<span class="info-label">Date & Heure</span>
-							<p class="info-value">14/07/2026 à 14h30</p>
+							<p class="info-value">{{ reservation.departureDate|date('d/m/Y') }} à {{ reservation.departureTime }}</p>
 						</div>
 						<div class="info-item">
 							<span class="info-label">Véhicule Assigné</span>
-							<p class="info-value">Bus 01 (Marcopolo)</p>
+							<p class="info-value">{{ reservation.busLabel }}</p>
 						</div>
 					</div>
 				</div>
 
 			</div>
 
-			{# COLONNE DROITE : ATTRIBUTION LOGISTIQUE ET ACTIONS DE REDIRECTION #}
+			{# COLONNE DROITE : ATTRIBUTION LOGISTIQUE ET ACTIONS GUICHET #}
 			<aside class="layout-sidebar-panel">
 
 				{# Carte de Siège #}
 				<div class="detail-card-box text-center mb-20 highlight-seat-box">
 					<span class="info-label">SIÈGE ATTRIBUÉ</span>
-					<div class="seat-badge-display">14</div>
-					<span class="seat-fare-label">Classe Standard</span>
+					<div class="seat-badge-display">{{ reservation.seatNumber }}</div>
+					<span class="seat-fare-label">{{ reservation.fareCategory }}</span>
 				</div>
 
-				{# Carte d'encaissement future #}
+				{# Carte d'encaissement et d'annulation #}
 				<div class="detail-card-box action-routing-box mb-20">
 					<h3 class="box-title">
 						<i class="fa-solid fa-cash-register"></i>
@@ -117,43 +139,43 @@
 
 					<div class="billing-estimation-zone mb-20">
 						<span class="info-label">Montant à percevoir en caisse :</span>
-						<p class="estimated-price">45 000 CDF</p>
+						<p class="estimated-price">{{ reservation.amount|number_format(2, ',', ' ') }} {{ reservation.currencyCode }}</p>
 					</div>
 
-					<div class="sidebar-action-buttons">
-						{# Redirection directe vers la caisse avec l'ID du bon #}
-						<a href="#" class="btn btn-pay-trigger btn-refined btn-success-gradient">
-							<i class="fa-solid fa-money-bill-transfer"></i>
-							Envoyer à la Caisse
-						</a>
+					{% if reservation.status == 'pending' %}
+						<div class="sidebar-action-buttons">
+							<a href="#" class="btn btn-pay-trigger btn-refined btn-success-gradient">
+								<i class="fa-solid fa-money-bill-transfer"></i>
+								Envoyer à la Caisse
+							</a>
 
-						{# Lien d'annulation manuelle #}
-						<a href="#" class="btn btn-cancel-trigger " id="cancelBtn">
-							<i class="fa-solid fa-trash-can"></i>
-							Annuler la réservation
-						</a>
-					</div>
+							{% if is_granted('reservation.write') %}
+								<a href="#" class="btn btn-cancel-trigger" id="cancelBtn">
+									<i class="fa-solid fa-trash-can"></i>
+									Annuler la réservation
+								</a>
+							{% endif %}
+						</div>
 
-					<div id="cancel-reason" class="my-20 cancellation-box">
+						{% if is_granted('reservation.write') %}
+							<div id="cancel-reason" class="my-20 cancellation-box">
+								<form action="{{ path('admin_agency_reservation_cancel', {'reference': reservation.reference}) }}" method="POST">
+									<input type="hidden" name="_token" value="{{ csrf_token('cancel_reservation_' ~ reservation.reference) }}">
+									<div class="field">
+										<label for="cancellation_reason" class="text-size-15">Motif d'annulation</label>
+										<p class="warning text-danger text-size-10 text-weight-700">
+											<i class="fa-solid fa-triangle-exclamation"></i>
+											Cette action est irréversible
+										</p>
+										<textarea name="cancellation_reason" id="cancellation_reason" required></textarea>
+									</div>
 
-						<form action="">
-
-							<div class="field">
-								<label for="cancellation_reason" class="text-size-15">Motif d'annulation</label>
-								<p class="warning text-danger text-size-10 text-weight-700 ">
-									<i class="fa-solid fa-triangle-exclamation"></i>
-									Cette action est irreversible
-								</p>
-								<textarea name="cancellation_reason" id="cancellation_reason"></textarea>
+									<button type="button" class="btn-refined btn-dark-gradient" id="cancel2">Fermer</button>
+									<button type="submit" class="btn-refined btn-danger-gradient">Confirmer</button>
+								</form>
 							</div>
-
-
-							<button type="button" class="btn-refined btn-dark-gradient" id="cancel2">Annuler</button>
-							<button type="submit" class="btn-refined btn-danger-gradient">Confirmer</button>
-
-						</form>
-
-					</div>
+						{% endif %}
+					{% endif %}
 
 				</div>
 

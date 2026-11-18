@@ -180,6 +180,11 @@
             background-color: rgba($primary, 0.12); color: $primary;
             padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap;
         }
+
+        .badge-status-danger {
+            background-color: rgba($danger, 0.12); color: $danger;
+            padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; white-space: nowrap;
+        }
     }
 
     // --- CORRECTIF DE DÉCALAGE : CELLULES DES BOUTONS D'ACTION DU TABLEAU ---
