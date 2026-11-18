@@ -9,6 +9,7 @@ use App\Entity\Agency;
 use App\Entity\Trip;
 use App\Entity\TripSeat;
 use App\Entity\User;
+use App\Enum\BusStatus;
 use App\Enum\SeatType;
 use App\Enum\TripSeatStatus;
 use App\Enum\TripStatus;
@@ -25,6 +26,10 @@ final class TripPlanningService
 {
     /** Rôle (portée « agence ») des chauffeurs : un utilisateur qui l'a, non révoqué, peut être affecté à un voyage. */
     public const DRIVER_ROLE_CODE = 'ROLE_DRIVER';
+
+    /** Temps minimum de rotation/repos (en minutes) entre l'arrivée d'un bus et son prochain départ. */
+    private const TURNAROUND_MINUTES = 120;
+
 
     /** Un bus ou un chauffeur déjà affecté à un voyage dans l'un de ces statuts n'est plus disponible. */
     private const BUSY_STATUSES = [TripStatus::Scheduled, TripStatus::Boarding, TripStatus::Departed];
@@ -57,6 +62,11 @@ final class TripPlanningService
             if ($bus->getAgency()?->getId() !== $agency->getId()) {
                 $errors['bus_id'] = 'Ce bus n\'appartient pas à votre agence.';
             }
+
+            if (BusStatus::Active !== $bus->getStatus()) {
+                $errors['bus_id'] = 'Ce bus n\'est pas actif et ne peut pas être planifié.';
+            }
+
 
             $errors += $this->conflicts($data, $departureAt, $arrivalAt);
 
@@ -114,40 +124,74 @@ final class TripPlanningService
      *
      * @return array<string, string> champ => message
      */
+    /**
+     * Le bus, le chauffeur et le convoyeur ne peuvent pas être sur deux voyages qui se chevauchent,
+     * et le bus doit repartir de la ville où il est arrivé lors de son voyage précédent.
+     *
+     * @return array<string, string> champ => message
+     */
     private function conflicts(TripPlanningData $data, \DateTimeImmutable $departureAt, \DateTimeImmutable $arrivalAt): array
     {
         $people = array_values(array_filter([$data->driver?->getId(), $data->coDriver?->getId()]));
 
         /** @var list<Trip> $candidates */
         $candidates = $this->em->createQueryBuilder()
-            ->select('t')
+            ->select('t', 'r')
             ->from(Trip::class, 't')
+            ->join('t.route', 'r')
             ->andWhere('t.status IN (:statuses)')
             ->andWhere('t.departureDate <= :to')
             ->andWhere('t.arrivalDate >= :from')
             ->andWhere('(IDENTITY(t.bus) = :bus OR IDENTITY(t.driver) IN (:people) OR IDENTITY(t.coDriver) IN (:people))')
             ->setParameter('statuses', array_map(static fn(TripStatus $s): string => $s->value, self::BUSY_STATUSES))
-            ->setParameter('from', $departureAt->modify('-1 day'), Types::DATE_IMMUTABLE)
-            ->setParameter('to', $arrivalAt->modify('+1 day'), Types::DATE_IMMUTABLE)
+            ->setParameter('from', $departureAt->modify('-3 days'), Types::DATE_IMMUTABLE)
+            ->setParameter('to', $arrivalAt->modify('+3 days'), Types::DATE_IMMUTABLE)
             ->setParameter('bus', $data->bus?->getId())
             ->setParameter('people', [] === $people ? [0] : $people)
             ->getQuery()
             ->getResult();
 
         $errors = [];
+        $buffer = sprintf('+%d minutes', self::TURNAROUND_MINUTES);
+        [$newOriginCity,] = $this->routeEndpoints($data->route);
+
+        $latestPreviousTripForBus = null;
+        $latestPreviousArrival = null;
 
         foreach ($candidates as $other) {
             $otherDeparture = $this->at($other->getDepartureDate(), $other->getDepartureTime());
-            $otherArrival = $this->at($other->getArrivalDate(), $other->getArrivalTime());
+            $otherArrival   = $this->at($other->getArrivalDate(), $other->getArrivalTime());
 
-            if (null === $otherDeparture || null === $otherArrival || $otherDeparture >= $arrivalAt || $otherArrival <= $departureAt) {
+            if (null === $otherDeparture || null === $otherArrival) {
                 continue;
             }
 
             $code = (string) $other->getCode();
+            $isSameBus = $other->getBus()?->getId() === $data->bus?->getId();
 
-            if ($other->getBus()?->getId() === $data->bus?->getId()) {
-                $errors['bus_id'] ??= sprintf('Ce bus est déjà affecté au voyage %s sur cette période.', $code);
+            // 1. Repérer le dernier voyage du bus qui se termine AVANT le nouveau départ (pour vérifier la ville)
+            if ($isSameBus && $otherArrival <= $departureAt) {
+                if (null === $latestPreviousArrival || $otherArrival > $latestPreviousArrival) {
+                    $latestPreviousArrival = $otherArrival;
+                    $latestPreviousTripForBus = $other;
+                }
+            }
+
+            // 2. Vérifier le chevauchement horaire + temps de battement (120 min)
+            $otherFreeAt = $otherArrival->modify($buffer);
+            $newFreeAt   = $arrivalAt->modify($buffer);
+
+            if ($otherDeparture >= $newFreeAt || $otherFreeAt <= $departureAt) {
+                continue;
+            }
+
+            if ($isSameBus) {
+                $errors['bus_id'] ??= sprintf(
+                    'Ce bus est occupé par le voyage %s (arrivée le %s, disponible à partir de %s).',
+                    $code,
+                    $otherArrival->format('d/m à H\hi'),
+                    $otherFreeAt->format('d/m à H\hi')
+                );
             }
 
             $crew = [$other->getDriver()?->getId(), $other->getCoDriver()?->getId()];
@@ -160,8 +204,90 @@ final class TripPlanningService
             }
         }
 
+        // 3. Vérification géographique : le bus doit repartir de la ville où il est arrivé !
+        if (null !== $latestPreviousTripForBus && null !== $newOriginCity && !isset($errors['bus_id'])) {
+            [, $previousDestinationCity] = $this->routeEndpoints($latestPreviousTripForBus->getRoute());
+
+            if (
+                null !== $previousDestinationCity
+                && mb_strtolower($previousDestinationCity) !== mb_strtolower($newOriginCity)
+            ) {
+                $errors['bus_id'] = sprintf(
+                    'Incohérence géographique : ce bus arrivera à %s le %s (voyage %s) et ne peut pas repartir directement depuis %s.',
+                    $previousDestinationCity,
+                    $latestPreviousArrival->format('d/m/Y à H\hi'),
+                    (string) $latestPreviousTripForBus->getCode(),
+                    $newOriginCity
+                );
+            }
+        }
+
+        // 4. Vérification géographique symétrique : le bus doit arriver dans la ville d'où part son prochain voyage déjà planifié !
+        $earliestNextTripForBus = null;
+        $earliestNextDeparture = null;
+
+        foreach ($candidates as $other) {
+            if ($other->getBus()?->getId() !== $data->bus?->getId()) {
+                continue;
+            }
+            $otherDep = $this->at($other->getDepartureDate(), $other->getDepartureTime());
+            if (null !== $otherDep && $otherDep >= $arrivalAt) {
+                if (null === $earliestNextDeparture || $otherDep < $earliestNextDeparture) {
+                    $earliestNextDeparture = $otherDep;
+                    $earliestNextTripForBus = $other;
+                }
+            }
+        }
+
+        [, $newDestinationCity] = $this->routeEndpoints($data->route);
+        if (null !== $earliestNextTripForBus && null !== $newDestinationCity && !isset($errors['bus_id'])) {
+            [$nextOriginCity,] = $this->routeEndpoints($earliestNextTripForBus->getRoute());
+
+            if (null !== $nextOriginCity && mb_strtolower($nextOriginCity) !== mb_strtolower($newDestinationCity)) {
+                $errors['bus_id'] = sprintf(
+                    'Incohérence géographique : ce bus doit repartir de %s le %s (voyage %s) et ne peut pas terminer ce trajet à %s.',
+                    $nextOriginCity,
+                    $earliestNextDeparture->format('d/m/Y à H\hi'),
+                    (string) $earliestNextTripForBus->getCode(),
+                    $newDestinationCity
+                );
+            }
+        }
+
+
         return $errors;
     }
+
+    /**
+     * Retourne [ville de départ, ville d'arrivée finale] d'une route d'après ses RouteStops actifs.
+     *
+     * @return array{0: ?string, 1: ?string}
+     */
+    private function routeEndpoints(?\App\Entity\Route $route): array
+    {
+        if (null === $route) {
+            return [null, null];
+        }
+
+        $stops = [];
+        foreach ($route->getRouteStops() as $stop) {
+            if ($stop->isActive()) {
+                $stops[] = $stop;
+            }
+        }
+
+        if ([] === $stops) {
+            return [null, null];
+        }
+
+        usort($stops, static fn($a, $b): int => $a->getStopOrder() <=> $b->getStopOrder());
+
+        $firstCity = trim((string) reset($stops)->getCity());
+        $lastCity  = trim((string) end($stops)->getCity());
+
+        return ['' !== $firstCity ? $firstCity : null, '' !== $lastCity ? $lastCity : null];
+    }
+
 
     private function at(?\DateTimeInterface $date, ?\DateTimeInterface $time): ?\DateTimeImmutable
     {

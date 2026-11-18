@@ -114,15 +114,12 @@
 					{% endif %}
 
 					{% if trip.status in ['scheduled', 'boarding'] %}
-						<form method="POST" action="{{ path('admin_agency_trip_status', {'code': trip.code}) }}" style="display:inline;" onsubmit="return confirm('Annuler définitivement ce départ ?');">
-							<input type="hidden" name="_token" value="{{ csrf_token('trip_status_' ~ trip.code) }}">
-							<input type="hidden" name="target_status" value="cancelled">
-							<button type="submit" class="btn btn-danger-action">
-								<i class="fa-solid fa-rectangle-xmark"></i>
-								Annuler
-							</button>
-						</form>
+						<button type="button" class="btn btn-danger-action" id="open-cancel-trip-modal">
+							<i class="fa-solid fa-rectangle-xmark"></i>
+							Annuler
+						</button>
 					{% endif %}
+
 				</div>
 			{% endif %}
 		</div>
@@ -242,4 +239,158 @@
 
 		</div>
 	</div>
+
+	{# MODAL SPECIAL  #}
+	{% if is_granted('trip.write') and trip.status in ['scheduled', 'boarding'] %}
+		<div id="cancel-trip-modal" class="mdt-modal-backdrop" aria-hidden="true">
+			<div class="mdt-modal-card" role="dialog" aria-modal="true" aria-labelledby="cancel-trip-title">
+				<div class="mdt-modal-header">
+					<div class="mdt-modal-icon-danger">
+						<i class="fa-solid fa-triangle-exclamation"></i>
+					</div>
+					<div>
+						<h3 id="cancel-trip-title">Annuler le voyage {{ trip.tripNumber }}</h3>
+						<p class="text-gray text-size-12">Cette action est irréversible et sera tracée dans le journal d'audit.</p>
+					</div>
+				</div>
+
+				<form method="POST" action="{{ path('admin_agency_trip_status', {'code': trip.code}) }}">
+					<input type="hidden" name="_token" value="{{ csrf_token('trip_status_' ~ trip.code) }}">
+					<input type="hidden" name="target_status" value="cancelled">
+
+					<div class="mdt-modal-body">
+						<p class="mb-15 text-size-13">
+							Vous êtes sur le point d'annuler le départ <strong>{{ trip.route }}</strong> prévu le
+							<strong>{{ trip.departureDate|date('d/m/Y') }} à {{ trip.departureTime }}</strong>.
+						</p>
+
+						<div class="field">
+							<label for="trip_cancel_reason" class="admin-bus-layout-add-label">Motif de l'annulation *</label>
+							<textarea
+							id="trip_cancel_reason"
+							name="cancel_reason"
+							rows="3"
+							class="admin-bus-layout-add-input"
+							placeholder="Ex : Panne mécanique imprévue, force majeure, fusion de départ..."
+							required
+						></textarea>
+						</div>
+					</div>
+
+					<div class="mdt-modal-footer">
+						<button type="button" class="btn-refined btn-gray-gradient" id="close-cancel-trip-modal">
+							Conserver le voyage
+						</button>
+						<button type="submit" class="btn-refined btn-danger-gradient">
+							<i class="fa-solid fa-ban"></i>
+							Confirmer l'annulation
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<style>
+			.mdt-modal-backdrop {
+				position: fixed;
+				inset: 0;
+				background: rgba(12, 50, 109, 0.55);
+				backdrop-filter: blur(3px);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 9999;
+				padding: 16px;
+			}
+			.mdt-modal-backdrop.is-open {
+				display: flex;
+			}
+			.mdt-modal-card {
+				background: #ffffff;
+				border-radius: 12px;
+				width: 100%;
+				max-width: 480px;
+				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+				border-top: 4px solid #d94516;
+				overflow: hidden;
+				animation: mdtModalPop 0.18s ease-out;
+			}
+			@keyframes mdtModalPop {
+				from {
+					opacity: 0;
+					transform: scale(0.95);
+				}
+				to {
+					opacity: 1;
+					transform: scale(1);
+				}
+			}
+			.mdt-modal-header {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				padding: 20px 24px 14px;
+				border-bottom: 1px solid #e5e7eb;
+			}
+			.mdt-modal-header h3 {
+				margin: 0;
+				font-size: 16px;
+				color: #0c326d;
+			}
+			.mdt-modal-icon-danger {
+				width: 42px;
+				height: 42px;
+				border-radius: 50%;
+				background: rgba(217, 69, 22, 0.12);
+				color: #d94516;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 18px;
+				flex-shrink: 0;
+			}
+			.mdt-modal-body {
+				padding: 18px 24px;
+			}
+			.mdt-modal-footer {
+				display: flex;
+				justify-content: flex-end;
+				gap: 10px;
+				padding: 14px 24px 20px;
+				background: #f9fafb;
+				border-top: 1px solid #e5e7eb;
+			}
+		</style>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				const modal = document.getElementById("cancel-trip-modal");
+				const openBtn = document.getElementById("open-cancel-trip-modal");
+				const closeBtn = document.getElementById("close-cancel-trip-modal");
+
+				if (!modal || !openBtn) return;
+
+				openBtn.addEventListener("click", () => {
+					modal.classList.add("is-open");
+					modal.setAttribute("aria-hidden", "false");
+					modal.querySelector("textarea")?.focus();
+				});
+
+				const closeModal = () => {
+					modal.classList.remove("is-open");
+					modal.setAttribute("aria-hidden", "true");
+				};
+
+				closeBtn?.addEventListener("click", closeModal);
+				modal.addEventListener("click", (e) => {
+					if (e.target === modal) closeModal();
+				});
+				document.addEventListener("keydown", (e) => {
+					if (e.key === "Escape" && modal.classList.contains("is-open"))
+						closeModal();
+				});
+			});
+		</script>
+	{% endif %}
+
 {% endblock %}

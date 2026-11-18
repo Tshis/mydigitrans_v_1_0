@@ -172,7 +172,7 @@
 				</aside>
 
 			</div>
-			{{ form_widget(form._token) }}
+		<input type="hidden" name="_token" value="{{ csrf_token('trip_plan_add') }}">
 		{{ form_end(form, {render_rest: false}) }}
 	</div>
 {% endblock %}

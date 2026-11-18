@@ -172,8 +172,14 @@ class TripPlanningType extends AbstractType
         $resolver
             ->setRequired('agency')
             ->setAllowedTypes('agency', Agency::class)
-            ->setDefaults(['data_class' => TripPlanningData::class]);
+            ->setDefaults([
+                'data_class'         => TripPlanningData::class,
+                'csrf_protection'    => false,
+                'allow_extra_fields' => true,
+            ]);
     }
+
+
 
     public function getBlockPrefix(): string
     {

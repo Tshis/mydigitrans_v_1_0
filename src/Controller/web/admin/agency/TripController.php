@@ -142,7 +142,8 @@ final class TripController extends AbstractController
         }
 
         try {
-            $this->tripOperationService->transitionStatus($trip, $targetStatus, $user);
+            $reason = trim((string) $request->request->get('cancel_reason', '')) ?: null;
+            $this->tripOperationService->transitionStatus($trip, $targetStatus, $user, $reason);
             $this->addFlash('success', 'Le statut du voyage a été mis à jour.');
         } catch (\DomainException $e) {
             $this->addFlash('error', $e->getMessage());
@@ -150,6 +151,7 @@ final class TripController extends AbstractController
 
         return $this->redirectToRoute('admin_agency_trip_show', ['code' => $trip->getCode()]);
     }
+
 
     #[Route('/admin/agency/trip/search/', name: 'admin_agency_trip_search', methods: ['GET'])]
     public function search(Request $request): Response

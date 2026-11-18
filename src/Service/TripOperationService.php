@@ -195,7 +195,7 @@ final class TripOperationService
      *
      * @throws \DomainException
      */
-    public function transitionStatus(Trip $trip, TripStatus $targetStatus, User $actor): void
+    public function transitionStatus(Trip $trip, TripStatus $targetStatus, User $actor, ?string $reason = null): void
     {
         $current = $trip->getStatus();
 
@@ -216,18 +216,31 @@ final class TripOperationService
 
         $auditAction = TripStatus::Cancelled === $targetStatus ? AuditAction::Cancel : AuditAction::Update;
 
+        $newValues = [
+            'code'   => $trip->getCode(),
+            'status' => $targetStatus->value,
+        ];
+
+        if (null !== $reason && '' !== trim($reason)) {
+            $newValues['reason'] = trim($reason);
+        }
+
         $this->auditLogger->log(
             action: $auditAction,
             entityName: 'Trip',
             entityId: $trip->getId(),
-            oldValues: ['code' => $trip->getCode(), 'status' => $oldStatusValue],
-            newValues: ['code' => $trip->getCode(), 'status' => $targetStatus->value],
+            oldValues: [
+                'code'   => $trip->getCode(),
+                'status' => $oldStatusValue,
+            ],
+            newValues: $newValues,
             actor: $actor,
             flush: false
         );
 
         $this->em->flush();
     }
+
 
     /**
      * Vérifie les conditions temporelles et de succursale avant d'ouvrir l'embarquement.
