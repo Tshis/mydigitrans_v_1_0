@@ -238,6 +238,17 @@ final class TripOperationService
             flush: false
         );
 
+        if (TripStatus::Arrived === $targetStatus) {
+            $shipments = $this->em->getRepository(\App\Entity\Shipment::class)->findBy([
+                'trip'   => $trip,
+                'status' => \App\Enum\ShipmentStatus::InTransit,
+            ]);
+            foreach ($shipments as $shp) {
+                $shp->setStatus(\App\Enum\ShipmentStatus::ReadyForPickup);
+            }
+        }
+
+
         $this->em->flush();
     }
 

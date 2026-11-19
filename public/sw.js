@@ -1,7 +1,7 @@
 // public/sw.js
 
 // 🚨 ON CHANGE LE NOM DE LA CLÉ POUR FORCER L'INCRÉMENTATION D'USINE
-//date du 14/11/2026 à 20H49 LSHI derniere modification
+//date du 19/11/2026 à 10H40 LSHI derniere modification
 
 const CACHE_NAME = 'mydigitrans-v1.0-cache'; 
 const ASSETS_TO_CACHE = [
@@ -64,10 +64,18 @@ self.addEventListener('activate', event => {
 
 
 // 3. DISTRIBUTION DES FLUX
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request);
-        })
-    );
+self.addEventListener('fetch', (event) => {
+  // Ne pas intercepter les requêtes POST ni les pages d'administration
+  if (event.request.method !== 'GET' || event.request.url.includes('/admin')) {
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      return cachedResponse || fetch(event.request).catch(() => {
+        // Repli silencieux si le réseau est coupé ou la requête annulée
+        return new Response('', { status: 408, statusText: 'Network error' });
+      });
+    })
+  );
 });

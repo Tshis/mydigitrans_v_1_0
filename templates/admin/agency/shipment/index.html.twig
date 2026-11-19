@@ -9,6 +9,9 @@
 {% block body %}
 	<div class="admin-shipment-wrapper container">
 
+		{% for message in app.flashes('success') %}
+			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+		{% endfor %}
 
 		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header-refined my-30">
@@ -25,10 +28,12 @@
 				<p class="subtitle">Enregistrez les dépôts, attribuez les colis aux trajets et suivez les livraisons.</p>
 			</div>
 			<div class="header-right">
-				<a href="{{ path('admin_agency_shipment_add') }}" class="btn-refined btn-success-gradient">
-					<i class="fa-solid fa-plus"></i>
-					Enregistrer un colis
-				</a>
+				{% if is_granted('shipment.write') %}
+					<a href="{{ path('admin_agency_shipment_add') }}" class="btn-refined btn-success-gradient">
+						<i class="fa-solid fa-plus"></i>
+						Enregistrer un colis
+					</a>
+				{% endif %}
 			</div>
 		</header>
 
@@ -39,8 +44,8 @@
 					<i class="fa-solid fa-warehouse"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">En Entrepôt (Dépôt)</span>
-					<strong class="stat-value">42</strong>
+					<span class="stat-label">En Entrepôt / Attente Retrait</span>
+					<strong class="stat-value">{{ stats.warehouse }}</strong>
 				</div>
 			</div>
 
@@ -50,7 +55,7 @@
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">En Transit (Dans le bus)</span>
-					<strong class="stat-value">18</strong>
+					<strong class="stat-value">{{ stats.in_transit }}</strong>
 				</div>
 			</div>
 
@@ -60,32 +65,33 @@
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">Livrés / Retirés</span>
-					<strong class="stat-value">1,105</strong>
+					<strong class="stat-value">{{ stats.delivered }}</strong>
 				</div>
 			</div>
 		</div>
 
 		{# --- ZONE DE FILTRES AVANCÉS DU BACKOFFICE --- #}
 		<div class="trip-filters-card mb-20">
-			<form action="#" method="GET" class="field-group">
+			<form action="{{ path('admin_agency_shipment_index') }}" method="GET" class="field-group">
 				<div class="field">
-					<label class="admin-bus-layout-add-label">Code Suivi / Téléphone Destinataire</label>
+					<label class="admin-bus-layout-add-label">Code Suivi / Téléphone</label>
 					<input
 						type="text"
 						name="search_query"
 						class="admin-bus-layout-add-input"
-						placeholder="Ex: SHP-2607-001"
+						placeholder="Ex: SHP-2611-..."
+						value="{{ filters.query }}"
 					>
 				</div>
 				<div class="field">
 					<label class="admin-bus-layout-add-label">État du Colis</label>
 					<select name="shipment_status" class="admin-bus-layout-add-select">
-						<option value="">-- Tous les états --</option>
-						<option value="pending">En attente (Non payé)</option>
-						<option value="received">Reçu à l'entrepôt (Payé)</option>
-						<option value="in_transit">En cours de route</option>
-						<option value="available">Prêt pour retrait</option>
-						<option value="delivered">Remis au destinataire</option>
+						<option value="">-- Tous les états actifs --</option>
+						<option value="pending" {{ filters.status == 'pending' ? 'selected' : '' }}>En attente (Non payé)</option>
+						<option value="in_transit" {{ filters.status == 'in_transit' ? 'selected' : '' }}>En Transit</option>
+						<option value="ready_for_pickup" {{ filters.status == 'ready_for_pickup' ? 'selected' : '' }}>Disponible Terminus</option>
+						<option value="delivered" {{ filters.status == 'delivered' ? 'selected' : '' }}>Livré / Retiré</option>
+						<option value="cancelled" {{ filters.status == 'cancelled' ? 'selected' : '' }}>Annulé</option>
 					</select>
 				</div>
 				<div class="field-actions">
@@ -97,105 +103,100 @@
 			</form>
 		</div>
 
-		{# --- TABLEAU GÉNÉRIQUE DES COLIS (COMPOSANT GLOBAL) --- #}
-		<table class="table table-scrollable table-striped js-datatable">
-			<thead>
-				<tr>
-					<th>Code Suivi</th>
-					<th>Expéditeur (Sender)</th>
-					<th>Destinataire (Receiver)</th>
-					<th>Caractéristiques</th>
-					<th>Paiement Fret</th>
-					<th>État Logistique</th>
-					<th class="text-right">Actions Guichet</th>
-				</tr>
-			</thead>
-			<tbody>
-				{# Exemple 1 : Colis payé en cours de voyage #}
-				<tr>
-					<td>
-						<strong>SHP-2026-8942</strong>
-						<span class="sub-meta-text">Gare Kinshasa</span>
-					</td>
-					<td>
-						<strong>Mbala Jean</strong>
-						<span class="sub-meta-text">+243 812 345 678</span>
-					</td>
-					<td>
-						<strong>Toko Dieudonné</strong>
-						<span class="sub-meta-text">+243 897 654 321</span>
-					</td>
-					<td>
-						<strong>Carton Pièces Réchange</strong>
-						<span class="sub-meta-text">Poids : 25 Kg (Fragile)</span>
-					</td>
-					<td>
-						<strong>17 500 CDF</strong>
-						<span class="sub-meta-text text-weight-700 text-success">PAYÉ (Caisse)</span>
-					</td>
-					<td class="table-badge-cell">
-						<span class="badge-shipment transit">En Transit</span>
-					</td>
-					<td class="text-right table-action-buttons">
-						<a
-							href="{{ path('admin_agency_shipment_show', {'reference': 'SHP-XYZ-20-AB-001'}) }}"
-							class="table-action-trigger view"
-							title="Voir l'historique complet du colis"
-						>
-							<i class="fa-solid fa-eye"></i>
-						</a>
-						
-						<a href="{{ path('admin_agency_shipment_print', {'reference': 'SHP-XYZ-20-AB-001'}) }}" class="table-action-trigger print" title="Imprimer l'étiquette de colisage">
-							<i class="fa-solid fa-tag"></i>
-						</a>
-					</td>
-				</tr>
+		{# --- TABLEAU DES COLIS --- #}
+		<div class="table-responsive-wrapper">
+			<table class="table table-scrollable table-striped js-datatable">
+				<thead>
+					<tr>
+						<th>Code Suivi</th>
+						<th>Expéditeur (Sender)</th>
+						<th>Destinataire (Receiver)</th>
+						<th>Caractéristiques</th>
+						<th>Paiement Fret</th>
+						<th>État Logistique</th>
+						<th class="text-right">Actions Guichet</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for shp in shipments %}
+						<tr>
+							<td>
+								<strong>{{ shp.reference }}</strong>
+								<span class="sub-meta-text">{{ shp.departureBranch }} → {{ shp.arrivalBranch }}</span>
+							</td>
+							<td>
+								<strong>{{ shp.senderName }}</strong>
+								<span class="sub-meta-text">{{ shp.senderPhone }}</span>
+							</td>
+							<td>
+								<strong>{{ shp.receiverName }}</strong>
+								<span class="sub-meta-text">{{ shp.receiverPhone }}</span>
+							</td>
+							<td>
+								<strong>{{ shp.description }}</strong>
+								<span class="sub-meta-text">Poids : {{ shp.weight }} Kg ({{ shp.nature }})</span>
+							</td>
+							<td>
+								<strong>{{ shp.amountFormatted }}</strong>
+								{% if shp.isPaid %}
+									<span class="sub-meta-text text-weight-700 text-success">PAYÉ (Caisse)</span>
+								{% else %}
+									<span class="sub-meta-text text-weight-700 text-danger">NON ACQUITTÉ</span>
+								{% endif %}
+							</td>
+							<td class="table-badge-cell">
+								{% if shp.status == 'delivered' %}
+									<span class="badge badge-success-status">{{ shp.statusLabel }}</span>
+								{% elseif shp.status == 'ready_for_pickup' %}
+									<span class="badge-shipment ready">{{ shp.statusLabel }}</span>
+								{% elseif shp.status == 'in_transit' %}
+									<span class="badge-shipment transit">{{ shp.statusLabel }}</span>
+								{% elseif shp.status == 'pending' %}
+									<span class="badge-status-pending">{{ shp.statusLabel }}</span>
+								{% else %}
+									<span class="badge badge-danger-status">{{ shp.statusLabel }}</span>
+								{% endif %}
+							</td>
+							<td class="text-right table-action-buttons">
+								{% if shp.status not in ['delivered', 'cancelled'] %}
+									{% if is_granted('shipment.write') and shp.status in ['in_transit', 'ready_for_pickup'] %}
+										<a
+											href="{{ path('admin_agency_shipment_pickup', {'reference': shp.reference}) }}"
+											class="table-action-trigger validate"
+											title="Confirmer le retrait physique par le destinataire"
+										>
+											<i class="fa-solid fa-box-open"></i>
+										</a>
+									{% endif %}
+									<a
+										href="{{ path('admin_agency_shipment_print', {'reference': shp.reference}) }}"
+										class="table-action-trigger print"
+										title="Imprimer le reçu / étiquette"
+										target="_blank"
+									>
+										<i class="fa-solid fa-tag"></i>
+									</a>
+								{% endif %}
+								<a
+									href="{{ path('admin_agency_shipment_show', {'reference': shp.reference}) }}"
+									class="table-action-trigger view"
+									title="Voir le dossier du colis"
+								>
+									<i class="fa-solid fa-eye"></i>
+								</a>
+							</td>
 
-				{# Exemple 2 : Colis arrivé à destination, prêt à être retiré #}
-				<tr>
-					<td>
-						<strong>SHP-2026-8943</strong>
-						<span class="sub-meta-text">Gare Kenge</span>
-					</td>
-					<td>
-						<strong>Mukendi Pierre</strong>
-						<span class="sub-meta-text">+243 824 556 677</span>
-					</td>
-					<td>
-						<strong>Buka Marie</strong>
-						<span class="sub-meta-text">+243 815 112 233</span>
-					</td>
-					<td>
-						<strong>Sac de Vivres / Manioc</strong>
-						<span class="sub-meta-text">Poids : 50 Kg (Périssable)</span>
-					</td>
-					<td>
-						<strong>20 000 CDF</strong>
-						<span class="sub-meta-text text-weight-700 text-success">PAYÉ (Caisse)</span>
-					</td>
-					<td class="table-badge-cell">
-						<span class="badge-shipment ready">Disponible Terminus</span>
-					</td>
-					<td class="text-right table-action-buttons">
-						{# Action forte de déchargement / remise physique #}
-						<a
-							href="{{ path('admin_agency_shipment_pickup', {'reference': 'SHP-XYZ-20-AB-001'}) }}"
-							class="table-action-trigger validate"
-							title="Confirmer le retrait physique par le destinataire"
-						>
-							<i class="fa-solid fa-box-open"></i>
-						</a>
-						<a
-							href="{{ path('admin_agency_shipment_show', {'reference': 'SHP-XYZ-20-AB-001'}) }}"
-							class="table-action-trigger view"
-							title="Voir l'historique"
-						>
-							<i class="fa-solid fa-eye"></i>
-						</a>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="7" class="text-center text-gray italic padding-20">
+								Aucune expédition enregistrée pour le moment.
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 
 	</div>
 {% endblock %}

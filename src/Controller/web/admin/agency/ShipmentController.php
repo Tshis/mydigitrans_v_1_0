@@ -1,224 +1,299 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\web\admin\agency;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use App\Controller\web\admin\AbstractAdminController;
+use App\Dto\admin\agency\ShipmentCreateData;
+use App\Dto\admin\agency\ShipmentPickupData;
+use App\Entity\Shipment;
+use App\Enum\Scope;
+use App\Form\agency\ShipmentCreateType;
+use App\Form\agency\ShipmentPickupType;
+use App\Service\AgencyShipmentService;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Encoding\Encoding;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
-class ShipmentController extends AbstractController
+final class ShipmentController extends AbstractAdminController
 {
+    public function __construct(
+        private readonly AgencyShipmentService $shipmentService,
+    ) {}
 
-    #[Route('/admin/agency/shipments', name: 'admin_agency_shipment_index')]
+    protected function scope(): Scope
+    {
+        return Scope::Agency;
+    }
+
+    #[Route('/admin/agency/shipments', name: 'admin_agency_shipment_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('shipment.view');
+        $agency = $this->actor()->getAgency();
+
+        $filters = [
+            'query'  => trim((string) $request->query->get('search_query', '')) ?: null,
+            'status' => trim((string) $request->query->get('shipment_status', '')) ?: null,
+        ];
+
         return $this->render('admin/agency/shipment/index.html.twig', [
-            'page' => 'shipment',
-        ]);
-    } //index
+            'page'    => 'shipment',
+            'filters' => $filters,
+        ] + $this->shipmentService->listAgencyShipments($agency, $filters));
+    }
 
-
-    #[Route('/admin/agency/shipment/add', name: 'admin_agency_shipment_add')]
+    #[Route('/admin/agency/shipment/add', name: 'admin_agency_shipment_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('shipment.write');
+        $actor  = $this->actor();
+        $agency = $actor->getAgency();
 
+        $data = new ShipmentCreateData();
+        $data->departureAgencyBranch = $actor->getBranch();
 
-        // Configuration par défaut de l'agence connectée
-        $systemCurrency = 'USD';
-        $pricePerKg = 1.25; // 1.25 $ par Kilo pour la ligne active
+        $form = $this->createForm(ShipmentCreateType::class, $data, [
+            'agency' => $agency,
+        ]);
+        $form->handleRequest($request);
 
-        $currentBranch = [
-            'id' => 1,
-            'name' => 'Kinshasa (Gare Centrale Siège)'
-        ];
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $shipment = $this->shipmentService->createShipment($data, $actor);
+                $this->addFlash('success', sprintf(
+                    'Colis [%s] enregistré. Code secret de retrait : %s',
+                    $shipment->getReference(),
+                    $shipment->getPickupCode()
+                ));
 
-        // Succursales de destination du réseau (MCD Table 4)
-        $branches = [
-            ['id' => 2, 'name' => 'Succursale Goma'],
-            ['id' => 3, 'name' => 'Succursale Matadi'],
-            ['id' => 4, 'name' => 'Succursale Kikwit Terminus'],
-        ];
-
-        // Liste des devises actives pour fixer manuellement le prix par pièce
-        $activeCurrencies = [
-            ['code' => 'USD'],
-            ['code' => 'CDF'],
-        ];
-
-        if ($request->isMethod('POST')) {
-
-
-            return $this->redirectToRoute('admin_agency_shipment_print', ['reference' => 'SHP-2026-001']);
+                return $this->redirectToRoute('admin_agency_shipment_show', [
+                    'reference' => $shipment->getReference(),
+                ]);
+            } catch (\DomainException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
         }
-
-
 
         return $this->render('admin/agency/shipment/add.html.twig', [
             'page' => 'shipment',
-            'system_currency'   => $systemCurrency,
-            'price_per_kg'      => $pricePerKg,
-            'current_branch'    => $currentBranch,
-            'branches'          => $branches,
-            'active_currencies' => $activeCurrencies,
+            'form' => $form->createView(),
+        ] + $this->shipmentService->buildTripsPricingMetadata($agency), new Response(
+            status: $form->isSubmitted() && !$form->isValid() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK
+        ));
+    }
 
-        ]);
-    } //add
-
-
-
-    #[Route('/admin/agency/shipment/{reference}', name: 'admin_agency_shipment_show')]
-    public function show(Request $request): Response
+    #[Route('/admin/agency/shipment/{reference}', name: 'admin_agency_shipment_show', methods: ['GET'])]
+    public function show(string $reference): Response
     {
+        $this->denyAccessUnlessGranted('shipment.view');
+        $shipment = $this->requireAgencyShipment($reference);
+
         return $this->render('admin/agency/shipment/show.html.twig', [
             'page' => 'shipment',
-        ]);
-    } //show
+        ] + $this->shipmentService->getShipmentDetails($shipment));
+    }
 
-
-
-    /**
-     * GESTION DU FRET : IMPRESSION DES BONS AVEC SÉCURITÉ ANTI-FRAUDE DUPLICATA
-     */
-    #[Route('/admin/agency/shipment/print/{reference}', name: 'admin_agency_shipment_print', methods: ['GET'])]
-    public function printFretVouchers(string $reference, Request $request): Response
+    #[Route('/admin/agency/shipment/{reference}/cancel', name: 'admin_agency_shipment_cancel', methods: ['POST'])]
+    public function cancel(string $reference, Request $request): Response
     {
-        // 1. Simulation de ton entité Colis/Fret
-        $package = [
-            'id' => 512,
-            'reference' => $reference, // Consomme dynamiquement la référence de l'URL
-            'waybill' => 'AWB-202610-F892',
-            'pickup_code' => 'MDT-591A',
-            'sender_name' => 'Daniel Mukendi',
-            'sender_phone' => '+243 812 345 678',
-            'receiver_name' => 'Merveille Kabamba',
-            'receiver_phone' => '+243 998 765 432',
-            'route' => 'Kinshasa ➔ Kikwit',
-            'arrival_branch' => 'Gare de Kikwit (Terminus)',
-            'nature' => 'Carton de marchandises',
-            'weight' => 28.5,
-            'amount_paid' => 35.00,
-            'currency' => 'USD',
-            'created_at' => new \DateTime('now')
-        ];
+        $this->denyAccessUnlessGranted('shipment.write');
+        $actor    = $this->actor();
+        $shipment = $this->requireAgencyShipment($reference);
 
-        // 2. 🚨 LE BLINDAGE SÉCURITÉ : Calcul de l'écart de temps en arrière-plan
-        $now = new \DateTime('now');
-        $interval = $now->diff($package['created_at']);
+        if (!$this->isCsrfTokenValid('cancel_shipment_' . $shipment->getReference(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
 
-        // Convertit l'écart en minutes totales
-        $minutesSinceCreation = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
+        try {
+            $reason = trim((string) $request->request->get('cancel_reason', '')) ?: null;
+            $this->shipmentService->cancelShipment($shipment, $reason, $actor);
+            $this->addFlash('success', sprintf('L\'expédition [%s] a été annulée.', $shipment->getReference()));
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
 
-        // Si le colis a été créé il y a MOINS de 15 minutes, on autorise l'impression initiale du doublé.
-        // Au-delà de 15 minutes, le système passe d'office en mode 'duplicate' restrictif.
+        return $this->redirectToRoute('admin_agency_shipment_show', [
+            'reference' => $shipment->getReference(),
+        ]);
+    }
+
+
+    #[Route('/admin/agency/shipment/print/{reference}', name: 'admin_agency_shipment_print', methods: ['GET'])]
+    public function printFretVouchers(string $reference): Response
+    {
+        $this->denyAccessUnlessGranted('shipment.view');
+        $actor    = $this->actor();
+        $shipment = $this->requireAgencyShipment($reference);
+        $details  = $this->shipmentService->getShipmentDetails($shipment)['shipment'];
+
+        $now = new \DateTimeImmutable();
+        $createdAt = $shipment->getCreatedAt() ?? $now;
+        $minutesSinceCreation = (int) floor(($now->getTimestamp() - $createdAt->getTimestamp()) / 60);
+
         $printMode = ($minutesSinceCreation <= 15) ? 'creation' : 'duplicate';
 
-        // 3. Génération locale et immuable du QR Code v5 avec ta structure immuable validée
+        $package = [
+            'id'             => $details['id'],
+            'reference'      => $details['reference'],
+            'waybill'        => $details['waybill'],
+            'pickup_code'    => $details['pickupCode'],
+            'sender_name'    => $details['senderName'],
+            'sender_phone'   => $details['senderPhone'],
+            'receiver_name'  => $details['receiverName'],
+            'receiver_phone' => $details['receiverPhone'],
+            'route'          => $details['route'],
+            'arrival_branch' => $details['arrivalBranch'],
+            'nature'         => sprintf('%s (%s)', $details['description'], $details['nature']),
+            'weight'         => $details['weight'],
+            'amount_paid'    => $details['price'],
+            'currency'       => $details['currency'],
+            'created_at'     => $createdAt,
+        ];
+
         $qrBase64 = null;
-        if ($printMode === 'creation') {
+        if ('creation' === $printMode) {
             $qrCode = new QrCode(
-                data: 'MDT-FRET-VERIFY-' . $package['waybill'],
+                data: 'MDT-FRET-' . $package['waybill'],
                 encoding: new Encoding('UTF-8'),
                 size: 150,
                 margin: 0
             );
             $writer = new PngWriter();
             try {
-                $result = $writer->write($qrCode);
-                $qrBase64 = $result->getDataUri();
-            } catch (\Exception $e) {
+                $qrBase64 = $writer->write($qrCode)->getDataUri();
+            } catch (\Exception) {
                 $qrBase64 = null;
             }
         }
 
-        // 4. Initialisation de la carrosserie Dompdf
         $pdfOptions = new Options();
         $pdfOptions->set('defaultFont', 'Arial');
         $pdfOptions->set('isHtml5ParserEnabled', true);
-        $pdfOptions->set('isRemoteEnabled', true);
 
         $dompdf = new Dompdf($pdfOptions);
 
         $html = $this->renderView('admin/agency/shipment/fret_vouchers_pdf.html.twig', [
-            'agency_name' => 'TransKin Express',
-            'package' => $package,
-            'print_mode' => $printMode,
-            'qr_base64' => $qrBase64
+            'agency_name' => (string) $actor->getAgency()?->getName(),
+            'package'     => $package,
+            'print_mode'  => $printMode,
+            'qr_base64'   => $qrBase64,
         ]);
 
         $dompdf->loadHtml($html);
-
-        // Calibration dynamique de la hauteur de la bande thermique 80mm
-        $paperHeight = ($printMode === 'creation') ? 793.70 : 425.20;
+        $paperHeight = ('creation' === $printMode) ? 793.70 : 425.20;
         $dompdf->setPaper([0, 0, 250.00, $paperHeight], 'portrait');
         $dompdf->render();
 
         return new Response($dompdf->output(), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="Pieces_Fret.pdf"'
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => sprintf('inline; filename="Fret_%s.pdf"', $package['waybill']),
         ]);
-    }//printFretVouchers    
+    }
 
-
-    /**
-     * GUICHET ARRIVÉE : AFFICHAGE DE L'ÉCRAN DE RETRAIT DE COLIS
-     */
-    #[Route('/admin/agency/shipment/{reference}/pickup', name: 'admin_agency_shipment_pickup', methods: ['GET'])]
-    public function pickupForm(string $reference): Response
+    #[Route('/admin/agency/shipment/{reference}/pickup', name: 'admin_agency_shipment_pickup', methods: ['GET', 'POST'])]
+    public function pickupForm(string $reference, Request $request): Response
     {
-        // Extraction de ton entité Colis en attente à la gare de destination [Profile]
-        $package = [
-            'id' => 412,
-            'reference' => $reference,
-            'waybill' => $reference,
-            'sender_name' => 'Daniel Mukendi',
-            'receiver_name' => 'Merveille Kabamba',
-            'receiver_phone' => '+243 998 765 432',
-            'arrival_branch' => 'Gare de Kikwit (Terminus)',
-            'nature' => 'Carton de produits pharmaceutiques',
-            'weight' => 28.5
-        ];
+        $this->denyAccessUnlessGranted('shipment.write');
+        $actor    = $this->actor();
+        $shipment = $this->requireAgencyShipment($reference);
+        $details  = $this->shipmentService->getShipmentDetails($shipment)['shipment'];
 
-        return $this->render('admin/agency/shipment/pickup.html.twig', [
-            'page' => 'shipment',
-            'package' => $package
-        ]);
-    }//pickupForm
+        $pickupData = new ShipmentPickupData();
+        $form = $this->createForm(ShipmentPickupType::class, $pickupData);
+        $form->handleRequest($request);
 
-    /**
-     * TRAITEMENT DU DÉBLOCAGE : COMPARAISON DU CODE ET ENREGISTREMENT DE LA DÉCHARGE JURIDIQUE
-     */
-    #[Route('/admin/agency/shipment/{reference}/pickup/process', name: 'admin_agency_shipment_pickup_process', methods: ['POST'])]
-    public function processPickup(string $reference, Request $request): Response
-    {
-        // 1. Récupération du colis en BDD (Ici simulation de son code secret d'usine d'origine)
-        $truePickupCode = '591A';
+        if ($form->isSubmitted()) {
+            if (!$this->isCsrfTokenValid('pickup_shipment_' . $shipment->getReference(), (string) $request->request->get('_token'))) {
+                $this->addFlash('error', 'Jeton de sécurité expiré. Veuillez réessayer.');
+                return $this->redirectToRoute('admin_agency_shipment_pickup', ['reference' => $shipment->getReference()]);
+            }
 
-        // 2. Capture des entrées du guichetier d'arrivée [Profile]
-        $inputCode = strtoupper(trim($request->request->get('input_pickup_code')));
-        $idType = $request->request->get('receiver_id_type');
-        $idNumber = trim($request->request->get('receiver_id_number'));
+            if ($form->isValid()) {
+                try {
+                    $this->shipmentService->processPickup($shipment, $pickupData, $actor);
+                    $this->addFlash('success', sprintf('Livraison du colis [%s] confirmée et décharge enregistrée.', $shipment->getReference()));
 
-        // 3. BARRIÈRE 1 : Validation stricte du code d'usine [Profile]
-        if ($inputCode !== $truePickupCode) {
-            $this->addFlash('danger', 'Erreur de déblocage : Le code secret de retrait dicté par le destinataire est incorrect.');
-            return $this->redirectToRoute('admin_agency_shipment_pickup', ['reference' => $reference]);
+                    return $this->redirectToRoute('admin_agency_shipment_show', [
+                        'reference' => $shipment->getReference(),
+                    ]);
+                } catch (\DomainException $e) {
+                    $form->get('pickupCode')->addError(new FormError($e->getMessage()));
+                    $this->addFlash('error', $e->getMessage());
+                }
+            }
         }
 
-        // 4. ACTION PRODUCTION :
-        // - Passage du statut du colis à 'delivered' (livré)
-        // - Enregistrement des champs audit de ton MCD : receiver_id_type et receiver_id_number [Profile]
-        // - Horodatage de l'opération comptable finale
 
-        $this->addFlash('success', 'Livraison approuvée. La décharge juridique a été enregistrée avec succès.');
-        return $this->redirectToRoute('admin_agency_shipment_index');
-    } //processPickup
+        return $this->render('admin/agency/shipment/pickup.html.twig', [
+            'page'    => 'shipment',
+            'form'    => $form->createView(),
+            'package' => [
+                'id'             => $details['id'],
+                'reference'      => $details['reference'],
+                'waybill'        => $details['waybill'],
+                'sender_name'    => $details['senderName'],
+                'receiver_name'  => $details['receiverName'],
+                'receiver_phone' => $details['receiverPhone'],
+                'arrival_branch' => $details['arrivalBranch'],
+                'nature'         => sprintf('%s (%s)', $details['description'], $details['nature']),
+                'weight'         => $details['weight'],
+            ],
+        ]);
+    }
 
 
 
+    #[Route('/admin/agency/shipment/{reference}/ready', name: 'admin_agency_shipment_ready', methods: ['POST'])]
+    public function markReady(string $reference, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('shipment.write');
+        $actor    = $this->actor();
+        $shipment = $this->requireAgencyShipment($reference);
+
+        if (!$this->isCsrfTokenValid('ready_shipment_' . $shipment->getReference(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
+
+        try {
+            $password    = (string) $request->request->get('agent_password', '');
+            $observation = trim((string) $request->request->get('reception_observation', '')) ?: null;
+
+            $this->shipmentService->markReadyForPickup($shipment, $password, $observation, $actor);
+            $this->addFlash('success', sprintf(
+                'Colis [%s] réceptionné en magasin (%s) sous la responsabilité de %s.',
+                $shipment->getReference(),
+                $shipment->getArrivalAgencyBranch()?->getName(),
+                $actor->getFullName()
+            ));
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_shipment_show', [
+            'reference' => $shipment->getReference(),
+        ]);
+    }
+
+
+
+
+
+    private function requireAgencyShipment(string $reference): Shipment
+    {
+        $shipment = $this->shipmentService->findAgencyShipmentByReference($this->actor()->getAgency(), $reference);
+        if (!$shipment instanceof Shipment) {
+            throw $this->createNotFoundException('Expédition introuvable dans votre agence.');
+        }
+
+        return $shipment;
+    }
 }

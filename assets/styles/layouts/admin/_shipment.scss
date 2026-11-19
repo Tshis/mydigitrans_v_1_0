@@ -424,10 +424,16 @@
         }
     }
 
+
     // --- PANNEAUX DE COMPOSITION ---
     .reservation-container {
         display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem;
         align-items: start; width: 100%;
+
+        .layout-main-panel,
+        .field{
+            min-width: 0;
+        }
 
         @media (max-width: 992px) { grid-template-columns: 1fr; }
     }
