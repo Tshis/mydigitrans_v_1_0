@@ -113,7 +113,7 @@ final class AgencyCashierService
     }
 
     /**
-     * Prépare une session de caisse Top-Down (statut Pending) avec les dotations par devise.
+     * Prépare une session de caisse Top-Down (statut Pending) ou ouvre directement la session si l'utilisateur connecté s'auto-attribue le guichet.
      *
      * @throws \DomainException
      */
@@ -121,16 +121,16 @@ final class AgencyCashierService
     {
         $agency = $manager->getAgency() ?? throw new \DomainException('Agence introuvable.');
         $register = $data->cashRegister;
-        $cashier = $data->cashier;
+        $cashier = $data->cashier ?? $manager;
 
         if (null === $register || $register->getAgency()?->getId() !== $agency->getId()) {
             throw new \DomainException('Guichet de caisse invalide.');
         }
-        if (null === $cashier || $cashier->getAgency()?->getId() !== $agency->getId()) {
+        if ($cashier->getAgency()?->getId() !== $agency->getId()) {
             throw new \DomainException('Caissier assigné invalide.');
         }
 
-        // Vérifier qu'aucune session n'est déjà ouverte/en attente sur ce guichet ou pour ce caissier
+        // Vérifier qu'aucune session n'est déjà ouverte/en attente sur ce guichet
         $busyRegister = $this->em->createQueryBuilder()
             ->select('COUNT(cs.id)')
             ->from(CashSession::class, 'cs')
@@ -145,15 +145,18 @@ final class AgencyCashierService
             throw new \DomainException(sprintf('Le guichet [%s] possède déjà une session ouverte ou en attente.', $register->getCode()));
         }
 
+        // Vérifier que le caissier n'a pas déjà une session active ailleurs
         $existingCashierSession = $this->findCurrentSessionForCashier($cashier);
         if (null !== $existingCashierSession) {
             throw new \DomainException(sprintf('%s possède déjà une session active (%s).', $cashier->getFullName(), $existingCashierSession->getCashRegister()?->getName()));
         }
 
+        $isSelfOpening = $cashier->getId() === $manager->getId();
+
         $session = (new CashSession())
             ->setCashRegister($register)
             ->setOpenedBy($cashier)
-            ->setStatus(CashSessionStatus::Pending);
+            ->setStatus($isSelfOpening ? CashSessionStatus::Opened : CashSessionStatus::Pending);
 
         $this->em->persist($session);
 
@@ -165,13 +168,14 @@ final class AgencyCashierService
         foreach ($activeCurrencies as $currency) {
             $code = (string) $currency->getCode();
             $expected = max(0.0, (float) ($data->amounts[$code] ?? 0));
+            $formatted = number_format($expected, 2, '.', '');
 
             $balance = (new CashSessionBalance())
                 ->setCashSession($session)
                 ->setCurrency($currency)
-                ->setOpeningBalanceExpected(number_format($expected, 2, '.', ''))
-                ->setOpeningBalanceDeclared('0.00')
-                ->setOpenBalanceDifference(number_format(-$expected, 2, '.', ''))
+                ->setOpeningBalanceExpected($formatted)
+                ->setOpeningBalanceDeclared($isSelfOpening ? $formatted : '0.00')
+                ->setOpenBalanceDifference($isSelfOpening ? '0.00' : number_format(-$expected, 2, '.', ''))
                 ->setOpeningNote($data->openingNote);
 
             $session->addBalance($balance);
@@ -184,9 +188,10 @@ final class AgencyCashierService
             entityId: $session->getId(),
             oldValues: null,
             newValues: [
-                'register' => $register->getCode(),
-                'cashier'  => $cashier->getFullName(),
-                'status'   => CashSessionStatus::Pending->value,
+                'register'    => $register->getCode(),
+                'cashier'     => $cashier->getFullName(),
+                'selfOpening' => $isSelfOpening,
+                'status'      => $session->getStatus()->value,
             ],
             actor: $manager,
             flush: false
@@ -196,6 +201,7 @@ final class AgencyCashierService
 
         return $session;
     }
+
 
     /**
      * Ouverture physique de la session par le caissier après comptage des espèces.

@@ -45,8 +45,18 @@ final class CashierController extends AbstractAdminController
     public function index(): Response
     {
         $actor = $this->actor();
-        $session = $this->cashierService->findCurrentSessionForCashier($actor);
 
+        // 1. Administrateur d'agence (non rattaché à une succursale unique ou rôle Owner/Admin) -> Console globale du réseau
+        if (
+            null === $actor->getBranch()
+            || $this->isGranted('ROLE_AGENCY_OWNER')
+            || $this->isGranted('ROLE_AGENCY_ADMIN')
+        ) {
+            return $this->redirectToRoute('admin_agency_cashier_dashboard_global');
+        }
+
+        // 2. Si l'agent a une session de caisse personnelle (Pending ou Opened) -> Espace Caissier
+        $session = $this->cashierService->findCurrentSessionForCashier($actor);
         if ($session instanceof CashSession) {
             if (CashSessionStatus::Pending === $session->getStatus()) {
                 return $this->redirectToRoute('admin_agency_cashier_session_open');
@@ -55,12 +65,16 @@ final class CashierController extends AbstractAdminController
             return $this->redirectToRoute('admin_agency_cashier_dashboard');
         }
 
-        if ($this->isGranted('ROLE_AGENCY_OWNER') || $this->isGranted('finance.view')) {
+        // 3. Gérant de succursale (rattaché à une succursale, avec droit de supervision) -> Dashboard Succursale
+        if ($this->isGranted('finance.view') || $this->isGranted('cashier.manage')) {
             return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
         }
 
+        // 4. Caissier sans session préparée -> Écran d'attente
         return $this->redirectToRoute('admin_agency_cashier_awaiting_init');
     }
+
+
 
     #[Route('/admin/agency/cash-register/create', name: 'admin_agency_cashier_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
@@ -400,7 +414,6 @@ final class CashierController extends AbstractAdminController
     }
 
     #[Route('/admin/agency/cash-register/session/{id}/closing/validation', name: 'admin_agency_cashier_session_closing_validation', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-
     public function sessionClosingValidation(int $id, Request $request): Response
     {
         $actor   = $this->actor();
@@ -427,28 +440,42 @@ final class CashierController extends AbstractAdminController
             'form'        => $form->createView(),
         ]);
     }
+
     #[Route('/admin/agency/cash-register/session/initialization', name: 'admin_agency_cashier_session_init', methods: ['GET', 'POST'])]
     public function sessionInit(Request $request): Response
     {
         $actor  = $this->actor();
         $agency = $actor->getAgency();
+
         $initData = new CashSessionInitData();
+        $initData->cashier = $actor;
+
         $form = $this->createForm(CashSessionInitType::class, $initData, [
             'agency' => $agency,
             'branch' => $actor->getBranch(),
         ]);
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $initData->amounts = (array) $request->request->all('amounts');
-                $this->cashierService->initSession($initData, $actor);
+                $session = $this->cashierService->initSession($initData, $actor);
+
+                if ($session->getOpenedBy()?->getId() === $actor->getId()) {
+                    $this->addFlash('success', 'Votre session de caisse est ouverte. Vous pouvez encaisser immédiatement.');
+
+                    return $this->redirectToRoute('admin_agency_cashier_dashboard');
+                }
+
                 $this->addFlash('success', 'Dotation matinale allouée. Le caissier peut maintenant ouvrir sa session.');
+
                 return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
             } catch (\DomainException $e) {
                 $this->addFlash('error', $e->getMessage());
             }
         }
-        return $this->render('admin/agency/cashier/session_init.html.twig', [
+
+        return $this->render('admin/agency/cashier/init_session.html.twig', [
             'page'              => 'cashier',
             'actor'             => $actor,
             'form'              => $form->createView(),
