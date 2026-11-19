@@ -126,7 +126,7 @@
 					</h3>
 
 					<div class="sidebar-action-button">
-						{% if shipment.status == 'pending' %}
+						{% if not shipment.isPaid %}
 							<a href="#" class="btn-refined btn-primary-gradient btn-full my-4">
 								<i class="fa-solid fa-money-bill-transfer"></i>
 								Encaisser le Fret
@@ -149,8 +149,8 @@
 							</button>
 						{% endif %}
 
-						{% if is_granted('shipment.write') and shipment.status in ['in_transit', 'ready_for_pickup'] %}
-							<a href="{{ path('admin_agency_shipment_pickup', {'reference': shipment.reference}) }}" class="btn-refined btn-primary-gradient btn-full my-4 ">
+						{% if is_granted('shipment.write') and shipment.status in ['in_transit', 'ready_for_pickup'] and shipment.isPaid %}
+							<a href="{{ path('admin_agency_shipment_pickup', {'reference': shipment.reference}) }}" class="btn-refined btn-success-gradient btn-full my-4 ">
 								<i class="fa-solid fa-box-open"></i>
 								Livrer au Destinataire
 							</a>

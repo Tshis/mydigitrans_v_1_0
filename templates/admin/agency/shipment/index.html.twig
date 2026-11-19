@@ -159,7 +159,7 @@
 							</td>
 							<td class="text-right table-action-buttons">
 								{% if shp.status not in ['delivered', 'cancelled'] %}
-									{% if is_granted('shipment.write') and shp.status in ['in_transit', 'ready_for_pickup'] %}
+									{% if is_granted('shipment.write') and shp.status in ['in_transit', 'ready_for_pickup'] and shp.isPaid %}
 										<a
 											href="{{ path('admin_agency_shipment_pickup', {'reference': shp.reference}) }}"
 											class="table-action-trigger validate"
@@ -168,6 +168,17 @@
 											<i class="fa-solid fa-box-open"></i>
 										</a>
 									{% endif %}
+									
+									{% if not shp.isPaid %}
+										<a
+											href="#"
+											class="table-action-trigger validate"
+											title="Confirmer le retrait physique par le destinataire"
+										>
+											<i class="fa-solid fa-money-bill-transfer"></i>
+										</a>
+									{% endif %}
+
 									<a
 										href="{{ path('admin_agency_shipment_print', {'reference': shp.reference}) }}"
 										class="table-action-trigger print"
