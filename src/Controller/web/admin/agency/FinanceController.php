@@ -1,202 +1,113 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\web\admin\agency;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Controller\web\admin\AbstractAdminController;
+use App\Dto\admin\agency\ExpenseCreateData;
+use App\Enum\Scope;
+use App\Form\agency\ExpenseCreateType;
+use App\Service\AgencyFinanceService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class FinanceController extends AbstractController
+final class FinanceController extends AbstractAdminController
 {
+    public function __construct(
+        private readonly AgencyFinanceService $financeService,
+    ) {}
 
-    #[Route('/admin/agency/finances', name: 'admin_agency_finance_index')]
+    protected function scope(): Scope
+    {
+        return Scope::Agency;
+    }
+
+    #[Route('/admin/agency/finances', name: 'admin_agency_finance_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
+        $actor  = $this->actor();
+        $agency = $actor->getAgency();
 
-        // 1. Simulation des filtres d'agences (MCD Table 4)
-        $branches = [
-            ['id' => 1, 'name' => 'Kinshasa Centre (Guichet 1)'],
-            ['id' => 2, 'name' => 'Succursale Goma'],
-            ['id' => 3, 'name' => 'Succursale Matadi'],
+        $filters = [
+            'date'     => trim((string) $request->query->get('filter_date', '')) ?: null,
+            'branchId' => $actor->getBranch()?->getId() ?? ($request->query->getInt('filter_branch') ?: null),
+            'type'     => trim((string) $request->query->get('filter_type', '')) ?: null,
         ];
-
-        // 2. Statistique multi-devises des recettes cumulées (Entrants)
-        $dailyRevenues = [
-            ['code' => 'CDF', 'amount' => '2 950 000'],
-        ];
-
-        // 3. Statistique multi-devises des dépenses cumulées (Sorties)
-        $dailyExpenses = [
-            ['code' => 'CDF', 'amount' => '180 000'],
-        ];
-
-        // 4. Calcul dynamique du solde net provisoire par tiroir monétaire
-        $dailyNets = [
-            ['code' => 'CDF', 'amount' => '2 770 000'],
-        ];
-
-        // 5. Grand livre unifié des flux financiers (FinancialOperation)
-        $financialOperations = [
-            [
-                'id'          => 1,
-                'date'        => '13/08/2026',
-                'time'        => '10h14',
-                'reference'   => 'PAY-8942',
-                'type'        => 'payment',
-                'label'       => 'Billet de Voyage (Jean Kabamba)',
-                'sub_label'   => 'Réservation #RES-3904',
-                'mode'        => 'Mobile Money',
-                'origin'      => 'M-Pesa (+243 812...)',
-                'amount'      => '45.00',
-                'currency'    => 'USD',
-                'status'      => 'Confirmé'
-            ],
-            [
-                'id'          => 401,
-                'date'        => '13/08/2026',
-                'time'        => '08h30',
-                'reference'   => 'EXP-0401',
-                'type'        => 'expense',
-                'label'       => 'Achat Carburant Bus #01',
-                'sub_label'   => 'Frais d\'exploitation de ligne',
-                'mode'        => 'Espèces (Cash)',
-                'origin'      => 'Kinshasa Centre',
-                'amount'      => '250.00',
-                'currency'    => 'USD',
-                'status'      => 'pending'
-            ],
-            [
-                'id'          => 2,
-                'date'        => '13/08/2026',
-                'time'        => '11h20',
-                'reference'   => 'PAY-8943',
-                'type'        => 'payment',
-                'label'       => 'Expédition Colis Fret',
-                'sub_label'   => 'Bordereau #COL-9023',
-                'mode'        => 'Espèces (Cash)',
-                'origin'      => 'Goma Terminal',
-                'amount'      => '65 000',
-                'currency'    => 'CDF',
-                'status'      => 'Confirmé'
-            ]
-        ];
-
 
         return $this->render('admin/agency/finance/index.html.twig', [
-            'page' => 'finances',
-            'branches'             => $branches,
-            'daily_revenues'       => $dailyRevenues,
-            'daily_expenses'       => $dailyExpenses,
-            'daily_nets'           => $dailyNets,
-            'financial_operations' => $financialOperations,
-        ]);
-    } //index
+            'page'    => 'finances',
+            'filters' => $filters,
+        ] + $this->financeService->getFinanceOverview($agency, $filters));
+    }
 
-
-
-    #[Route('/admin/agency/finance/show/{id}/{type}', name: 'admin_agency_finance_show')]
-    public function show(Request $request, int $id, string $type): Response
+    #[Route('/admin/agency/finance/show/{id}/{type}', name: 'admin_agency_finance_show', requirements: ['id' => '\d+', 'type' => 'payment|expense'], methods: ['GET'])]
+    public function show(int $id, string $type): Response
     {
-
-        if ($type === 'payment') {
-            $operation = [
-                'id' => $id,
-                'type' => 'payment',
-                'reference' => '8942',
-                'amount' => '130 500',
-                'amount_raw' => '130500',
-                'currency' => 'FC',
-                'date' => '13/08/2026',
-                'time' => '10:41',
-                'label' => 'Vente de Billet (Clientèle Transit - Guichet Unique)',
-                'branch_name' => 'Kinshasa Centre — Gare Centrale Principale',
-                'actor' => 'Jean Kabamba (+243 812 345 678)',
-                'funding_source' => 'Compte Mobile Money Principal (M-Pesa)',
-                'created_by' => 'Client Authentifié (Portail Web public)',
-                'confirmed_by' => 'API Webhook Vodacom RDC',
-                'description' => 'Préservation de place pour le voyage Kinshasa -> Kikwit. Le siège n°12 a été réservé et bloqué avec succès pour ce passager.'
-            ];
-        } else {
-            $operation = [
-                'id' => $id,
-                'type' => 'expense',
-                'reference' => '0401',
-                'amount' => '250.00',
-                'amount_raw' => '250',
-                'currency' => 'USD',
-                'date' => '13/08/2026',
-                'time' => '08:30',
-                'label' => 'Achat Carburant Bus #01 (Exploitation Ligne Interurbaine)',
-                'branch_name' => 'Kinshasa Centre — Gare Centrale Principale',
-                'actor' => 'Chauffeur : Jean Mukendi (Flotte #01)',
-                'funding_source' => 'Caisse Principale de Guichet - Tiroir 1',
-                'created_by' => 'Manager : Alphonse Kalonji',
-                'confirmed_by' => 'Guichetier principal (Session physique active)',
-                'description' => 'Facture de carburant émise par la Station Engen Limete (Reçu physique agrafé N°ENG-9923). Index kilométrique au départ : 142 500 km.'
-            ];
+        $details = $this->financeService->getOperationAuditDetails($this->actor()->getAgency(), $id, $type);
+        if (null === $details) {
+            throw $this->createNotFoundException('Opération financière introuvable dans votre agence.');
         }
 
-
         return $this->render('admin/agency/finance/show.html.twig', [
-            'page' => 'finances',
-            'type' => $type,
-            'operation' => $operation
+            'page'      => 'finances',
+            'type'      => $type,
+            'operation' => $details,
         ]);
-    } //show
+    }
 
-    #[Route('/admin/agency/finance/expense/add', name: 'admin_agency_finance_expense_add')]
-    public function expense_add(Request $request): Response
+    #[Route('/admin/agency/finance/expense/add', name: 'admin_agency_finance_expense_add', methods: ['GET', 'POST'])]
+    public function expenseAdd(Request $request): Response
     {
+        $actor  = $this->actor();
+        $agency = $actor->getAgency();
+        $restrictedBranch = $actor->getBranch();
 
-        // 1. Simulation du rôle de l'utilisateur connecté (True = SuperManager, False = Gérant de succursale)
-        $isNetworkManager = true;
+        $expenseData = new ExpenseCreateData();
+        if (null !== $restrictedBranch) {
+            $expenseData->branch = $restrictedBranch;
+        }
 
-        // Si l'utilisateur est gérant simple, on mémorise l'ID de sa succursale attitrée (ex: Kinshasa Centre)
-        $userBranchId = 1;
+        $form = $this->createForm(ExpenseCreateType::class, $expenseData, [
+            'agency'            => $agency,
+            'restricted_branch' => $restrictedBranch,
+        ]);
+        $form->handleRequest($request);
 
-        // 2. Liste globale des succursales (Uniquement exploitée par le Network Manager)
-        $branches = [
-            ['id' => 1, 'name' => 'Kinshasa Centre (Siège)'],
-            ['id' => 2, 'name' => 'Succursale Goma'],
-            ['id' => 3, 'name' => 'Succursale Matadi'],
-        ];
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $expense = $this->financeService->createExpense($expenseData, $actor);
+                $this->addFlash('success', sprintf(
+                    'Dépense [%s] (%s %s) enregistrée avec succès.',
+                    $expense->getName(),
+                    number_format((float) $expense->getAmount(), 2, ',', ' '),
+                    $expense->getCurrency()?->getCode()
+                ));
 
-        // 3. Devises autorisées par le système
-        $activeCurrencies = [
-            ['code' => 'USD', 'symbol' => '$'],
-            ['code' => 'CDF', 'symbol' => 'FC'],
-            ['code' => 'EUR', 'symbol' => '£'],
-        ];
-
-        // 4. Liste des sessions de caisses de guichet physiques actives (Uniquement pour type = other & source = cash_register)
-        $activeSessions = [
-            ['id' => 1, 'label' => 'Guichet Billetterie 1 (Jean M.)', 'balance' => '1 425 000 CDF'],
-            ['id' => 2, 'label' => 'Guichet Colis & Fret (Marie K.)', 'balance' => '450 USD'],
-        ];
-
-
-
+                return $this->redirectToRoute('admin_agency_finance_index');
+            } catch (\DomainException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
+        }
 
         return $this->render('admin/agency/finance/expense_add.html.twig', [
-            'page' => 'finances',
-            'is_network_manager' => $isNetworkManager,
-            'user_branch_id'     => $userBranchId,
-            'branches'           => $branches,
-            'active_currencies'  => $activeCurrencies,
-            'active_sessions'    => $activeSessions,
+            'page'               => 'finances',
+            'is_network_manager' => null === $restrictedBranch,
+            'form'               => $form->createView(),
         ]);
-    } //expense_add
+    }
 
-
-    #[Route('/admin/agency/finance/cashier/journal/{code}', name: 'admin_agency_finance_journal')]
-    public function journal_caissier(Request $request): Response
+    #[Route('/admin/agency/finance/cashier/journal/{code}', name: 'admin_agency_finance_journal', requirements: ['code' => '\d+'], methods: ['GET'])]
+    public function journalCaissier(int $code): Response
     {
-        return $this->render('admin/agency/finance/journal_caissier.html.twig', [
+        $journal = $this->financeService->getSessionJournalDetails($this->actor()->getAgency(), $code);
+        if (null === $journal) {
+            throw $this->createNotFoundException('Session de caisse introuvable.');
+        }
+
+        return $this->render('admin/agency/cashier/journal_caissier.html.twig', [
             'page' => 'finances',
-        ]);
-    } //journal
-
-
-
+        ] + $journal);
+    }
 }

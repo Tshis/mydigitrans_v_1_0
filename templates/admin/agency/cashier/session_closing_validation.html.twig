@@ -1,8 +1,12 @@
-{# templates/admin/agency/cashier/validate.html.twig #}
+{# templates/admin/agency/cashier/session_closing_validation.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
 	<div class="admin-booking-creation-scope container">
+
+		{% for message in app.flashes('error') %}
+			<div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+		{% endfor %}
 
 		<header class="header-refined mb-25">
 			<div class="header-main-info">
@@ -12,13 +16,13 @@
 				<div class="info">
 					<h1>Clôture de Caisse & Arbitrage Comptable</h1>
 					<p class="subtitle">Validation contradictoire de la session
-						<strong class="text-primary">CS-2026-0711</strong>
+						<strong class="text-primary">{{ sessionCode }}</strong>
 					</p>
 				</div>
 			</div>
 		</header>
 
-		<form action="#" method="POST" class="reservation-form">
+		{{ form_start(form, {attr: {class: 'reservation-form'}}) }}
 			<div class="reservation-container">
 
 				{# PANNEAU MAÎTRE (GAUCHE) #}
@@ -27,12 +31,12 @@
 						<h2>Comparatif des Écarts par Devise</h2>
 
 						<div class="dynamic-discrepancy-grid">
-							{# Boucle Twig sur chaque ligne de solde configurée #}
-							{% if session_balance > 0 %}
-								<div class="currency-discrepancy-block">
+							{% for bal in session.balances %}
+								{% set diff = bal.closingBalanceDifference + 0 %}
+								<div class="currency-discrepancy-block mb-15">
 									<div class="block-header">
 										<h3>Devise de transaction :
-											<strong>{{ session_balance.currency }}</strong>
+											<strong>{{ bal.currency.code }}</strong>
 										</h3>
 									</div>
 									<div class="field-group">
@@ -41,7 +45,7 @@
 											<input
 												type="text"
 												class="input-readonly font-bold"
-												value="{{ session_balance.closingBalanceExpected }} {{ session_balance.currency }}"
+												value="{{ (bal.closingBalanceExpected ?? 0)|number_format(2, ',', ' ') }} {{ bal.currency.code }}"
 												readonly
 											>
 										</div>
@@ -50,7 +54,7 @@
 											<input
 												type="text"
 												class="input-readonly text-highlight-input"
-												value="{{ session_balance.closingBalanceDeclared }} {{ session_balance.currency }}"
+												value="{{ (bal.closingBalanceDeclared ?? 0)|number_format(2, ',', ' ') }} {{ bal.currency.code }}"
 												readonly
 											>
 										</div>
@@ -58,14 +62,17 @@
 											<label>Écart constaté</label>
 											<input
 												type="text"
-												class="input-readonly {% if session_balance.closingBalanceDifference < 0 %}text-danger-mode{% else %}text-success-mode{% endif %} font-bold"
-												value="{{ session_balance.closingBalanceDifference }} {{ session_balance.currency }}"
+												class="input-readonly {{ diff < 0 ? 'text-danger-mode' : 'text-success-mode' }} font-bold"
+												value="{{ diff|number_format(2, ',', ' ') }} {{ bal.currency.code }}"
 												readonly
 											>
 										</div>
 									</div>
+									{% if bal.closingObservation %}
+										<p class="sub-meta-text mt-10"><strong>Note du caissier :</strong> {{ bal.closingObservation }}</p>
+									{% endif %}
 								</div>
-							{% endif %}
+							{% endfor %}
 						</div>
 					</div>
 
@@ -73,10 +80,9 @@
 					<div class="card">
 						<h2>Rapport d'Arbitrage & Signature du Gérant</h2>
 						<div class="field">
-							<label>Note explicative de décharge *</label>
-							<textarea name="manager_note" class="text-area-arbitrage"
-							placeholder="Saisissez les conclusions de l'inventaire physique avec l'agent (ex: Erreur de rendu de monnaie sur le billet #44)..."
-							required></textarea>
+							{{ form_label(form.managerConclusion) }}
+							{{ form_widget(form.managerConclusion) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.managerConclusion) }}</div>
 						</div>
 					</div>
 				</div>
@@ -90,18 +96,21 @@
 								<i class="fa-solid fa-triangle-exclamation"></i>
 								Action irréversible
 							</p>
-							<p class="notice-text">La signature de cette décharge gèle définitivement les écritures
-								comptables de la journée.</p>
+							<p class="notice-text">La signature de cette décharge gèle définitivement les écritures comptables de la journée.</p>
 						</div>
 
 						<ul class="billing-details-list">
 							<li>
+								<strong>Guichet :</strong>
+								<span>{{ session.cashRegister.name }}</span>
+							</li>
+							<li>
 								<strong>Caissier :</strong>
-								<span>Marie Kabedi</span>
+								<span>{{ session.openedBy.fullName }}</span>
 							</li>
 							<li>
 								<strong>Statut cible :</strong>
-								<span class="text-success-mode">validated</span>
+								<span class="text-success-mode">Validée</span>
 							</li>
 						</ul>
 
@@ -113,6 +122,6 @@
 				</aside>
 
 			</div>
-		</form>
+		{{ form_end(form) }}
 	</div>
 {% endblock %}

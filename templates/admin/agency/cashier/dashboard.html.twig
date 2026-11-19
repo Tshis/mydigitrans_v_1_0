@@ -9,22 +9,28 @@
 {% block body %}
 	<div class="admin-cashier-dashboard-scope container">
 
+		{% for message in app.flashes('success') %}
+			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+		{% endfor %}
+
+		{% for message in app.flashes('error') %}
+			<div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+		{% endfor %}
+
 		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header-refined my-30">
 			<div class="header-main-info">
 				<div class="info">
 					<h1>
 						<i class="fa-solid fa-vault"></i>
-						Tableau de Bord de la Caisse
+						Tableau de Bord de la Caisse — {{ session.cashRegister.name }}
 					</h1>
-					<p class="subtitle">Suivi des soldes physiques en direct, enregistrement des flux et contrôle de
-						session.</p>
+					<p class="subtitle">Suivi des soldes physiques en direct, enregistrement des flux et contrôle de session.</p>
 				</div>
 			</div>
 		</header>
 
 		<div class="header mb-30">
-
 			<div class="border-actions-group">
 				<a href="{{ path('admin_agency_cashier_payment') }}" class="btn-refined btn-success-gradient">
 					<i class="fa-solid fa-cash-register"></i>
@@ -32,7 +38,7 @@
 				</a>
 				<a href="{{ path('admin_agency_cashier_expense') }}" class="btn-refined btn-primary-gradient">
 					<i class="fa-solid fa-money-bill-transfer"></i>
-					Bons de décaissement (2)
+					Bons de décaissement ({{ pending_expense_count }})
 				</a>
 				<a href="{{ path('admin_agency_cashier_session_closing') }}" class="btn-refined btn-danger-gradient">
 					<i class="fa-solid fa-lock"></i>
@@ -43,39 +49,38 @@
 
 		{# --- LES SOLDES DU TIROIR-CAISSE DYNAMIQUE (PAR DEVISE ACTIVE) --- #}
 		<div class="stats-overview-grid mb-25">
-			{# Boucle dynamique sur les soldes réels présents dans le tiroir #}
-			{% if vault_balances %}
+			{% for bal in balances %}
 				<div class="stat-card">
 					<div class="stat-icon stat-icon--success">
 						<i class="fa-solid fa-money-bill-wave"></i>
 					</div>
 					<div class="stat-details">
 						<p class="stat-label">Solde Tiroir
-							<span class="text-primary">{{ vault_balances.code }}</span>
+							<span class="text-primary">{{ bal.code }}</span>
 						</p>
 						<strong class="stat-value text-success">
-							{{ vault_balances.amount }}
-							<small>{{ vault_balances.code }}</small>
+							{{ bal.formatted }}
+							<small>{{ bal.code }}</small>
 						</strong>
 					</div>
 				</div>
-			{% endif %}
+			{% endfor %}
 
-			{# Carte consolidée des dépenses de la journée multi-devises #}
+			{# Carte consolidée des dépenses de la session multi-devises #}
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--danger">
 					<i class="fa-solid fa-arrow-trend-down"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">Total Sorties (Ce jour)</span>
+					<span class="stat-label">Total Sorties (Cette session)</span>
 					<div class="expenses-currency-stack">
-						
-						<strong class="stat-value text-danger">
-							{{ daily_expenses.amount }}
-							{{ currency_base.code }}
-						</strong>
-					
-						
+						{% for code, amt in expenses_by_currency %}
+							<strong class="stat-value text-danger">
+								{{ amt|number_format(2, ',', ' ') }} {{ code }}
+							</strong>
+						{% else %}
+							<strong class="stat-value text-muted">0,00</strong>
+						{% endfor %}
 					</div>
 				</div>
 			</div>
@@ -85,7 +90,7 @@
 		<div class="card monitoring-table-card">
 			<h2>
 				<i class="fa-solid fa-list-ol"></i>
-				Grand Livre des Flux du Jour
+				Grand Livre des Flux de la Session
 			</h2>
 			<table class="table table-scrollable table-striped js-datatable">
 				<thead>
@@ -93,71 +98,52 @@
 						<th>Heure & Réf</th>
 						<th>Direction</th>
 						<th>Libellé / Motif</th>
-						<th>Mode de Règlement</th>
+						<th>Opérateur</th>
 						<th class="text-right">Montant & Devise</th>
 						<th class="text-right">Action</th>
 					</tr>
 				</thead>
 				<tbody>
-					{# Ligne 1 : Flux Entrant #}
-					<tr>
-						<td>
-							<strong>09h42</strong>
-							<span class="sub-meta-text">FLX-9834</span>
-						</td>
-						<td>
-							<span class="cash-badge badge-entry">IN</span>
-						</td>
-						<td>
-							<strong>Billet Passager : Mputu Antoinette</strong>
-							<span class="sub-meta-text">Réf: RVS-2026-8943 • Kinshasa → Kenge</span>
-						</td>
-						<td>
-							<span class="text-success-mode font-weight-700">Espèces</span>
-						</td>
-						<td class="text-right text-success-mode font-bold">
-							+45 000 CDF
-						</td>
-						<td class="text-right table-action-buttons">
-							<a
-								href="{{ path('admin_agency_cashier_show_payment') }}"
-								class="table-action-trigger view"
-								title="Voir le reçu"
-							>
-								<i class="fa-solid fa-eye"></i>
-							</a>
-						</td>
-					</tr>
-
-					{# Ligne 2 : Flux Sortant #}
-					<tr>
-						<td>
-							<strong>11h15</strong>
-							<span class="sub-meta-text">FLX-9835</span>
-						</td>
-						<td>
-							<span class="cash-badge badge-exit">OUT</span>
-						</td>
-						<td>
-							<strong>Carburant Bus 01 (Marcopolo)</strong>
-							<span class="sub-meta-text">Reçu Station Engen #44</span>
-						</td>
-						<td>
-							<span class="text-danger-mode font-weight-700">Espèces</span>
-						</td>
-						<td class="text-right text-danger-mode font-bold">
-							-60 000 CDF
-						</td>
-						<td class="text-right table-action-buttons">
-							<a
-								href="{{ path('admin_agency_cashier_show_expense') }}"
-								class="table-action-trigger view"
-								title="Voir la pièce justificative"
-							>
-								<i class="fa-solid fa-eye"></i>
-							</a>
-						</td>
-					</tr>
+					{% for op in operations %}
+						{% set isIn = op.type.value == 'in' %}
+						<tr>
+							<td>
+								<strong>{{ op.createdAt|date('H\\hi') }}</strong>
+								<span class="sub-meta-text">FLX-{{ '%04d'|format(op.id) }}</span>
+							</td>
+							<td>
+								{% if isIn %}
+									<span class="cash-badge badge-entry">IN</span>
+								{% else %}
+									<span class="cash-badge badge-exit">OUT</span>
+								{% endif %}
+							</td>
+							<td>
+								<strong>{{ op.description }}</strong>
+							</td>
+							<td>
+								<span class="sub-meta-text">{{ op.createdBy.fullName }}</span>
+							</td>
+							<td class="text-right {{ isIn ? 'text-success-mode' : 'text-danger-mode' }} font-bold">
+								{{ isIn ? '+' : '-' }}{{ op.amount|number_format(2, ',', ' ') }} {{ op.currency.code }}
+							</td>
+							<td class="text-right table-action-buttons">
+								{% if op.referenceType.value == 'agency_payment' %}
+									<a href="{{ path('admin_agency_cashier_show_payment', {'id': op.referenceId}) }}" class="table-action-trigger view" title="Voir le reçu">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								{% elseif op.referenceType.value == 'expense' %}
+									<a href="{{ path('admin_agency_cashier_show_expense', {'id': op.referenceId}) }}" class="table-action-trigger view" title="Voir la pièce justificative">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								{% endif %}
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="6" class="text-center text-muted py-15">Aucune transaction enregistrée sur cette session pour le moment.</td>
+						</tr>
+					{% endfor %}
 				</tbody>
 			</table>
 		</div>

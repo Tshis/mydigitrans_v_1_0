@@ -1,97 +1,114 @@
-/**
- * Mydigitrans SaaS - Module Espace Caissier
- * Gestion des encaissements croisés et co-paiements (Multi-devises RDC)
- */
 document.addEventListener('DOMContentLoaded', () => {
     const searchForm = document.getElementById('voucher-search-form');
     const voucherInput = document.getElementById('voucher-input');
-    const paymentContainer = document.getElementById('cashier-payment-container');
+    const lookupError = document.getElementById('voucher-lookup-error');
 
-    const docNatureText = document.getElementById('doc-nature-text');
-    const docRefText = document.getElementById('doc-ref-text');
+    const hiddenRef = document.getElementById('cashier_payment_voucherReference');
     const baseAmountDisplay = document.getElementById('base-amount-display');
+    const finalAmountDisplay = document.getElementById('final-amount-display');
+    const currencyBadges = document.querySelectorAll('.id-doc-currency');
+
     const discountInput = document.getElementById('discount-input');
     const discountType = document.getElementById('discount-type');
-    const finalAmountDisplay = document.getElementById('final-amount-display');
-
-    const docCurrencyBadges = document.querySelectorAll('.id-doc-currency');
-    const currentDocCurrencySpan = document.querySelector('.js-current-doc-currency');
-
-    // Les deux nouveaux champs d'encaissement réel libre
     const capturedAmountInput = document.getElementById('captured-amount');
     const capturedCurrencySelect = document.getElementById('captured-currency-select');
 
-    let baseValue = 45000;
-    let currentCurrencyCode = 'CDF'; 
+    const docNatureText = document.getElementById('doc-nature-text');
+    const docRefText = document.getElementById('doc-ref-text');
+    const docActor1Label = document.getElementById('doc-actor1-label');
+    const docActor1Name = document.getElementById('doc-actor1-name');
+    const docActor1Phone = document.getElementById('doc-actor1-phone');
+    const docActor2Label = document.getElementById('doc-actor2-label');
+    const docActor2Name = document.getElementById('doc-actor2-name');
+    const docActor2Phone = document.getElementById('doc-actor2-phone');
 
-    if (paymentContainer) paymentContainer.style.display = 'none';
-
-    if (searchForm) {
-        searchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const query = voucherInput.value.trim().toLowerCase();
-
-            if (paymentContainer) paymentContainer.style.display = 'grid';
-
-            if (query.includes('colis') || query.includes('col')) { 
-                docNatureText.innerText = "BON D'EXPÉDITION COLIS (FRET)";
-                docRefText.innerText = "SHP-2026-0402";
-                baseValue = 25.00;
-                currentCurrencyCode = 'USD';
-            } else { 
-                docNatureText.innerText = "BON DE RÉSERVATION PASSAGER";
-                docRefText.innerText = "RSV-2026-8943";
-                baseValue = 45000;
-                currentCurrencyCode = 'CDF';
-            }
-
-            baseAmountDisplay.value = new Intl.NumberFormat('fr-FR').format(baseValue);
-
-            if (currentDocCurrencySpan) currentDocCurrencySpan.innerText = currentCurrencyCode;
-            docCurrencyBadges.forEach(badge => badge.innerText = currentCurrencyCode);
-
-            // Pré-remplissage indicatif par confort, mais l'agent peut modifier librement !
-            if (capturedAmountInput) capturedAmountInput.value = baseValue;
-            if (capturedCurrencySelect) capturedCurrencySelect.value = currentCurrencyCode;
-
-            if (discountInput) discountInput.value = '';
-            recalculateTotal();
-        });
+    function formatMoney(val) {
+        return new Intl.NumberFormat('fr-FR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(val);
     }
 
-    function recalculateTotal() {
-        if (!discountInput || !finalAmountDisplay) return;
+    function recalculateNet() {
+        const rawBase = parseFloat(baseAmountDisplay?.dataset.raw || '0') || 0;
+        const disc = Math.max(0, parseFloat(discountInput?.value || '0') || 0);
+        const type = discountType?.value || 'percent';
 
-        let discount = parseFloat(discountInput.value) || 0;
-        let finalValue = baseValue;
-
-        if (discount < 0) {
-            discount = 0;
-            discountInput.value = 0;
+        let net = rawBase;
+        if (type === 'percent') {
+            const pct = Math.min(100, disc);
+            net = rawBase - (rawBase * pct / 100);
+        } else {
+            net = Math.max(0, rawBase - disc);
         }
 
-        if (discountType.value === 'percent') { 
-            if (discount > 100) {
-                discount = 100;
-                discountInput.value = 100;
-            }
-            finalValue = baseValue - (baseValue * (discount / 100));
-        } else { 
-            if (discount > baseValue) {
-                discount = baseValue;
-                discountInput.value = baseValue;
-            }
-            finalValue = baseValue - discount;
+        net = Math.round(net * 100) / 100;
+        if (finalAmountDisplay) {
+            finalAmountDisplay.value = formatMoney(net);
         }
-
-        finalAmountDisplay.value = new Intl.NumberFormat('fr-FR').format(finalValue);
-        
-        // Si aucune remise n'est touchée, on synchronise la suggestion de perception
-        if (discount === 0 && capturedAmountInput && capturedCurrencySelect.value === currentCurrencyCode) {
-            capturedAmountInput.value = finalValue;
+        if (capturedAmountInput && rawBase > 0) {
+            capturedAmountInput.value = net.toFixed(2);
         }
     }
 
-    if (discountInput) discountInput.addEventListener('input', recalculateTotal);
-    if (discountType) discountType.addEventListener('change', recalculateTotal);
+    async function loadVoucher(ref) {
+        const cleanRef = ref.trim().toUpperCase();
+        if (!cleanRef || !searchForm) return;
+
+        lookupError?.classList.add('is-hidden');
+        const url = `${searchForm.dataset.lookupUrl}?ref=${encodeURIComponent(cleanRef)}`;
+
+        try {
+            const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            const json = await resp.json();
+
+            if (!resp.ok || !json.found) {
+                if (lookupError) {
+                    lookupError.textContent = json.message || 'Document introuvable.';
+                    lookupError.classList.remove('is-hidden');
+                }
+                return;
+            }
+
+            const v = json.voucher;
+            if (hiddenRef) hiddenRef.value = v.reference;
+            if (baseAmountDisplay) {
+                baseAmountDisplay.dataset.raw = String(v.amountRaw);
+                baseAmountDisplay.value = formatMoney(v.amountRaw);
+            }
+            currencyBadges.forEach(el => { el.textContent = v.currencyCode; });
+
+            if (capturedCurrencySelect && v.currencyId) {
+                capturedCurrencySelect.value = String(v.currencyId);
+            }
+
+            if (docNatureText) docNatureText.textContent = v.natureLabel;
+            if (docRefText) docRefText.textContent = v.reference;
+            if (docActor1Label) docActor1Label.textContent = v.actor1Label;
+            if (docActor1Name) docActor1Name.textContent = v.actor1Name;
+            if (docActor1Phone) docActor1Phone.textContent = v.actor1Phone;
+            if (docActor2Label) docActor2Label.textContent = v.actor2Label;
+            if (docActor2Name) docActor2Name.textContent = v.actor2Name;
+            if (docActor2Phone) docActor2Phone.textContent = v.actor2Phone;
+
+            recalculateNet();
+        } catch (err) {
+            if (lookupError) {
+                lookupError.textContent = 'Erreur réseau lors de la recherche du dossier.';
+                lookupError.classList.remove('is-hidden');
+            }
+        }
+    }
+
+    searchForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        loadVoucher(voucherInput?.value || '');
+    });
+
+    discountInput?.addEventListener('input', recalculateNet);
+    discountType?.addEventListener('change', recalculateNet);
+
+    if (voucherInput && voucherInput.value.trim() !== '') {
+        loadVoucher(voucherInput.value);
+    }
 });

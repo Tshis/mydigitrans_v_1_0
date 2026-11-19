@@ -7,8 +7,11 @@
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-index-finance-scope container">
+	<div class="admin-index-finance-scope container">
+
+		{% for message in app.flashes('success') %}
+			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+		{% endfor %}
 
 		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header-refined my-30">
@@ -30,9 +33,7 @@
 		</header>
 
 		{# --- CARTES DE STATISTIQUES CONSOLIDÉES MULTI-DEVISES --- #}
-		<div
-			class="stats-overview-grid mb-25">
-			{# CARTE 1 : pile des recettes du jour #}
+		<div class="stats-overview-grid mb-25">
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--success">
 					<i class="fa-solid fa-arrow-trend-up"></i>
@@ -42,17 +43,15 @@
 					<div class="currency-financial-stack">
 						{% for revenue in daily_revenues %}
 							<p>
-								<strong class="stat-value text-success">{{ revenue.amount }}
-									{{ revenue.code }}</strong>
+								<strong class="stat-value text-success">{{ revenue.amount }} {{ revenue.code }}</strong>
 							</p>
 						{% else %}
-							<strong class="stat-value text-muted">0.00</strong>
+							<strong class="stat-value text-muted">0,00</strong>
 						{% endfor %}
 					</div>
 				</div>
 			</div>
 
-			{# CARTE 2 : pile des dépenses du jour #}
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--danger">
 					<i class="fa-solid fa-arrow-trend-down"></i>
@@ -62,17 +61,15 @@
 					<div class="currency-financial-stack">
 						{% for expense in daily_expenses %}
 							<p>
-								<strong class="stat-value text-danger">{{ expense.amount }}
-									{{ expense.code }}</strong>
+								<strong class="stat-value text-danger">{{ expense.amount }} {{ expense.code }}</strong>
 							</p>
 						{% else %}
-							<strong class="stat-value text-muted">0.00</strong>
+							<strong class="stat-value text-muted">0,00</strong>
 						{% endfor %}
 					</div>
 				</div>
 			</div>
 
-			{# CARTE 3 : pile des soldes nets #}
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--primary">
 					<i class="fa-solid fa-scale-balanced"></i>
@@ -82,11 +79,10 @@
 					<div class="currency-financial-stack">
 						{% for net in daily_nets %}
 							<p>
-								<strong class="stat-value text-primary">{{ net.amount }}
-									{{ net.code }}</strong>
+								<strong class="stat-value text-primary">{{ net.amount }} {{ net.code }}</strong>
 							</p>
 						{% else %}
-							<strong class="stat-value text-muted">0.00</strong>
+							<strong class="stat-value text-muted">0,00</strong>
 						{% endfor %}
 					</div>
 				</div>
@@ -95,35 +91,31 @@
 
 		{# --- ZONE DE RECHERCHE ET DE FILTRE AVANCÉ --- #}
 		<div class="card trip-filters-card mb-20">
-			<form action="" method="GET">
-				<div
-					class="field-group">
-					{# Filtre 1 : Date exacte #}
+			<form action="{{ path('admin_agency_finance_index') }}" method="GET">
+				<div class="field-group">
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Rechercher par date exacte</label>
-						<input type="date" name="filter_date" class="admin-bus-layout-add-input" value="">
+						<input type="date" name="filter_date" class="admin-bus-layout-add-input" value="{{ filters.date }}">
 					</div>
 
-					{# Filtre 2 : Succursales / Branches #}
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Filtrer par Succursale</label>
 						<select name="filter_branch" class="admin-bus-layout-add-select">
 							<option value="">-- Toutes les succursales --</option>
 							{% for branch in branches %}
-								<option value="{{ branch.id }}">
+								<option value="{{ branch.id }}" {{ filters.branchId == branch.id ? 'selected' : '' }}>
 									{{ branch.name }}
 								</option>
 							{% endfor %}
 						</select>
 					</div>
 
-					{# Filtre 3 : Type de flux financier #}
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Filtrer par type de flux</label>
 						<select name="filter_type" class="admin-bus-layout-add-select">
 							<option value="">-- Tous les mouvements --</option>
-							<option value="payment">Recettes (Paiements Entrants)</option>
-							<option value="expense">Dépenses (Décaissements)</option>
+							<option value="payment" {{ filters.type == 'payment' ? 'selected' : '' }}>Recettes (Paiements Entrants)</option>
+							<option value="expense" {{ filters.type == 'expense' ? 'selected' : '' }}>Dépenses (Décaissements)</option>
 						</select>
 					</div>
 				</div>
@@ -155,9 +147,7 @@
 							<tr>
 								<td>
 									<strong>{{ operation.date }}</strong>
-									<span class="sub-meta-text">{{ operation.time }}
-										•
-										{{ operation.reference }}</span>
+									<span class="sub-meta-text">{{ operation.time }} • {{ operation.reference }}</span>
 								</td>
 								<td>
 									<strong>{{ operation.label }}</strong>
@@ -167,14 +157,11 @@
 									<strong>{{ operation.mode }}</strong>
 									<span class="sub-meta-text">{{ operation.origin }}</span>
 								</td>
-								<td class="text-right font-bold {% if operation.type == 'payment' %}text-success{% else %}text-danger{% endif %}">
-									{% if operation.type == 'payment' %}+{% else %}-
-									{% endif %}
-									{{ operation.amount }}
-									{{ operation.currency }}
+								<td class="text-right font-bold {{ operation.type == 'payment' ? 'text-success' : 'text-danger' }}">
+									{{ operation.type == 'payment' ? '+' : '-' }}{{ operation.amount }} {{ operation.currency }}
 								</td>
 								<td>
-									<span class="cash-badge {% if operation.type == 'payment' %}badge-confirmed{% else %}badge-impacted{% endif %}">
+									<span class="cash-badge {{ operation.type == 'payment' ? 'badge-confirmed' : 'badge-impacted' }}">
 										{{ operation.status }}
 									</span>
 								</td>

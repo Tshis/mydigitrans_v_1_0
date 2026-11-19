@@ -1,32 +1,28 @@
-{# templates/admin/agency/cashier/open.html.twig #}
+{# templates/admin/agency/cashier/session_openhtml.twig #}
 {% extends "admin/base.html.twig" %}
-
-{% block javascripts %}
-	{{ parent() }}
-	<script src="/js/cashier-open.js" defer></script>
-{% endblock %}
 
 {% block body %}
 	<div class="admin-cashier-session-scope container">
 
+		{% for message in app.flashes('error') %}
+			<div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+		{% endfor %}
+
 		<header class="header-refined mb-25">
-
 			<div class="header-main-info">
-
 				<div class="info">
 					<h1>
 						<i class="fa-solid fa-lock-open text-primary"></i>
 						Ouverture de Session & Confirmation de Dotation
 					</h1>
-					<p class="subtitle">Vérifiez et confirmez le montant physique de l'enveloppe de monnaie remise par votre
-						gérant ce matin.</p>
+					<p class="subtitle">Vérifiez et confirmez le montant physique de l'enveloppe de monnaie remise par votre gérant ce matin.</p>
 				</div>
 			</div>
 		</header>
 
 		<div class="session-init-container">
 
-			{# DROITE : PROFIL ET DOTATION DE LA SESSIONS (Configurée par le gérant en amont) #}
+			{# DROITE : PROFIL ET DOTATION DE LA SESSION #}
 			<aside class="summary">
 				<div class="card summary-sticky-card alert-session-box">
 					<h2>
@@ -36,32 +32,30 @@
 
 					<div class="meta-item mb-15">
 						<span class="session-micro-label">Caissier Titulaire</span>
-						<strong class="text-dark">Jean Mukendi</strong>
+						<strong class="text-dark">{{ actor.fullName }}</strong>
 						<span class="sub-meta-text">Affecté au :
-							<strong>Guichet Principal 01</strong>
+							<strong>{{ session.cashRegister.name }} ({{ session.cashRegister.code }})</strong>
 						</span>
 					</div>
 
 					<hr class="summary-divider mb-15">
 
-					{# Zone de sécurité dynamique : Affiche les dotations attendues configurées dans la table pivot
-				CashSessionBalance #}
 					<div class="meta-item prev-session-audit-box">
 						<span class="session-micro-label text-highlight">Dotation attendue du matin (Par le Gérant)</span>
 						<ul class="dynamic-expected-balances-list">
-							{% if active_currency %}
+							{% for bal in session.balances %}
 								<li>
 									•
-									<span class="js-expected-val" data-currency="{{ active_currency.code }}">{{
-								active_currency.expected_amount }}</span>
-									{{ active_currency.code }}
+									<span class="js-expected-val" data-currency="{{ bal.currency.code }}">{{ bal.openingBalanceExpected|number_format(2, ',', ' ') }}</span>
+									{{ bal.currency.code }}
 								</li>
 							{% else %}
 								<li class="text-danger">Aucune dotation configurée pour ce matin.</li>
-							{% endif %}
+							{% endfor %}
 						</ul>
-						<span class="sub-meta-text inline-notice-italic">Le gérant déclare vous avoir remis cette enveloppe.
-							Votre saisie à gauche doit y correspondre.</span>
+						{% if session.balances|first and session.balances|first.openingNote %}
+							<p class="sub-meta-text mt-10"><strong>Note du gérant :</strong> {{ session.balances|first.openingNote }}</p>
+						{% endif %}
 					</div>
 				</div>
 			</aside>
@@ -72,37 +66,36 @@
 					<i class="fa-solid fa-calculator"></i>
 					Comptage des espèces reçues
 				</h2>
-				<form action="#" method="POST" id="session-open-form">
+				<form action="{{ path('admin_agency_cashier_session_open') }}" method="POST" id="session-open-form">
+					<input type="hidden" name="_token" value="{{ csrf_token('open_session_' ~ session.id) }}">
 
-					{# Boucle magique : Génère les champs uniquement pour les devises actives de l'agence #}
 					<div class="field-group mb-15 grid-dynamic-currencies">
-						
-						<div class="field">
-							<label class="session-micro-label">Espèces physiques en
-								{{ active_currency.code }}
-								*</label>
-							<div class="input-currency-wrapper">
-								<input
-									type="number"
-									name="opening_balances[{{ active_currency.code }}]"
-									class="input-session-field js-declared-input"
-									data-currency="{{ active_currency.code }}"
-									placeholder="0"
-									min="0"
-									step="0.01"
-									required
-								>
-								<span class="currency-badge-suffix">{{ active_currency.code }}</span>
+						{% for bal in session.balances %}
+							<div class="field">
+								<label class="session-micro-label">Espèces physiques en {{ bal.currency.code }} *</label>
+								<div class="input-currency-wrapper">
+									<input
+										type="number"
+										name="opening_balances[{{ bal.currency.code }}]"
+										class="input-session-field js-declared-input"
+										data-currency="{{ bal.currency.code }}"
+										placeholder="0.00"
+										min="0"
+										step="0.01"
+										value="{{ bal.openingBalanceExpected }}"
+										required
+									>
+									<span class="currency-badge-suffix">{{ bal.currency.code }}</span>
+								</div>
+								<span class="sub-meta-text">Comptez les billets physiques reçus en {{ bal.currency.code }}.</span>
 							</div>
-							<span class="sub-meta-text">Comptez les billets physiques reçus en
-								{{ active_currency.code }}.</span>
-						</div>
+						{% endfor %}
 					</div>
 
 					<div class="field mb-15">
 						<label class="session-micro-label">Observations / Notes d'ouverture</label>
 						<textarea name="opening_note" class="input-session-field text-area-fixed"
-						placeholder="Signalez si des coupures sont trop usées ou si l'enveloppe reçue ne correspond pas..."></textarea>
+							placeholder="Signalez si des coupures sont trop usées ou si l'enveloppe reçue ne correspond pas..."></textarea>
 					</div>
 
 					<div class="block-action-wrapper">
@@ -116,60 +109,4 @@
 		</div>
 
 	</div>
-
-	{# Intercepteur JS universel et décorrélé des devises figées #}
-	<script>
-		document.addEventListener("DOMContentLoaded", () => {
-			const openForm = document.getElementById("session-open-form");
-
-			if (openForm) {
-				openForm.addEventListener("submit", (e) => {
-					let hasDiscrepancy = false;
-					let logExpected = [];
-					let logDeclared = [];
-
-					// 1. Parcourir toutes les valeurs attendues générées à droite
-					const expectedElements =
-						document.querySelectorAll(".js-expected-val");
-
-					expectedElements.forEach((el) => {
-						const currency = el.getAttribute("data-currency");
-						const expectedAmt = parseFloat(el.innerText) || 0;
-
-						// Trouver l'input de déclaration correspondant à gauche
-						const inputEl = document.querySelector(
-							`.js-declared-input[data-currency="${currency}"]`,
-						);
-						const declaredAmt = inputEl
-							? parseFloat(inputEl.value) || 0
-							: 0;
-
-						logExpected.push(`${expectedAmt} ${currency}`);
-						logDeclared.push(`${declaredAmt} ${currency}`);
-
-						if (declaredAmt !== expectedAmt) {
-							hasDiscrepancy = true;
-						}
-					});
-
-					// 2. Si un écart est détecté sur au moins une devise, bloquer le formulaire et lancer l'alerte
-					if (hasDiscrepancy) {
-						e.preventDefault();
-
-						const message =
-							`⚠️ LITIGE DE DOTATION INITIALE DETECTÉ\n\n` +
-							`Le gérant a enregistré en base : ${logExpected.join(
-								" / ",
-							)}.\n` +
-							`Vous déclarez avoir compté en main : ${logDeclared.join(
-								" / ",
-							)}.\n\n` +
-							`Cette différence empêche l'ouverture automatique sécurisée. Un arbitrage du gérant de succursale est requis immédiatement pour forcer ou corriger ce tiroir de caisse.`;
-
-						alert(message);
-					}
-				});
-			}
-		});
-	</script>
 {% endblock %}

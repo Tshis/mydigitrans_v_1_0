@@ -2,8 +2,11 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-	<div
-		class="admin-cashier-show-scope container">
+	<div class="admin-cashier-show-scope container">
+
+		{% for message in app.flashes('success') %}
+			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+		{% endfor %}
 
 		{# --- EN-TÊTE --- #}
 		<header class="header mb-25">
@@ -12,16 +15,17 @@
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
-					<h2>Reçu d'Encaissement N° TXN-45920</h2>
-					<p>Transaction archivée le 03/08/2026 à 09h42 | Statut :
+					<h2>Reçu d'Encaissement N° {{ operation.reference }}</h2>
+					<p>Transaction archivée le {{ operation.date }} à {{ operation.time }} | Statut :
 						<strong class="status-validated">Validé</strong>
 					</p>
 				</div>
 			</div>
 			<div class="border-actions-group">
-				<button type="button" class="btn btn-action-caisse btn-danger-caisse">
+				<button type="button" class="btn btn-action-caisse btn-danger-caisse" onclick="window.print();">
 					<i class="fa-solid fa-print"></i>
-					Réimprimer</button>
+					Imprimer le reçu
+				</button>
 			</div>
 		</header>
 
@@ -30,42 +34,43 @@
 				<div class="card mb-20">
 					<h2>
 						<i class="fa-solid fa-circle-info"></i>
-						Informations de l'Écriture</h2>
+						Informations de l'Écriture
+					</h2>
 					<div class="field-group mb-20">
 						<div class="field">
 							<span class="section-micro-label">Nature du Flux</span>
 							<p class="text-dark bold text-success">FLUX ENTRANT (RECETTE)</p>
 						</div>
 						<div class="field">
-							<span class="section-micro-label">Session Comptable</span>
-							<p class="text-dark bold text-main">Session #CS-2026-0712</p>
+							<span class="section-micro-label">Canal & Session</span>
+							<p class="text-dark bold text-main">{{ operation.funding_source }}</p>
 						</div>
 					</div>
 					<div class="field-group">
 						<div class="field">
 							<span class="section-micro-label">Opérateur / Caissier</span>
-							<p class="text-main bold">Mputu Antoinette</p>
+							<p class="text-main bold">{{ operation.confirmed_by }}</p>
 						</div>
 						<div class="field">
 							<span class="section-micro-label">Succursale</span>
-							<p class="text-main bold">Gare Centrale - Kinshasa</p>
+							<p class="text-main bold">{{ operation.branch_name }}</p>
 						</div>
 					</div>
 				</div>
 				<div class="card">
 					<h2>
 						<i class="fa-solid fa-user-check"></i>
-						Attribution et Client</h2>
+						Prestation & Document Lié
+					</h2>
 					<div class="field-group">
 						<div class="field">
-							<span class="section-micro-label">Client / Voyageur</span>
-							<p class="text-dark bold text-main">Kabila Dieudonné</p>
-							<span class="sub-meta-text">Contact : +243 812 345 678</span>
+							<span class="section-micro-label">Type de prestation</span>
+							<p class="text-dark bold text-main">{{ operation.label }}</p>
+							<span class="sub-meta-text">{{ operation.description }}</span>
 						</div>
 						<div class="field">
-							<span class="section-micro-label">Prestation liée</span>
-							<p class="text-dark bold text-main">Billet Voyage (VIP)</p>
-							<span class="sub-meta-text">Trajet : Kinshasa → Matadi | Siège 01</span>
+							<span class="section-micro-label">Référence Document</span>
+							<p class="text-dark bold text-main">{{ operation.actor }}</p>
 						</div>
 					</div>
 				</div>
@@ -75,21 +80,17 @@
 					<h2>Règlement Encaissé</h2>
 					<ul class="billing-details-list">
 						<li>
-							<strong>Mode de paiement :</strong>
-							<span class="text-main bold">Espèces</span>
+							<strong>Référence pièce :</strong>
+							<span class="text-main bold">{{ operation.reference }}</span>
 						</li>
 						<li>
 							<strong>Devise d'encaissement :</strong>
-							<span class="text-main bold">CDF</span>
-						</li>
-						<li>
-							<strong>Référence pièce :</strong>
-							<span class="text-main bold">FAC-2026-0042</span>
+							<span class="text-main bold">{{ operation.currency }}</span>
 						</li>
 					</ul>
 					<hr class="summary-divider mb-15">
 					<div class="total">Montant Perçu :
-						<strong class="text-success">40 000 CDF</strong>
+						<strong class="text-success">{{ operation.amount }} {{ operation.currency }}</strong>
 					</div>
 				</div>
 			</aside>

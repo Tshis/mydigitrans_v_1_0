@@ -1,8 +1,12 @@
-{# templates/admin/agency/dashboard/succursale.html.twig #}
+{# templates/admin/agency/dashboard/branch.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
 	<div class="admin-dashboard-branch-scope container">
+
+		{% for message in app.flashes('success') %}
+			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+		{% endfor %}
 
 		{# --- EN-TÊTE DE LA PAGE DE LA SUCCURSALE --- #}
 		<header class="header-refined my-30">
@@ -15,7 +19,11 @@
 					<p class="subtitle">Suivi des sessions actives et des guichetiers de la succursale.</p>
 				</div>
 			</div>
-			<div class="right">
+			<div class="right" style="display: flex; gap: 10px;">
+				<a href="{{ path('admin_agency_cashier_session_init') }}" class="btn-refined btn-primary-gradient text-size-12">
+					<i class="fa-solid fa-key"></i>
+					Initialiser une session
+				</a>
 				<a href="{{ path('admin_agency_cashier_add') }}" class="btn-refined btn-success-gradient text-size-12">
 					<i class="fa-solid fa-plus"></i>
 					Nouveau guichet de caisse
@@ -31,7 +39,7 @@
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">Sessions Actives</span>
-					<strong class="stat-value">3 Guichets</strong>
+					<strong class="stat-value">{{ active_sessions_count }} Guichet(s)</strong>
 				</div>
 			</div>
 
@@ -41,9 +49,12 @@
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">Fonds Estimés en Caisse</span>
-					{# Pile de devises de la succursale locale #}
 					<div class="stats-currency-stack">
-						<span class="stat-value text-success">1 875 000 <small>CDF</small></span>
+						{% for code, total in totals_by_currency %}
+							<span class="stat-value text-success">{{ total|number_format(2, ',', ' ') }} <small>{{ code }}</small></span>
+						{% else %}
+							<span class="stat-value text-muted">0,00</span>
+						{% endfor %}
 					</div>
 				</div>
 			</div>
@@ -53,8 +64,8 @@
 					<i class="fa-solid fa-triangle-exclamation"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">Alertes Écarts Clôture</span>
-					<strong class="stat-value text-danger">1 En Attente</strong>
+					<span class="stat-label">Sessions à Arbitrer</span>
+					<strong class="stat-value text-danger">{{ pending_arbitration_count }} En Attente</strong>
 				</div>
 			</div>
 		</div>
@@ -77,119 +88,71 @@
 					</tr>
 				</thead>
 				<tbody>
-					{# Caissier 1 : Session ouverte active #}
-					<tr>
-						<td>
-							<strong>Mputu Antoinette</strong>
-							<span class="sub-meta-text">Guichet Principal #1</span>
-						</td>
-						<td>
-							<span class="session-code-text">CS-2026-0712</span>
-						</td>
-						<td>
-							<span class="session-badge active-status">
-								OUVERTE
-								<p class="status-time-meta">07h00</p>
-							</span>
-						</td>
-						<td>
-							{# Pile dynamique issue de la table CashSessionBalance #}
-							<div class="table-balances-stack">
-								<div class="balance-item">
-									2 450 000 FC
+					{% for s in sessions %}
+						<tr>
+							<td>
+								<strong>{{ s.cashierName }}</strong>
+								<span class="sub-meta-text">{{ s.registerName }} ({{ s.registerCode }})</span>
+							</td>
+							<td>
+								<span class="session-code-text">{{ s.code }}</span>
+							</td>
+							<td>
+								{% if s.status == 'opened' %}
+									<span class="session-badge active-status">
+										OUVERTE
+										<p class="status-time-meta">{{ s.openedTime }}</p>
+									</span>
+								{% elseif s.status == 'pending' %}
+									<span class="session-badge await-status">
+										EN ATTENTE OUVERTURE
+										<p class="status-time-meta">{{ s.openedTime }}</p>
+									</span>
+								{% elseif s.status == 'closed' %}
+									<span class="session-badge await-status">
+										À ARBITRER
+										<p class="status-time-meta">{{ s.openedTime }}</p>
+									</span>
+								{% else %}
+									<span class="session-badge closed-status">
+										VALIDÉE
+										<p class="status-time-meta">{{ s.openedTime }}</p>
+									</span>
+								{% endif %}
+							</td>
+							<td>
+								<div class="table-balances-stack">
+									{% for bal in s.balances %}
+										<div class="balance-item">
+											{{ bal.amount }} {{ bal.code }}
+										</div>
+									{% endfor %}
 								</div>
-							</div>
-						</td>
-						<td class="text-right table-action-buttons">
-							<a
-								href="{{ path('admin_agency_finance_journal', {'code': 2}) }}"
-								class="table-action-trigger view"
-								title="Auditer le journal en direct (Live)"
-							>
-								<i class="fa-solid fa-chart-line"></i>
-							</a>
-						</td>
-					</tr>
-
-					{# Caissier 2 : Session CLÔTURÉE (Prête pour une ré-initialisation / ré-ouverture) #}
-					<tr>
-						<td>
-							<strong>Ilunga Christian</strong>
-							<span class="sub-meta-text">Guichet Fret & Colis</span>
-						</td>
-						<td>
-							<span class="session-code-text">CS-2026-0711</span>
-						</td>
-						<td>
-							<span class="session-badge closed-status">
-								CLÔTURÉE
-								<p class="status-time-meta">06h00</p>
-							</span>
-						</td>
-						<td>
-							<div class="table-balances-stack">
-								<div class="balance-item">
-									1 600 000 FC
-								</div>
-							</div>
-						</td>
-						<td class="text-right table-action-buttons">
-							<a
-								href="{{ path('admin_agency_cashier_session_init', {'code': 2}) }}"
-								class="table-action-trigger init"
-								title="Initialiser l'ouverture d'une session (Top-Down)"
-							>
-								<i class="fa-solid fa-key"></i>
-							</a>
-							<a
-								href="{{ path('admin_agency_finance_journal', {'code': 2}) }}"
-								class="table-action-trigger view"
-								title="Voir l'historique comptable de ce journal"
-							>
-								<i class="fa-solid fa-chart-line"></i>
-							</a>
-						</td>
-					</tr>
-
-					{# Caissier 3 : Session En Attente de validation d'arbitrage #}
-					<tr>
-						<td>
-							<strong>Ilunga Christian</strong>
-							<span class="sub-meta-text">Guichet Fret & Colis</span>
-						</td>
-						<td>
-							<span class="session-code-text">CS-2026-0711</span>
-						</td>
-						<td>
-							<span class="session-badge await-status">
-								A CLOTURER
-								<p class="status-time-meta">06h00</p>
-							</span>
-						</td>
-						<td>
-							<div class="table-balances-stack">
-								<div class="balance-item">
-									1 600 000 FC
-								</div>
-							</div>
-						</td>
-						<td class="text-right table-action-buttons">
-							<a
-								href="{{ path('admin_agency_cashier_session_closing_validation', {'code': 2}) }}"
-								class="table-action-trigger arbitrate"
-								title="Ouvrir l'inventaire contradictoire et arbitrer les écarts"
-							>
-								<i class="fa-solid fa-gavel"></i>
-							</a>
-							<a
-								href="{{ path('admin_agency_finance_journal', {'code': 2}) }}"
-								class="table-action-trigger view"
-								title="Auditer le journal des ventes de cette session"
-							>
-								<i class="fa-solid fa-chart-line"></i>
-							</a>
-						</td>
-					</tr>
+							</td>
+							<td class="text-right table-action-buttons">
+								{% if s.status == 'closed' %}
+									<a
+										href="{{ path('admin_agency_cashier_session_closing_validation', {'id': s.id}) }}"
+										class="table-action-trigger arbitrate"
+										title="Ouvrir l'inventaire contradictoire et arbitrer les écarts"
+									>
+										<i class="fa-solid fa-gavel"></i>
+									</a>
+								{% endif %}
+								<a
+									href="{{ path('admin_agency_finance_journal', {'code': s.id}) }}"
+									class="table-action-trigger view"
+									title="Auditer le journal comptable de cette session"
+								>
+									<i class="fa-solid fa-chart-line"></i>
+								</a>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="5" class="text-center text-muted py-15">Aucune session de caisse enregistrée pour le moment.</td>
+						</tr>
+					{% endfor %}
 				</tbody>
 			</table>
 		</div>

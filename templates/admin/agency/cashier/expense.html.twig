@@ -3,13 +3,19 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	<script src="/js/admin/modalQuestion.js" defer></script>
+	<script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 {% block body %}
-	<div
-		class="admin-cashier-expense-scope container"
-	>
+	<div class="admin-cashier-expense-scope container">
+
+		{% for message in app.flashes('success') %}
+			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+		{% endfor %}
+
+		{% for message in app.flashes('error') %}
+			<div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+		{% endfor %}
 
 		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header-refined my-30">
@@ -27,7 +33,7 @@
 			</div>
 		</header>
 
-		{# --- CARTES DES FLUX DISPONIBLES EN DIRECT (DYNAMIQUE) --- #}
+		{# --- CARTES DES FLUX DISPONIBLES EN DIRECT --- #}
 		<div class="stats-overview-grid mb-25">
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--primary">
@@ -35,28 +41,26 @@
 				</div>
 				<div class="stat-details">
 					<span class="stat-label">Bons en attente</span>
-					<strong class="stat-value text-primary">{{ pending_count }}
-						En attente</strong>
+					<strong class="stat-value text-primary">{{ pending_count }} En attente</strong>
 				</div>
 			</div>
 
-			{# Boucle dynamique sur l'état réel des tiroirs monétaires [MCD 19] #}
-			
-			<div class="stat-card">
-				<div class="stat-icon {% if vault_balances.code == 'CDF' %}stat-icon--success{% else %}stat-icon--primary{% endif %}">
-					<i class="fa-solid fa-wallet"></i>
+			{% for bal in balances %}
+				<div class="stat-card">
+					<div class="stat-icon stat-icon--success">
+						<i class="fa-solid fa-wallet"></i>
+					</div>
+					<div class="stat-details">
+						<span class="stat-label">Espèces Dispo ({{ bal.code }})</span>
+						<strong class="stat-value text-success">
+							{{ bal.formatted }} {{ bal.code }}
+						</strong>
+					</div>
 				</div>
-				<div class="stat-details">
-					<span class="stat-label">Espèces Dispo ({{ vault_balances.code }})</span>
-					<strong class="stat-value text-success">
-						{{ vault_balances.amount }}
-						{{ vault_balances.code }}
-					</strong>
-				</div>
-			</div>
+			{% endfor %}
 		</div>
 
-		{# --- LISTE DES BONS DE DÉCAISSEMENT EN ATTENTE (DATATABLE) --- #}
+		{# --- LISTE DES BONS DE DÉCAISSEMENT EN ATTENTE --- #}
 		<div class="card monitoring-table-card">
 			<h2>
 				<i class="fa-solid fa-clock-rotate-left"></i>
@@ -68,45 +72,46 @@
 						<tr>
 							<th>Réf & Date d'Ordre</th>
 							<th>Autorisé Par</th>
-							<th>Bénéficiaire / Motif</th>
+							<th>Succursale / Motif</th>
 							<th class="text-right">Montant Ordonné</th>
 							<th>Statut</th>
 							<th class="text-right">Action</th>
 						</tr>
 					</thead>
 					<tbody>
-						{# Boucle sur les ordres de dépenses en attente d'exécution physique #}
 						{% for expense in pending_expenses %}
 							<tr>
 								<td>
-									<strong>{{ expense.reference }}</strong>
-									<span class="sub-meta-text">{{ expense.date_ordered }}</span>
+									<strong>EXP-{{ '%04d'|format(expense.id) }}</strong>
+									<span class="sub-meta-text">{{ expense.createdAt|date('d/m/Y H\\hi') }}</span>
 								</td>
 								<td>
-									<strong>{{ expense.authorizer }}</strong>
-									<span class="sub-meta-text">{{ expense.authorizer_role }}</span>
+									<strong>{{ expense.createdBy.fullName }}</strong>
+									<span class="sub-meta-text">{{ expense.createdBy.email }}</span>
 								</td>
 								<td>
-									<strong>{{ expense.beneficiary }}</strong>
-									<span class="sub-meta-text">{{ expense.motif }}</span>
+									<strong>{{ expense.name }}</strong>
+									<span class="sub-meta-text">{{ expense.branch.name }}{% if expense.description %} — {{ expense.description }}{% endif %}</span>
 								</td>
 								<td class="text-right font-bold text-danger-mode">
-									{{ expense.amount }}
-									{{ expense.currency }}
+									{{ expense.amount|number_format(2, ',', ' ') }} {{ expense.currency.code }}
 								</td>
 								<td>
-									<span class="cash-badge badge-pending">{{ expense.status }}</span>
+									<span class="cash-badge badge-pending">EN ATTENTE</span>
 								</td>
 								<td class="text-right table-action-buttons">
-									<button id="ctaBtn" class="btn-disburse-trigger js-btn-disburse" data-target="{{ path('admin_agency_cashier_expense_exec', {'reference':expense.reference}) }}" ">
-										<i class="fa-solid fa-money-bill-wave"></i>
-										Décaisser le cash
-									</button>
+									<form method="POST" action="{{ path('admin_agency_cashier_expense_exec', {'id': expense.id}) }}" onsubmit="return confirm('Confirmer le décaissement physique de {{ expense.amount }} {{ expense.currency.code }} ?');">
+										<input type="hidden" name="_token" value="{{ csrf_token('exec_expense_' ~ expense.id) }}">
+										<button type="submit" class="btn-disburse-trigger">
+											<i class="fa-solid fa-money-bill-wave"></i>
+											Décaisser le cash
+										</button>
+									</form>
 								</td>
 							</tr>
 						{% else %}
 							<tr>
-								<td colspan="6" class="text-center text-muted">Aucun ordre de décaissement en attente de paiement.</td>
+								<td colspan="6" class="text-center text-muted py-15">Aucun ordre de décaissement en attente de paiement.</td>
 							</tr>
 						{% endfor %}
 					</tbody>
@@ -115,7 +120,4 @@
 		</div>
 
 	</div>
-
-	{% include "admin/partials/_modal.html.twig" %}
-
 {% endblock %}

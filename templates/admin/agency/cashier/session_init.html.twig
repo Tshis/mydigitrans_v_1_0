@@ -1,26 +1,27 @@
-{# templates/admin/agency/cashier/init_session.html.twig #}
+{# templates/admin/agency/cashier/session_init.html.twig #}
 {% extends "admin/base.html.twig" %}
+
+{% block ux_assets %}{{ importmap('app') }}{% endblock %}
 
 {% block body %}
 	<div class="admin-cashier-session-scope container">
 
-		{# --- EN-TÊTE DE LA PAGE (Fidèle à votre modèle manager) --- #}
+		{% for message in app.flashes('error') %}
+			<div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+		{% endfor %}
+
+		{# --- EN-TÊTE DE LA PAGE --- #}
 		<header class="header-refined my-30">
 			<div class="header-main-info">
-				<a
-					href="{{ path('admin_agency_cashier_dashboard_branch') }}"
-					class="agency-back-action"
-					title="Retour au tableau de bord succursale"
-				>
+				<a href="{{ path('admin_agency_cashier_dashboard_branch') }}" class="agency-back-action" title="Retour au tableau de bord succursale">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
-					<h1>Mputu Antoinette</h1>
+					<h1>Initialisation de Session de Caisse</h1>
 					<p class="subtitle">
-						<span class="text-gray text-size-13">Guichet #001</span>
+						<span class="text-gray text-size-13">Procédure Top-Down</span>
 						<span class="arrow-divider">•</span>
-						<span class="text-primary text-size-13 text-highlight">Allocation de la Dotation Matinale
-						</span>
+						<span class="text-primary text-size-13 text-highlight">Allocation de la Dotation Matinale</span>
 					</p>
 				</div>
 			</div>
@@ -30,67 +31,57 @@
 		<div class="session-init-container">
 
 			{# GAUCHE : LE FORMULAIRE DE CRÉATION DE LA DOTATION #}
-			<div class="card">
+			<div class="card" style="min-width: 0;">
 				<h2>
 					<i class="fa-solid fa-money-bill-transfer"></i>
 					Préparation de l'enveloppe de fonds
 				</h2>
-				<form
-					action="#"
-					method="POST"
-					onsubmit="event.preventDefault(); alert('Dotation injectée avec succès en BDD. Session au statut pending_open.');"
-				>
 
-					{# Sélection du guichet physique lié à la succursale du manager #}
+				{{ form_start(form, {attr: {'data-turbo': 'false'}}) }}
+
+					{% if form.vars.errors|length > 0 %}
+						<div class="notice-box-danger-dashboard mb-15">{{ form_errors(form) }}</div>
+					{% endif %}
+
 					<div class="field mb-15">
-						<label class="session-micro-label">Guichet physique de destination *</label>
-						<select class="input-session-field" required>
-							<option value="1">Guichet Principal 01 — Terminal Billetterie</option>
-							<option value="2">Guichet Principal 02 — Terminal Fret & Colis</option>
-						</select>
+						{{ form_label(form.cashRegister) }}
+						{{ form_widget(form.cashRegister) }}
+						<div class="text-danger text-size-12 mt-5">{{ form_errors(form.cashRegister) }}</div>
 					</div>
 
-					{# Sélection du caissier de garde ce matin #}
 					<div class="field mb-15">
-						<label class="session-micro-label">Guichetier / Caissier assigné *</label>
-						<select class="input-session-field" required>
-							<option value="89">Mputu Antoinette (Agent Certifié)</option>
-							<option value="90">Ilunga Christian (Agent Certifié)</option>
-						</select>
+						{{ form_label(form.cashier) }}
+						{{ form_widget(form.cashier) }}
+						<div class="text-danger text-size-12 mt-5">{{ form_errors(form.cashier) }}</div>
 					</div>
-
 
 					<div class="field-group-dynamic">
-						{% if base_currency != '' %}
-							<div class="field mb-15"> <label class="session-micro-label">Dotation initiale en
-									<strong>{{ base_currency }}</strong>
-								</label>
+						{% for currency in active_currencies %}
+							<div class="field mb-15">
+								<label class="session-micro-label">Dotation initiale en <strong>{{ currency.code }}</strong></label>
 								<div class="input-currency-wrapper">
 									<input
 										type="number"
-										name="amounts[{{ base_currency }}]"
+										name="amounts[{{ currency.code }}]"
 										class="input-session-field"
 										placeholder="0.00"
 										min="0"
 										step="0.01"
 										value="0"
 									>
-									<span class="currency-badge-suffix">{{ base_currency }}</span>
+									<span class="currency-badge-suffix">{{ currency.code }}</span>
 								</div>
-								<span class="sub-meta-text">Saisissez le montant physique transféré pour la devise
-									{{ base_currency }}.</span>
+								<span class="sub-meta-text">Saisissez le montant physique transféré pour la devise {{ currency.code }} ({{ currency.name }}).</span>
 							</div>
 						{% else %}
-							<p class="alert-text">Aucune devise configurée pour cette succursale. Contactez l'administrateur.
-							</p>
-						{% endif %}
+							<p class="alert-text">Aucune devise active configurée pour cette agence.</p>
+						{% endfor %}
 					</div>
 
-
 					<div class="field mb-15">
-						<label class="session-micro-label">Consignes de service / Notes pour le guichetier</label>
-						<textarea class="input-session-field text-area-fixed"
-						placeholder="Ex: Prioriser le rendu de monnaie en petites coupures de 500 CDF reçues de la banque..."></textarea>
+						{{ form_label(form.openingNote) }}
+						{{ form_widget(form.openingNote) }}
+						<div class="text-danger text-size-12 mt-5">{{ form_errors(form.openingNote) }}</div>
 					</div>
 
 					<div class="block-action-wrapper">
@@ -99,7 +90,8 @@
 							Allouer les fonds & Envoyer au guichet
 						</button>
 					</div>
-				</form>
+
+				{{ form_end(form) }}
 			</div>
 
 			{# DROITE : PROFIL SÉCURITÉ DU MANAGER CONNECTÉ #}
@@ -112,13 +104,13 @@
 
 					<div class="meta-item mb-15">
 						<span class="session-micro-label">Manager émetteur</span>
-						<strong class="text-dark">Samy Badibanga</strong>
-						<span class="sub-meta-text">Fonction : Gérant de Succursale</span>
+						<strong class="text-dark">{{ actor.fullName }}</strong>
+						<span class="sub-meta-text">{{ actor.email }}</span>
 					</div>
 
 					<div class="meta-item mb-15">
 						<span class="session-micro-label">Gare d'exploitation</span>
-						<strong>Kinshasa Centre — Gare Centrale</strong>
+						<strong>{{ actor.branch ? actor.branch.name : 'Direction Réseau' }}</strong>
 					</div>
 
 					<hr class="summary-divider mb-15">
@@ -126,9 +118,9 @@
 					<div class="meta-item">
 						<span class="sub-meta-text">
 							<i class="fa-solid fa-shield-halved"></i>
-							Impact sur la Caisse</span>
-						<span class="sub-meta-text">Cette action initialise l'ouverture d'une session de caisse. Le caissier
-							verra ces chiffres s'afficher dès sa connexion pour confirmation physique.</span>
+							Impact sur la Caisse
+						</span>
+						<span class="sub-meta-text">Cette action initialise l'ouverture d'une session de caisse. Le caissier verra ces chiffres s'afficher dès sa connexion pour confirmation physique.</span>
 					</div>
 				</div>
 			</aside>

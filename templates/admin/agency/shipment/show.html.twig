@@ -127,7 +127,7 @@
 
 					<div class="sidebar-action-button">
 						{% if not shipment.isPaid %}
-							<a href="#" class="btn-refined btn-primary-gradient btn-full my-4">
+							<a href="{{ path('admin_agency_cashier_payment', {'ref': shipment.reference}) }}" class="btn-refined btn-primary-gradient btn-full my-4">
 								<i class="fa-solid fa-money-bill-transfer"></i>
 								Encaisser le Fret
 							</a>
