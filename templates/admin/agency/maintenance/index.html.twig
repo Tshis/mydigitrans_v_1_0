@@ -19,7 +19,7 @@
 				<h1>Maintenance & Pannes</h1>
 				<p class="subtitle">Suivi des immobilisations techniques, diagnostics et remises en service de la flotte.</p>
 			</div>
-			{% if is_granted('bus.write') %}
+			{% if is_granted('maintenance.write') %}
 				<div class="header-right">
 					<a href="{{ path('admin_agency_maintenance_declare') }}" class="btn-refined btn-danger-gradient">
 						<i class="fa-solid fa-triangle-exclamation"></i>
@@ -115,7 +115,7 @@
 							</td>
 							<td class="text-right">
 								<div class="action-group-refined">
-									{% if is_granted('bus.write') and log.status == 'broken' %}
+									{% if is_granted('maintenance.write') and log.status == 'broken' %}
 										<a href="{{ path('admin_agency_maintenance_resolve', {'id': log.id}) }}" class="action-link edit" title="Clôturer / Résoudre la panne">
 											<i class="fa-solid fa-circle-check"></i>
 										</a>

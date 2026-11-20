@@ -108,7 +108,9 @@
 		</span>
 		<span class="text">Bus</span>
 	</a>
+{% endif %}
 
+{% if is_granted('maintenance.view') %}
 	<a href="{{ path('admin_agency_maintenance_index') }}" class="menu-link {{ page is same as('maintenance') ? 'active' : '' }}" data-tooltip="Maintenance & Pannes">
 		<span class="icon">
 			<i class="fa-solid fa-screwdriver-wrench"></i>
