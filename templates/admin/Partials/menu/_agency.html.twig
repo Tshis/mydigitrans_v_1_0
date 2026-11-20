@@ -81,7 +81,7 @@
 {% endif %}
 
 {# Tarifs #}
-{% if is_granted('fare.view') %}
+{% if is_granted('fare.write') %}
 	<a href="{{ path('admin_agency_fare_add') }}" class="menu-link {{ page is same as('fare') ? 'active' : '' }}" data-tooltip="Grille Tarifaire">
 		<span class="icon">
 			<i class="fa-solid fa-tags"></i>
