@@ -58,6 +58,8 @@ final class AccessCatalog
         'user' => ['Utilisateurs', 'fa-users', ['view', 'write', 'activate']],
         'role' => ['Fonctions et droits', 'fa-user-shield', ['view']],
         'subscription' => ['Abonnement', 'fa-id-badge', ['view', 'write']],
+        'maintenance' => ['Maintenance & Pannes', 'fa-screwdriver-wrench', ['view', 'write']],
+
     ];
 
     private const PLATFORM_MODULES = [
@@ -88,7 +90,7 @@ final class AccessCatalog
         'ROLE_MANAGER' => [
             'Gestionnaire',
             'Pilotage de l\'exploitation : flotte, lignes, voyages, tarifs, ventes et dépenses.',
-            ['dashboard.view', 'branch.view', 'bus.view', 'route.view', 'trip.*', 'fare.view', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'expense.*', 'report.view', 'user.view', 'user.write']
+            ['dashboard.view', 'branch.view', 'bus.view', 'maintenance.*', 'route.view', 'trip.*', 'fare.view', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'expense.*', 'report.view', 'user.view', 'user.write']
         ],
         'ROLE_CASHIER' => [
             'Caissier / Guichetier',
