@@ -31,7 +31,7 @@ final class MaintenanceController extends AbstractAdminController
     #[Route('/admin/agency/maintenance/list', name: 'admin_agency_maintenance_index', methods: ['GET'])]
     public function index(): Response
     {
-        $this->denyAccessUnlessGranted('maintenace.view');
+        $this->denyAccessUnlessGranted('maintenance.view');
         $agency = $this->actor()->getAgency();
 
         return $this->render('admin/agency/maintenance/index.html.twig', [
@@ -42,7 +42,7 @@ final class MaintenanceController extends AbstractAdminController
     #[Route('/admin/agency/maintenance/declare', name: 'admin_agency_maintenance_declare', methods: ['GET', 'POST'])]
     public function declare(Request $request): Response
     {
-        $this->denyAccessUnlessGranted('maintenace.write');
+        $this->denyAccessUnlessGranted('maintenance.write');
         $actor = $this->actor();
 
         $dto = new BusMaintenanceDeclareData();
@@ -76,7 +76,7 @@ final class MaintenanceController extends AbstractAdminController
     #[Route('/admin/agency/maintenance/{id}/resolve', name: 'admin_agency_maintenance_resolve', methods: ['GET', 'POST'])]
     public function resolve(int $id, Request $request): Response
     {
-        $this->denyAccessUnlessGranted('maintenace.write');
+        $this->denyAccessUnlessGranted('maintenance.write');
         $actor = $this->actor();
         $maintenance = $this->requireAgencyMaintenance($id);
 
@@ -110,7 +110,7 @@ final class MaintenanceController extends AbstractAdminController
     #[Route('/admin/agency/maintenance/{id}/cancel', name: 'admin_agency_maintenance_cancel', methods: ['POST'])]
     public function cancel(int $id, Request $request): Response
     {
-        $this->denyAccessUnlessGranted('maintenace.write');
+        $this->denyAccessUnlessGranted('maintenance.write');
         $actor = $this->actor();
         $maintenance = $this->requireAgencyMaintenance($id);
 
