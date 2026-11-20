@@ -59,39 +59,21 @@ final class AgencyShipmentService
     }
 
     /**
-     * Liste les colis de l'agence avec statistiques globales et filtres.
+     * Liste les colis de l'agence filtrés par succursale de l'agent (si rattaché à une gare), statut et recherche.
      *
-     * @param array{query: ?string, status: ?string} $filters
-     * @return array<string, mixed>
+     * @param array{status: ?string, query: ?string} $filters
+     * @return list<array<string, mixed>>
      */
-    public function listAgencyShipments(Agency $agency, array $filters): array
+    public function listAgencyShipments(User $actor, array $filters): array
     {
-        $statsRows = $this->em->createQueryBuilder()
-            ->select('s.status AS st', 'COUNT(s.id) AS cnt')
-            ->from(Shipment::class, 's')
-            ->andWhere('s.agency = :agency')
-            ->setParameter('agency', $agency)
-            ->groupBy('s.status')
-            ->getQuery()
-            ->getArrayResult();
-
-        $stats = ['warehouse' => 0, 'in_transit' => 0, 'delivered' => 0];
-        foreach ($statsRows as $row) {
-            $val = $row['st'] instanceof \BackedEnum ? $row['st']->value : (string) $row['st'];
-            if (\in_array($val, [ShipmentStatus::Pending->value, ShipmentStatus::ReadyForPickup->value], true)) {
-                $stats['warehouse'] += (int) $row['cnt'];
-            } elseif (ShipmentStatus::InTransit->value === $val) {
-                $stats['in_transit'] += (int) $row['cnt'];
-            } elseif (ShipmentStatus::Delivered->value === $val) {
-                $stats['delivered'] += (int) $row['cnt'];
-            }
-        }
+        $agency = $actor->getAgency();
+        $branch = $actor->getBranch();
 
         $qb = $this->em->createQueryBuilder()
-            ->select('s', 't', 'r', 'snd', 'rcv', 'depBr', 'arrBr', 'cur')
+            ->select('s', 't', 'rt', 'snd', 'rcv', 'depBr', 'arrBr', 'cur')
             ->from(Shipment::class, 's')
             ->join('s.trip', 't')
-            ->join('t.route', 'r')
+            ->join('t.route', 'rt')
             ->join('s.sender', 'snd')
             ->join('s.receiver', 'rcv')
             ->join('s.departureAgencyBranch', 'depBr')
@@ -100,11 +82,11 @@ final class AgencyShipmentService
             ->andWhere('s.agency = :agency')
             ->setParameter('agency', $agency)
             ->orderBy('s.createdAt', 'DESC')
-            ->setMaxResults(300);
+            ->setMaxResults(150);
 
-        if (null !== $filters['query'] && '' !== $filters['query']) {
-            $qb->andWhere('(s.reference LIKE :q OR rcv.phone LIKE :q OR snd.phone LIKE :q OR rcv.firstname LIKE :q OR rcv.lastname LIKE :q)')
-                ->setParameter('q', '%' . $filters['query'] . '%');
+        if (null !== $branch) {
+            $qb->andWhere('(s.departureAgencyBranch = :branch OR s.arrivalAgencyBranch = :branch OR s.branch = :branch)')
+                ->setParameter('branch', $branch);
         }
 
         if (null !== $filters['status'] && '' !== $filters['status']) {
@@ -119,44 +101,48 @@ final class AgencyShipmentService
                 ]);
         }
 
+        if (null !== $filters['query'] && '' !== $filters['query']) {
+            $q = '%' . trim($filters['query']) . '%';
+            $qb->andWhere('(s.reference LIKE :q OR snd.firstname LIKE :q OR snd.lastname LIKE :q OR rcv.firstname LIKE :q OR rcv.lastname LIKE :q)')
+                ->setParameter('q', $q);
+        }
 
         /** @var list<Shipment> $shipments */
         $shipments = $qb->getQuery()->getResult();
+        $paidRefs = $this->findPaidShipmentReferences($shipments);
 
         $rows = [];
-        $paidRefs = $this->findPaidShipmentReferences($shipments);
         foreach ($shipments as $shp) {
-            $st = $shp->getStatus()->value;
+            $statusVal = $shp->getStatus()->value;
             $rows[] = [
-                'reference'       => (string) $shp->getReference(),
-                'departureBranch' => (string) $shp->getDepartureAgencyBranch()?->getName(),
-                'arrivalBranch'   => (string) $shp->getArrivalAgencyBranch()?->getName(),
-                'senderName'      => (string) $shp->getSender()?->getFullName(),
-                'senderPhone'     => (string) $shp->getSender()?->getPhone(),
-                'receiverName'    => (string) $shp->getReceiver()?->getFullName(),
-                'receiverPhone'   => (string) $shp->getReceiver()?->getPhone(),
-                'description'     => (string) $shp->getDescription(),
-                'weight'          => (float) $shp->getWeight(),
-                'nature'          => (string) $shp->getNature(),
-                'amountFormatted' => sprintf('%s %s', number_format((float) $shp->getPrice(), 2, ',', ' '), $shp->getCurrency()?->getCode()),
-                'isPaid' => isset($paidRefs[(string) $shp->getReference()]),
-                'status'          => $st,
-                'statusLabel'     => match ($st) {
-                    'pending'          => 'En attente (Non payé)',
-                    'in_transit'       => 'En Transit',
-                    'ready_for_pickup' => 'Disponible Terminus',
-                    'delivered'        => 'Livré / Retiré',
-                    'cancelled'        => 'Annulé',
-                    default            => $st,
-                },
+                'id'            => $shp->getId(),
+                'reference'     => $shp->getReference(),
+                'waybill'       => 'WB-' . $shp->getReference(),
+                'senderName'    => $shp->getSender()?->getFullName() ?? '-',
+                'senderPhone'   => $shp->getSender()?->getPhone() ?? '-',
+                'receiverName'  => $shp->getReceiver()?->getFullName() ?? '-',
+                'receiverPhone' => $shp->getReceiver()?->getPhone() ?? '-',
+                'departureCity' => $shp->getDepartureAgencyBranch()?->getCity() ?? '-',
+                'arrivalCity'   => $shp->getArrivalAgencyBranch()?->getCity() ?? '-',
+                'arrivalBranch' => $shp->getArrivalAgencyBranch()?->getName() ?? '-',
+                'tripCode'      => strtoupper((string) $shp->getTrip()?->getCode()),
+                'tripDate'      => $shp->getTrip()?->getDepartureDate()?->format('d/m/Y') ?? '-',
+                'description'   => $shp->getDescription(),
+                'nature'        => $shp->getNature(),
+                'weight'        => $shp->getWeight(),
+                'billingType'   => $shp->getBillingType()->value,
+                'price'         => number_format((float) $shp->getPrice(), 2, ',', ' '),
+                'currency'      => $shp->getCurrency()?->getCode() ?? '',
+                'status'        => $statusVal,
+                'statusLabel'   => $this->formatStatusLabel($shp->getStatus()),
+                'isPaid'        => isset($paidRefs[(string) $shp->getReference()]),
+                'createdAt'     => $shp->getCreatedAt()?->format('d/m/Y H\hi') ?? '-',
             ];
         }
 
-        return [
-            'stats'     => $stats,
-            'shipments' => $rows,
-        ];
+        return $rows;
     }
+
 
 
     /**
@@ -639,5 +625,17 @@ final class AgencyShipmentService
         }
 
         return $paidMap;
+    }
+
+
+    private function formatStatusLabel(ShipmentStatus $status): string
+    {
+        return match ($status) {
+            ShipmentStatus::Pending        => 'En attente (Non payé)',
+            ShipmentStatus::InTransit      => 'En Transit',
+            ShipmentStatus::ReadyForPickup => 'Disponible Terminus',
+            ShipmentStatus::Delivered      => 'Livré / Retiré',
+            ShipmentStatus::Cancelled      => 'Annulé',
+        };
     }
 }

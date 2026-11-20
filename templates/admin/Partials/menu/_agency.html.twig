@@ -49,8 +49,8 @@
 	</a>
 {% endif %}
 
-{# Flux / Dépenses #}
-{% if is_granted('payment.view') or is_granted('expense.view') %}
+{# Flux / Dépenses (Direction, Gérant & Comptable uniquement — masqué pour le simple caissier) #}
+{% if is_granted('expense.view') or is_granted('report.view') %}
 	<a href="{{ path('admin_agency_finance_index') }}" class="menu-link {{ page is same as('finances') ? 'active' : '' }}" data-tooltip="Paiements & Dépenses">
 		<span class="icon">
 			<i class="fa-solid fa-hand-holding-dollar"></i>
@@ -70,7 +70,7 @@
 	</a>
 {% endif %}
 
-{# 🟢 POSITIONNEMENT STRATÉGIQUE : Devises & Taux de Trésorerie #}
+{# Devises & Taux de Trésorerie #}
 {% if is_granted('currency.view') %}
 	<a href="{{ path('admin_agency_currency_index') }}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Configuration monétaire et taux d'échange">
 		<span class="icon">
@@ -92,7 +92,7 @@
 
 {# Billetterie & Contrôle #}
 {% if is_granted('ticket.view') %}
-	<a href="{{ path('admin_agency_ticket_index') }}" class="menu-link {{ page is same as('ticket') ? 'active' : '' }}" data-tooltip="Billeterie et controle">
+	<a href="{{ path('admin_agency_ticket_index') }}" class="menu-link {{ page is same as('ticket') ? 'active' : '' }}" data-tooltip="Billetterie et contrôle">
 		<span class="icon">
 			<i class="fa-solid fa-file-invoice"></i>
 		</span>
@@ -109,7 +109,7 @@
 		<span class="text">Bus</span>
 	</a>
 
-	<a href="{{ path('admin_agency_maintenance_index') }}" class="menu-link {{ page is same as('maintenance') ? 'active' : '' }}" data-tooltip="Flotte de Bus">
+	<a href="{{ path('admin_agency_maintenance_index') }}" class="menu-link {{ page is same as('maintenance') ? 'active' : '' }}" data-tooltip="Maintenance & Pannes">
 		<span class="icon">
 			<i class="fa-solid fa-screwdriver-wrench"></i>
 		</span>
@@ -118,8 +118,8 @@
 {% endif %}
 
 {# 4. RESSOURCES HUMAINES & STRUCTURE #}
-{# Succursales #}
-{% if is_granted('branch.view') %}
+{# Succursales (Réseau global uniquement) #}
+{% if is_granted('branch.view') and app.user.branch is null %}
 	<a href="{{ path('admin_agency_branch_index') }}" class="menu-link {{ page is same as('branch') ? 'active' : '' }}" data-tooltip="Succursales">
 		<span class="icon">
 			<i class="fa-solid fa-folder-tree"></i>
@@ -140,7 +140,7 @@
 
 {# Fonctions du Personnel #}
 {% if is_granted('role.view') %}
-	<a href="{{ path('admin_agency_role_index') }}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et controle d'acces">
+	<a href="{{ path('admin_agency_role_index') }}" class="menu-link {{ page is same as('job title') ? 'active' : '' }}" data-tooltip="Fonctions et contrôle d'accès">
 		<span class="icon">
 			<i class="fa-solid fa-id-card-clip"></i>
 		</span>
@@ -149,23 +149,13 @@
 {% endif %}
 
 {# 5. PILOTAGE & RÉFÉRENTIELS #}
-{# Documents #}
-{% if is_granted('subscription.view') %}
-	<a href="{{ path('admin_agency_bus_document_index') }}" class="menu-link {{ page is same as('document') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
+{# Documents de bord #}
+{% if is_granted('bus.view') %}
+	<a href="{{ path('admin_agency_bus_document_index') }}" class="menu-link {{ page is same as('document') ? 'active' : '' }}" data-tooltip="Documents de bord">
 		<span class="icon">
 			<i class="fa-solid fa-file"></i>
 		</span>
 		<span class="text">Documents</span>
-	</a>
-{% endif %}
-
-{# Devise #}
-{% if is_granted('currency.view') %}
-	<a href="{{ path('admin_agency_currency_index') }}" class="menu-link {{ page is same as('currency') ? 'active' : '' }}" data-tooltip="Rapports & Statistiques">
-		<span class="icon">
-			<i class="fa-solid fa-money-bill-1-wave"></i>
-		</span>
-		<span class="text">Devise</span>
 	</a>
 {% endif %}
 
@@ -179,7 +169,7 @@
 	</a>
 {% endif %}
 
-<a href="{{ path('admin_password_change') }}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de securité">
+<a href="{{ path('admin_password_change') }}" class="menu-link {{ page is same as('setting') ? 'active' : '' }}" data-tooltip="Paramètres de sécurité">
 	<span class="icon">
 		<i class="fa-solid fa-gear"></i>
 	</span>

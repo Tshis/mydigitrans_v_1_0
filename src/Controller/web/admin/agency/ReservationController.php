@@ -50,7 +50,7 @@ final class ReservationController extends AbstractAdminController
         return $this->render('admin/agency/reservation/index.html.twig', [
             'page'    => 'reservation',
             'filters' => $filters,
-        ] + $this->reservationService->listAgencyReservations($agency, $filters));
+        ] + $this->reservationService->listAgencyReservations($this->actor(), $filters));
     }
 
     #[Route('/admin/agency/reservation/add/{code}', name: 'admin_agency_reservation_add', methods: ['GET', 'POST'])]

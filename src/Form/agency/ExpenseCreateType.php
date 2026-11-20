@@ -47,7 +47,8 @@ final class ExpenseCreateType extends AbstractType
             ->add('branch', EntityType::class, [
                 'class'              => Branch::class,
                 'label'              => 'Succursale bénéficiaire *',
-                'autocomplete'       => true,
+                'disabled'           => null !== $restrictedBranch,
+                'autocomplete'       => null === $restrictedBranch,
                 'tom_select_options' => ['plugins' => ['dropdown_input']],
                 'choice_label'       => static fn(Branch $b): string => sprintf('%s (%s)', $b->getName(), $b->getCity()),
                 'query_builder'      => static function (EntityRepository $er) use ($agency, $restrictedBranch) {
@@ -63,6 +64,7 @@ final class ExpenseCreateType extends AbstractType
                     return $qb;
                 },
             ])
+
             ->add('name', TextType::class, [
                 'label' => 'Nom / Libellé de la dépense *',
                 'attr'  => ['class' => 'admin-bus-layout-add-input', 'placeholder' => 'Ex: Achat carburant Bus #01, Abonnement SaaS...'],

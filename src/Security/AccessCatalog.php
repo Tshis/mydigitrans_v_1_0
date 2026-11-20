@@ -88,7 +88,7 @@ final class AccessCatalog
         'ROLE_MANAGER' => [
             'Gestionnaire',
             'Pilotage de l\'exploitation : flotte, lignes, voyages, tarifs, ventes et dépenses.',
-            ['dashboard.view', 'branch.view', 'bus.*', 'route.*', 'trip.*', 'fare.*', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'currency.view', 'expense.*', 'report.view', 'user.view', 'user.write', 'role.view']
+            ['dashboard.view', 'branch.view', 'bus.*', 'route.*', 'trip.*', 'fare.*', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'expense.*', 'report.view', 'user.view', 'user.write']
         ],
         'ROLE_CASHIER' => [
             'Caissier / Guichetier',

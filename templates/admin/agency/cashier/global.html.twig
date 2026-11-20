@@ -1,6 +1,8 @@
 {# templates/admin/agency/cashier/global.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+{% block ux_assets %}{{ importmap('app') }}{% endblock %}
+
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/datatable.js" defer></script>
@@ -77,10 +79,18 @@
 				<div class="field-group">
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Filtrer par Succursale Réseau</label>
-						<select name="filter_branch" class="admin-bus-layout-add-select">
-							<option value="">-- Toutes les succursales du réseau --</option>
-							{% for b in branches %}
-								<option value="{{ b.id }}" {{ filters.branchId == b.id ? 'selected' : '' }}>{{ b.name }} ({{ b.city }})</option>
+						<select
+							class="admin-bus-layout-add-select"
+							name="filter_branch"
+							placeholder="-- Toutes les succursales --"
+							data-controller="symfony--ux-autocomplete--autocomplete"
+							data-symfony--ux-autocomplete--autocomplete-tom-select-options-value="{{ {'plugins': ['dropdown_input'], 'allowEmptyOption': true}|json_encode|e('html_attr') }}"
+						>
+							<option value="">-- Toutes les succursales --</option>
+							{% for branch in branches %}
+								<option value="{{ branch.id }}" {{ filters.branchId == branch.id ? 'selected' : '' }}>
+									{{ branch.name }} ({{ branch.city }})
+								</option>
 							{% endfor %}
 						</select>
 					</div>

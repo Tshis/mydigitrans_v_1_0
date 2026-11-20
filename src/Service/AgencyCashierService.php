@@ -12,6 +12,7 @@ use App\Dto\admin\agency\CashSessionOpenData;
 use App\Dto\admin\agency\CashSessionValidateData;
 use App\Entity\Agency;
 use App\Entity\AgencyPayment;
+use App\Entity\Branch;
 use App\Entity\CashRegister;
 use App\Entity\CashSession;
 use App\Entity\CashSessionBalance;
@@ -55,7 +56,9 @@ final class AgencyCashierService
             throw new \DomainException('Succursale invalide.');
         }
 
-        $code = strtoupper(trim((string) $data->code));
+        $rawCode = strtoupper(trim((string) ($data->code ?? '')));
+        $code = '' !== $rawCode ? $rawCode : $this->generateRegisterCode($agency, $branch);
+
         $existing = $this->em->getRepository(CashRegister::class)->findOneBy([
             'agency' => $agency,
             'code'   => $code,
@@ -726,5 +729,19 @@ final class AgencyCashierService
             ->orderBy('fo.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    private function generateRegisterCode(Agency $agency, Branch $branch): string
+    {
+        $cityPrefix = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', (string) $branch->getCity()) ?: 'AGY', 0, 3));
+        $repo = $this->em->getRepository(CashRegister::class);
+        $index = 1;
+
+        do {
+            $candidate = sprintf('CSH-%s-%02d', $cityPrefix, $index);
+            ++$index;
+        } while (null !== $repo->findOneBy(['agency' => $agency, 'code' => $candidate]));
+
+        return $candidate;
     }
 }

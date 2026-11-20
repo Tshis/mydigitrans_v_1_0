@@ -46,16 +46,16 @@ final class CashierController extends AbstractAdminController
     {
         $actor = $this->actor();
 
-        // 1. Administrateur d'agence (non rattaché à une succursale unique ou rôle Owner/Admin) -> Console globale du réseau
+        // 1. Administrateur d'agence ou General Manager (réseau global, non rattaché à une succursale unique)
         if (
             null === $actor->getBranch()
-            || $this->isGranted('ROLE_AGENCY_OWNER')
             || $this->isGranted('ROLE_AGENCY_ADMIN')
+            || $this->isGranted('ROLE_GENERAL_MANAGER')
         ) {
             return $this->redirectToRoute('admin_agency_cashier_dashboard_global');
         }
 
-        // 2. Si l'agent a une session de caisse personnelle (Pending ou Opened) -> Espace Caissier
+        // 2. Si l'agent rattaché à une succursale a une session personnelle (Pending ou Opened) -> Espace Caissier
         $session = $this->cashierService->findCurrentSessionForCashier($actor);
         if ($session instanceof CashSession) {
             if (CashSessionStatus::Pending === $session->getStatus()) {
@@ -65,8 +65,8 @@ final class CashierController extends AbstractAdminController
             return $this->redirectToRoute('admin_agency_cashier_dashboard');
         }
 
-        // 3. Gérant de succursale (rattaché à une succursale, avec droit de supervision) -> Dashboard Succursale
-        if ($this->isGranted('finance.view') || $this->isGranted('cashier.manage')) {
+        // 3. Gestionnaire / Comptable de succursale (rattaché à une succursale) -> Dashboard de sa succursale uniquement
+        if ($this->isGranted('ROLE_MANAGER') || $this->isGranted('ROLE_ACCOUNTANT')) {
             return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
         }
 
@@ -79,23 +79,33 @@ final class CashierController extends AbstractAdminController
     #[Route('/admin/agency/cash-register/create', name: 'admin_agency_cashier_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
-        $actor  = $this->actor();
-        $agency = $actor->getAgency();
+        $actor            = $this->actor();
+        $agency           = $actor->getAgency();
+        $restrictedBranch = $actor->getBranch();
 
         $data = new CashRegisterCreateData();
-        $data->branch = $actor->getBranch();
+        if (null !== $restrictedBranch) {
+            $data->branch = $restrictedBranch;
+        }
 
         $form = $this->createForm(CashRegisterCreateType::class, $data, [
-            'agency' => $agency,
+            'agency'            => $agency,
+            'restricted_branch' => $restrictedBranch,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                if (null !== $restrictedBranch) {
+                    $data->branch = $restrictedBranch;
+                }
+
                 $register = $this->cashierService->createRegister($data, $actor);
                 $this->addFlash('success', sprintf('Guichet [%s — %s] immatriculé et activé.', $register->getCode(), $register->getName()));
 
-                return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
+                return $this->redirectToRoute(
+                    null === $restrictedBranch ? 'admin_agency_cashier_dashboard_global' : 'admin_agency_cashier_dashboard_branch'
+                );
             } catch (\DomainException $e) {
                 $this->addFlash('error', $e->getMessage());
             }
@@ -107,6 +117,9 @@ final class CashierController extends AbstractAdminController
             'form'   => $form->createView(),
         ]);
     }
+
+
+
 
     #[Route('/admin/agency/cash-register/await/init', name: 'admin_agency_cashier_awaiting_init', methods: ['GET'])]
     public function awaitingInit(): Response
@@ -341,12 +354,17 @@ final class CashierController extends AbstractAdminController
             'page'      => 'cashier',
             'operation' => $details,
         ]);
-    }
+    } //showExpense
 
     #[Route('/admin/agency/cash-register/dashboard/global', name: 'admin_agency_cashier_dashboard_global', methods: ['GET'])]
     public function global(Request $request): Response
     {
-        $agency = $this->actor()->getAgency();
+        $actor = $this->actor();
+        if (null !== $actor->getBranch()) {
+            return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
+        }
+
+        $agency = $actor->getAgency();
         $filters = [
             'branchId' => $request->query->getInt('filter_branch') ?: null,
             'status'   => trim((string) $request->query->get('filter_status', '')) ?: null,
@@ -357,7 +375,8 @@ final class CashierController extends AbstractAdminController
             'page'    => 'cashier',
             'filters' => $filters,
         ] + $this->financeService->getSessionsMonitoring($agency, $filters));
-    }
+    } //global
+
 
     #[Route('/admin/agency/cash-register/dashboard/branch', name: 'admin_agency_cashier_dashboard_branch', methods: ['GET'])]
     public function branch(): Response
@@ -369,7 +388,7 @@ final class CashierController extends AbstractAdminController
             $filters['branchId'] = $actor->getBranch()->getId();
         }
 
-        return $this->render('admin/agency/dashboard/branch.html.twig', [
+        return $this->render('admin/agency/cashier/branch.html.twig', [
             'page' => 'cashier',
         ] + $this->financeService->getSessionsMonitoring($agency, $filters));
     }
@@ -421,6 +440,12 @@ final class CashierController extends AbstractAdminController
         if (!$session instanceof CashSession || $session->getCashRegister()?->getAgency()?->getId() !== $actor->getAgency()?->getId()) {
             throw $this->createNotFoundException('Session de caisse introuvable.');
         }
+
+        if (null !== $actor->getBranch() && $session->getCashRegister()?->getBranch()?->getId() !== $actor->getBranch()->getId()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez arbitrer que les sessions de votre succursale.');
+        }
+
+
         $validateData = new CashSessionValidateData();
         $form = $this->createForm(CashSessionValidateType::class, $validateData);
         $form->handleRequest($request);
@@ -475,7 +500,7 @@ final class CashierController extends AbstractAdminController
             }
         }
 
-        return $this->render('admin/agency/cashier/init_session.html.twig', [
+        return $this->render('admin/agency/cashier/session_init.html.twig', [
             'page'              => 'cashier',
             'actor'             => $actor,
             'form'              => $form->createView(),

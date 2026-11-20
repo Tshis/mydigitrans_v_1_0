@@ -34,22 +34,24 @@ final class ShipmentController extends AbstractAdminController
         return Scope::Agency;
     }
 
-    #[Route('/admin/agency/shipments', name: 'admin_agency_shipment_index', methods: ['GET'])]
+    #[Route('/admin/agency/shipment', name: 'admin_agency_shipment_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
         $this->denyAccessUnlessGranted('shipment.view');
-        $agency = $this->actor()->getAgency();
+        $actor = $this->actor();
 
         $filters = [
+            'status' => trim((string) $request->query->get('filter_status', '')) ?: null,
             'query'  => trim((string) $request->query->get('search_query', '')) ?: null,
-            'status' => trim((string) $request->query->get('shipment_status', '')) ?: null,
         ];
 
         return $this->render('admin/agency/shipment/index.html.twig', [
-            'page'    => 'shipment',
-            'filters' => $filters,
-        ] + $this->shipmentService->listAgencyShipments($agency, $filters));
+            'page'      => 'shipment',
+            'filters'   => $filters,
+            'shipments' => $this->shipmentService->listAgencyShipments($actor, $filters),
+        ]);
     }
+
 
     #[Route('/admin/agency/shipment/add', name: 'admin_agency_shipment_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response

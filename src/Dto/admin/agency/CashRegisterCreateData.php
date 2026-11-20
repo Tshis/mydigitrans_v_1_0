@@ -13,9 +13,9 @@ final class CashRegisterCreateData
     #[Assert\Length(max: 100)]
     public ?string $name = null;
 
-    #[Assert\NotBlank(message: 'Le code d\'identification unique est obligatoire.')]
     #[Assert\Length(max: 50)]
     public ?string $code = null;
+
 
     #[Assert\NotNull(message: 'Veuillez sélectionner la succursale d\'affectation.')]
     public ?Branch $branch = null;

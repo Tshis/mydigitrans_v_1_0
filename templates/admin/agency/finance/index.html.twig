@@ -1,10 +1,14 @@
 {# templates/admin/agency/finance/index.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+{% block ux_assets %}{{ importmap('app') }}{% endblock %}
+
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/datatable.js" defer></script>
 {% endblock %}
+
+
 
 {% block body %}
 	<div class="admin-index-finance-scope container">
@@ -98,17 +102,24 @@
 						<input type="date" name="filter_date" class="admin-bus-layout-add-input" value="{{ filters.date }}">
 					</div>
 
-					<div class="field">
-						<label class="admin-bus-layout-add-label">Filtrer par Succursale</label>
-						<select name="filter_branch" class="admin-bus-layout-add-select">
-							<option value="">-- Toutes les succursales --</option>
-							{% for branch in branches %}
-								<option value="{{ branch.id }}" {{ filters.branchId == branch.id ? 'selected' : '' }}>
-									{{ branch.name }}
-								</option>
-							{% endfor %}
-						</select>
-					</div>
+					{% if app.user.branch is null %}
+						<div class="field">
+							<label class="admin-bus-layout-add-label">Filtrer par Succursale</label>
+							<select
+								name="filter_branch"
+								data-controller="symfony--ux-autocomplete--autocomplete"
+								data-symfony--ux-autocomplete--autocomplete-tom-select-options-value="{{ {'plugins': ['dropdown_input'], 'allowEmptyOption': true}|json_encode|e('html_attr') }}"
+							>
+								<option value="">-- Toutes les succursales du réseau --</option>
+								{% for branch in branches %}
+									<option value="{{ branch.id }}" {{ filters.branchId == branch.id ? 'selected' : '' }}>
+										{{ branch.name }} ({{ branch.city }})
+									</option>
+								{% endfor %}
+							</select>
+						</div>
+					{% endif %}
+
 
 					<div class="field">
 						<label class="admin-bus-layout-add-label">Filtrer par type de flux</label>
@@ -119,6 +130,7 @@
 						</select>
 					</div>
 				</div>
+
 				<div class="field-button-right mt-15">
 					<button type="submit" class="btn btn-dark">
 						<i class="fa-solid fa-magnifying-glass"></i>

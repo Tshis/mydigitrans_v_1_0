@@ -74,30 +74,40 @@ final class AgencyReservationService
     }
 
     /**
-     * Liste les réservations de l'agence avec statistiques globales et filtres.
+     * Liste les réservations de l'agence filtrées par succursale (si l'agent est rattaché à une gare).
      *
      * @param array{query: ?string, status: ?string, routeId: ?int} $filters
      * @return array<string, mixed>
      */
-    public function listAgencyReservations(Agency $agency, array $filters): array
+    public function listAgencyReservations(User $actor, array $filters): array
     {
+        $agency = $actor->getAgency();
+        $branch = $actor->getBranch();
         $now = new \DateTimeImmutable();
         $this->releaseExpiredReservations($agency, $now);
 
         $today = $now->setTime(0, 0);
 
-        $statsRows = $this->em->createQueryBuilder()
+        $statsQb = $this->em->createQueryBuilder()
             ->select('res.status AS st', 'COUNT(res.id) AS cnt')
             ->from(Reservation::class, 'res')
             ->join('res.trip', 't')
+            ->join('res.departureStop', 'dep')
+            ->join('res.arrivalStop', 'arr')
+            ->leftJoin('res.createdBy', 'cb')
             ->andWhere('res.agency = :agency')
             ->andWhere('t.departureDate >= :today')
             ->setParameter('agency', $agency)
             ->setParameter('today', $today, \Doctrine\DBAL\Types\Types::DATE_IMMUTABLE)
-            ->groupBy('res.status')
-            ->getQuery()
-            ->getArrayResult();
+            ->groupBy('res.status');
 
+        if (null !== $branch) {
+            $statsQb->andWhere('(dep.city = :branchCity OR arr.city = :branchCity OR cb.branch = :branch)')
+                ->setParameter('branchCity', $branch->getCity())
+                ->setParameter('branch', $branch);
+        }
+
+        $statsRows = $statsQb->getQuery()->getArrayResult();
 
         $stats = ['confirmed' => 0, 'pending' => 0, 'cancelled' => 0];
         foreach ($statsRows as $row) {
@@ -125,6 +135,13 @@ final class AgencyReservationService
             ->setParameter('agency', $agency)
             ->orderBy('res.createdAt', 'DESC')
             ->setMaxResults(300);
+
+        if (null !== $branch) {
+            $qb->andWhere('(dep.city = :branchCity OR arr.city = :branchCity OR cb.branch = :branch)')
+                ->setParameter('branchCity', $branch->getCity())
+                ->setParameter('branch', $branch);
+        }
+
 
         if (null !== $filters['query'] && '' !== $filters['query']) {
             $qb->andWhere('(res.reference LIKE :q OR u.phone LIKE :q OR u.firstname LIKE :q OR u.lastname LIKE :q)')

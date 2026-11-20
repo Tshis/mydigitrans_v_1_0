@@ -22,6 +22,8 @@ final class CashRegisterCreateType extends AbstractType
     {
         /** @var Agency $agency */
         $agency = $options['agency'];
+        /** @var ?Branch $restrictedBranch */
+        $restrictedBranch = $options['restricted_branch'];
 
         $builder
             ->add('name', TextType::class, [
@@ -29,22 +31,33 @@ final class CashRegisterCreateType extends AbstractType
                 'attr'  => ['id' => 'register-name-input', 'placeholder' => 'Ex : Guichet Principal 01, Caisse Fret...'],
             ])
             ->add('code', TextType::class, [
-                'label' => 'Code d\'identification Unique *',
-                'attr'  => ['id' => 'register-code-input', 'class' => 'text-uppercase', 'placeholder' => 'Ex : CSH-KIN-01'],
+                'label'    => 'Code Unique (Optionnel)',
+                'required' => false,
+                'attr'     => ['id' => 'register-code-input', 'class' => 'text-uppercase', 'placeholder' => 'Ex : CSH-KIN-01'],
             ])
             ->add('branch', EntityType::class, [
                 'class'              => Branch::class,
                 'label'              => 'Succursale d\'immatriculation *',
-                'autocomplete'       => true,
+                'disabled'           => null !== $restrictedBranch,
+                'autocomplete'       => null === $restrictedBranch,
                 'tom_select_options' => ['plugins' => ['dropdown_input']],
                 'choice_label'       => static fn(Branch $b): string => sprintf('%s (%s)', $b->getName(), $b->getCity()),
-                'query_builder'      => static fn(EntityRepository $er) => $er->createQueryBuilder('b')
-                    ->andWhere('b.agency = :agency')
-                    ->andWhere('b.status = :opened')
-                    ->setParameter('agency', $agency)
-                    ->setParameter('opened', BranchStatus::Opened)
-                    ->orderBy('b.city', 'ASC'),
+                'query_builder'      => static function (EntityRepository $er) use ($agency, $restrictedBranch) {
+                    $qb = $er->createQueryBuilder('b')
+                        ->andWhere('b.agency = :agency')
+                        ->andWhere('b.status = :opened')
+                        ->setParameter('agency', $agency)
+                        ->setParameter('opened', BranchStatus::Opened)
+                        ->orderBy('b.city', 'ASC');
+
+                    if (null !== $restrictedBranch) {
+                        $qb->andWhere('b = :branch')->setParameter('branch', $restrictedBranch);
+                    }
+
+                    return $qb;
+                },
             ])
+
             ->add('hardwareNote', TextareaType::class, [
                 'label'    => 'Note d\'inventaire matériel (Optionnel)',
                 'required' => false,
@@ -58,7 +71,8 @@ final class CashRegisterCreateType extends AbstractType
             ->setRequired('agency')
             ->setAllowedTypes('agency', Agency::class)
             ->setDefaults([
-                'data_class' => CashRegisterCreateData::class,
+                'data_class'        => CashRegisterCreateData::class,
+                'restricted_branch' => null,
             ]);
     }
 }
