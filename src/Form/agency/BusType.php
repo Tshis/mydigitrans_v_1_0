@@ -63,9 +63,9 @@ final class BusType extends AbstractType
             ->add('year', IntegerType::class, [
                 'label' => 'Année de fabrication *',
                 'attr'  => [
-                    'placeholder' => 'Ex: 2022',
+                    'placeholder' => 'Ex: ' . date('Y'),
                     'min'         => 1990,
-                    'max'         => 2027,
+                    'max'         => (int) date('Y'),
                 ],
             ])
             ->add('mileage', IntegerType::class, [

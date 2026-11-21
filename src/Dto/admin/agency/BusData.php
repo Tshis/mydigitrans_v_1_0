@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Dto\admin\agency;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Création ou modification d'un véhicule de la flotte d'agence.
@@ -35,12 +36,9 @@ final class BusData
     public ?string $model = null;
 
     #[Assert\NotNull(message: 'Indiquez l\'année de fabrication.')]
-    #[Assert\Range(
-        min: 1990,
-        max: 2027,
-        notInRangeMessage: 'L\'année de fabrication doit être comprise entre {{ min }} et {{ max }}.'
-    )]
+    #[Assert\GreaterThanOrEqual(value: 1990, message: 'L\'année de fabrication ne peut pas être antérieure à {{ compared_value }}.')]
     public ?int $year = null;
+
 
     #[Assert\NotNull(message: 'Indiquez le kilométrage actuel.')]
     #[Assert\PositiveOrZero(message: 'Le kilométrage ne peut pas être négatif.')]
@@ -53,4 +51,16 @@ final class BusData
     #[Assert\NotNull(message: 'Choisissez un gabarit d\'usine.', groups: ['create'])]
     #[Assert\Positive(message: 'Gabarit invalide.', groups: ['create'])]
     public ?int $busLayoutId = null;
+
+
+    #[Assert\Callback]
+    public function validateYear(ExecutionContextInterface $context): void
+    {
+        $maxYear = (int) date('Y');
+        if (null !== $this->year && $this->year > $maxYear) {
+            $context->buildViolation(sprintf('L\'année de fabrication ne peut pas être postérieure à %d.', $maxYear))
+                ->atPath('year')
+                ->addViolation();
+        }
+    }
 }

@@ -48,11 +48,11 @@ final class FleetService
     }
 
     /**
-     * Retourne la liste formatée des bus de l'agence ainsi que les statistiques globales.
+     * Retourne la liste formatée des bus actifs/en garage de l'agence ainsi que les statistiques globales.
      *
-     * @return array{fleet: list<array<string, mixed>>, stats: array{total: int, active: int, maintenance: int, expiredDocs: int}}
+     * @return array{fleet: list<array<string, mixed>>, stats: array{total: int, active: int, maintenance: int, expiredDocs: int}, decommissionedCount: int}
      */
-    public function listAgencyFleet(Agency $agency): array
+    public function listAgencyFleet(Agency $agency, bool $includeDecommissioned = false): array
     {
         $buses = $this->em->getRepository(Bus::class)->findBy(
             ['agency' => $agency],
@@ -66,8 +66,10 @@ final class FleetService
             ->from(BusDocument::class, 'd')
             ->join('d.bus', 'b')
             ->andWhere('b.agency = :agency')
+            ->andWhere('b.status != :inactive')
             ->andWhere('d.expiredAt < :today')
             ->setParameter('agency', $agency)
+            ->setParameter('inactive', BusStatus::Inactive)
             ->setParameter('today', $today)
             ->getQuery()
             ->getArrayResult();
@@ -78,22 +80,32 @@ final class FleetService
         }
 
         $stats = [
-            'total'       => \count($buses),
+            'total'       => 0,
             'active'      => 0,
             'maintenance' => 0,
             'expiredDocs' => 0,
         ];
+        $decommissionedCount = 0;
 
         $fleet = [];
         foreach ($buses as $bus) {
             $status = $bus->getStatus();
-            if (BusStatus::Active === $status) {
-                ++$stats['active'];
-            } elseif (BusStatus::Maintenance === $status) {
-                ++$stats['maintenance'];
+
+            if (BusStatus::Inactive === $status) {
+                ++$decommissionedCount;
+                if (!$includeDecommissioned) {
+                    continue;
+                }
+            } else {
+                ++$stats['total'];
+                if (BusStatus::Active === $status) {
+                    ++$stats['active'];
+                } elseif (BusStatus::Maintenance === $status) {
+                    ++$stats['maintenance'];
+                }
             }
 
-            $hasExpiredDoc = isset($expiredBusIds[(int) $bus->getId()]);
+            $hasExpiredDoc = BusStatus::Inactive !== $status && isset($expiredBusIds[(int) $bus->getId()]);
             if ($hasExpiredDoc) {
                 ++$stats['expiredDocs'];
             }
@@ -120,10 +132,12 @@ final class FleetService
         }
 
         return [
-            'fleet' => $fleet,
-            'stats' => $stats,
+            'fleet'               => $fleet,
+            'stats'               => $stats,
+            'decommissionedCount' => $decommissionedCount,
         ];
     }
+
 
     /**
      * Retourne les gabarits d'usine validés disponibles pour les agences.
@@ -173,6 +187,13 @@ final class FleetService
         $rawCode     = strtoupper(trim((string) $data->code));
         $rawName     = trim((string) $data->name);
         $cargoCapacity = max(0, (int) $data->cargoCapacity);
+
+        $currentYear = (int) date('Y');
+
+        if ($year < 1990 || $year > $currentYear) {
+            throw new \DomainException(sprintf('L\'année de fabrication doit être comprise entre 1990 et %d.', $currentYear));
+        }
+
 
         if (null !== $this->em->getRepository(Bus::class)->findOneBy(['plateNumber' => $plateNumber])) {
             throw new \DomainException(sprintf('La plaque d\'immatriculation [%s] est déjà enregistrée.', $plateNumber));
@@ -292,6 +313,13 @@ final class FleetService
         $name        = trim((string) $data->name);
         $year        = (int) $data->year;
         $mileage     = (int) $data->mileage;
+
+        $currentYear = (int) date('Y');
+        if ($year < 1990 || $year > $currentYear) {
+            throw new \DomainException(sprintf('L\'année de fabrication doit être comprise entre 1990 et %d.', $currentYear));
+        }
+
+
         if ($mileage < $bus->getMileage()) {
             throw new \DomainException(sprintf('Le nouveau kilométrage ne peut pas être inférieur à l\'actuel (%d km).', $bus->getMileage()));
         }
