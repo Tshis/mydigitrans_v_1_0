@@ -86,6 +86,13 @@
                                 </div>
                             </div>
 
+                            <div class="field mb-20">
+                                {{ form_label(form.cargoCapacity, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}
+                                {{ form_widget(form.cargoCapacity, {'attr': {'class': 'agency-bus-add-form-input'}}) }}
+                                <div class="text-danger text-size-12 mt-5">{{ form_errors(form.cargoCapacity) }}</div>
+                            </div>
+
+
                             {# SÉLECTEUR DE GABARITS SYSTÈME (conserve l'id bus-layout-selector) #}
                             <div class="field mb-20">
                                 {{ form_label(form.busLayoutId, null, {'label_attr': {'class': 'agency-bus-add-form-label'}}) }}

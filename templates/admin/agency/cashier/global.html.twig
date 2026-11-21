@@ -6,7 +6,9 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/datatable.js" defer></script>
+	<script src="/js/admin/modalQuestion.js" defer></script>
 {% endblock %}
+
 
 {% block body %}
 	<div class="admin-agency-cashier-dashboard-global-scope container">
@@ -125,6 +127,59 @@
 			</form>
 		</div>
 
+		{# --- PARC DES GUICHETS DU RÉSEAU --- #}
+		<div class="layout-main-card mb-25">
+			<div class="card-inner-box table-responsive-wrapper">
+				<h2 class="mb-15 text-primary text-size-18"><i class="fa-solid fa-desktop"></i> Guichets Physiques du Réseau ({{ registers|length }})</h2>
+				<table class="table table-scrollable table-striped js-datatable">
+					<thead>
+						<tr>
+							<th>Succursale</th>
+							<th>Guichet & Code</th>
+							<th>Statut Matériel</th>
+							<th>Occupation</th>
+							<th class="text-right">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for reg in registers %}
+							<tr>
+								<td><strong>{{ reg.branchName }}</strong></td>
+								<td><strong>{{ reg.name }}</strong> <span class="sub-meta-text">({{ reg.code }})</span></td>
+								<td>
+									<span class="cash-badge {{ reg.isActive ? 'badge-entry' : 'badge-exit' }}">
+										{{ reg.isActive ? 'ACTIF' : 'INACTIF' }}
+									</span>
+								</td>
+								<td>
+									{% if reg.cashierName %}
+										<strong>{{ reg.cashierName }}</strong> <span class="sub-meta-text">({{ reg.sessionState }})</span>
+									{% else %}
+										<span class="text-muted">Libre</span>
+									{% endif %}
+								</td>
+								<td class="text-right actions">
+									<a
+										id="ctaBtn"
+										href="javascript:void(0)"
+										data-target="{{ path('admin_agency_cashier_register_toggle', {'id': reg.id}) }}"
+										class="table-action-btn {{ reg.isActive ? 'bg-mute' : 'bg-success' }}"
+										title="{{ reg.isActive ? 'Désactiver ce guichet' : 'Activer ce guichet' }}"
+									>
+										<i class="fa-solid {{ reg.isActive ? 'fa-ban' : 'fa-circle-check' }}"></i>
+									</a>
+								</td>
+
+							</tr>
+						{% else %}
+							<tr><td colspan="5" class="text-center text-muted py-15">Aucun guichet immatriculé.</td></tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+
 		{# --- REGISTRE CONSOLIDÉ DES FLUX DE SESSIONS --- #}
 		<div class="layout-main-card mb-20">
 			<div class="card-inner-box table-responsive-wrapper">
@@ -204,4 +259,6 @@
 		</div>
 
 	</div>
+
+	{% include 'admin/partials/_modal.html.twig' %}
 {% endblock %}

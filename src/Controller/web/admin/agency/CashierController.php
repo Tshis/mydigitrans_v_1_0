@@ -79,6 +79,11 @@ final class CashierController extends AbstractAdminController
     #[Route('/admin/agency/cash-register/create', name: 'admin_agency_cashier_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
+        if (!$this->isGranted('ROLE_AGENCY_ADMIN') && !$this->isGranted('ROLE_GENERAL_MANAGER')) {
+            throw $this->createAccessDeniedException('Seule la direction générale peut immatriculer un nouveau guichet de caisse.');
+        }
+
+
         $actor            = $this->actor();
         $agency           = $actor->getAgency();
         $restrictedBranch = $actor->getBranch();
@@ -471,18 +476,38 @@ final class CashierController extends AbstractAdminController
     {
         $actor  = $this->actor();
         $agency = $actor->getAgency();
+        $branch = $actor->getBranch();
+
+        $lockedRegister = null;
+        $registerId = $request->query->getInt('registerId');
+        if ($registerId > 0) {
+            $candidate = $this->em->getRepository(\App\Entity\CashRegister::class)->find($registerId);
+            if (
+                $candidate instanceof \App\Entity\CashRegister
+                && $candidate->getAgency()?->getId() === $agency->getId()
+                && (null === $branch || $candidate->getBranch()?->getId() === $branch->getId())
+            ) {
+                $lockedRegister = $candidate;
+            }
+        }
 
         $initData = new CashSessionInitData();
-        $initData->cashier = $actor;
+        if (null !== $lockedRegister) {
+            $initData->cashRegister = $lockedRegister;
+        }
 
         $form = $this->createForm(CashSessionInitType::class, $initData, [
-            'agency' => $agency,
-            'branch' => $actor->getBranch(),
+            'agency'          => $agency,
+            'branch'          => $branch,
+            'locked_register' => $lockedRegister,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                if (null !== $lockedRegister) {
+                    $initData->cashRegister = $lockedRegister;
+                }
                 $initData->amounts = (array) $request->request->all('amounts');
                 $session = $this->cashierService->initSession($initData, $actor);
 
@@ -494,7 +519,9 @@ final class CashierController extends AbstractAdminController
 
                 $this->addFlash('success', 'Dotation matinale allouée. Le caissier peut maintenant ouvrir sa session.');
 
-                return $this->redirectToRoute('admin_agency_cashier_dashboard_branch');
+                return $this->redirectToRoute(
+                    null === $branch ? 'admin_agency_cashier_dashboard_global' : 'admin_agency_cashier_dashboard_branch'
+                );
             } catch (\DomainException $e) {
                 $this->addFlash('error', $e->getMessage());
             }
@@ -506,5 +533,28 @@ final class CashierController extends AbstractAdminController
             'form'              => $form->createView(),
             'active_currencies' => $this->cashierService->getAgencyActiveCurrencies($agency),
         ]);
+    }
+
+    #[Route('/admin/agency/cash-register/{id}/toggle-status', name: 'admin_agency_cashier_register_toggle', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function toggleRegister(int $id): Response
+    {
+        if (!$this->isGranted('ROLE_AGENCY_ADMIN') && !$this->isGranted('ROLE_GENERAL_MANAGER')) {
+            throw $this->createAccessDeniedException('Seule la direction générale peut activer ou désactiver un guichet.');
+        }
+
+        $actor = $this->actor();
+        $register = $this->em->getRepository(\App\Entity\CashRegister::class)->find($id);
+        if (!$register instanceof \App\Entity\CashRegister || $register->getAgency()?->getId() !== $actor->getAgency()?->getId()) {
+            throw $this->createNotFoundException('Guichet introuvable.');
+        }
+
+        try {
+            $this->cashierService->toggleRegisterStatus($register, $actor);
+            $this->addFlash('success', sprintf('Statut du guichet [%s] mis à jour (%s).', $register->getCode(), $register->getStatus()->value));
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_cashier_dashboard_global');
     }
 }

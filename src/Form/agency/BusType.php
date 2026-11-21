@@ -74,7 +74,17 @@ final class BusType extends AbstractType
                     'placeholder' => '0',
                     'min'         => $options['min_mileage'],
                 ],
+            ])
+            ->add('cargoCapacity', IntegerType::class, [
+                'label'    => 'Capacité soute fret en Kg (0 si sans soute, ex: Coaster)',
+                'required' => false,
+                'empty_data' => '0',
+                'attr'     => [
+                    'placeholder' => 'Ex: 1500 (ou 0 pour minibus sans soute)',
+                    'min'         => 0,
+                ],
             ]);
+
 
         if (!$isEdit) {
             $choices = [];

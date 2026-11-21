@@ -26,24 +26,33 @@ final class CashSessionInitType extends AbstractType
         $agency = $options['agency'];
         /** @var ?Branch $branch */
         $branch = $options['branch'];
+        /** @var ?CashRegister $lockedRegister */
+        $lockedRegister = $options['locked_register'];
+
+        $effectiveBranch = $lockedRegister?->getBranch() ?? $branch;
 
         $builder
             ->add('cashRegister', EntityType::class, [
                 'class'              => CashRegister::class,
                 'label'              => 'Guichet physique de destination *',
-                'autocomplete'       => true,
+                'disabled'           => null !== $lockedRegister,
+                'autocomplete'       => null === $lockedRegister,
                 'tom_select_options' => ['plugins' => ['dropdown_input']],
                 'choice_label'       => static fn(CashRegister $cr): string => sprintf('%s [%s] — %s', $cr->getName(), $cr->getCode(), $cr->getBranch()?->getName()),
-                'query_builder'      => static function (EntityRepository $er) use ($agency, $branch) {
+                'query_builder'      => static function (EntityRepository $er) use ($agency, $effectiveBranch, $lockedRegister) {
                     $qb = $er->createQueryBuilder('cr')
                         ->andWhere('cr.agency = :agency')
                         ->andWhere('cr.status = :active')
                         ->setParameter('agency', $agency)
                         ->setParameter('active', ActiveStatus::Active)
                         ->orderBy('cr.name', 'ASC');
-                    if (null !== $branch) {
-                        $qb->andWhere('cr.branch = :branch')->setParameter('branch', $branch);
+
+                    if (null !== $lockedRegister) {
+                        $qb->andWhere('cr = :locked')->setParameter('locked', $lockedRegister);
+                    } elseif (null !== $effectiveBranch) {
+                        $qb->andWhere('cr.branch = :branch')->setParameter('branch', $effectiveBranch);
                     }
+
                     return $qb;
                 },
             ])
@@ -53,7 +62,7 @@ final class CashSessionInitType extends AbstractType
                 'autocomplete'       => true,
                 'tom_select_options' => ['plugins' => ['dropdown_input']],
                 'choice_label'       => static fn(User $u): string => sprintf('%s (%s)', $u->getFullName(), $u->getEmail()),
-                'query_builder'      => static function (EntityRepository $er) use ($agency, $branch) {
+                'query_builder'      => static function (EntityRepository $er) use ($agency, $effectiveBranch) {
                     $qb = $er->createQueryBuilder('u')
                         ->andWhere('u.agency = :agency')
                         ->andWhere('u.userType = :type')
@@ -62,9 +71,11 @@ final class CashSessionInitType extends AbstractType
                         ->setParameter('type', UserType::Agency)
                         ->setParameter('yes', true)
                         ->orderBy('u.firstname', 'ASC');
-                    if (null !== $branch) {
-                        $qb->andWhere('u.branch = :branch')->setParameter('branch', $branch);
+
+                    if (null !== $effectiveBranch) {
+                        $qb->andWhere('u.branch = :branch')->setParameter('branch', $effectiveBranch);
                     }
+
                     return $qb;
                 },
             ])
@@ -83,6 +94,7 @@ final class CashSessionInitType extends AbstractType
             ->setDefaults([
                 'data_class'         => CashSessionInitData::class,
                 'branch'             => null,
+                'locked_register'    => null,
                 'allow_extra_fields' => true,
             ]);
     }

@@ -433,12 +433,58 @@ final class AgencyFinanceService
             ['city' => 'ASC']
         );
 
+        $regQb = $this->em->createQueryBuilder()
+            ->select('cr', 'br')
+            ->from(\App\Entity\CashRegister::class, 'cr')
+            ->join('cr.branch', 'br')
+            ->andWhere('cr.agency = :agency')
+            ->setParameter('agency', $agency)
+            ->orderBy('cr.name', 'ASC');
+
+        if (!empty($filters['branchId'])) {
+            $regQb->andWhere('br.id = :branchId')->setParameter('branchId', (int) $filters['branchId']);
+        }
+
+        /** @var list<\App\Entity\CashRegister> $allRegisters */
+        $allRegisters = $regQb->getQuery()->getResult();
+
+        $activeByRegisterId = [];
+        foreach ($sessions as $s) {
+            $regId = $s->getCashRegister()?->getId();
+            if (null === $regId || isset($activeByRegisterId[$regId])) {
+                continue;
+            }
+            $isUnvalidatedClosed = CashSessionStatus::Closed === $s->getStatus() && null === $s->getClosedBy();
+            if (\in_array($s->getStatus(), [CashSessionStatus::Pending, CashSessionStatus::Opened], true) || $isUnvalidatedClosed) {
+                $activeByRegisterId[$regId] = $s;
+            }
+        }
+
+        $registersView = [];
+        foreach ($allRegisters as $reg) {
+            $currentSession = $activeByRegisterId[(int) $reg->getId()] ?? null;
+            $registersView[] = [
+                'id'           => $reg->getId(),
+                'name'         => (string) $reg->getName(),
+                'code'         => (string) $reg->getCode(),
+                'branchName'   => (string) $reg->getBranch()?->getName(),
+                'isActive'     => \App\Enum\ActiveStatus::Active === $reg->getStatus(),
+                'sessionId'    => $currentSession?->getId(),
+                'sessionState' => $currentSession?->getStatus()->value ?? 'free',
+                'cashierName'  => $currentSession?->getOpenedBy()?->getFullName(),
+                'openedAt'     => $currentSession?->getOpenedAt()?->format('d/m H\hi'),
+                'registers' => $registersView,
+            ];
+        }
+
+
         return [
             'branches'                  => $branches,
             'active_sessions_count'     => $activeCount,
             'pending_arbitration_count' => $pendingArbitrationCount,
             'totals_by_currency'        => $totalsByCurrency,
             'sessions'                  => $rows,
+            'registers'                 => $registersView,
         ];
     }
 

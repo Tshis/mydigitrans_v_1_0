@@ -41,6 +41,7 @@ final class FleetService
         $dto->model = $bus->getModel();
         $dto->year = $bus->getYear();
         $dto->mileage = $bus->getMileage();
+        $dto->cargoCapacity = $bus->getCargoCapacity();
         $dto->busLayoutId = $bus->getBusLayout()?->getId();
 
         return $dto;
@@ -171,6 +172,7 @@ final class FleetService
         $layoutId    = (int) $data->busLayoutId;
         $rawCode     = strtoupper(trim((string) $data->code));
         $rawName     = trim((string) $data->name);
+        $cargoCapacity = max(0, (int) $data->cargoCapacity);
 
         if (null !== $this->em->getRepository(Bus::class)->findOneBy(['plateNumber' => $plateNumber])) {
             throw new \DomainException(sprintf('La plaque d\'immatriculation [%s] est déjà enregistrée.', $plateNumber));
@@ -188,7 +190,7 @@ final class FleetService
 
         $bus = new Bus();
 
-        $this->em->wrapInTransaction(function () use ($bus, $agency, $actor, $layout, $code, $rawName, $plateNumber, $brand, $model, $year, $mileage): void {
+        $this->em->wrapInTransaction(function () use ($bus, $agency, $actor, $layout, $code, $rawName, $plateNumber, $brand, $model, $year, $mileage, $cargoCapacity): void {
             $bus->setAgency($agency)
                 ->setBusLayout($layout)
                 ->setCode($code)
@@ -198,6 +200,7 @@ final class FleetService
                 ->setModel($model)
                 ->setYear($year)
                 ->setMileage($mileage)
+                ->setCargoCapacity($cargoCapacity)
                 ->setStatus(BusStatus::Active)
                 ->setCreatedBy($actor);
 
@@ -301,7 +304,8 @@ final class FleetService
             ->setModel($model)
             ->setName('' !== $name ? $name : null)
             ->setYear($year)
-            ->setMileage($mileage);
+            ->setMileage($mileage)
+            ->setCargoCapacity(max(0, (int) $data->cargoCapacity));
         $this->em->flush();
     }
     /**

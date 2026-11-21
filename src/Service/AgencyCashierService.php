@@ -744,4 +744,44 @@ final class AgencyCashierService
 
         return $candidate;
     }
+
+
+    /**
+     * Active ou désactive un guichet physique (réservé à l'Admin d'agence / General Manager).
+     *
+     * @throws \DomainException
+     */
+    public function toggleRegisterStatus(CashRegister $register, User $actor): void
+    {
+        if (ActiveStatus::Active === $register->getStatus()) {
+            $busyCount = (int) $this->em->createQueryBuilder()
+                ->select('COUNT(cs.id)')
+                ->from(CashSession::class, 'cs')
+                ->andWhere('cs.cashRegister = :reg')
+                ->andWhere('cs.status IN (:st)')
+                ->setParameter('reg', $register)
+                ->setParameter('st', [CashSessionStatus::Pending->value, CashSessionStatus::Opened->value])
+                ->getQuery()
+                ->getSingleScalarResult();
+
+            if ($busyCount > 0) {
+                throw new \DomainException(sprintf('Impossible de désactiver le guichet [%s] tant qu\'une session est ouverte ou en attente.', $register->getCode()));
+            }
+            $register->setStatus(ActiveStatus::Inactive);
+        } else {
+            $register->setStatus(ActiveStatus::Active);
+        }
+
+        $this->auditLogger->log(
+            action: AuditAction::Update,
+            entityName: 'CashRegister',
+            entityId: $register->getId(),
+            oldValues: ['code' => $register->getCode()],
+            newValues: ['code' => $register->getCode(), 'status' => $register->getStatus()->value],
+            actor: $actor,
+            flush: false
+        );
+
+        $this->em->flush();
+    }
 }

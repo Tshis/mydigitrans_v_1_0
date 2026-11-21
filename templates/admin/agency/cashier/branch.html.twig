@@ -24,10 +24,13 @@
 					<i class="fa-solid fa-key"></i>
 					Initialiser une session
 				</a>
-				<a href="{{ path('admin_agency_cashier_add') }}" class="btn-refined btn-success-gradient text-size-12">
-					<i class="fa-solid fa-plus"></i>
-					Nouveau guichet de caisse
-				</a>
+				{% if is_granted('ROLE_AGENCY_ADMIN') or is_granted('ROLE_GENERAL_MANAGER') %}
+					<a href="{{ path('admin_agency_cashier_add') }}" class="btn-refined btn-success-gradient text-size-12">
+						<i class="fa-solid fa-plus"></i>
+						Nouveau guichet de caisse
+					</a>
+				{% endif %}
+
 			</div>
 		</header>
 
@@ -69,6 +72,78 @@
 				</div>
 			</div>
 		</div>
+
+
+		{# --- ÉTAT EN DIRECT DES GUICHETS PHYSIQUES DE LA SUCCURSALE --- #}
+		<div class="card monitoring-table-card mb-25">
+			<h2>
+				<i class="fa-solid fa-desktop"></i>
+				Guichets Physiques de la Succursale ({{ registers|length }})
+			</h2>
+
+			<table class="table table-scrollable table-striped">
+				<thead>
+					<tr>
+						<th>Guichet & Code</th>
+						<th>État du Poste</th>
+						<th>Caissier Affecté</th>
+						<th class="text-right">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for reg in registers %}
+						<tr>
+							<td>
+								<strong>{{ reg.name }}</strong>
+								<span class="sub-meta-text monospace">{{ reg.code }}</span>
+							</td>
+							<td>
+								{% if reg.sessionState == 'opened' %}
+									<span class="session-badge active-status">EN SERVICE (OUVERT)</span>
+								{% elseif reg.sessionState == 'pending' %}
+									<span class="session-badge await-status">DOTATION ENVOYÉE (EN ATTENTE)</span>
+								{% elseif reg.sessionState == 'closed' %}
+									<span class="session-badge await-status">CLÔTURÉ (À ARBITRER)</span>
+								{% else %}
+									<span class="session-badge closed-status">LIBRE / DISPONIBLE</span>
+								{% endif %}
+							</td>
+							<td>
+								{% if reg.cashierName %}
+									<strong>{{ reg.cashierName }}</strong>
+									<span class="sub-meta-text">Depuis {{ reg.openedAt }}</span>
+								{% else %}
+									<span class="text-muted">Aucun agent en poste</span>
+								{% endif %}
+							</td>
+							<td class="text-right table-action-buttons">
+								{% if reg.sessionState == 'free' and reg.isActive %}
+									<a href="{{ path('admin_agency_cashier_session_init', {'registerId': reg.id}) }}" class="table-action-trigger view" title="Allouer une dotation sur ce guichet">
+										<i class="fa-solid fa-key"></i>
+									</a>
+								{% elseif reg.sessionState == 'closed' and reg.sessionId %}
+									<a href="{{ path('admin_agency_cashier_session_closing_validation', {'id': reg.sessionId}) }}" class="table-action-trigger arbitrate" title="Arbitrer la clôture">
+										<i class="fa-solid fa-gavel"></i>
+									</a>
+								{% elseif reg.sessionId %}
+									<a href="{{ path('admin_agency_finance_journal', {'code': reg.sessionId}) }}" class="table-action-trigger view" title="Voir le journal en direct">
+										<i class="fa-solid fa-eye"></i>
+									</a>
+								{% endif %}
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="4" class="text-center text-muted py-15">Aucun guichet immatriculé sur cette succursale. Contactez l'administrateur d'agence.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+
+
+
 
 		{# --- REGISTRE DE CONTRÔLE DES CAISSIERS --- #}
 		<div class="card monitoring-table-card">

@@ -46,6 +46,10 @@ final class BusData
     #[Assert\PositiveOrZero(message: 'Le kilométrage ne peut pas être négatif.')]
     public ?int $mileage = 0;
 
+    #[Assert\PositiveOrZero(message: 'La capacité en soute ne peut pas être négative.')]
+    public int $cargoCapacity = 0;
+
+
     #[Assert\NotNull(message: 'Choisissez un gabarit d\'usine.', groups: ['create'])]
     #[Assert\Positive(message: 'Gabarit invalide.', groups: ['create'])]
     public ?int $busLayoutId = null;

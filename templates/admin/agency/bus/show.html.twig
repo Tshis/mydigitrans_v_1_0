@@ -21,6 +21,7 @@
 					<h2 class="agency-bus-profile-title">Fiche Véhicule : {{ bus.code }}</h2>
 					<p class="agency-bus-profile-subtitle">{{ bus.brand }} {{ bus.model }}{% if bus.name %} ({{ bus.name }}){% endif %} — {{ bus.plateNumber }}</p>
 					<p class="text-dark text-size-13 my-10">Gabarit : {{ bus.busLayout.name }} • {{ bus.seats|length }} places • Année {{ bus.year }}</p>
+					<p class="text-dark text-size-13 my-10">Gabarit : {{ bus.busLayout.name }} • {{ bus.seats|length }} places • Soute : {{ bus.cargoCapacity > 0 ? bus.cargoCapacity ~ ' kg' : 'Sans soute (0 kg)' }} • Année {{ bus.year }}</p>
 				</div>
 				<div class="agency-bus-profile-status-badge-zone text-weight-700 text-size-20">
 					{% set badgeModifier = bus.status.value == 'active' ? 'agency-bus-state-badge--on-route' : (bus.status.value == 'maintenance' ? 'agency-bus-state-badge--maintenance' : 'agency-bus-state-badge--inactive') %}
@@ -169,6 +170,12 @@
 									{{ form_widget(form.year, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
 									<div class="text-danger text-size-12 mt-5">{{ form_errors(form.year) }}</div>
 								</div>
+							</div>
+
+							<div class="field mb-20">
+								{{ form_label(form.cargoCapacity, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
+								{{ form_widget(form.cargoCapacity, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.cargoCapacity) }}</div>
 							</div>
 
 							{% if is_granted('bus.write') and bus.status.value != 'inactive' %}

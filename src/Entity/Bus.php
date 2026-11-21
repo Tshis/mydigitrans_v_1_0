@@ -54,6 +54,9 @@ class Bus
     #[ORM\Column]
     private int $mileage = 0;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private int $cargoCapacity = 0;
+
     #[ORM\Column]
     private ?int $year = null;
 
@@ -198,6 +201,19 @@ class Bus
 
         return $this;
     }
+
+    public function getCargoCapacity(): int
+    {
+        return $this->cargoCapacity;
+    }
+
+    public function setCargoCapacity(int $cargoCapacity): static
+    {
+        $this->cargoCapacity = max(0, $cargoCapacity);
+
+        return $this;
+    }
+
 
     public function getYear(): ?int
     {
