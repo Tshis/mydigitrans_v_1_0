@@ -33,7 +33,7 @@ class ContactType extends AbstractType
             ->add('subject', EnumType::class, [
                 'label' => 'Objet',
                 'class' => ContactSubject::class,
-                'choice_label' => static fn (ContactSubject $subject): string => $subject->label(),
+                'choice_label' => static fn(ContactSubject $subject): string => $subject->label(),
                 'placeholder' => '-- Sélectionner --',
             ])
             ->add('message', TextareaType::class, [
@@ -49,6 +49,9 @@ class ContactType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => ContactData::class]);
+        $resolver->setDefaults([
+            'data_class' => ContactData::class,
+            'csrf_token_id' => 'public_contact_form'
+        ]);
     }
 }

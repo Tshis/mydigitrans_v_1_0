@@ -87,7 +87,8 @@ final class CashierPaymentType extends AbstractType
             ->setRequired('agency')
             ->setAllowedTypes('agency', Agency::class)
             ->setDefaults([
-                'data_class' => CashierPaymentData::class,
+                'data_class'    => CashierPaymentData::class,
+                'csrf_token_id' => 'agency_cashier_payment',
             ]);
     }
 }

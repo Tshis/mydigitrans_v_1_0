@@ -117,6 +117,9 @@ class AgencyRegistrationType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => AgencyRegistrationData::class]);
+        $resolver->setDefaults([
+            'data_class' => AgencyRegistrationData::class,
+            'csrf_token_id' => 'public_agency_registration'
+        ]);
     }
 }

@@ -43,7 +43,7 @@ final class BusType extends AbstractType
                 ],
             ])
             ->add('plateNumber', TextType::class, [
-                'label' => 'Numéro de Plaque d\'Immatriculation *',
+                'label' => 'Plaque d\'Immatriculation *',
                 'attr'  => [
                     'placeholder' => 'Ex: 5412AB/01',
                 ],
@@ -110,6 +110,7 @@ final class BusType extends AbstractType
             'is_edit'           => false,
             'layouts'           => [],
             'min_mileage'       => 0,
+            'csrf_token_id' => 'agency_bus_form',
             'validation_groups' => static function (FormInterface $form): array {
                 $isEdit = (bool) $form->getConfig()->getOption('is_edit');
 

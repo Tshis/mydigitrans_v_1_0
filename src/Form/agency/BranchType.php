@@ -69,8 +69,10 @@ final class BranchType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => BranchData::class,
-            'agents'     => [],
+            'data_class'    => BranchData::class,
+            'csrf_token_id' => 'agency_branch_form',
+            'agents'        => [],
+
         ]);
 
         $resolver->setAllowedTypes('agents', 'array');

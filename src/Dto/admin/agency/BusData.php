@@ -47,7 +47,7 @@ final class BusData
     public ?int $mileage = 0;
 
     #[Assert\PositiveOrZero(message: 'La capacité en soute ne peut pas être négative.')]
-    public int $cargoCapacity = 0;
+    public ?int $cargoCapacity = 0;
 
 
     #[Assert\NotNull(message: 'Choisissez un gabarit d\'usine.', groups: ['create'])]

@@ -27,7 +27,8 @@ final class CashSessionValidateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => CashSessionValidateData::class,
+            'data_class'    => CashSessionValidateData::class,
+            'csrf_token_id' => 'agency_cash_session_validate',
         ]);
     }
 }

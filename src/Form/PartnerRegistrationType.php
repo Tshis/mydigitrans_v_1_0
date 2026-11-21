@@ -65,6 +65,9 @@ class PartnerRegistrationType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => PartnerRegistrationData::class]);
+        $resolver->setDefaults([
+            'data_class' => PartnerRegistrationData::class,
+            'csrf_token_id' => 'public_partner_registration'
+        ]);
     }
 }

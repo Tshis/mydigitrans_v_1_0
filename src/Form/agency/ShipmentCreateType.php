@@ -181,7 +181,8 @@ final class ShipmentCreateType extends AbstractType
             ->setRequired('agency')
             ->setAllowedTypes('agency', Agency::class)
             ->setDefaults([
-                'data_class' => ShipmentCreateData::class,
+                'data_class'    => ShipmentCreateData::class,
+                'csrf_token_id' => 'agency_shipment_create',
             ]);
     }
 }

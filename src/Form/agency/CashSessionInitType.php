@@ -93,6 +93,7 @@ final class CashSessionInitType extends AbstractType
             ->setAllowedTypes('agency', Agency::class)
             ->setDefaults([
                 'data_class'         => CashSessionInitData::class,
+                'csrf_token_id'      => 'agency_cash_session_init',
                 'branch'             => null,
                 'locked_register'    => null,
                 'allow_extra_fields' => true,

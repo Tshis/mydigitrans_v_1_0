@@ -132,6 +132,7 @@ class AgentType extends AbstractType
             'identity_only' => false,
             'branches' => [],
             'roles' => [],
+            'csrf_token_id'      => 'admin_agent_form',
             'validation_groups' => static fn(FormInterface $form): array => $form->getConfig()->getOption('is_edit') ? ['Default'] : ['Default', 'create'],
         ]);
 

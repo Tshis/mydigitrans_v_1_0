@@ -75,8 +75,9 @@ final class BusMaintenanceDeclareType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class'   => BusMaintenanceDeclareData::class,
-            'active_buses' => [],
+            'data_class'    => BusMaintenanceDeclareData::class,
+            'csrf_token_id' => 'agency_bus_maintenance_declare',
+            'active_buses'  => [],
         ]);
 
         $resolver->setAllowedTypes('active_buses', 'array');

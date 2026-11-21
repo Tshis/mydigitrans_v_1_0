@@ -72,6 +72,7 @@ final class CashRegisterCreateType extends AbstractType
             ->setAllowedTypes('agency', Agency::class)
             ->setDefaults([
                 'data_class'        => CashRegisterCreateData::class,
+                'csrf_token_id'     => 'agency_cash_register_create',
                 'restricted_branch' => null,
             ]);
     }

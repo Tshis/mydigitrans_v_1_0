@@ -67,6 +67,7 @@ final class BookingType extends AbstractType
         $resolver->setDefaults([
             'data_class' => BookingData::class,
             'csrf_protection' => true,
+            'csrf_token_id' => 'public_booking_form'
         ]);
     }
 }

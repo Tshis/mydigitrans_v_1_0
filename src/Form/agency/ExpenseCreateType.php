@@ -143,6 +143,7 @@ final class ExpenseCreateType extends AbstractType
             ->setAllowedTypes('agency', Agency::class)
             ->setDefaults([
                 'data_class'        => ExpenseCreateData::class,
+                'csrf_token_id'     => 'agency_expense_create',
                 'restricted_branch' => null,
             ]);
     }

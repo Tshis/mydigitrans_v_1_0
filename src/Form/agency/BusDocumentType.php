@@ -85,6 +85,7 @@ final class BusDocumentType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class'        => BusDocumentData::class,
+            'csrf_token_id'     => 'agency_bus_document_form',
             'mode'              => 'create',
             'fleet'             => [],
             'validation_groups' => static function (FormInterface $form): array {

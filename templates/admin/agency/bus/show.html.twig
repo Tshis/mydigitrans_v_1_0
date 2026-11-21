@@ -1,6 +1,7 @@
 {# templates/admin/agency/bus/show.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/admin/bus_profil.js" defer></script>
@@ -20,7 +21,6 @@
 				<div class="bus-info text-center">
 					<h2 class="agency-bus-profile-title">Fiche Véhicule : {{ bus.code }}</h2>
 					<p class="agency-bus-profile-subtitle">{{ bus.brand }} {{ bus.model }}{% if bus.name %} ({{ bus.name }}){% endif %} — {{ bus.plateNumber }}</p>
-					<p class="text-dark text-size-13 my-10">Gabarit : {{ bus.busLayout.name }} • {{ bus.seats|length }} places • Année {{ bus.year }}</p>
 					<p class="text-dark text-size-13 my-10">Gabarit : {{ bus.busLayout.name }} • {{ bus.seats|length }} places • Soute : {{ bus.cargoCapacity > 0 ? bus.cargoCapacity ~ ' kg' : 'Sans soute (0 kg)' }} • Année {{ bus.year }}</p>
 				</div>
 				<div class="agency-bus-profile-status-badge-zone text-weight-700 text-size-20">
@@ -131,61 +131,62 @@
 
 						{{ form_start(form, {'attr': {'id': 'agency-bus-update-form', 'class': 'agency-bus-profile-form', 'novalidate': 'novalidate'}}) }}
 
-							{{ form_errors(form) }}
 
-							<div class="field-group mb-20">
-								<div class="field">
-									{{ form_label(form.plateNumber, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
-									{{ form_widget(form.plateNumber, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
-									<div class="text-danger text-size-12 mt-5">{{ form_errors(form.plateNumber) }}</div>
-								</div>
-								<div class="field">
-									{{ form_label(form.mileage, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
-									{{ form_widget(form.mileage, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
-									<div class="text-danger text-size-12 mt-5">{{ form_errors(form.mileage) }}</div>
-								</div>
+						{{ form_errors(form) }}
+
+						<div class="field-group mb-20">
+							<div class="field">
+								{{ form_label(form.plateNumber, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
+								{{ form_widget(form.plateNumber, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.plateNumber) }}</div>
 							</div>
-
-							<div class="field-group mb-20">
-								<div class="field">
-									{{ form_label(form.brand, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
-									{{ form_widget(form.brand, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
-									<div class="text-danger text-size-12 mt-5">{{ form_errors(form.brand) }}</div>
-								</div>
-								<div class="field">
-									{{ form_label(form.model, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
-									{{ form_widget(form.model, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
-									<div class="text-danger text-size-12 mt-5">{{ form_errors(form.model) }}</div>
-								</div>
+							<div class="field">
+								{{ form_label(form.mileage, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
+								{{ form_widget(form.mileage, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.mileage) }}</div>
 							</div>
+						</div>
 
-							<div class="field-group mb-20">
-								<div class="field">
-									{{ form_label(form.name, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
-									{{ form_widget(form.name, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
-									<div class="text-danger text-size-12 mt-5">{{ form_errors(form.name) }}</div>
-								</div>
-								<div class="field">
-									{{ form_label(form.year, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
-									{{ form_widget(form.year, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
-									<div class="text-danger text-size-12 mt-5">{{ form_errors(form.year) }}</div>
-								</div>
+						<div class="field-group mb-20">
+							<div class="field">
+								{{ form_label(form.brand, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
+								{{ form_widget(form.brand, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.brand) }}</div>
 							</div>
-
-							<div class="field mb-20">
-								{{ form_label(form.cargoCapacity, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
-								{{ form_widget(form.cargoCapacity, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
-								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.cargoCapacity) }}</div>
+							<div class="field">
+								{{ form_label(form.model, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
+								{{ form_widget(form.model, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.model) }}</div>
 							</div>
+						</div>
 
-							{% if is_granted('bus.write') and bus.status.value != 'inactive' %}
-								<div class="field-button-right">
-									<button type="submit" class="btn-refined btn-success-gradient text-size-12">
-										<i class="fa-solid fa-floppy-disk"></i>
-										Enregistrer les modifications
-									</button>
-								</div>
-							{% endif %}
+						<div class="field-group mb-20">
+							<div class="field">
+								{{ form_label(form.name, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
+								{{ form_widget(form.name, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.name) }}</div>
+							</div>
+							<div class="field">
+								{{ form_label(form.year, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
+								{{ form_widget(form.year, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.year) }}</div>
+							</div>
+						</div>
+
+						<div class="field mb-20">
+							{{ form_label(form.cargoCapacity, null, {'label_attr': {'class': 'agency-bus-profile-form-label'}}) }}
+							{{ form_widget(form.cargoCapacity, {'attr': {'class': 'agency-bus-profile-form-input'}}) }}
+							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.cargoCapacity) }}</div>
+						</div>
+
+						{% if is_granted('bus.write') and bus.status.value != 'inactive' %}
+							<div class="field-button-right">
+								<button type="submit" class="btn-refined btn-success-gradient text-size-12">
+									<i class="fa-solid fa-floppy-disk"></i>
+									Enregistrer les modifications
+								</button>
+							</div>
+						{% endif %}
 
 						{{ form_end(form) }}
 					</div>

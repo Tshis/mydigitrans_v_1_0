@@ -305,7 +305,7 @@ final class FleetService
             ->setName('' !== $name ? $name : null)
             ->setYear($year)
             ->setMileage($mileage)
-            ->setCargoCapacity(max(0, (int) $data->cargoCapacity));
+            ->setCargoCapacity(max(0, (int) ($data->cargoCapacity ?? 0)));
         $this->em->flush();
     }
     /**

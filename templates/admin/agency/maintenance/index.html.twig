@@ -121,7 +121,7 @@
 										</a>
 										<form method="POST" action="{{ path('admin_agency_maintenance_cancel', {'id': log.id}) }}" style="display:inline;" onsubmit="return confirm('Annuler ce ticket de panne et remettre le bus en service ?');">
 											<input type="hidden" name="_token" value="{{ csrf_token('maintenance_cancel_' ~ log.id) }}">
-											<button type="submit" class="action-link" style="border:none; background:transparent; cursor:pointer; color: var(--danger);" title="Annuler le ticket">
+											<button type="submit" class="action-link details" style="border:none; background:transparent; cursor:pointer; color: var(--danger);" title="Annuler le ticket">
 												<i class="fa-solid fa-xmark"></i>
 											</button>
 										</form>

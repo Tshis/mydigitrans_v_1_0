@@ -33,7 +33,8 @@ final class BusMaintenanceResolveType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => BusMaintenanceResolveData::class,
+            'data_class'    => BusMaintenanceResolveData::class,
+            'csrf_token_id' => 'agency_bus_maintenance_resolve',
         ]);
     }
 }

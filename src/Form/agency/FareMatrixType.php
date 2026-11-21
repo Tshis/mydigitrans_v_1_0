@@ -66,6 +66,7 @@ final class FareMatrixType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class'       => FareMatrixData::class,
+            'csrf_token_id'    => 'agency_fare_matrix',
             'currency_choices' => [],
         ]);
 

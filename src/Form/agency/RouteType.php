@@ -130,6 +130,7 @@ final class RouteType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class'       => RouteData::class,
+            'csrf_token_id'    => 'agency_route_form',
             'currency_choices' => [],
         ]);
 
