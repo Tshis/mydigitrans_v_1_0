@@ -2,74 +2,80 @@
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-	<div class="admin-agency-fleet-document-add-scope container">
+	<div class="admin-agency-maintenance-add-scope container">
 		{# --- HEADER --- #}
-		<header class="header mb-25">
+		<header class="header-refined mb-25">
+
 			<div class="header-main-info">
 				<a href="{{ path('admin_agency_maintenance_index') }}" class="agency-back-action" title="Retour à l'atelier">
 					<i class="fa-solid fa-arrow-left"></i>
 				</a>
 				<div class="title">
-					<div class="sub-header-flex">
-						<span class="text-gray text-size-13">Logistique & Atelier</span>
-						<span class="arrow-divider">•</span>
-						<span class="text-danger text-size-13 text-highlight">Immobilisation Technique</span>
+					<div class="breadcrumb-mini">
+						<span>Logistique & Atelier</span>
+						<i class="fa-solid fa-chevron-right"></i>
+						<strong>Immobilisation Technique</strong>
 					</div>
-					<h1 class="mt-5">Déclarer une Panne</h1>
+					<h1>Déclarer une Panne</h1>
+					<p class="subtitle">Enregistrez une avarie mécanique ou électrique pour immobiliser le véhicule à l'atelier.</p>
 				</div>
 			</div>
 		</header>
 
 		{# --- FORMULAIRE SYMFONY LIÉ AU DTO BusMaintenanceDeclareData --- #}
-		{{ form_start(form, {'attr': {'class': 'document-form-layout', 'novalidate': 'novalidate'}}) }}
+		{{ form_start(form, {'attr': {'class': 'maintenance-form-layout', 'novalidate': 'novalidate'}}) }}
 
-			<div class="document-container-grid">
+			<div class="maintenance-container-grid">
 				{# COLONNE GAUCHE : FORMULAIRE DE SIGNALEMENT #}
 				<div class="main-form-panel">
 
 					{{ form_errors(form) }}
 
-					<div class="card control-card mb-20">
+					<div class="card control-card danger-accent mb-20">
 						<h2 class="card-title-fix">
 							<i class="fa-solid fa-bus text-danger"></i>
 							Identification du Véhicule & Gravité
 						</h2>
 
-						<div class="direct-pricing-row mb-20">
+						<div class="fields-row mb-20">
 							<div class="field">
-								{{ form_label(form.busCode, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
-								{{ form_widget(form.busCode, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+								{{ form_label(form.busCode) }}
+								{{ form_widget(form.busCode, {'attr': {'class': 'matrix-select'}}) }}
 								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.busCode) }}</div>
 							</div>
 							<div class="field">
-								{{ form_label(form.severity, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
-								{{ form_widget(form.severity, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+								{{ form_label(form.severity) }}
+								{{ form_widget(form.severity, {'attr': {'class': 'matrix-select'}}) }}
 								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.severity) }}</div>
 							</div>
 						</div>
 
-						<div class="direct-pricing-row mb-20">
+						<div class="fields-row mb-20">
 							<div class="field">
-								{{ form_label(form.issuedAt, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
-								{{ form_widget(form.issuedAt, {'attr': {'class': 'admin-bus-layout-add-input'}}) }}
+								{{ form_label(form.issuedAt) }}
+								{{ form_widget(form.issuedAt, {'attr': {'class': 'matrix-input'}}) }}
 								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.issuedAt) }}</div>
 							</div>
 							<div class="field">
-								{{ form_label(form.mileage, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
-								{{ form_widget(form.mileage, {'attr': {'class': 'admin-bus-layout-add-input'}}) }}
+								{{ form_label(form.mileage) }}
+								{{ form_widget(form.mileage, {'attr': {'class': 'matrix-input'}}) }}
 								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.mileage) }}</div>
 							</div>
 						</div>
 
-						<div class="field mb-20">
-							{{ form_label(form.issueDescription, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
-							{{ form_widget(form.issueDescription, {'attr': {'class': 'admin-bus-layout-add-input'}}) }}
-							<div class="text-danger text-size-12 mt-5">{{ form_errors(form.issueDescription) }}</div>
+						<div class="fields-row mb-20">
+							<div class="field">
+								{{ form_label(form.issueDescription) }}
+								{{ form_widget(form.issueDescription, {'attr': {'class': 'matrix-textarea'}}) }}
+								<div class="text-danger text-size-12 mt-5">{{ form_errors(form.issueDescription) }}</div>
+							</div>
 						</div>
 
-						<div class="field mb-15">
-							<label class="admin-bus-layout-add-label">Agent déclarant</label>
-							<input type="text" class="admin-bus-layout-add-input text-disabled" value="{{ app.user.fullName|default(app.user.email) }}" readonly>
+						<div class="fields-row mb-15">
+							<div class="field">
+								<label>Agent déclarant</label>
+								<input type="text" class="matrix-input text-disabled" value="{{ app.user.fullName|default(app.user.email) }}" readonly>
+							</div>
 						</div>
 
 						<hr class="section-divider mb-15">
@@ -85,7 +91,7 @@
 
 				{# COLONNE DROITE : IMPACT OPÉRATIONNEL #}
 				<aside class="sidebar-action-panel">
-					<div class="card sticky-aside-card">
+					<div class="sticky-aside-card">
 						<h2 class="card-title-fix">
 							<i class="fa-solid fa-circle-info text-primary"></i>
 							Impact Flotte
