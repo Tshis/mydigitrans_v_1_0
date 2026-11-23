@@ -4,7 +4,9 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script src="/js/datatable.js" defer></script>
+	<script src="/js/admin/modalQuestion.js" defer></script>
 {% endblock %}
+
 
 {% block body %}
 	<div class="admin-agency-fleet-index-scope container">
@@ -119,12 +121,15 @@
 										<a href="{{ path('admin_agency_maintenance_resolve', {'id': log.id}) }}" class="action-link edit" title="Clôturer / Résoudre la panne">
 											<i class="fa-solid fa-circle-check"></i>
 										</a>
-										<form method="POST" action="{{ path('admin_agency_maintenance_cancel', {'id': log.id}) }}" style="display:inline;" onsubmit="return confirm('Annuler ce ticket de panne et remettre le bus en service ?');">
-											<input type="hidden" name="_token" value="{{ csrf_token('maintenance_cancel_' ~ log.id) }}">
-											<button type="submit" class="action-link details" style="border:none; background:transparent; cursor:pointer; color: var(--danger);" title="Annuler le ticket">
-												<i class="fa-solid fa-xmark"></i>
-											</button>
-										</form>
+										<a
+											id="ctaBtn"
+											href="javascript:void(0)"
+											data-target="{{ path('admin_agency_maintenance_cancel', {'id': log.id}) }}"
+											class="action-link refund"
+											title="Annuler le ticket"
+										>
+											<i class="fa-solid fa-xmark"></i>
+										</a>
 									{% else %}
 										<a href="{{ path('admin_agency_bus_show', {'code': log.busCode}) }}" class="action-link details" title="Voir la fiche du bus">
 											<i class="fa-solid fa-eye"></i>
@@ -144,4 +149,7 @@
 			</table>
 		</div>
 	</div>
+
+
+	{% include 'admin/partials/_modal.html.twig' %}
 {% endblock %}

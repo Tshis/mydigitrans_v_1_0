@@ -14,7 +14,6 @@ use App\Form\agency\BusMaintenanceResolveType;
 use App\Service\BusMaintenanceService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class MaintenanceController extends AbstractAdminController
@@ -107,16 +106,12 @@ final class MaintenanceController extends AbstractAdminController
         ]);
     }
 
-    #[Route('/admin/agency/maintenance/{id}/cancel', name: 'admin_agency_maintenance_cancel', methods: ['POST'])]
-    public function cancel(int $id, Request $request): Response
+    #[Route('/admin/agency/maintenance/{id}/cancel', name: 'admin_agency_maintenance_cancel', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function cancel(int $id): Response
     {
         $this->denyAccessUnlessGranted('maintenance.write');
         $actor = $this->actor();
         $maintenance = $this->requireAgencyMaintenance($id);
-
-        if (!$this->isCsrfTokenValid('maintenance_cancel_' . $maintenance->getId(), (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Jeton CSRF invalide.');
-        }
 
         try {
             $this->maintenanceService->cancelFault($maintenance, $actor);
@@ -127,6 +122,7 @@ final class MaintenanceController extends AbstractAdminController
 
         return $this->redirectToRoute('admin_agency_maintenance_index');
     }
+
 
     private function requireAgencyMaintenance(int $id): BusMaintenance
     {
