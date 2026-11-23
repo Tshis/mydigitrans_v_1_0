@@ -257,7 +257,7 @@
 											<td><span class="monospace font-bold">{{ log.severity.value|upper }}</span></td>
 											<td>{{ log.solution|default('En attente de diagnostic...')|nl2br }}</td>
 											<td>
-												<span class="pill-maintenance {{ log.status.value == 'broken' ? 'in_progress' : 'resolved' }}">
+												<span class="pill-maintenance {{ log.status.value == 'broken' ? 'in_progress' : (log.status.value == 'resolved' ? 'resolved' : 'in_progress') }}">
 													{{ log.status.value == 'broken' ? 'Panne' : (log.status.value == 'resolved' ? 'Résolue' : 'Annulée') }}
 												</span>
 											</td>

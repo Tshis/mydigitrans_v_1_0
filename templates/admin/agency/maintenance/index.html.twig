@@ -92,10 +92,10 @@
 							<td>
 								<div class="bus-cell">
 									<div class="info">
-										<a href="{{ path('admin_agency_bus_show', {'code': log.busCode}) }}" class="model font-bold text-primary-mode">
+										<a href="{{ path('admin_agency_bus_show', {'code': log.busCode}) }}" class="model font-bold text-primary-mode text-size-12">
 											{{ log.brand }} {{ log.model }}
 										</a>
-										<span class="plate-tag">{{ log.plateNumber }}</span>
+										<span class="plate-tag text-size-12">{{ log.plateNumber }}</span>
 									</div>
 								</div>
 							</td>
@@ -108,7 +108,7 @@
 							<td>{{ log.solution|default('Aucun détail')|nl2br }}</td>
 							<td class="text-size-13">{{ log.reportedBy }}</td>
 							<td class="text-center">
-								<span class="pill-maintenance {{ log.status == 'broken' ? 'in_progress' : 'resolved' }}">
+								<span class="text-weight-700 {{ log.status == 'broken' ? 'text-danger' : (log.status == 'resolved' ? 'text-success' : 'text-primary') }}">
 									{{ log.statusLabel }}
 								</span>
 							</td>
