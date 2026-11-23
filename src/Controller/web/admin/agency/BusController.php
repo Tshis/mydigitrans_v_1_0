@@ -29,15 +29,18 @@ final class BusController extends AbstractAdminController
     }
 
     #[Route('/admin/agency/bus/list', name: 'admin_agency_bus_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $this->denyAccessUnlessGranted('bus.view');
         $agency = $this->actor()->getAgency();
+        $showDecommissioned = $request->query->getBoolean('show_decommissioned');
 
         return $this->render('admin/agency/bus/index.html.twig', [
-            'page' => 'bus',
-        ] + $this->fleetService->listAgencyFleet($agency));
+            'page'               => 'bus',
+            'showDecommissioned' => $showDecommissioned,
+        ] + $this->fleetService->listAgencyFleet($agency, $showDecommissioned));
     }
+
 
     #[Route('/admin/agency/bus/add', name: 'admin_agency_bus_add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
@@ -150,7 +153,7 @@ final class BusController extends AbstractAdminController
     #[Route('/admin/agency/bus/{code}/report-fault', name: 'admin_agency_bus_report_fault', methods: ['POST'])]
     public function reportFault(string $code, Request $request): Response
     {
-        $this->denyAccessUnlessGranted('bus.write');
+        $this->denyAccessUnlessGranted('maintenance.write');
         $actor = $this->actor();
         $bus = $this->requireAgencyBus($code);
 
@@ -176,7 +179,7 @@ final class BusController extends AbstractAdminController
     #[Route('/admin/agency/bus/{code}/resolve-fault', name: 'admin_agency_bus_resolve_fault', methods: ['POST'])]
     public function resolveFault(string $code, Request $request): Response
     {
-        $this->denyAccessUnlessGranted('bus.write');
+        $this->denyAccessUnlessGranted('maintenance.write');
         $actor = $this->actor();
         $bus = $this->requireAgencyBus($code);
 

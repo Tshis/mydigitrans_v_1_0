@@ -82,6 +82,14 @@ final class BusDocumentController extends AbstractAdminController
         ]);
         $form->handleRequest($request);
 
+        $referer = (string) $request->headers->get('referer', '');
+        $cameFromBus = (!$isEdit && null !== $bus_code) || str_contains($referer, '/details');
+        $targetBusCode = $isEdit ? $document->getBus()?->getCode() : $bus_code;
+
+        $backUrl = ($cameFromBus && null !== $targetBusCode)
+            ? $this->generateUrl('admin_agency_bus_show', ['code' => $targetBusCode])
+            : $this->generateUrl('admin_agency_bus_document_index');
+
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 if ($isEdit && $document instanceof BusDocument) {
@@ -104,6 +112,9 @@ final class BusDocumentController extends AbstractAdminController
             }
         }
 
+
+
+
         return $this->render('admin/agency/bus_document/form.html.twig', [
             'page'     => 'document',
             'form'     => $form,
@@ -112,6 +123,7 @@ final class BusDocumentController extends AbstractAdminController
             'isEdit'   => $isEdit,
             'document' => $document,
             'title'    => $title,
+            'back_url' => $backUrl
         ]);
     }
 
@@ -132,6 +144,12 @@ final class BusDocumentController extends AbstractAdminController
             throw $this->createNotFoundException('Document introuvable pour ce véhicule.');
         }
 
+        $referer = (string) $request->headers->get('referer', '');
+        $cameFromBus = str_contains($referer, '/details');
+        $backUrl = $cameFromBus
+            ? $this->generateUrl('admin_agency_bus_show', ['code' => $bus->getCode()])
+            : $this->generateUrl('admin_agency_bus_document_index');
+
         $dto = $this->documentService->createDtoFromDocument($document, true);
         $form = $this->createForm(BusDocumentType::class, $dto, [
             'mode' => 'renew',
@@ -143,7 +161,7 @@ final class BusDocumentController extends AbstractAdminController
                 $this->documentService->updateDocument($document, $actor, $dto, true);
                 $this->addFlash('success', sprintf('Le document « %s » a été renouvelé avec succès.', $document->getType()));
 
-                return $this->redirectToRoute('admin_agency_bus_show', ['code' => $bus->getCode()]);
+                return $this->redirect($backUrl);
             } catch (\DomainException $e) {
                 $this->addFlash('error', $e->getMessage());
             }
@@ -154,8 +172,10 @@ final class BusDocumentController extends AbstractAdminController
             'form'     => $form,
             'document' => $document,
             'bus'      => $bus,
+            'back_url' => $backUrl,
         ]);
     }
+
 
     #[Route('/admin/agency/bus-documents/download/{code}', name: 'admin_agency_bus_document_download_file', methods: ['GET'])]
     public function downloadFile(string $code): BinaryFileResponse
@@ -170,13 +190,15 @@ final class BusDocumentController extends AbstractAdminController
         }
 
         $extension = pathinfo($filePath, PATHINFO_EXTENSION);
-        $downloadName = sprintf('%s_%s.%s', $document->getBus()?->getPlateNumber() ?? 'bus', $document->getCode(), $extension);
+        $safePlate = str_replace(['/', '\\'], '-', (string) ($document->getBus()?->getPlateNumber() ?? 'bus'));
+        $downloadName = sprintf('%s_%s.%s', $safePlate, $document->getCode(), $extension);
 
         $response = new BinaryFileResponse($filePath);
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $downloadName);
 
         return $response;
     }
+
 
     #[Route('/admin/agency/bus-documents/open/{code}', name: 'admin_agency_bus_document_open_file', methods: ['GET'])]
     public function openFile(string $code): BinaryFileResponse
