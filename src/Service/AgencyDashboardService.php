@@ -7,7 +7,6 @@ namespace App\Service;
 use App\Entity\Agency;
 use App\Entity\Branch;
 use App\Entity\BusDocument;
-use App\Entity\BusMaintenance;
 use App\Entity\CashSessionBalance;
 use App\Entity\Currency;
 use App\Entity\CurrencyAgency;
@@ -18,7 +17,6 @@ use App\Entity\TripSeat;
 use App\Entity\User;
 use App\Enum\CashSessionStatus;
 use App\Enum\FlowType;
-use App\Enum\MaintenanceStatus;
 use App\Enum\SeatType;
 use App\Enum\TripSeatStatus;
 use App\Enum\TripStatus;
@@ -43,8 +41,7 @@ final class AgencyDashboardService
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly ExchangeRateRepository $rates,
-    ) {
-    }
+    ) {}
 
     /**
      * Variables attendues par admin/agency/dashboard/index.html.twig.
@@ -82,7 +79,7 @@ final class AgencyDashboardService
             'current_branch_name' => $isCentral ? ($selected?->getName() ?? 'Siège Central') : (string) $userBranch?->getName(),
             'selected_branch' => $selected?->getCode() ?? '',
             'branches_list' => array_map(
-                static fn (Branch $b): array => ['code' => (string) $b->getCode(), 'name' => (string) $b->getName()],
+                static fn(Branch $b): array => ['code' => (string) $b->getCode(), 'name' => (string) $b->getName()],
                 $branches,
             ),
             'stats' => [
@@ -138,7 +135,7 @@ final class AgencyDashboardService
             ->setParameter('agency', $agency)
             ->setParameter('from', $from, Types::DATE_IMMUTABLE)
             ->setParameter('to', $to, Types::DATE_IMMUTABLE)
-            ->setParameter('statuses', array_map(static fn (TripStatus $s): string => $s->value, $statuses));
+            ->setParameter('statuses', array_map(static fn(TripStatus $s): string => $s->value, $statuses));
 
         if (null !== $branch) {
             $qb->andWhere(sprintf(
@@ -164,11 +161,11 @@ final class AgencyDashboardService
             ->getQuery()
             ->getArrayResult();
 
-        return array_map(static fn (array $row): int => (int) $row['id'], $rows);
+        return array_map(static fn(array $row): int => (int) $row['id'], $rows);
     }
 
     /**
-     * Places vendables par voyage : capacité et places prises (réservées, ou retenues dont le délai court encore).
+     * Places vendables par voyage : capacité réelle du bus et places prises (réservées/payées, ou retenues en cours).
      *
      * @param list<int> $tripIds
      *
@@ -180,18 +177,44 @@ final class AgencyDashboardService
             return [];
         }
 
-        $rows = $this->em->createQueryBuilder()
-            ->select(
-                'IDENTITY(ts.trip) AS tripId',
-                'COUNT(ts.id) AS capacity',
-                'SUM(CASE WHEN ts.seatStatus = :reserved THEN 1 WHEN (ts.seatStatus = :held AND ts.heldUntil >= :now) THEN 1 ELSE 0 END) AS taken',
-            )
-            ->from(TripSeat::class, 'ts')
-            ->join('ts.seat', 's')
-            ->andWhere('IDENTITY(ts.trip) IN (:tripIds)')
+        // 1. Capacité totale vendable de chaque voyage depuis les sièges du bus assigné
+        $capRows = $this->em->createQueryBuilder()
+            ->select('t.id AS tripId', 'COUNT(s.id) AS capacity')
+            ->from(Trip::class, 't')
+            ->join('t.bus', 'b')
+            ->join('b.seats', 's')
+            ->andWhere('t.id IN (:tripIds)')
             ->andWhere('s.type IN (:types)')
             ->setParameter('tripIds', $tripIds)
-            ->setParameter('types', array_map(static fn (SeatType $t): string => $t->value, self::SELLABLE_SEAT_TYPES))
+            ->setParameter('types', array_map(static fn(SeatType $t): string => $t->value, self::SELLABLE_SEAT_TYPES))
+            ->groupBy('t.id')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($capRows as $row) {
+            $counts[(int) $row['tripId']] = [
+                'capacity' => (int) $row['capacity'],
+                'taken'    => 0,
+            ];
+        }
+
+        // 2. Places occupées (TripSeat liés à une réservation active Paid/Pending non expirée, ou Held valide)
+        $takenRows = $this->em->createQueryBuilder()
+            ->select('IDENTITY(ts.trip) AS tripId', 'COUNT(DISTINCT ts.seat) AS taken')
+            ->from(TripSeat::class, 'ts')
+            ->join('ts.seat', 's')
+            ->leftJoin('ts.reservation', 'res')
+            ->andWhere('IDENTITY(ts.trip) IN (:tripIds)')
+            ->andWhere('s.type IN (:types)')
+            ->andWhere(
+                '(res.id IS NOT NULL AND (res.status = :paid OR (res.status = :pending AND (res.expiresAt IS NULL OR res.expiresAt > :now))))'
+                    . ' OR (res.id IS NULL AND (ts.seatStatus = :reserved OR (ts.seatStatus = :held AND ts.heldUntil > :now)))'
+            )
+            ->setParameter('tripIds', $tripIds)
+            ->setParameter('types', array_map(static fn(SeatType $t): string => $t->value, self::SELLABLE_SEAT_TYPES))
+            ->setParameter('paid', \App\Enum\ReservationStatus::Paid->value)
+            ->setParameter('pending', \App\Enum\ReservationStatus::Pending->value)
             ->setParameter('reserved', TripSeatStatus::Reserved->value)
             ->setParameter('held', TripSeatStatus::Held->value)
             ->setParameter('now', $now)
@@ -199,14 +222,15 @@ final class AgencyDashboardService
             ->getQuery()
             ->getArrayResult();
 
-        $counts = [];
-
-        foreach ($rows as $row) {
-            $counts[(int) $row['tripId']] = ['capacity' => (int) $row['capacity'], 'taken' => (int) $row['taken']];
+        foreach ($takenRows as $row) {
+            $tid = (int) $row['tripId'];
+            $counts[$tid] ??= ['capacity' => 0, 'taken' => 0];
+            $counts[$tid]['taken'] = (int) $row['taken'];
         }
 
         return $counts;
     }
+
 
     /**
      * Prochains départs : voyages programmés ou en embarquement, aujourd'hui et demain.
@@ -246,11 +270,11 @@ final class AgencyDashboardService
             $candidates[] = [$at, $trip];
         }
 
-        usort($candidates, static fn (array $a, array $b): int => $a[0] <=> $b[0]);
+        usort($candidates, static fn(array $a, array $b): int => $a[0] <=> $b[0]);
         $candidates = \array_slice($candidates, 0, self::UPCOMING_LIMIT);
 
         $seats = $this->seatCounts(
-            array_map(static fn (array $c): int => (int) $c[1]->getId(), $candidates),
+            array_map(static fn(array $c): int => (int) $c[1]->getId(), $candidates),
             $now,
         );
 
@@ -262,8 +286,8 @@ final class AgencyDashboardService
             $soon = $at <= $now->modify('+60 minutes');
 
             $out[] = [
-                'time' => $at->format('Y-m-d') === $now->format('Y-m-d') ? $at->format('H:i') : 'Demain '.$at->format('H:i'),
-                'bus' => trim($bus?->getBrand().' '.$bus?->getModel()),
+                'time' => $at->format('Y-m-d') === $now->format('Y-m-d') ? $at->format('H:i') : 'Demain ' . $at->format('H:i'),
+                'bus' => trim($bus?->getBrand() . ' ' . $bus?->getModel()),
                 'plate' => (string) $bus?->getPlateNumber(),
                 'route' => (string) $trip->getRoute()?->getName(),
                 'seats_taken' => $seats[(int) $trip->getId()]['taken'] ?? 0,
@@ -279,21 +303,21 @@ final class AgencyDashboardService
     // ------------------------------------------------------------------ alertes
 
     /**
-     * Nombre de bus de l'agence immobilisés : au moins une panne ouverte (statut « broken »).
+     * Nombre de bus de l'agence actuellement immobilisés au garage.
      */
     private function brokenBuses(Agency $agency): int
     {
         return (int) $this->em->createQueryBuilder()
-            ->select('COUNT(DISTINCT b.id)')
-            ->from(BusMaintenance::class, 'm')
-            ->join('m.bus', 'b')
+            ->select('COUNT(b.id)')
+            ->from(\App\Entity\Bus::class, 'b')
             ->andWhere('b.agency = :agency')
-            ->andWhere('m.status = :broken')
+            ->andWhere('b.status = :maintenance')
             ->setParameter('agency', $agency)
-            ->setParameter('broken', MaintenanceStatus::Broken->value)
+            ->setParameter('maintenance', \App\Enum\BusStatus::Maintenance)
             ->getQuery()
             ->getSingleScalarResult();
     }
+
 
     /**
      * Documents de bus expirés ou qui expirent dans les prochains jours.
@@ -401,8 +425,8 @@ final class AgencyDashboardService
     }
 
     /**
-     * Montant converti vers la devise de base, au dernier taux connu (taux de l'agence d'abord, sinon taux global).
-     * Null si aucun taux n'existe entre les deux devises.
+     * Montant converti vers la devise de base de l'agence.
+     * Convention ExchangeRate : baseCurrency = devise pivot (ex: CDF), targetCurrency = devise étrangère (ex: USD), rate = 2300 (1 USD = 2300 CDF).
      */
     private function convert(float $amount, Currency $from, Currency $base, Agency $agency, \DateTimeImmutable $now): ?float
     {
@@ -410,23 +434,26 @@ final class AgencyDashboardService
             return $amount;
         }
 
-        $direct = $this->rates->findLatest($from, $base, $agency, $now);
-        if (null !== $direct) {
-            return $amount * (float) $direct->getRate();
+        // Cas standard de l'application : baseCurrency = $base (CDF), targetCurrency = $from (USD) -> multiplier par rate
+        $fromToBase = $this->rates->findLatest($base, $from, $agency, $now);
+        if (null !== $fromToBase && (float) $fromToBase->getRate() > 0.0) {
+            return $amount * (float) $fromToBase->getRate();
         }
 
-        $inverse = $this->rates->findLatest($base, $from, $agency, $now);
-        if (null !== $inverse && (float) $inverse->getRate() > 0.0) {
-            return $amount / (float) $inverse->getRate();
+        // Cas inverse éventuel : baseCurrency = $from, targetCurrency = $base -> diviser par rate
+        $baseToFrom = $this->rates->findLatest($from, $base, $agency, $now);
+        if (null !== $baseToFrom && (float) $baseToFrom->getRate() > 0.0) {
+            return $amount / (float) $baseToFrom->getRate();
         }
 
         return null;
     }
 
+
     /**
      * Devise de base de l'agence et devises acceptées aux guichets, avec leur taux « 1 devise = X devise de base ».
      *
-     * @return array{base: ?Currency, settings: array{base_currency: string, accepted_currencies: list<array{code: string, name: string, exchange_rate: ?float, isActive: bool}>}}
+     * @return array{base: ?Currency, settings: array{base_currency: string, accepted_currencies: list<array{code: string, name: string, exchange_rate: ?float, isActive: bool, isBase: bool}>}}
      */
     private function currencySettings(Agency $agency, \DateTimeImmutable $now): array
     {
@@ -436,43 +463,69 @@ final class AgencyDashboardService
             ->from(CurrencyAgency::class, 'ca')
             ->join('ca.currency', 'c')
             ->andWhere('ca.agency = :agency')
+            ->andWhere('ca.isActive = :yes')
             ->setParameter('agency', $agency)
-            ->orderBy('c.code', 'ASC')
+            ->setParameter('yes', true)
+            ->orderBy('ca.isBase', 'DESC')
+            ->addOrderBy('c.code', 'ASC')
             ->getQuery()
             ->getResult();
 
         $base = null;
-
         foreach ($links as $link) {
             if ($link->isBase()) {
                 $base = $link->getCurrency();
                 break;
             }
         }
-
         $base ??= $agency->getDefaultCurrency();
 
         $accepted = [];
-
         foreach ($links as $link) {
             $currency = $link->getCurrency();
-
-            if (null === $currency || (null !== $base && $currency->getId() === $base->getId())) {
+            if (null === $currency) {
                 continue;
             }
 
+            $isBase = $link->isBase() || (null !== $base && $currency->getId() === $base->getId());
+            $rate = null;
+
+            if (!$isBase && null !== $base) {
+                $latest = $this->em->createQueryBuilder()
+                    ->select('er.rate')
+                    ->from(\App\Entity\ExchangeRate::class, 'er')
+                    ->andWhere('er.agency = :agency')
+                    ->andWhere('er.baseCurrency = :base')
+                    ->andWhere('er.targetCurrency = :target')
+                    ->andWhere('er.effectiveFrom <= :now')
+                    ->setParameter('agency', $agency)
+                    ->setParameter('base', $base)
+                    ->setParameter('target', $currency)
+                    ->setParameter('now', $now)
+                    ->orderBy('er.effectiveFrom', 'DESC')
+                    ->addOrderBy('er.createdAt', 'DESC')
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getOneOrNullResult();
+
+                if (null !== $latest && (float) $latest['rate'] > 0.0) {
+                    $rate = (float) $latest['rate'];
+                }
+            }
+
             $accepted[] = [
-                'code' => (string) $currency->getCode(),
-                'name' => (string) $currency->getName(),
-                'exchange_rate' => null === $base ? null : $this->convert(1.0, $currency, $base, $agency, $now),
-                'isActive' => $link->isActive(),
+                'code'          => (string) $currency->getCode(),
+                'name'          => (string) $currency->getName(),
+                'exchange_rate' => $isBase ? 1.0 : $rate,
+                'isActive'      => $link->isActive(),
+                'isBase'        => $isBase,
             ];
         }
 
         return [
-            'base' => $base,
+            'base'     => $base,
             'settings' => [
-                'base_currency' => (string) $base?->getCode(),
+                'base_currency'       => (string) ($base?->getCode() ?? 'Non configurée'),
                 'accepted_currencies' => $accepted,
             ],
         ];

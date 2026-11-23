@@ -27,6 +27,7 @@ final class FinanceController extends AbstractAdminController
     #[Route('/admin/agency/finances', name: 'admin_agency_finance_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('finance.view');
         $actor  = $this->actor();
         $agency = $actor->getAgency();
 
@@ -45,6 +46,7 @@ final class FinanceController extends AbstractAdminController
     #[Route('/admin/agency/finance/show/{id}/{type}', name: 'admin_agency_finance_show', requirements: ['id' => '\d+', 'type' => 'payment|expense'], methods: ['GET'])]
     public function show(int $id, string $type): Response
     {
+        $this->denyAccessUnlessGranted('finance.view');
         $details = $this->financeService->getOperationAuditDetails($this->actor()->getAgency(), $id, $type);
         if (null === $details) {
             throw $this->createNotFoundException('Opération financière introuvable dans votre agence.');
@@ -60,6 +62,7 @@ final class FinanceController extends AbstractAdminController
     #[Route('/admin/agency/finance/expense/add', name: 'admin_agency_finance_expense_add', methods: ['GET', 'POST'])]
     public function expenseAdd(Request $request): Response
     {
+        $this->denyAccessUnlessGranted('expense.write');
         $actor  = $this->actor();
         $agency = $actor->getAgency();
         $restrictedBranch = $actor->getBranch();
@@ -101,12 +104,13 @@ final class FinanceController extends AbstractAdminController
     #[Route('/admin/agency/finance/cashier/journal/{code}', name: 'admin_agency_finance_journal', requirements: ['code' => '\d+'], methods: ['GET'])]
     public function journalCaissier(int $code): Response
     {
+        $this->denyAccessUnlessGranted('finance.view');
         $journal = $this->financeService->getSessionJournalDetails($this->actor()->getAgency(), $code);
         if (null === $journal) {
             throw $this->createNotFoundException('Session de caisse introuvable.');
         }
 
-        return $this->render('admin/agency/cashier/journal_caissier.html.twig', [
+        return $this->render('admin/agency/finance/journal_caissier.html.twig', [
             'page' => 'finances',
         ] + $journal);
     }

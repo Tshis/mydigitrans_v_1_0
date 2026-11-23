@@ -1,4 +1,4 @@
-{# templates/admin/agency/cashier/session_openhtml.twig #}
+{# templates/admin/agency/cashier/session_open.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
@@ -43,7 +43,7 @@
 					<div class="meta-item prev-session-audit-box">
 						<span class="session-micro-label text-highlight">Dotation attendue du matin (Par le Gérant)</span>
 						<ul class="dynamic-expected-balances-list">
-							{% for bal in session.balances %}
+							{% for bal in balances %}
 								<li>
 									•
 									<span class="js-expected-val" data-currency="{{ bal.currency.code }}">{{ bal.openingBalanceExpected|number_format(2, ',', ' ') }}</span>
@@ -53,8 +53,8 @@
 								<li class="text-danger">Aucune dotation configurée pour ce matin.</li>
 							{% endfor %}
 						</ul>
-						{% if session.balances|first and session.balances|first.openingNote %}
-							<p class="sub-meta-text mt-10"><strong>Note du gérant :</strong> {{ session.balances|first.openingNote }}</p>
+						{% if balances|first and balances|first.openingNote %}
+							<p class="sub-meta-text mt-10"><strong>Note du gérant :</strong> {{ balances|first.openingNote }}</p>
 						{% endif %}
 					</div>
 				</div>
@@ -70,7 +70,7 @@
 					<input type="hidden" name="_token" value="{{ csrf_token('open_session_' ~ session.id) }}">
 
 					<div class="field-group mb-15 grid-dynamic-currencies">
-						{% for bal in session.balances %}
+						{% for bal in balances %}
 							<div class="field">
 								<label class="session-micro-label">Espèces physiques en {{ bal.currency.code }} *</label>
 								<div class="input-currency-wrapper">

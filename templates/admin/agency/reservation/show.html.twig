@@ -144,7 +144,7 @@
 
 					{% if reservation.status == 'pending' %}
 						<div class="sidebar-action-buttons">
-							<a href="#" class="btn btn-pay-trigger btn-refined btn-success-gradient">
+							<a href="{{ path('admin_agency_cashier_payment', {'ref': reservation.reference}) }}" class="btn btn-pay-trigger btn-refined btn-success-gradient">
 								<i class="fa-solid fa-money-bill-transfer"></i>
 								Envoyer à la Caisse
 							</a>

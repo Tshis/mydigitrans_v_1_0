@@ -143,6 +143,11 @@
 								{% endif %}
 							</td>
 							<td class="text-right table-action-buttons">
+								{% if res.status not in ['paid', 'cancelled', 'expired'] %}
+									<a href="{{ path('admin_agency_cashier_payment', {'ref': res.reference}) }}" class="table-action-trigger validate" title="Encaisser en caisse">
+										<i class="fa-solid fa-money-bill-transfer"></i>
+									</a>
+								{% endif %}
 								<a href="{{ path('admin_agency_reservation_show', {'reference': res.reference}) }}" class="table-action-trigger view" title="Voir les détails">
 									<i class="fa-solid fa-eye"></i>
 								</a>

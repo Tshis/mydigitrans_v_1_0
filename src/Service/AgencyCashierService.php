@@ -18,6 +18,7 @@ use App\Entity\CashSession;
 use App\Entity\CashSessionBalance;
 use App\Entity\Currency;
 use App\Entity\CurrencyAgency;
+use App\Entity\ExchangeRate;
 use App\Entity\Expense;
 use App\Entity\FinancialOperation;
 use App\Entity\Reservation;
@@ -217,7 +218,15 @@ final class AgencyCashierService
             throw new \DomainException('Cette session n\'est pas en attente d\'ouverture.');
         }
 
-        foreach ($session->getBalances() as $balance) {
+        $balances = $this->em->getRepository(CashSessionBalance::class)->findBy([
+            'cashSession' => $session,
+        ]);
+
+        if ([] === $balances) {
+            throw new \DomainException('Aucune ligne de dotation trouvée pour cette session.');
+        }
+
+        foreach ($balances as $balance) {
             $code = (string) $balance->getCurrency()?->getCode();
             $expected = (float) $balance->getOpeningBalanceExpected();
             $declared = max(0.0, (float) ($data->openingBalances[$code] ?? 0));
@@ -254,13 +263,28 @@ final class AgencyCashierService
         $this->em->flush();
     }
 
+
     /**
-     * Calcule les soldes théoriques actuels en tiroir pour une session (dotation + IN - OUT).
+     * Calcule le solde global théorique de la session consolidé en devise de base (dotation + IN - OUT),
+     * ainsi que les soldes détaillés par devise pour la validation physique.
      *
-     * @return array<string, array{code: string, name: string, expected: float, formatted: string, opening: float}>
+     * @return array{
+     *   baseCode: string,
+     *   consolidatedExpected: float,
+     *   consolidatedFormatted: string,
+     *   consolidatedOut: float,
+     *   consolidatedOutFormatted: string,
+     *   byCurrency: array<string, array{code: string, name: string, expected: float, formatted: string, opening: float, rateToBase: float}>
+     * }
      */
     public function computeSessionTheoreticalBalances(CashSession $session): array
     {
+        $this->ensureSessionBalances($session);
+
+        $agency = $session->getCashRegister()?->getAgency();
+        $baseCurrency = null !== $agency ? $this->getBaseCurrency($agency) : null;
+        $baseCode = (string) ($baseCurrency?->getCode() ?? 'CDF');
+
         $rows = $this->em->createQueryBuilder()
             ->select('IDENTITY(fo.currency) AS curId', 'fo.type AS flowType', 'COALESCE(SUM(fo.amount), 0) AS total')
             ->from(FinancialOperation::class, 'fo')
@@ -271,18 +295,36 @@ final class AgencyCashierService
             ->getArrayResult();
 
         $netMovements = [];
+        $outMovements = [];
         foreach ($rows as $row) {
             $cid = (int) $row['curId'];
             $ft = $row['flowType'] instanceof \BackedEnum ? $row['flowType']->value : (string) $row['flowType'];
             $netMovements[$cid] ??= 0.0;
+            $outMovements[$cid] ??= 0.0;
             if (FlowType::In->value === $ft) {
                 $netMovements[$cid] += (float) $row['total'];
             } else {
                 $netMovements[$cid] -= (float) $row['total'];
+                $outMovements[$cid] += (float) $row['total'];
             }
         }
-        $result = [];
-        foreach ($session->getBalances() as $bal) {
+
+        $balances = $this->em->getRepository(CashSessionBalance::class)->findBy([
+            'cashSession' => $session,
+        ]);
+
+        $orderedCurrencies = null !== $agency ? $this->getAgencyActiveCurrencies($agency) : [];
+        $orderMap = [];
+        foreach ($orderedCurrencies as $idx => $c) {
+            $orderMap[(int) $c->getId()] = $idx;
+        }
+        usort($balances, static fn(CashSessionBalance $a, CashSessionBalance $b): int => ($orderMap[(int) $a->getCurrency()?->getId()] ?? 99) <=> ($orderMap[(int) $b->getCurrency()?->getId()] ?? 99));
+
+        $byCurrency = [];
+        $consolidatedExpected = 0.0;
+        $consolidatedOut = 0.0;
+
+        foreach ($balances as $bal) {
             $cur = $bal->getCurrency();
             if (null === $cur) {
                 continue;
@@ -292,17 +334,41 @@ final class AgencyCashierService
             if ($opening <= 0 && CashSessionStatus::Pending === $session->getStatus()) {
                 $opening = (float) $bal->getOpeningBalanceExpected();
             }
-            $expected = round($opening + ($netMovements[(int) $cur->getId()] ?? 0.0), 2);
-            $result[$code] = [
-                'code'      => $code,
-                'name'      => (string) $cur->getName(),
-                'opening'   => $opening,
-                'expected'  => $expected,
-                'formatted' => number_format($expected, 2, ',', ' '),
+
+            $cid = (int) $cur->getId();
+            $expected = round($opening + ($netMovements[$cid] ?? 0.0), 2);
+            $rate = null !== $agency ? $this->getCurrencyRateToBase($agency, $cur) : 1.0;
+            if ($rate <= 0) {
+                $rate = 1.0;
+            }
+
+            $consolidatedExpected += $expected * $rate;
+            $consolidatedOut += ($outMovements[$cid] ?? 0.0) * $rate;
+
+            $byCurrency[$code] = [
+                'code'       => $code,
+                'name'       => (string) $cur->getName(),
+                'opening'    => $opening,
+                'expected'   => $expected,
+                'formatted'  => number_format($expected, 2, ',', ' '),
+                'rateToBase' => $rate,
             ];
         }
-        return $result;
+
+        $consolidatedExpected = round($consolidatedExpected, 2);
+        $consolidatedOut = round($consolidatedOut, 2);
+
+        return [
+            'baseCode'                 => $baseCode,
+            'consolidatedExpected'     => $consolidatedExpected,
+            'consolidatedFormatted'    => number_format($consolidatedExpected, 2, ',', ' '),
+            'consolidatedOut'          => $consolidatedOut,
+            'consolidatedOutFormatted' => number_format($consolidatedOut, 2, ',', ' '),
+            'byCurrency'               => $byCurrency,
+        ];
     }
+
+
     /**
      * Clôture la session par le caissier et enregistre le comptage physique de fin de journée.
      *
@@ -316,7 +382,7 @@ final class AgencyCashierService
         $theoretical = $this->computeSessionTheoreticalBalances($session);
         foreach ($session->getBalances() as $bal) {
             $code = (string) $bal->getCurrency()?->getCode();
-            $expected = $theoretical[$code]['expected'] ?? 0.0;
+            $expected = $theoretical['byCurrency'][$code]['expected'] ?? 0.0;
             $declared = max(0.0, (float) ($data->physicalBalances[$code] ?? 0));
             $diff = round($declared - $expected, 2);
             $bal->setClosingBalanceExpected(number_format($expected, 2, '.', ''))
@@ -362,12 +428,13 @@ final class AgencyCashierService
         );
         $this->em->flush();
     }
+
     /**
-     * @return list
+     * @return list<Currency>
      */
     public function getAgencyActiveCurrencies(Agency $agency): array
     {
-        /* @var list $rows */
+        /** @var list<CurrencyAgency> $rows */
         $rows = $this->em->createQueryBuilder()
             ->select('ca', 'c')
             ->from(CurrencyAgency::class, 'ca')
@@ -380,8 +447,69 @@ final class AgencyCashierService
             ->addOrderBy('c.code', 'ASC')
             ->getQuery()
             ->getResult();
-        return array_values(array_filter(array_map(static fn(CurrencyAgency $ca): ?Currency => $ca->getCurrency(), $rows)));
+
+        return array_values(array_filter(array_map(
+            static fn(CurrencyAgency $ca): ?Currency => $ca->getCurrency(),
+            $rows
+        )));
     }
+
+    /**
+     * 
+     * Retourne la valeur  devise de base de l'agence .
+     */
+    private function getBaseCurrency(Agency $agency): ?Currency
+    {
+        $baseRel = $this->em->getRepository(CurrencyAgency::class)->findOneBy([
+            'agency'   => $agency,
+            'isBase'   => true,
+            'isActive' => true,
+        ]);
+
+        return $baseRel?->getCurrency() ?? $agency->getDefaultCurrency();
+    }//getBaseCurrency
+
+
+
+
+    /**
+     * Retourne la valeur de 1 unité de $currency dans la devise de base de l'agence (ex: 1 USD = 2300 CDF -> 2300.0).
+     */
+    private function getCurrencyRateToBase(Agency $agency, Currency $currency): float
+    {
+        $baseRel = $this->em->getRepository(CurrencyAgency::class)->findOneBy([
+            'agency'   => $agency,
+            'isBase'   => true,
+            'isActive' => true,
+        ]);
+
+        $baseCurrency = $baseRel?->getCurrency();
+        if (null === $baseCurrency || $baseCurrency->getId() === $currency->getId()) {
+            return 1.0;
+        }
+
+        $row = $this->em->createQueryBuilder()
+            ->select('er.rate')
+            ->from(ExchangeRate::class, 'er')
+            ->andWhere('er.agency = :agency')
+            ->andWhere('er.baseCurrency = :base')
+            ->andWhere('er.targetCurrency = :target')
+            ->andWhere('er.effectiveFrom <= :now')
+            ->setParameter('agency', $agency)
+            ->setParameter('base', $baseCurrency)
+            ->setParameter('target', $currency)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('er.effectiveFrom', 'DESC')
+            ->addOrderBy('er.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return null !== $row ? (float) $row['rate'] : 0.0;
+    }
+
+
+
 
 
     /**
@@ -422,6 +550,14 @@ final class AgencyCashierService
             if (ReservationStatus::Cancelled === $reservation->getStatus()) {
                 return ['error' => 'Cette réservation a été annulée et ne peut plus être encaissée.'];
             }
+
+            if (
+                ReservationStatus::Expired === $reservation->getStatus()
+                || (null !== $reservation->getExpiresAt() && $reservation->getExpiresAt() <= new \DateTimeImmutable())
+            ) {
+                return ['error' => 'Cette réservation a expiré et ses sièges ont été libérés.'];
+            }
+
 
             $alreadyPaid = $this->getConfirmedPaidTotal($agency, PaymentType::Reservation, (string) $reservation->getReference());
             $totalAmount = (float) $reservation->getTotalAmount();
@@ -504,8 +640,11 @@ final class AgencyCashierService
         return null;
     }
 
+
     /**
      * Encaisse un bon (Réservation ou Colis) dans la session de caisse active.
+     * Gère le rendu de monnaie : si le client remet un montant supérieur (ex: 15 USD = 34 500 CDF pour un bon de 30 000 CDF),
+     * la différence (4 500 CDF) est rendue au client et le tiroir est crédité de la recette nette exacte.
      *
      * @throws \DomainException
      */
@@ -526,15 +665,63 @@ final class AgencyCashierService
         }
 
         $capturedCurrency = $data->capturedCurrency ?? throw new \DomainException('Devise d\'encaissement requise.');
-        $capturedAmount = (float) $data->capturedAmount;
-        if ($capturedAmount <= 0) {
-            throw new \DomainException('Le montant encaissé doit être supérieur à 0.');
+        $tenderedAmount = round((float) $data->capturedAmount, 2);
+        if ($tenderedAmount <= 0) {
+            throw new \DomainException('Le montant remis par le client doit être supérieur à 0.');
         }
 
         $discount = max(0.0, (float) ($data->discountAmount ?? 0.0));
         if ($discount > 0 && (null === $data->discountObservation || '' === trim($data->discountObservation))) {
             throw new \DomainException('Une observation justificative est obligatoire lorsqu\'une remise est appliquée.');
         }
+
+        $baseAmount = (float) $voucher['amountRaw'];
+        $netInVoucherCurrency = 'percent' === $data->discountType
+            ? round($baseAmount - ($baseAmount * min(100.0, $discount) / 100.0), 2)
+            : max(0.0, round($baseAmount - $discount, 2));
+
+        $voucherCurrency = $this->em->getRepository(Currency::class)->find((int) $voucher['currencyId']);
+        if (!$voucherCurrency instanceof Currency) {
+            throw new \DomainException('Devise du document introuvable.');
+        }
+
+        $baseCurrency = $this->getBaseCurrency($agency) ?? $voucherCurrency;
+        $rateVoucherToBase = $this->getCurrencyRateToBase($agency, $voucherCurrency);
+        $rateCapturedToBase = $this->getCurrencyRateToBase($agency, $capturedCurrency);
+
+        if ($rateVoucherToBase <= 0 || $rateCapturedToBase <= 0) {
+            throw new \DomainException(sprintf(
+                'Aucun taux de change actif configuré pour convertir %s vers %s.',
+                $voucher['currencyCode'],
+                $capturedCurrency->getCode()
+            ));
+        }
+
+        // Conversion du net dû et du montant remis en devise de base (ex: CDF)
+        $dueInBase = round($netInVoucherCurrency * $rateVoucherToBase, 2);
+        $tenderedInBase = round($tenderedAmount * $rateCapturedToBase, 2);
+        $toleranceBase = max(1.0, round($dueInBase * 0.005, 2));
+
+        if (($tenderedInBase + $toleranceBase) < $dueInBase) {
+            $expectedInCaptured = round($dueInBase / $rateCapturedToBase, 2);
+            throw new \DomainException(sprintf(
+                'Montant remis insuffisant : %s %s attendus (équivalent de %s %s), remis %s %s.',
+                number_format($expectedInCaptured, 2, ',', ' '),
+                $capturedCurrency->getCode(),
+                number_format($dueInBase, 2, ',', ' '),
+                $baseCurrency->getCode(),
+                number_format($tenderedAmount, 2, ',', ' '),
+                $capturedCurrency->getCode()
+            ));
+        }
+
+        // Monnaie rendue au client en devise de base (si le client a donné un billet supérieur)
+        $changeInBase = max(0.0, round($tenderedInBase - $dueInBase, 2));
+
+        // Recette nette comptabilisée dans la devise encaissée (sans le surplus rendu en monnaie)
+        $netBookedInCaptured = ($capturedCurrency->getId() === $voucherCurrency->getId())
+            ? $netInVoucherCurrency
+            : round($dueInBase / $rateCapturedToBase, 2);
 
         $isReservation = 'reservation' === $voucher['docType'];
         $paymentType = $isReservation ? PaymentType::Reservation : PaymentType::Shipment;
@@ -543,7 +730,7 @@ final class AgencyCashierService
         $payment = (new AgencyPayment())
             ->setType($paymentType)
             ->setReference($ref)
-            ->setAmount(number_format($capturedAmount, 2, '.', ''))
+            ->setAmount(number_format($netBookedInCaptured, 2, '.', ''))
             ->setCurrency($capturedCurrency)
             ->setPaymentMethod($data->paymentMethod)
             ->setStatus(PaymentStatus::Confirmed)
@@ -557,13 +744,24 @@ final class AgencyCashierService
         $this->em->persist($payment);
         $this->em->flush();
 
-        // Écriture comptable entrante dans le journal de la session (FinancialOperation)
         $desc = sprintf(
             'Encaissement %s [%s] (%s)',
             $isReservation ? 'Réservation' : 'Colis Fret',
             $ref,
             $voucher['actor1Name']
         );
+        if ($capturedCurrency->getId() !== $baseCurrency->getId()) {
+            $desc .= sprintf(' — Équiv. %s %s', number_format($dueInBase, 2, ',', ' '), $baseCurrency->getCode());
+        }
+        if ($changeInBase > 0.01) {
+            $desc .= sprintf(
+                ' | Reçu: %s %s — Monnaie rendue: %s %s',
+                number_format($tenderedAmount, 2, ',', ' '),
+                $capturedCurrency->getCode(),
+                number_format($changeInBase, 2, ',', ' '),
+                $baseCurrency->getCode()
+            );
+        }
         if ($discount > 0) {
             $desc .= sprintf(' | Remise: %s (%s) — Motif: %s', $discount, $data->discountType, trim((string) $data->discountObservation));
         }
@@ -573,7 +771,7 @@ final class AgencyCashierService
             ->setType(FlowType::In)
             ->setReferenceType(FinancialReferenceType::AgencyPayment)
             ->setReferenceId((int) $payment->getId())
-            ->setAmount(number_format($capturedAmount, 2, '.', ''))
+            ->setAmount(number_format($netBookedInCaptured, 2, '.', ''))
             ->setCurrency($capturedCurrency)
             ->setCreatedBy($cashier)
             ->setDescription($desc);
@@ -601,19 +799,25 @@ final class AgencyCashierService
             entityId: $payment->getId(),
             oldValues: null,
             newValues: [
-                'type'     => $paymentType->value,
-
-                'ref'      => $ref,
-                'amount'   => $payment->getAmount(),
-                'currency' => $capturedCurrency->getCode(),
-                'session'  => $session->getId(),
+                'type'         => $paymentType->value,
+                'ref'          => $ref,
+                'amount'       => $payment->getAmount(),
+                'currency'     => $capturedCurrency->getCode(),
+                'dueInBase'    => $dueInBase,
+                'changeInBase' => $changeInBase,
+                'session'      => $session->getId(),
             ],
             actor: $cashier,
             flush: false
         );
         $this->em->flush();
+
         return $payment;
     }
+
+
+
+
     /**
      * Exécute physiquement un bon de décaissement approuvé depuis le tiroir de la session active.
      *
@@ -630,7 +834,7 @@ final class AgencyCashierService
         $currency = $expense->getCurrency() ?? throw new \DomainException('Devise de la dépense invalide.');
         $amount = (float) $expense->getAmount();
         $balances = $this->computeSessionTheoreticalBalances($session);
-        $available = $balances[(string) $currency->getCode()]['expected'] ?? 0.0;
+        $available = $balances['byCurrency'][(string) $currency->getCode()]['expected'] ?? 0.0;
         if ($available < $amount) {
             throw new \DomainException(sprintf(
                 'Solde insuffisant en %s dans votre tiroir (%s %s disponibles pour %s %s demandés).',
@@ -783,5 +987,49 @@ final class AgencyCashierService
         );
 
         $this->em->flush();
+    }
+
+    /**
+     * Garantit que chaque devise active de l'agence possède une ligne CashSessionBalance sur la session.
+     */
+    public function ensureSessionBalances(CashSession $session): void
+    {
+        $agency = $session->getCashRegister()?->getAgency();
+        if (null === $agency) {
+            return;
+        }
+
+        $existingBalances = $this->em->getRepository(CashSessionBalance::class)->findBy([
+            'cashSession' => $session,
+        ]);
+
+        $existingCurrencyIds = [];
+        foreach ($existingBalances as $bal) {
+            if (null !== $bal->getCurrency()) {
+                $existingCurrencyIds[(int) $bal->getCurrency()->getId()] = true;
+            }
+        }
+
+        $added = false;
+        foreach ($this->getAgencyActiveCurrencies($agency) as $currency) {
+            if (isset($existingCurrencyIds[(int) $currency->getId()])) {
+                continue;
+            }
+
+            $balance = (new CashSessionBalance())
+                ->setCashSession($session)
+                ->setCurrency($currency)
+                ->setOpeningBalanceExpected('0.00')
+                ->setOpeningBalanceDeclared('0.00')
+                ->setOpenBalanceDifference('0.00');
+
+            $session->addBalance($balance);
+            $this->em->persist($balance);
+            $added = true;
+        }
+
+        if ($added) {
+            $this->em->flush();
+        }
     }
 }

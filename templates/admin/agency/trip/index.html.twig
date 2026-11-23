@@ -30,12 +30,15 @@
 				<p class="subtitle">Planifiez les départs et suivez les embarquements en temps réel.</p>
 			</div>
 
-			<div class="header-right">
-				<a href="{{ path('admin_agency_trip_add') }}" class="btn-refined btn-success-gradient text-size-12">
-					<i class="fa-solid fa-plus"></i>
-					Planifier un voyage
-				</a>
-			</div>
+			{% if is_granted('trip.write') %}
+				<div class="header-right">
+					<a href="{{ path('admin_agency_trip_add') }}" class="btn-refined btn-success-gradient text-size-12">
+						<i class="fa-solid fa-plus"></i>
+						Planifier un voyage
+					</a>
+				</div>
+			{% endif %}
+			
 		</header>
 
 		{# --- CARTES DE STATISTIQUES --- #}

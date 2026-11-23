@@ -154,6 +154,19 @@ final class CashierController extends AbstractAdminController
             return $this->redirectToRoute('admin_agency_cashier_dashboard');
         }
 
+        $this->cashierService->ensureSessionBalances($session);
+
+        $orderedCurrencies = $this->cashierService->getAgencyActiveCurrencies($actor->getAgency());
+        $orderMap = [];
+        foreach ($orderedCurrencies as $idx => $cur) {
+            $orderMap[(int) $cur->getId()] = $idx;
+        }
+
+        $balances = $this->em->getRepository(\App\Entity\CashSessionBalance::class)->findBy([
+            'cashSession' => $session,
+        ]);
+        usort($balances, static fn($a, $b): int => ($orderMap[(int) $a->getCurrency()?->getId()] ?? 99) <=> ($orderMap[(int) $b->getCurrency()?->getId()] ?? 99));
+
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('open_session_' . $session->getId(), (string) $request->request->get('_token'))) {
                 throw new BadRequestHttpException('Jeton CSRF invalide.');
@@ -174,11 +187,13 @@ final class CashierController extends AbstractAdminController
         }
 
         return $this->render('admin/agency/cashier/session_open.html.twig', [
-            'page'    => 'cashier',
-            'actor'   => $actor,
-            'session' => $session,
+            'page'     => 'cashier',
+            'actor'    => $actor,
+            'session'  => $session,
+            'balances' => $balances,
         ]);
     }
+
 
     #[Route('/admin/agency/cash-register/dashboard', name: 'admin_agency_cashier_dashboard', methods: ['GET'])]
     public function dashboard(): Response
@@ -193,27 +208,20 @@ final class CashierController extends AbstractAdminController
             return $this->redirectToRoute('admin_agency_cashier_session_open');
         }
 
-        $balances = $this->cashierService->computeSessionTheoreticalBalances($session);
+        $balanceSummary = $this->cashierService->computeSessionTheoreticalBalances($session);
         $operations = $this->cashierService->getSessionOperations($session);
         $pendingExpenses = $this->cashierService->getPendingExpensesForCashier($actor);
-
-        $expensesByCurrency = [];
-        foreach ($operations as $op) {
-            if ('out' === $op->getType()->value) {
-                $code = (string) $op->getCurrency()?->getCode();
-                $expensesByCurrency[$code] = ($expensesByCurrency[$code] ?? 0.0) + (float) $op->getAmount();
-            }
-        }
 
         return $this->render('admin/agency/cashier/dashboard.html.twig', [
             'page'                  => 'cashier',
             'session'               => $session,
-            'balances'              => $balances,
-            'expenses_by_currency'  => $expensesByCurrency,
+            'balance_summary'       => $balanceSummary,
+            'balances'              => $balanceSummary['byCurrency'],
             'operations'            => $operations,
             'pending_expense_count' => \count($pendingExpenses),
         ]);
     }
+
 
 
     #[Route('/admin/agency/cash-register/lookup', name: 'admin_agency_cashier_lookup', methods: ['GET'])]
@@ -386,6 +394,15 @@ final class CashierController extends AbstractAdminController
     #[Route('/admin/agency/cash-register/dashboard/branch', name: 'admin_agency_cashier_dashboard_branch', methods: ['GET'])]
     public function branch(): Response
     {
+        if (
+            !$this->isGranted('ROLE_AGENCY_ADMIN')
+            && !$this->isGranted('ROLE_GENERAL_MANAGER')
+            && !$this->isGranted('ROLE_MANAGER')
+            && !$this->isGranted('ROLE_ACCOUNTANT')
+        ) {
+            return $this->redirectToRoute('admin_agency_cashier_index');
+        }
+
         $actor  = $this->actor();
         $agency = $actor->getAgency();
         $filters = [];
@@ -398,6 +415,7 @@ final class CashierController extends AbstractAdminController
         ] + $this->financeService->getSessionsMonitoring($agency, $filters));
     }
 
+
     #[Route('/admin/agency/cash-register/session/closing', name: 'admin_agency_cashier_session_closing', methods: ['GET', 'POST'])]
     public function sessionClosing(Request $request): Response
     {
@@ -408,7 +426,9 @@ final class CashierController extends AbstractAdminController
             return $this->redirectToRoute('admin_agency_cashier_index');
         }
 
-        $balances = $this->cashierService->computeSessionTheoreticalBalances($session);
+        $balanceSummary = $this->cashierService->computeSessionTheoreticalBalances($session);
+        $balances = $balanceSummary['byCurrency'];
+
 
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('close_session_' . $session->getId(), (string) $request->request->get('_token'))) {

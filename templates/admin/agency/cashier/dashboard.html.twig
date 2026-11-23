@@ -47,44 +47,38 @@
 			</div>
 		</div>
 
-		{# --- LES SOLDES DU TIROIR-CAISSE DYNAMIQUE (PAR DEVISE ACTIVE) --- #}
+		{# --- SOLDE GLOBAL CONSOLIDÉ EN DEVISE DE BASE --- #}
 		<div class="stats-overview-grid mb-25">
-			{% for bal in balances %}
-				<div class="stat-card">
-					<div class="stat-icon stat-icon--success">
-						<i class="fa-solid fa-money-bill-wave"></i>
-					</div>
-					<div class="stat-details">
-						<p class="stat-label">Solde Tiroir
-							<span class="text-primary">{{ bal.code }}</span>
-						</p>
-						<strong class="stat-value text-success">
-							{{ bal.formatted }}
-							<small>{{ bal.code }}</small>
-						</strong>
-					</div>
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-vault"></i>
 				</div>
-			{% endfor %}
+				<div class="stat-details">
+					<p class="stat-label">Solde Global en Caisse
+						<span class="text-primary">({{ balance_summary.baseCode }})</span>
+					</p>
+					<strong class="stat-value text-success">
+						{{ balance_summary.consolidatedFormatted }}
+						<small>{{ balance_summary.baseCode }}</small>
+					</strong>
+				</div>
+			</div>
 
-			{# Carte consolidée des dépenses de la session multi-devises #}
+			{# Carte consolidée des dépenses de la session en devise de base #}
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--danger">
 					<i class="fa-solid fa-arrow-trend-down"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">Total Sorties (Cette session)</span>
-					<div class="expenses-currency-stack">
-						{% for code, amt in expenses_by_currency %}
-							<strong class="stat-value text-danger">
-								{{ amt|number_format(2, ',', ' ') }} {{ code }}
-							</strong>
-						{% else %}
-							<strong class="stat-value text-muted">0,00</strong>
-						{% endfor %}
-					</div>
+					<span class="stat-label">Total Sorties ({{ balance_summary.baseCode }})</span>
+					<strong class="stat-value text-danger">
+						{{ balance_summary.consolidatedOutFormatted }}
+						<small>{{ balance_summary.baseCode }}</small>
+					</strong>
 				</div>
 			</div>
 		</div>
+
 
 		{# --- GRAND LIVRE DES FLUX JOURNALIERS UNIFIÉ (FinancialOperation) --- #}
 		<div class="card monitoring-table-card">

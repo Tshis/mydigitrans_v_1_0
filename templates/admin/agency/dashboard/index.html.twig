@@ -69,7 +69,7 @@
                 </div>
                 <div class="info">
                     <div class="amount-revenue">
-                        <h3>{{ stats.revenue.amount|number_format(0, ',', ' ') }}
+                        <h3>{{ stats.revenue.amount|number_format(2, ',', ' ') }}
                             <small class="text-size-11 text-weight-600 text-primary">{{ stats.revenue.currency|upper }}</small>
                         </h3>
                     </div>
@@ -112,7 +112,7 @@
                 <div class="table-responsive-wrapper">
                     <h2 class="card-title-fix text-size-16 py-10">
                         <i class="fa-solid fa-plane-departure text-primary"></i>
-                        Prochains Départs imminents (RN1 / Itinéraires)
+                        Prochains Départs imminents 
                     </h2>
                     <table class="table table-scrollable table-striped">
                         <thead>
@@ -214,23 +214,29 @@
                     <tbody>
                         {% for currency in agency_currency_settings.accepted_currencies %}
                             <tr>
-                                <td><strong>{{ currency.name }}</strong></td>
-                                <td class="monospace font-bold text-primary-mode">{{ currency.code }}</td>
-                                <td class="text-center font-bold monospace text-live-rate">
-                                    {% if currency.exchange_rate is not null %}
-                                        {% set clean_rate = currency.exchange_rate|replace({',': '.'}) %}
-                                        1 {{ currency.code }} = 
-                                        {{ clean_rate|number_format(2, ',', ' ') }} {{ agency_currency_settings.base_currency }}
-                                    {% else %}
-                                        <span class="text-gray">Taux non défini</span>
+                                <td>
+                                    <strong>{{ currency.name }}</strong>
+                                    {% if currency.isBase %}
+                                        <span class="badge-status-confirmed">Devise de Base</span>
                                     {% endif %}
                                 </td>
-                                <td class="text-center">
+                                <td class="monospace font-bold text-primary-mode">{{ currency.code }}</td>
+                                <td class="text-center font-bold monospace text-live-rate">
+                                    {% if currency.isBase %}
+                                        <span class="text-success">1 {{ currency.code }} = 1,00 {{ currency.code }}</span>
+                                    {% elseif currency.exchange_rate is not null %}
+                                        1 {{ currency.code }} = {{ currency.exchange_rate|number_format(2, ',', ' ') }} {{ agency_currency_settings.base_currency }}
+                                    {% else %}
+                                        <span class="text-danger">Taux non défini</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right">
                                     <span class="pill-report-audit {{ currency.isActive ? 'closed' : 'open' }}">
                                         {{ currency.isActive ? 'Autorisé' : 'Bloqué' }}
                                     </span>
                                 </td>
                             </tr>
+
                         {% else %}
                             <tr>
                                 <td colspan="5" class="text-center text-gray italic padding-15">Aucune devise secondaire activée pour vos points de vente.</td>

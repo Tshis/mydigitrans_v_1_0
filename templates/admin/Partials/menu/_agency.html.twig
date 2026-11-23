@@ -1,12 +1,16 @@
 {# templates/admin/partials/menu/_agency.html.twig #}
 
+
 {# 1. OPÉRATIONS QUOTIDIENNES #}
-<a href="{{ path('admin_agency_dashboard') }}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Tableau de bord">
-	<span class="icon">
-		<i class="fa-solid fa-gauge"></i>
-	</span>
-	<span class="text">Dashboard</span>
-</a>
+{% if is_granted('ROLE_AGENCY_ADMIN') or is_granted('ROLE_GENERAL_MANAGER') or is_granted('ROLE_MANAGER') or is_granted('ROLE_ACCOUNTANT') %}
+	<a href="{{ path('admin_agency_dashboard') }}" class="menu-link {{ page is same as('dashboard') ? 'active' : '' }}" data-tooltip="Tableau de bord">
+		<span class="icon">
+			<i class="fa-solid fa-gauge"></i>
+		</span>
+		<span class="text">Dashboard</span>
+	</a>
+{% endif %}
+
 
 {# Planification des départs (Voyages) #}
 {% if is_granted('trip.view') %}

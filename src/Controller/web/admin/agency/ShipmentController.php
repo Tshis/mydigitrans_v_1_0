@@ -41,16 +41,36 @@ final class ShipmentController extends AbstractAdminController
         $actor = $this->actor();
 
         $filters = [
-            'status' => trim((string) $request->query->get('filter_status', '')) ?: null,
+            'status' => trim((string) ($request->query->get('shipment_status') ?: $request->query->get('filter_status', ''))) ?: null,
             'query'  => trim((string) $request->query->get('search_query', '')) ?: null,
         ];
+
+        $shipments = $this->shipmentService->listAgencyShipments($actor, $filters);
+
+        $stats = [
+            'warehouse'  => 0,
+            'in_transit' => 0,
+            'delivered'  => 0,
+        ];
+        foreach ($shipments as $shp) {
+            $st = $shp['status'] ?? '';
+            if (\in_array($st, ['pending', 'ready_for_pickup'], true)) {
+                ++$stats['warehouse'];
+            } elseif ('in_transit' === $st) {
+                ++$stats['in_transit'];
+            } elseif ('delivered' === $st) {
+                ++$stats['delivered'];
+            }
+        }
 
         return $this->render('admin/agency/shipment/index.html.twig', [
             'page'      => 'shipment',
             'filters'   => $filters,
-            'shipments' => $this->shipmentService->listAgencyShipments($actor, $filters),
+            'stats'     => $stats,
+            'shipments' => $shipments,
         ]);
     }
+
 
 
     #[Route('/admin/agency/shipment/add', name: 'admin_agency_shipment_add', methods: ['GET', 'POST'])]
