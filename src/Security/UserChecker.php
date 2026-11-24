@@ -21,6 +21,15 @@ class UserChecker implements UserCheckerInterface
         if (!$user->isActive()) {
             throw new CustomUserMessageAccountStatusException('Votre compte est désactivé. Contactez votre administrateur.');
         }
+
+        if ($user->isOnline()) {
+            $lastLogin = $user->getLastLoginAt();
+            $isStale = null !== $lastLogin && $lastLogin < new \DateTimeImmutable('-12 hours');
+
+            if (!$isStale) {
+                throw new CustomUserMessageAccountStatusException('Ce compte est déjà connecté sur un autre poste. Déconnectez l\'autre session avant de continuer.');
+            }
+        }
     }
 
     public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void {}

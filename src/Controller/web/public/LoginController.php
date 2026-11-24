@@ -57,4 +57,30 @@ final class LoginController extends AbstractController
         ]);
     } //logout
 
+
+    #[Route('/logout-check', name: 'security_login_logout_check', methods: ['GET'])]
+    public function logoutCheck(\Doctrine\ORM\EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if ($user instanceof User) {
+            $openSession = $em->getRepository(\App\Entity\CashSession::class)->findOneBy([
+                'openedBy' => $user,
+                'status'   => \App\Enum\CashSessionStatus::Opened,
+            ]);
+
+            if (null !== $openSession) {
+                $this->addFlash(
+                    'error',
+                    sprintf(
+                        'Déconnexion impossible : vous devez d\'abord clôturer votre session de caisse sur le guichet [%s].',
+                        $openSession->getCashRegister()?->getName() ?? 'Caisse'
+                    )
+                );
+
+                return $this->redirectToRoute('admin_agency_cashier_session_closing');
+            }
+        }
+
+        return $this->redirectToRoute('security_login_logout');
+    } //logoutCheck
 }
