@@ -32,9 +32,11 @@
 					{% elseif app.user.userType.value is same as('client') %}
 						Client Voyageur
 					{% else %}
-						{# 🟢 extraction brute et directe du vrai nom du rôle depuis la base de données #}
-						{{ app.user.userRoles|map(ur => ur.role.name)|join(', ')|default('Agent Opérationnel') }}
+						{% set activeRoles = app.user.userRoles|filter(ur => ur.revokedAt is null and ur.role.isActive) %}
+						{{ activeRoles|map(ur => ur.role.name)|join(', ')|default('Agent Opérationnel') }}
 					{% endif %}
+				</span>
+
 				</span>
 			</div>
 			<!-- Remplacement par l'icône -->
