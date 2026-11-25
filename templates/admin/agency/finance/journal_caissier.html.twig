@@ -32,12 +32,13 @@
 					<div class="hero-amount-zone">
 						<span class="audit-label">Fonds physiques en direct dans le tiroir</span>
 						<div class="live-currency-grid">
-							{% for bal in theoretical %}
+							<div class="live-currency-grid">
 								<div class="live-currency-item text-success">
-									<h1 class="hero-main-amount">{{ bal.formatted }}</h1>
-									<span class="currency-tag">{{ bal.code }}</span>
+									<h1 class="hero-main-amount">{{ theoretical.consolidatedFormatted }}</h1>
+									<span class="currency-tag">{{ theoretical.baseCode }}</span>
 								</div>
-							{% endfor %}
+							</div>
+
 						</div>
 					</div>
 
@@ -60,7 +61,7 @@
 				<div class="audit-details-grid mb-25">
 					<div class="audit-item">
 						<span class="audit-label">Caissier surveillé</span>
-						<p class="audit-value">{{ session.openedBy.fullName }} ({{ session.openedBy.email }})</p>
+						<p class="audit-value">{{ session.openedBy.fullName }} </p>
 					</div>
 
 					<div class="audit-item">
@@ -76,11 +77,30 @@
 					<div class="audit-item">
 						<span class="audit-label">Dotation initiale (Fonds de roulement)</span>
 						<div class="initial-balances-inline">
-							{% for bal in theoretical %}
+							{% for bal in theoretical.byCurrency %}
 								<span class="balance-tag">{{ bal.opening|number_format(2, ',', ' ') }} {{ bal.code }}</span>
 							{% endfor %}
 						</div>
+
 					</div>
+
+					<div class="audit-item">
+						<span class="audit-label">Validation / Arbitrage</span>
+						<p class="audit-value">
+							{% if session.closedBy %}
+								Validée par <strong>{{ session.closedBy.fullName }}</strong>
+								<br>
+								<small>
+									{% if session.closedAt %} le {{ session.closedAt|date('d/m/Y à H\\hi') }}{% endif %}
+								</small>
+							{% elseif session.status.value == 'closing_pending' %}
+								<span class="text-danger">En attente d'arbitrage manager</span>
+							{% else %}
+								<span class="text-primary">Session non clôturée</span>
+							{% endif %}
+						</p>
+					</div>
+
 				</div>
 
 				<hr class="finance-divider mb-25">

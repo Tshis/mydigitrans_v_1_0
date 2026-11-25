@@ -406,14 +406,17 @@ final class CashierController extends AbstractAdminController
         $actor  = $this->actor();
         $agency = $actor->getAgency();
         $filters = [];
-        if (null !== $actor->getBranch()) {
+        if (null !== $actor->getBranch() && \App\Service\AgencyRegistrationService::HEADQUARTERS_CODE !== $actor->getBranch()->getCode()) {
             $filters['branchId'] = $actor->getBranch()->getId();
         }
 
+        $data = $this->financeService->getSessionsMonitoring($agency, $filters);
+
         return $this->render('admin/agency/cashier/branch.html.twig', [
             'page' => 'cashier',
-        ] + $this->financeService->getSessionsMonitoring($agency, $filters));
+        ] + $data);
     }
+
 
 
     #[Route('/admin/agency/cash-register/session/closing', name: 'admin_agency_cashier_session_closing', methods: ['GET', 'POST'])]
@@ -422,13 +425,14 @@ final class CashierController extends AbstractAdminController
         $actor   = $this->actor();
         $session = $this->cashierService->findCurrentSessionForCashier($actor);
 
-        if (!$session instanceof CashSession || CashSessionStatus::Opened !== $session->getStatus()) {
+        if (!$session instanceof CashSession) {
             return $this->redirectToRoute('admin_agency_cashier_index');
+        }
+        if (CashSessionStatus::Pending === $session->getStatus()) {
+            return $this->redirectToRoute('admin_agency_cashier_session_open');
         }
 
         $balanceSummary = $this->cashierService->computeSessionTheoreticalBalances($session);
-        $balances = $balanceSummary['byCurrency'];
-
 
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('close_session_' . $session->getId(), (string) $request->request->get('_token'))) {
@@ -441,21 +445,23 @@ final class CashierController extends AbstractAdminController
                 $closeData->closingObservation = trim((string) $request->request->get('closing_note', '')) ?: null;
 
                 $this->cashierService->closeSession($session, $closeData, $actor);
-                $this->addFlash('success', 'Session de caisse clôturée et verrouillée. En attente d\'arbitrage du gérant.');
+                $this->addFlash('success', sprintf('Session %s clôturée avec succès. Vous pouvez maintenant vous déconnecter.', 'SES-' . str_pad((string) $session->getId(), 5, '0', \STR_PAD_LEFT)));
 
-                return $this->redirectToRoute('admin_agency_cashier_awaiting_init');
+                return $this->redirectToRoute('admin_agency_cashier_index');
             } catch (\DomainException $e) {
                 $this->addFlash('error', $e->getMessage());
             }
         }
 
         return $this->render('admin/agency/cashier/session_close.html.twig', [
-            'page'        => 'cashier',
-            'session'     => $session,
-            'sessionCode' => sprintf('CS-%s-%04d', $session->getOpenedAt()?->format('Y') ?? date('Y'), (int) $session->getId()),
-            'balances'    => $balances,
+            'page'            => 'cashier',
+            'session'         => $session,
+            'sessionCode'     => 'SES-' . str_pad((string) $session->getId(), 5, '0', \STR_PAD_LEFT),
+            'balance_summary' => $balanceSummary,
+            'balances'        => $balanceSummary['byCurrency'],
         ]);
     }
+
 
     #[Route('/admin/agency/cash-register/session/{id}/closing/validation', name: 'admin_agency_cashier_session_closing_validation', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function sessionClosingValidation(int $id, Request $request): Response

@@ -111,6 +111,7 @@ final class AgencyCashierService
             ->setParameter('cashier', $cashier)
             ->setParameter('statuses', [CashSessionStatus::Pending->value, CashSessionStatus::Opened->value])
             ->orderBy('cs.openedAt', 'DESC')
+            ->addOrderBy('cs.id', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
@@ -141,7 +142,11 @@ final class AgencyCashierService
             ->andWhere('cs.cashRegister = :reg')
             ->andWhere('cs.status IN (:st)')
             ->setParameter('reg', $register)
-            ->setParameter('st', [CashSessionStatus::Pending->value, CashSessionStatus::Opened->value])
+            ->setParameter('st', [
+                CashSessionStatus::Pending->value,
+                CashSessionStatus::Opened->value,
+                CashSessionStatus::ClosingPending->value,
+            ])
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -369,8 +374,9 @@ final class AgencyCashierService
     }
 
 
+
     /**
-     * Clôture la session par le caissier et enregistre le comptage physique de fin de journée.
+     * Clôture la session par le caissier dans la devise de base de l'agence.
      *
      * @throws \DomainException
      */
@@ -379,30 +385,55 @@ final class AgencyCashierService
         if (CashSessionStatus::Opened !== $session->getStatus()) {
             throw new \DomainException('Seule une session ouverte peut être clôturée.');
         }
+
         $theoretical = $this->computeSessionTheoreticalBalances($session);
-        foreach ($session->getBalances() as $bal) {
+        $baseCode = $theoretical['baseCode'];
+        $expectedBase = $theoretical['consolidatedExpected'];
+        $declaredBase = max(0.0, (float) ($data->physicalBalances[$baseCode] ?? 0));
+        $diffBase = round($declaredBase - $expectedBase, 2);
+
+        $balances = $this->em->getRepository(CashSessionBalance::class)->findBy([
+            'cashSession' => $session,
+        ]);
+
+        foreach ($balances as $bal) {
             $code = (string) $bal->getCurrency()?->getCode();
-            $expected = $theoretical['byCurrency'][$code]['expected'] ?? 0.0;
-            $declared = max(0.0, (float) ($data->physicalBalances[$code] ?? 0));
-            $diff = round($declared - $expected, 2);
-            $bal->setClosingBalanceExpected(number_format($expected, 2, '.', ''))
-                ->setClosingBalanceDeclared(number_format($declared, 2, '.', ''))
-                ->setClosingBalanceDifference(number_format($diff, 2, '.', ''))
-                ->setClosingObservation($data->closingObservation);
+            if ($code === $baseCode) {
+                $bal->setClosingBalanceExpected(number_format($expectedBase, 2, '.', ''))
+                    ->setClosingBalanceDeclared(number_format($declaredBase, 2, '.', ''))
+                    ->setClosingBalanceDifference(number_format($diffBase, 2, '.', ''))
+                    ->setClosingObservation($data->closingObservation);
+            } else {
+                $bal->setClosingBalanceExpected('0.00')
+                    ->setClosingBalanceDeclared('0.00')
+                    ->setClosingBalanceDifference('0.00')
+                    ->setClosingObservation($data->closingObservation);
+            }
         }
-        $session->setStatus(CashSessionStatus::Closed)
+
+        $session->setStatus(CashSessionStatus::ClosingPending)
             ->setClosedAt(new \DateTimeImmutable());
+
         $this->auditLogger->log(
             action: AuditAction::Update,
             entityName: 'CashSession',
             entityId: $session->getId(),
             oldValues: ['status' => CashSessionStatus::Opened->value],
-            newValues: ['status' => CashSessionStatus::Closed->value],
+            newValues: [
+                'status'       => CashSessionStatus::ClosingPending->value,
+                'baseCurrency' => $baseCode,
+                'expected'     => $expectedBase,
+                'declared'     => $declaredBase,
+                'diff'         => $diffBase,
+            ],
             actor: $cashier,
             flush: false
         );
+
         $this->em->flush();
     }
+
+
     /**
      * Arbitrage final du gérant sur une session clôturée (enregistre closedBy et managerConclusion).
      *
@@ -410,24 +441,30 @@ final class AgencyCashierService
      */
     public function validateClosedSession(CashSession $session, CashSessionValidateData $data, User $manager): void
     {
-        if (CashSessionStatus::Closed !== $session->getStatus()) {
+        if (CashSessionStatus::ClosingPending !== $session->getStatus()) {
             throw new \DomainException('Cette session n\'est pas en attente d\'arbitrage.');
         }
+
         foreach ($session->getBalances() as $bal) {
             $bal->setManagerConclusion(trim((string) $data->managerConclusion));
         }
-        $session->setClosedBy($manager);
+
+        $session->setClosedBy($manager)
+            ->setStatus(CashSessionStatus::Closed);
+
         $this->auditLogger->log(
             action: AuditAction::Update,
             entityName: 'CashSession',
             entityId: $session->getId(),
-            oldValues: ['sessionId' => $session->getId()],
-            newValues: ['arbitratedBy' => $manager->getFullName(), 'conclusion' => $data->managerConclusion],
+            oldValues: ['status' => CashSessionStatus::ClosingPending->value],
+            newValues: ['status' => CashSessionStatus::Closed->value, 'arbitratedBy' => $manager->getFullName(), 'conclusion' => $data->managerConclusion],
             actor: $manager,
             flush: false
         );
+
         $this->em->flush();
     }
+
 
     /**
      * @return list<Currency>

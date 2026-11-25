@@ -13,6 +13,14 @@
 {% block body %}
 	<div class="admin-agency-cashier-dashboard-global-scope container">
 
+		{% for message in app.flashes('success') %}
+			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+		{% endfor %}
+
+		{% for message in app.flashes('error') %}
+			<div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+		{% endfor %}
+
 		{# --- EN-TÊTE DE NIVEAU DIRECTION GÉNÉRALE --- #}
 		<header class="header-refined my-30">
 			<div class="header-main-info">
@@ -101,9 +109,10 @@
 						<label class="admin-bus-layout-add-label">État de Session</label>
 						<select name="filter_status" class="admin-bus-layout-add-select">
 							<option value="">-- Tous les états --</option>
-							<option value="pending" {{ filters.status == 'pending' ? 'selected' : '' }}>pending (En attente d'ouverture)</option>
-							<option value="opened" {{ filters.status == 'opened' ? 'selected' : '' }}>opened (En cours de vente)</option>
-							<option value="closed" {{ filters.status == 'closed' ? 'selected' : '' }}>closed (Clôturée)</option>
+							<option value="pending" {{ filters.status == 'pending' ? 'selected' : '' }}>En attente d'ouverture (pending)</option>
+							<option value="opened" {{ filters.status == 'opened' ? 'selected' : '' }}>En cours de vente (opened)</option>
+							<option value="closing_pending" {{ filters.status == 'closing_pending' ? 'selected' : '' }}>À arbitrer (closing_pending)</option>
+							<option value="closed" {{ filters.status == 'closed' ? 'selected' : '' }}>Clôturée & Validée (closed)</option>
 						</select>
 					</div>
 
@@ -153,7 +162,10 @@
 								</td>
 								<td>
 									{% if reg.cashierName %}
-										<strong>{{ reg.cashierName }}</strong> <span class="sub-meta-text">({{ reg.sessionState }})</span>
+										<strong>{{ reg.cashierName }}</strong>
+										<span class="sub-meta-text">
+											({% if reg.sessionState == 'closing_pending' %}À arbitrer{% elseif reg.sessionState == 'opened' %}En service{% elseif reg.sessionState == 'pending' %}Dotation envoyée{% else %}{{ reg.sessionState }}{% endif %})
+										</span>
 									{% else %}
 										<span class="text-muted">Libre</span>
 									{% endif %}
@@ -169,7 +181,6 @@
 										<i class="fa-solid {{ reg.isActive ? 'fa-ban' : 'fa-circle-check' }}"></i>
 									</a>
 								</td>
-
 							</tr>
 						{% else %}
 							<tr><td colspan="5" class="text-center text-muted py-15">Aucun guichet immatriculé.</td></tr>
@@ -179,17 +190,17 @@
 			</div>
 		</div>
 
-
 		{# --- REGISTRE CONSOLIDÉ DES FLUX DE SESSIONS --- #}
 		<div class="layout-main-card mb-20">
 			<div class="card-inner-box table-responsive-wrapper">
+				<h2 class="mb-15 text-primary text-size-18"><i class="fa-solid fa-users-gear"></i> Journal des Sessions de Caisse du Réseau</h2>
 				<table class="table table-scrollable table-striped js-datatable">
 					<thead>
 						<tr>
 							<th>Succursale</th>
 							<th>Guichet de caisse</th>
 							<th>Caissier</th>
-							<th>Bilan des Encaissements par Devise</th>
+							<th>Bilan des Encaissements</th>
 							<th>Statut</th>
 							<th class="text-right">Actions</th>
 						</tr>
@@ -211,26 +222,35 @@
 											<div class="balance-item">
 												<span class="cur-code">{{ bal.code }}:</span>
 												{{ bal.amount }} {{ bal.code }}
-												{% if s.status in ['closed', 'validated'] %}
+												{% if s.status in ['closing_pending', 'closed'] %}
 													<span class="gap-indicator {{ bal.gap < 0 ? 'text-danger-mode font-bold' : 'text-success-mode' }}">
 														(Écart: {{ bal.gapFormatted }} {{ bal.code }})
 													</span>
 												{% endif %}
 											</div>
+										{% else %}
+											<span class="text-muted">0,00</span>
 										{% endfor %}
 									</div>
 								</td>
 								<td>
-									{% if s.status == 'validated' %}
-										<span class="badge-status-validated">validated</span>
-									{% elseif s.status == 'closed' %}
-										<span class="badge-status-closed">closed</span>
+									{% if s.status == 'closed' %}
+										<span class="badge-status-validated">
+											Clôturée & Validée
+											{% if s.validatedByName %}
+												<span class="sub-meta-text">Par : {{ s.validatedByName }}</span>
+											{% endif %}
+										</span>
+									{% elseif s.status == 'closing_pending' %}
+										<span class="badge-status-closed">À arbitrer</span>
+									{% elseif s.status == 'opened' %}
+										<span class="badge-status-open">Ouverte</span>
 									{% else %}
-										<span class="badge-status-open">{{ s.status }}</span>
+										<span class="badge-status-open">En attente</span>
 									{% endif %}
 								</td>
 								<td class="text-right actions">
-									{% if s.status == 'closed' %}
+									{% if s.status == 'closing_pending' %}
 										<a
 											href="{{ path('admin_agency_cashier_session_closing_validation', {'id': s.id}) }}"
 											class="btn-gavel-arbitrate"
@@ -247,18 +267,11 @@
 										<i class="fa-solid fa-eye"></i>
 									</a>
 								</td>
-							</tr>
 						{% else %}
-							<tr>
-								<td colspan="6" class="text-center text-muted py-15">Aucune session trouvée.</td>
-							</tr>
+							Aucune session trouvée.
 						{% endfor %}
-					</tbody>
-				</table>
-			</div>
-		</div>
 
-	</div>
 
-	{% include 'admin/partials/_modal.html.twig' %}
+
+						{% include 'admin/partials/_modal.html.twig' %}
 {% endblock %}

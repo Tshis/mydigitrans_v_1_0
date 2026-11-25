@@ -360,6 +360,7 @@ final class AgencyFinanceService
             ->andWhere('cr.agency = :agency')
             ->setParameter('agency', $agency)
             ->orderBy('cs.openedAt', 'DESC')
+            ->addOrderBy('cs.id', 'DESC')
             ->setMaxResults(150);
 
         if (!empty($filters['branchId'])) {
@@ -383,12 +384,11 @@ final class AgencyFinanceService
 
         foreach ($sessions as $s) {
             $st = $s->getStatus()->value;
-            $isValidated = CashSessionStatus::Closed === $s->getStatus() && null !== $s->getClosedBy();
 
             if (CashSessionStatus::Opened === $s->getStatus()) {
                 ++$activeCount;
             }
-            if (CashSessionStatus::Closed === $s->getStatus() && null === $s->getClosedBy()) {
+            if (CashSessionStatus::ClosingPending === $s->getStatus()) {
                 ++$pendingArbitrationCount;
             }
 
@@ -397,22 +397,26 @@ final class AgencyFinanceService
 
             foreach ($s->getBalances() as $bal) {
                 $code = (string) $bal->getCurrency()?->getCode();
-                $liveAmount = CashSessionStatus::Closed === $s->getStatus()
+                $isEnded = \in_array($s->getStatus(), [CashSessionStatus::ClosingPending, CashSessionStatus::Closed], true);
+
+                $liveAmount = $isEnded
                     ? (float) ($bal->getClosingBalanceDeclared() ?? $bal->getClosingBalanceExpected() ?? 0)
-                    : ($theoretical[$code]['expected'] ?? 0.0);
+                    : ($theoretical['byCurrency'][$code]['expected'] ?? 0.0);
 
                 $gap = (float) ($bal->getClosingBalanceDifference() ?? 0);
 
-                if (\in_array($s->getStatus(), [CashSessionStatus::Opened, CashSessionStatus::Closed], true)) {
+                if (\in_array($s->getStatus(), [CashSessionStatus::Opened, CashSessionStatus::ClosingPending], true) && $liveAmount > 0) {
                     $totalsByCurrency[$code] = ($totalsByCurrency[$code] ?? 0.0) + $liveAmount;
                 }
 
-                $balancesView[] = [
-                    'code'         => $code,
-                    'amount'       => number_format($liveAmount, 2, ',', ' '),
-                    'gap'          => $gap,
-                    'gapFormatted' => number_format($gap, 2, ',', ' '),
-                ];
+                if ($liveAmount > 0 || CashSessionStatus::Opened === $s->getStatus()) {
+                    $balancesView[] = [
+                        'code'         => $code,
+                        'amount'       => number_format($liveAmount, 2, ',', ' '),
+                        'gap'          => $gap,
+                        'gapFormatted' => number_format($gap, 2, ',', ' '),
+                    ];
+                }
             }
 
             $rows[] = [
@@ -421,9 +425,10 @@ final class AgencyFinanceService
                 'branchName'   => (string) $s->getCashRegister()?->getBranch()?->getName(),
                 'registerName' => (string) $s->getCashRegister()?->getName(),
                 'registerCode' => (string) $s->getCashRegister()?->getCode(),
-                'cashierName'  => (string) $s->getOpenedBy()?->getFullName(),
-                'openedTime'   => $s->getOpenedAt()?->format('d/m H\hi') ?? '-',
-                'status'       => $isValidated ? 'validated' : $st,
+                'cashierName'     => (string) $s->getOpenedBy()?->getFullName(),
+                'validatedByName' => $s->getClosedBy()?->getFullName(),
+                'openedTime'      => $s->getOpenedAt()?->format('d/m H\hi') ?? '-',
+                'status'       => $st,
                 'balances'     => $balancesView,
             ];
         }
@@ -454,8 +459,7 @@ final class AgencyFinanceService
             if (null === $regId || isset($activeByRegisterId[$regId])) {
                 continue;
             }
-            $isUnvalidatedClosed = CashSessionStatus::Closed === $s->getStatus() && null === $s->getClosedBy();
-            if (\in_array($s->getStatus(), [CashSessionStatus::Pending, CashSessionStatus::Opened], true) || $isUnvalidatedClosed) {
+            if (\in_array($s->getStatus(), [CashSessionStatus::Pending, CashSessionStatus::Opened, CashSessionStatus::ClosingPending], true)) {
                 $activeByRegisterId[$regId] = $s;
             }
         }
@@ -473,10 +477,8 @@ final class AgencyFinanceService
                 'sessionState' => $currentSession?->getStatus()->value ?? 'free',
                 'cashierName'  => $currentSession?->getOpenedBy()?->getFullName(),
                 'openedAt'     => $currentSession?->getOpenedAt()?->format('d/m H\hi'),
-                'registers' => $registersView,
             ];
         }
-
 
         return [
             'branches'                  => $branches,
@@ -487,6 +489,7 @@ final class AgencyFinanceService
             'registers'                 => $registersView,
         ];
     }
+
 
     /**
      * Charge le journal en direct d'une session spécifique (show_journal.html.twig).

@@ -47,6 +47,7 @@ final class AccessCatalog
         'shipment' => ['Colis (Fret)', 'fa-box-open', ['view', 'write']],
         'payment' => ['Paiements', 'fa-money-bill', ['view', 'write', 'confirm']],
         'cash' => ['Caisse', 'fa-cash-register', ['view', 'write']],
+        'finance' => ['Finance', 'fa-hand-holding-dollar', ['view', 'write']],
 
         // 🟢 CÔTÉ AGENCE : Uniquement le droit de voir et de configurer / activer localement (Pas de write)
         'currency' => ['Devises & Taux', 'fa-money-bill-transfer', ['view', 'configure']],
@@ -90,7 +91,7 @@ final class AccessCatalog
         'ROLE_MANAGER' => [
             'Gestionnaire',
             'Pilotage de l\'exploitation : flotte, lignes, voyages, tarifs, ventes et dépenses.',
-            ['dashboard.view', 'branch.view', 'bus.view', 'maintenance.*', 'route.view', 'trip.*', 'fare.view', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'expense.*', 'report.view', 'user.view', 'user.write']
+            ['dashboard.view', 'branch.view', 'bus.view', 'maintenance.*', 'route.view', 'trip.*', 'fare.view', 'reservation.*', 'ticket.*', 'shipment.*', 'payment.*', 'cash.*', 'finance.*', 'expense.*', 'report.view', 'user.view', 'user.write']
         ],
         'ROLE_CASHIER' => [
             'Caissier / Guichetier',

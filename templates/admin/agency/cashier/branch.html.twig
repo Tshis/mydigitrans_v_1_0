@@ -1,236 +1,240 @@
-{# templates/admin/agency/dashboard/branch.html.twig #}
+{# templates/admin/agency/cashier/branch.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block body %}
-	<div class="admin-dashboard-branch-scope container">
+    <div class="admin-dashboard-branch-scope container">
 
-		{% for message in app.flashes('success') %}
-			<div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
-		{% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+        {% endfor %}
 
-		{# --- EN-TÊTE DE LA PAGE DE LA SUCCURSALE --- #}
-		<header class="header-refined my-30">
-			<div class="header-main-info">
-				<div class="info">
-					<h1>
-						<i class="fa-solid fa-cash-register"></i>
-						Gestion des Caisses & Sessions
-					</h1>
-					<p class="subtitle">Suivi des sessions actives et des guichetiers de la succursale.</p>
-				</div>
-			</div>
-			<div class="right" style="display: flex; gap: 10px;">
-				<a href="{{ path('admin_agency_cashier_session_init') }}" class="btn-refined btn-primary-gradient text-size-12">
-					<i class="fa-solid fa-key"></i>
-					Initialiser une session
-				</a>
-				{% if is_granted('ROLE_AGENCY_ADMIN') or is_granted('ROLE_GENERAL_MANAGER') %}
-					<a href="{{ path('admin_agency_cashier_add') }}" class="btn-refined btn-success-gradient text-size-12">
-						<i class="fa-solid fa-plus"></i>
-						Nouveau guichet de caisse
-					</a>
-				{% endif %}
+        {% for message in app.flashes('error') %}
+            <div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+        {% endfor %}
 
-			</div>
-		</header>
+        {# --- EN-TÊTE DE LA PAGE DE LA SUCCURSALE --- #}
+        <header class="header-refined my-30">
+            <div class="header-main-info">
+                <div class="info">
+                    <h1>
+                        <i class="fa-solid fa-cash-register"></i>
+                        Gestion des Caisses & Sessions
+                    </h1>
+                    <p class="subtitle">Suivi des sessions actives et des guichetiers de la succursale.</p>
+                </div>
+            </div>
+            <div class="right" style="display: flex; gap: 10px;">
+                <a href="{{ path('admin_agency_cashier_session_init') }}" class="btn-refined btn-primary-gradient text-size-12">
+                    <i class="fa-solid fa-key"></i>
+                    Initialiser une session
+                </a>
+                {% if is_granted('ROLE_AGENCY_ADMIN') or is_granted('ROLE_GENERAL_MANAGER') %}
+                    <a href="{{ path('admin_agency_cashier_add') }}" class="btn-refined btn-success-gradient text-size-12">
+                        <i class="fa-solid fa-plus"></i>
+                        Nouveau guichet de caisse
+                    </a>
+                {% endif %}
+            </div>
+        </header>
 
-		{# --- CARTES DE STATISTIQUES COMPTABLES MULTI-DEVISES --- #}
-		<div class="stats-overview-grid mb-20">
-			<div class="stat-card">
-				<div class="stat-icon stat-icon--success">
-					<i class="fa-solid fa-door-open"></i>
-				</div>
-				<div class="stat-details">
-					<span class="stat-label">Sessions Actives</span>
-					<strong class="stat-value">{{ active_sessions_count }} Guichet(s)</strong>
-				</div>
-			</div>
+        {# --- CARTES DE STATISTIQUES COMPTABLES MULTI-DEVISES --- #}
+        <div class="stats-overview-grid mb-20">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon--success">
+                    <i class="fa-solid fa-door-open"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Sessions Actives</span>
+                    <strong class="stat-value">{{ active_sessions_count }} Guichet(s)</strong>
+                </div>
+            </div>
 
-			<div class="stat-card">
-				<div class="stat-icon stat-icon--primary">
-					<i class="fa-solid fa-vault"></i>
-				</div>
-				<div class="stat-details">
-					<span class="stat-label">Fonds Estimés en Caisse</span>
-					<div class="stats-currency-stack">
-						{% for code, total in totals_by_currency %}
-							<span class="stat-value text-success">{{ total|number_format(2, ',', ' ') }} <small>{{ code }}</small></span>
-						{% else %}
-							<span class="stat-value text-muted">0,00</span>
-						{% endfor %}
-					</div>
-				</div>
-			</div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon--primary">
+                    <i class="fa-solid fa-vault"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Fonds Estimés en Caisse</span>
+                    <div class="stats-currency-stack">
+                        {% for code, total in totals_by_currency %}
+                            <span class="stat-value text-success">{{ total|number_format(2, ',', ' ') }} <small>{{ code }}</small></span>
+                        {% else %}
+                            <span class="stat-value text-muted">0,00</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
-			<div class="stat-card">
-				<div class="stat-icon stat-icon--danger">
-					<i class="fa-solid fa-triangle-exclamation"></i>
-				</div>
-				<div class="stat-details">
-					<span class="stat-label">Sessions à Arbitrer</span>
-					<strong class="stat-value text-danger">{{ pending_arbitration_count }} En Attente</strong>
-				</div>
-			</div>
-		</div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon--danger">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Sessions à Arbitrer</span>
+                    <strong class="stat-value text-danger">{{ pending_arbitration_count }} En Attente</strong>
+                </div>
+            </div>
+        </div>
 
+        {# --- ÉTAT EN DIRECT DES GUICHETS PHYSIQUES DE LA SUCCURSALE --- #}
+        <div class="card monitoring-table-card mb-25">
+            <h2>
+                <i class="fa-solid fa-desktop"></i>
+                Guichets Physiques de la Succursale ({{ registers|length }})
+            </h2>
 
-		{# --- ÉTAT EN DIRECT DES GUICHETS PHYSIQUES DE LA SUCCURSALE --- #}
-		<div class="card monitoring-table-card mb-25">
-			<h2>
-				<i class="fa-solid fa-desktop"></i>
-				Guichets Physiques de la Succursale ({{ registers|length }})
-			</h2>
+            <table class="table table-scrollable table-striped">
+                <thead>
+                    <tr>
+                        <th>Guichet & Code</th>
+                        <th>État du Poste</th>
+                        <th>Caissier Affecté</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in registers %}
+                        <tr>
+                            <td>
+                                <strong>{{ reg.name }}</strong>
+                                <span class="sub-meta-text monospace">{{ reg.code }}</span>
+                            </td>
+                            <td>
+                                {% if reg.sessionState == 'opened' %}
+                                    <span class="session-badge active-status">EN SERVICE (OUVERT)</span>
+                                {% elseif reg.sessionState == 'pending' %}
+                                    <span class="session-badge await-status">DOTATION ENVOYÉE (EN ATTENTE)</span>
+                                {% elseif reg.sessionState == 'closing_pending' %}
+                                    <span class="session-badge await-status">ARRÊTÉE (À ARBITRER)</span>
+                                {% else %}
+                                    <span class="session-badge closed-status">LIBRE / DISPONIBLE</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if reg.cashierName %}
+                                    <strong>{{ reg.cashierName }}</strong>
+                                    <span class="sub-meta-text">Depuis {{ reg.openedAt }}</span>
+                                {% else %}
+                                    <span class="text-muted">Aucun agent en poste</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-right table-action-buttons">
+                                {% if reg.sessionState == 'free' and reg.isActive %}
+                                    <a href="{{ path('admin_agency_cashier_session_init', {'registerId': reg.id}) }}" class="table-action-trigger view" title="Allouer une dotation sur ce guichet">
+                                        <i class="fa-solid fa-key"></i>
+                                    </a>
+                                {% elseif reg.sessionState == 'closing_pending' and reg.sessionId %}
+                                    <a href="{{ path('admin_agency_cashier_session_closing_validation', {'id': reg.sessionId}) }}" class="table-action-trigger arbitrate" title="Arbitrer la clôture">
+                                        <i class="fa-solid fa-gavel"></i>
+                                    </a>
+                                {% elseif reg.sessionId %}
+                                    <a href="{{ path('admin_agency_finance_journal', {'code': reg.sessionId}) }}" class="table-action-trigger view" title="Voir le journal en direct">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-15">Aucun guichet immatriculé sur cette succursale. Contactez l'administrateur d'agence.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-			<table class="table table-scrollable table-striped">
-				<thead>
-					<tr>
-						<th>Guichet & Code</th>
-						<th>État du Poste</th>
-						<th>Caissier Affecté</th>
-						<th class="text-right">Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for reg in registers %}
-						<tr>
-							<td>
-								<strong>{{ reg.name }}</strong>
-								<span class="sub-meta-text monospace">{{ reg.code }}</span>
-							</td>
-							<td>
-								{% if reg.sessionState == 'opened' %}
-									<span class="session-badge active-status">EN SERVICE (OUVERT)</span>
-								{% elseif reg.sessionState == 'pending' %}
-									<span class="session-badge await-status">DOTATION ENVOYÉE (EN ATTENTE)</span>
-								{% elseif reg.sessionState == 'closed' %}
-									<span class="session-badge await-status">CLÔTURÉ (À ARBITRER)</span>
-								{% else %}
-									<span class="session-badge closed-status">LIBRE / DISPONIBLE</span>
-								{% endif %}
-							</td>
-							<td>
-								{% if reg.cashierName %}
-									<strong>{{ reg.cashierName }}</strong>
-									<span class="sub-meta-text">Depuis {{ reg.openedAt }}</span>
-								{% else %}
-									<span class="text-muted">Aucun agent en poste</span>
-								{% endif %}
-							</td>
-							<td class="text-right table-action-buttons">
-								{% if reg.sessionState == 'free' and reg.isActive %}
-									<a href="{{ path('admin_agency_cashier_session_init', {'registerId': reg.id}) }}" class="table-action-trigger view" title="Allouer une dotation sur ce guichet">
-										<i class="fa-solid fa-key"></i>
-									</a>
-								{% elseif reg.sessionState == 'closed' and reg.sessionId %}
-									<a href="{{ path('admin_agency_cashier_session_closing_validation', {'id': reg.sessionId}) }}" class="table-action-trigger arbitrate" title="Arbitrer la clôture">
-										<i class="fa-solid fa-gavel"></i>
-									</a>
-								{% elseif reg.sessionId %}
-									<a href="{{ path('admin_agency_finance_journal', {'code': reg.sessionId}) }}" class="table-action-trigger view" title="Voir le journal en direct">
-										<i class="fa-solid fa-eye"></i>
-									</a>
-								{% endif %}
-							</td>
-						</tr>
-					{% else %}
-						<tr>
-							<td colspan="4" class="text-center text-muted py-15">Aucun guichet immatriculé sur cette succursale. Contactez l'administrateur d'agence.</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
+        {# --- REGISTRE DE CONTRÔLE DES CAISSIERS --- #}
+        <div class="card monitoring-table-card">
+            <h2>
+                <i class="fa-solid fa-users-gear"></i>
+                Journal des Caissiers / Sessions de Guichet
+            </h2>
 
+            <table class="table table-scrollable table-striped">
+                <thead>
+                    <tr>
+                        <th>Guichetier (Operator)</th>
+                        <th>N° Session Caisse</th>
+                        <th>État Session</th>
+                        <th>Bilan des Encaissements</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in sessions %}
+                        <tr>
+                            <td>
+                                <strong>{{ s.cashierName }}</strong>
+                                <span class="sub-meta-text">{{ s.registerName }} ({{ s.registerCode }})</span>
+                            </td>
+                            <td>
+                                <span class="session-code-text">{{ s.code }}</span>
+                            </td>
+                            <td>
+                                {% if s.status == 'opened' %}
+                                    <span class="session-badge active-status">
+                                        OUVERTE
+                                        <p class="status-time-meta">{{ s.openedTime }}</p>
+                                    </span>
+                                {% elseif s.status == 'pending' %}
+                                    <span class="session-badge await-status">
+                                        EN ATTENTE OUVERTURE
+                                        <p class="status-time-meta">{{ s.openedTime }}</p>
+                                    </span>
+                                {% elseif s.status == 'closing_pending' %}
+                                    <span class="session-badge await-status">
+                                        À ARBITRER
+                                        <p class="status-time-meta">{{ s.openedTime }}</p>
+                                    </span>
+                                {% else %}
+                                    <span class="session-badge closed-status">
+                                        VALIDÉE
+                                        {% if s.validatedByName %}
+                                            <p class="status-time-meta">Par : {{ s.validatedByName }}</p>
+                                        {% else %}
+                                            <p class="status-time-meta">{{ s.openedTime }}</p>
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="table-balances-stack">
+                                    {% for bal in s.balances %}
+                                        <div class="balance-item">
+                                            {{ bal.amount }} {{ bal.code }}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">0,00</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td class="text-right table-action-buttons">
+                                {% if s.status == 'closing_pending' %}
+                                    <a
+                                        href="{{ path('admin_agency_cashier_session_closing_validation', {'id': s.id}) }}"
+                                        class="table-action-trigger arbitrate"
+                                        title="Ouvrir l'inventaire contradictoire et arbitrer les écarts"
+                                    >
+                                        <i class="fa-solid fa-gavel"></i>
+                                    </a>
+                                {% endif %}
+                                <a
+                                    href="{{ path('admin_agency_finance_journal', {'code': s.id}) }}"
+                                    class="table-action-trigger view"
+                                    title="Auditer le journal comptable de cette session"
+                                >
+                                    <i class="fa-solid fa-chart-line"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-15">Aucune session de caisse enregistrée pour le moment.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-
-
-
-		{# --- REGISTRE DE CONTRÔLE DES CAISSIERS --- #}
-		<div class="card monitoring-table-card">
-			<h2>
-				<i class="fa-solid fa-users-gear"></i>
-				Journal des Caissiers / Sessions de Guichet
-			</h2>
-
-			<table class="table table-scrollable table-striped">
-				<thead>
-					<tr>
-						<th>Guichetier (Operator)</th>
-						<th>N° Session Caisse</th>
-						<th>État Session</th>
-						<th>Bilan des Encaissements</th>
-						<th class="text-right">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for s in sessions %}
-						<tr>
-							<td>
-								<strong>{{ s.cashierName }}</strong>
-								<span class="sub-meta-text">{{ s.registerName }} ({{ s.registerCode }})</span>
-							</td>
-							<td>
-								<span class="session-code-text">{{ s.code }}</span>
-							</td>
-							<td>
-								{% if s.status == 'opened' %}
-									<span class="session-badge active-status">
-										OUVERTE
-										<p class="status-time-meta">{{ s.openedTime }}</p>
-									</span>
-								{% elseif s.status == 'pending' %}
-									<span class="session-badge await-status">
-										EN ATTENTE OUVERTURE
-										<p class="status-time-meta">{{ s.openedTime }}</p>
-									</span>
-								{% elseif s.status == 'closed' %}
-									<span class="session-badge await-status">
-										À ARBITRER
-										<p class="status-time-meta">{{ s.openedTime }}</p>
-									</span>
-								{% else %}
-									<span class="session-badge closed-status">
-										VALIDÉE
-										<p class="status-time-meta">{{ s.openedTime }}</p>
-									</span>
-								{% endif %}
-							</td>
-							<td>
-								<div class="table-balances-stack">
-									{% for bal in s.balances %}
-										<div class="balance-item">
-											{{ bal.amount }} {{ bal.code }}
-										</div>
-									{% endfor %}
-								</div>
-							</td>
-							<td class="text-right table-action-buttons">
-								{% if s.status == 'closed' %}
-									<a
-										href="{{ path('admin_agency_cashier_session_closing_validation', {'id': s.id}) }}"
-										class="table-action-trigger arbitrate"
-										title="Ouvrir l'inventaire contradictoire et arbitrer les écarts"
-									>
-										<i class="fa-solid fa-gavel"></i>
-									</a>
-								{% endif %}
-								<a
-									href="{{ path('admin_agency_finance_journal', {'code': s.id}) }}"
-									class="table-action-trigger view"
-									title="Auditer le journal comptable de cette session"
-								>
-									<i class="fa-solid fa-chart-line"></i>
-								</a>
-							</td>
-						</tr>
-					{% else %}
-						<tr>
-							<td colspan="5" class="text-center text-muted py-15">Aucune session de caisse enregistrée pour le moment.</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-
-	</div>
+    </div>
 {% endblock %}

@@ -6,7 +6,8 @@ namespace App\Enum;
 
 enum CashSessionStatus: string
 {
-    case Opened = 'opened';
-    case Closed = 'closed';
-    case Pending = 'pending';
+    case Pending        = 'pending';
+    case Opened         = 'opened';
+    case ClosingPending = 'closing_pending';
+    case Closed         = 'closed';
 }

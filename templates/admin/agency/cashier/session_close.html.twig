@@ -1,6 +1,115 @@
 {# templates/admin/agency/cashier/session_close.html.twig #}
 {% extends "admin/base.html.twig" %}
 
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.close-session-modal-backdrop {
+			position: fixed;
+			inset: 0;
+			background: rgba(12, 50, 109, 0.55);
+			backdrop-filter: blur(4px);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+			padding: 16px;
+		}
+		.close-session-modal-backdrop.is-open {
+			display: flex;
+		}
+		.close-session-modal-card {
+			background: #ffffff;
+			color: #1f2937;
+			width: 100%;
+			max-width: 430px;
+			border-radius: 16px;
+			padding: 28px 24px;
+			text-align: center;
+			box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22);
+			border: 1px solid rgba(175, 211, 231, 0.6);
+		}
+		body.dark-mode .close-session-modal-card {
+			background: #1e293b;
+			color: #f1f5f9;
+			border-color: #334155;
+		}
+		.close-session-modal-icon {
+			width: 56px;
+			height: 56px;
+			margin: 0 auto 14px auto;
+			border-radius: 50%;
+			background: rgba(220, 38, 38, 0.12);
+			color: #dc2626;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 22px;
+		}
+		.close-session-modal-card h3 {
+			margin: 0 0 8px 0;
+			font-size: 18px;
+			font-weight: 800;
+		}
+		.close-session-modal-card p {
+			margin: 0 0 22px 0;
+			font-size: 13.5px;
+			line-height: 1.5;
+			color: #6b7280;
+		}
+		body.dark-mode .close-session-modal-card p {
+			color: #94a3b8;
+		}
+		.close-session-modal-actions {
+			display: flex;
+			gap: 10px;
+			justify-content: center;
+		}
+		.close-session-modal-actions button {
+			flex: 1;
+			justify-content: center;
+		}
+	</style>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const form = document.getElementById("session-close-form");
+			const openModalBtn = document.getElementById("btn-open-close-modal");
+			const modal = document.getElementById("closeSessionModal");
+			const cancelBtn = document.getElementById("btn-cancel-close-modal");
+			const confirmBtn = document.getElementById("btn-confirm-close-modal");
+
+			if (!form || !openModalBtn || !modal) return;
+
+			openModalBtn.addEventListener("click", (e) => {
+				e.preventDefault();
+				if (!form.reportValidity()) return;
+				modal.classList.add("is-open");
+			});
+
+			cancelBtn?.addEventListener("click", (e) => {
+				e.preventDefault();
+				modal.classList.remove("is-open");
+			});
+
+			modal.addEventListener("click", (e) => {
+				if (e.target === modal) {
+					modal.classList.remove("is-open");
+				}
+			});
+
+			confirmBtn?.addEventListener("click", (e) => {
+				e.preventDefault();
+				confirmBtn.disabled = true;
+				form.submit();
+			});
+		});
+	</script>
+{% endblock %}
+
 {% block body %}
 	<div class="admin-cashier-session-closing-scope container">
 
@@ -18,85 +127,76 @@
 					<h1>Clôture de Session & Arrêt de Caisse</h1>
 					<p class="subtitle">Session active :
 						<strong>{{ sessionCode }}</strong>
-						| Veuillez compter vos billets et déclarer l'encaisse physique.
+						| Déclarez le montant global en devise de base ({{ balance_summary.baseCode }}).
 					</p>
 				</div>
 			</div>
 		</header>
 
-		{# --- LE TUNNEL DE VÉRIFICATION DES ÉCARTS --- #}
+		{# --- FORMULAIRE DE CLÔTURE EN DEVISE DE BASE --- #}
 		<form
+			id="session-close-form"
 			action="{{ path('admin_agency_cashier_session_closing') }}"
 			method="POST"
 			class="reservation-form"
-			onsubmit="return confirm('Confirmer la clôture définitive de la caisse ? Cette action est irréversible.');"
 		>
 			<input type="hidden" name="_token" value="{{ csrf_token('close_session_' ~ session.id) }}">
 
 			<div class="reservation-container">
 
-				{# GAUCHE : MULTI-DEVISES DYNAMIQUES --- #}
+				{# GAUCHE : SOLDE THÉORIQUE & DÉCLARATION EN DEVISE DE BASE --- #}
 				<div class="layout-main-panel">
 
-					{# SOLDES THÉORIQUES --- #}
 					<div class="card mb-20">
 						<h2>
 							<i class="fa-solid fa-calculator"></i>
-							Soldes Théoriques du Système (Calculés)
+							Solde Théorique Consolidé ({{ balance_summary.baseCode }})
 						</h2>
 
-						<div class="field-group mb-20 grid-dynamic-closing">
-							{% for bal in balances %}
-								<div class="field">
-									<span class="section-micro-label">Total attendu ({{ bal.code }})</span>
-									<p class="theoretical-value text-success-color text-weight-900 text-size-20">
-										{{ bal.formatted }} {{ bal.code }}
-									</p>
-									<span class="sub-meta-text">Dotation + Recettes - Dépenses</span>
-								</div>
-							{% else %}
-								<div class="field">
-									<span class="text-danger-mode font-bold">Aucune devise configurée sur cette session.</span>
-								</div>
-							{% endfor %}
+						<div class="field-group mb-10">
+							<div class="field">
+								<span class="section-micro-label">Total attendu en coffre ({{ balance_summary.baseCode }})</span>
+								<p class="theoretical-value text-success-color text-weight-900 text-size-20">
+									{{ balance_summary.consolidatedFormatted }} {{ balance_summary.baseCode }}
+								</p>
+								<span class="sub-meta-text">Dotation + Recettes encaissées - Dépenses décaissées (converties au taux actif)</span>
+							</div>
 						</div>
 					</div>
 
-					{# DÉCLARATION PHYSIQUE DES ESPÈCES PAR LE GUICHETIER #}
 					<div class="card">
 						<h2>
 							<i class="fa-solid fa-hand-holding-hand"></i>
 							Déclaration Physique (Comptage Réel)
 						</h2>
-						<div class="field-group mb-15 grid-dynamic-closing">
-							{% for bal in balances %}
-								<div class="field">
-									<label class="session-micro-label font-bold">Montant physique recompté ({{ bal.code }}) *</label>
-									<div class="input-currency-wrapper">
-										<input
-											type="number"
-											name="physical_balances[{{ bal.code }}]"
-											placeholder="0.00"
-											step="0.01"
-											min="0"
-											value="{{ bal.expected }}"
-											required
-										>
-										<span class="currency-badge-suffix">{{ bal.code }}</span>
-									</div>
+						<div class="field-group mb-15">
+							<div class="field">
+								<label class="session-micro-label font-bold">Montant physique recompté ({{ balance_summary.baseCode }}) *</label>
+								<div class="input-currency-wrapper">
+									<input
+										type="number"
+										name="physical_balances[{{ balance_summary.baseCode }}]"
+										placeholder="0.00"
+										step="0.01"
+										min="0"
+										value="{{ balance_summary.consolidatedExpected }}"
+										required
+									>
+									<span class="currency-badge-suffix">{{ balance_summary.baseCode }}</span>
 								</div>
-							{% endfor %}
+								<span class="sub-meta-text">Saisissez le total physique recompté équivalent en {{ balance_summary.baseCode }}.</span>
+							</div>
 						</div>
 
 						<div class="field mb-15">
 							<label class="session-micro-label">Rapport de passation / Notes de clôture</label>
 							<textarea name="closing_note" class="input-session-field text-area-fixed"
-							placeholder="Mentionnez les incidents de paiement, les billets suspects refusés ou les détails des décaissements effectués..."></textarea>
+							placeholder="Mentionnez les coupures en devises étrangères en tiroir, les incidents ou les détails des décaissements..."></textarea>
 						</div>
 					</div>
 				</div>
 
-				{# DROITE : VALIDATION ET EXPIRATION --- #}
+				{# DROITE : VALIDATION --- #}
 				<aside class="summary">
 					<div class="card summary-sticky-card">
 						<h2>Fermeture Définitive</h2>
@@ -106,12 +206,12 @@
 								<i class="fa-solid fa-lock"></i>
 								Action Irréversible
 							</p>
-							<p class="notice-text">Après confirmation, votre guichet sera verrouillé. Un rapport d'arrêt de caisse sera envoyé au gérant pour validation des écarts.</p>
+							<p class="notice-text">Après confirmation, votre guichet sera verrouillé. Un rapport d'arrêt de caisse sera envoyé au gérant pour validation.</p>
 						</div>
 
 						<hr class="summary-divider mb-15">
 
-						<button type="submit" class="btn-refined btn-danger-gradient btn-full">
+						<button type="button" id="btn-open-close-modal" class="btn-refined btn-danger-gradient btn-full">
 							<i class="fa-solid fa-circle-check"></i>
 							Clôturer & Verrouiller la Caisse
 						</button>
@@ -120,5 +220,23 @@
 
 			</div>
 		</form>
+
+		{# --- MODALE DE CONFIRMATION DE CLÔTURE --- #}
+		<div class="close-session-modal-backdrop" id="closeSessionModal">
+			<div class="close-session-modal-card">
+				<div class="close-session-modal-icon">
+					<i class="fa-solid fa-lock"></i>
+				</div>
+				<h3>Confirmer la clôture de caisse ?</h3>
+				<p>
+					Vous êtes sur le point de clôturer définitivement la session <strong>{{ sessionCode }}</strong> en <strong>{{ balance_summary.baseCode }}</strong>. Cette action verrouille le tiroir et ne peut pas être annulée.
+				</p>
+				<div class="close-session-modal-actions">
+					<button type="button" id="btn-cancel-close-modal" class="btn-refined btn-primary-gradient">Annuler</button>
+					<button type="button" id="btn-confirm-close-modal" class="btn-refined btn-danger-gradient">Confirmer la clôture</button>
+				</div>
+			</div>
+		</div>
+
 	</div>
 {% endblock %}

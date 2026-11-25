@@ -31,7 +31,10 @@
 						<h2>Comparatif des Écarts par Devise</h2>
 
 						<div class="dynamic-discrepancy-grid">
-							{% for bal in session.balances %}
+							{% set activeBalances = session.balances|filter(b => b.closingBalanceExpected is not null and (b.closingBalanceExpected + 0 > 0 or b.closingBalanceDeclared + 0 > 0)) %}
+							{% set displayBalances = activeBalances is not empty ? activeBalances : [session.balances|first] %}
+							{% for bal in displayBalances %}
+
 								{% set diff = bal.closingBalanceDifference + 0 %}
 								<div class="currency-discrepancy-block mb-15">
 									<div class="block-header">
