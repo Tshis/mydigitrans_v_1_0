@@ -275,8 +275,10 @@ final class CashierController extends AbstractAdminController
                     $payment->getCurrency()?->getCode()
                 ));
 
+
                 return $this->redirectToRoute('admin_agency_cashier_show_payment', [
-                    'id' => $payment->getId(),
+                    'id'          => $payment->getId(),
+                    'printTicket' => \App\Enum\PaymentType::Reservation === $payment->getType() ? 1 : 0,
                 ]);
             } catch (\DomainException $e) {
                 $this->addFlash('error', $e->getMessage());

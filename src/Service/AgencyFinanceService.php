@@ -295,6 +295,20 @@ final class AgencyFinanceService
             $dt = $pay->getCreatedAt();
             $isRes = 'reservation' === $pay->getType()->value;
 
+            $tickets = [];
+            if ($isRes) {
+                $resEntity = $this->em->getRepository(\App\Entity\Reservation::class)->findOneBy([
+                    'agency'    => $agency,
+                    'reference' => $pay->getReference(),
+                ]);
+                if (null !== $resEntity) {
+                    foreach ($resEntity->getTickets() as $tk) {
+                        $tickets[] = (string) $tk->getTicketNumber();
+                    }
+                }
+            }
+
+
             return [
                 'id'             => $pay->getId(),
                 'type'           => 'payment',
@@ -311,6 +325,7 @@ final class AgencyFinanceService
                 'created_by'     => $pay->getCreatedBy()?->getFullName() ?? 'Système',
                 'confirmed_by'   => $pay->getConfirmedBy()?->getFullName() ?? 'En attente',
                 'description'    => sprintf('Règlement enregistré sur la référence %s (%s).', $pay->getReference(), $this->formatPaymentMethod($pay->getPaymentMethod())),
+                'tickets' => $tickets,
             ];
         }
 

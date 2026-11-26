@@ -21,12 +21,15 @@
 					</p>
 				</div>
 			</div>
-			<div class="border-actions-group">
-				<button type="button" class="btn btn-action-caisse btn-danger-caisse" onclick="window.print();">
-					<i class="fa-solid fa-print"></i>
-					Imprimer le reçu
-				</button>
-			</div>
+			{% if operation.tickets is defined and operation.tickets is not empty %}
+				{% for tkNumber in operation.tickets %}
+					<a href="{{ path('admin_agency_ticket_print', {'ticketNumber': tkNumber}) }}" target="_blank" class="btn-refined btn-primary-gradient">
+						<i class="fa-solid fa-ticket"></i>
+						Imprimer le Billet {{ tkNumber }} (PDF)
+					</a>
+				{% endfor %}
+			{% endif %}
+
 		</header>
 
 		<div class="reservation-container">
@@ -96,4 +99,19 @@
 			</aside>
 		</div>
 	</div>
+
+	{% block javascripts %}
+		{{ parent() }}
+		{% if app.request.query.get('printTicket') == '1' and operation.tickets is defined and operation.tickets is not empty %}
+			<script>
+            document.addEventListener('DOMContentLoaded', () => {
+                {% for tkNumber in operation.tickets %}
+                    window.open("{{ path('admin_agency_ticket_print', {'ticketNumber': tkNumber}) }}", '_blank');
+                {% endfor %}
+            });
+        </script>
+		{% endif %}
+	{% endblock %}
+
+
 {% endblock %}

@@ -22,8 +22,7 @@
 		</header>
 
 		<div class="scan-wrapper-grid">
-			<div
-				class="scan-interaction-panel">
+			<div class="scan-interaction-panel">
 
 				{# --- NOUVEAU : BARRE DE SELECTION DEVICE --- #}
 				<div class="device-selector-bar mb-15">
@@ -60,24 +59,43 @@
 				</div>
 			</div>
 
-			<aside class="scan-history-panel">
-				<div class="card-refined">
-					<h3 class="side-title">Dernières validations</h3>
-					<div id="js-scan-history-list" class="history-list">
+			<div class="card-refined">
+				<h3 class="side-title mb-15">Dernières validations</h3>
+				<div id="js-scan-history-list" class="history-list">
+					{% for item in recent_scans %}
+						<div class="history-item {{ item.isValid ? 'valid' : 'invalid' }}">
+							<div class="history-item-meta">
+								<strong>#{{ item.ticketNumber }}</strong>
+								<small class="text-gray">Contrôleur : {{ item.scannedBy }}</small>
+							</div>
+							<div class="history-item-status text-right">
+								<span class="font-bold {{ item.isValid ? 'text-success' : 'text-danger' }}">
+									{{ item.resultLabel }}
+								</span>
+								<small class="text-gray">{{ item.scannedAt }}</small>
+							</div>
+						</div>
+					{% else %}
 						<div class="empty-state">En attente de scan...</div>
-					</div>
+					{% endfor %}
 				</div>
-			</aside>
+			</div>
+
+
+			
 		</div>
 
 		{# --- MODALE DE RESULTAT --- #}
 		<div id="js-scan-result-overlay" class="result-modal-wrapper hidden">
 			<div
-				class="result-content card-refined">
+				class="result-content card-refined"
+			>
 
 				{# Indicateur visuel haut #}
 				<div
-					id="js-res-icon" class="res-icon">{# Injecté par JS : <i class="fa-solid fa-circle-check"></i> #}
+					id="js-res-icon"
+					class="res-icon"
+				>{# Injecté par JS : <i class="fa-solid fa-circle-check"></i> #}
 				</div>
 
 				<div class="res-info">

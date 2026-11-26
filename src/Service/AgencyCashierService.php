@@ -23,6 +23,8 @@ use App\Entity\Expense;
 use App\Entity\FinancialOperation;
 use App\Entity\Reservation;
 use App\Entity\Shipment;
+use App\Entity\Ticket;
+use App\Entity\TripSeat;
 use App\Entity\User;
 use App\Enum\ActiveStatus;
 use App\Enum\AuditAction;
@@ -819,8 +821,46 @@ final class AgencyCashierService
             $reservation = $this->em->getRepository(Reservation::class)->findOneBy(['agency' => $agency, 'reference' => $ref]);
             if ($reservation instanceof Reservation) {
                 $reservation->setStatus(ReservationStatus::Paid);
-                foreach ($reservation->getTickets() as $ticket) {
-                    $ticket->setStatus(TicketStatus::Paid);
+
+                /** @var list<TripSeat> $tripSeats */
+                $tripSeats = $this->em->getRepository(TripSeat::class)->findBy(['reservation' => $reservation]);
+                $seatCount = max(1, \count($tripSeats));
+                $unitPrice = round((float) $reservation->getTotalAmount() / $seatCount, 2);
+
+                $existingByTripSeatId = [];
+                foreach ($reservation->getTickets() as $existingTicket) {
+                    $existingTicket->setStatus(TicketStatus::Paid);
+                    $tsId = $existingTicket->getTripSeat()?->getId();
+                    if (null !== $tsId) {
+                        $existingByTripSeatId[(int) $tsId] = true;
+                    }
+                }
+
+                $travelerName = (string) ($reservation->getUser()?->getFullName() ?? 'Passager');
+                $travelerPhone = (string) ($reservation->getUser()?->getPhone() ?? '-');
+                $ticketCurrency = $reservation->getCurrency() ?? $capturedCurrency;
+
+                foreach ($tripSeats as $ts) {
+                    $ts->setSeatStatus(\App\Enum\TripSeatStatus::Reserved)
+                        ->setHeldUntil(null);
+
+                    $tsId = (int) $ts->getId();
+                    if (isset($existingByTripSeatId[$tsId])) {
+                        continue;
+                    }
+
+                    $ticket = (new Ticket())
+                        ->setAgency($agency)
+                        ->setTicketNumber($this->generateUniqueTicketNumber())
+                        ->setReservation($reservation)
+                        ->setTripSeat($ts)
+                        ->setTravelerName($travelerName)
+                        ->setTravelerPhone($travelerPhone)
+                        ->setPrice(number_format($unitPrice, 2, '.', ''))
+                        ->setCurrency($ticketCurrency)
+                        ->setStatus(TicketStatus::Paid);
+
+                    $this->em->persist($ticket);
                 }
             }
         } else {
@@ -829,6 +869,7 @@ final class AgencyCashierService
                 $shipment->setStatus(ShipmentStatus::InTransit);
             }
         }
+
 
         $this->auditLogger->log(
             action: AuditAction::Create,
@@ -851,6 +892,17 @@ final class AgencyCashierService
 
         return $payment;
     }
+
+
+    private function generateUniqueTicketNumber(): string
+    {
+        $repo = $this->em->getRepository(Ticket::class);
+        do {
+            $candidate = sprintf('TK-%s-%05d', date('ym'), random_int(10000, 99999));
+        } while (null !== $repo->findOneBy(['ticketNumber' => $candidate]));
+
+        return $candidate;
+    }//generateUniqueTicketNumber
 
 
 

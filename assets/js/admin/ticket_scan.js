@@ -1,94 +1,125 @@
 // public/js/admin/ticket_scan.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-    if (typeof Html5Qrcode === 'undefined') {
-        console.error("ÉCHEC : La bibliothèque locale html5-qrcode n'est pas chargée.");
-        return;
-    }
+    const scopeEl = document.querySelector('.admin-agency-scan-scope');
+    const verifyUrl = scopeEl?.dataset.verifyUrl || '/admin/agency/ticket/scan/verify';
 
-    const html5QrCode = new Html5Qrcode("reader");
     const cameraSelect = document.getElementById('js-camera-selection');
     const resultModal = document.getElementById('js-scan-result-overlay');
     const manualForm = document.getElementById('js-manual-form');
     const manualInput = document.getElementById('js-manual-ref');
     const btnClose = document.getElementById('js-btn-close-res');
+    const historyList = document.getElementById('js-scan-history-list');
+
     const config = { fps: 15, qrbox: { width: 280, height: 250 } };
+    let html5QrCode = null;
+    let isProcessing = false;
 
-    // 1. Lister et initialiser les caméras disponibles
-    Html5Qrcode.getCameras().then(devices => {
-        if (devices && devices.length) {
-            cameraSelect.innerHTML = ""; 
-            devices.forEach(device => {
-                const option = document.createElement('option');
-                option.value = device.id;
-                option.text = device.label || `Caméra ${cameraSelect.length + 1}`;
-                cameraSelect.appendChild(option);
+    // 1. Initialisation caméra (n'empêche pas la saisie manuelle si pas de caméra)
+    if (typeof Html5Qrcode !== 'undefined') {
+        html5QrCode = new Html5Qrcode('reader');
+
+        Html5Qrcode.getCameras()
+            .then((devices) => {
+                if (devices && devices.length) {
+                    cameraSelect.innerHTML = '';
+                    devices.forEach((device, idx) => {
+                        const option = document.createElement('option');
+                        option.value = device.id;
+                        option.text = device.label || `Caméra ${idx + 1}`;
+                        cameraSelect.appendChild(option);
+                    });
+                    startScanner(devices[0].id);
+                } else {
+                    cameraSelect.innerHTML = "<option value=''>Aucune caméra détectée</option>";
+                }
+            })
+            .catch(() => {
+                cameraSelect.innerHTML = "<option value=''>Caméra indisponible (utilisez la saisie manuelle)</option>";
             });
-            startScanner(devices[0].id); // Démarre avec le premier périphérique trouvé
-        } else {
-            cameraSelect.innerHTML = "<option value=''>Aucune caméra détectée</option>";
+    } else {
+        if (cameraSelect) {
+            cameraSelect.innerHTML = "<option value=''>Lecteur optique non chargé</option>";
         }
-    }).catch(err => {
-        console.warn("Permissions caméra refusées ou absentes :", err);
-        cameraSelect.innerHTML = "<option value=''>Erreur d'accès caméra</option>";
-    });
-
-    // Fonction sécurisée pour démarrer le scan
-    function startScanner(cameraId) {
-        if (html5QrCode.getState() === 2) return; // Si déjà en cours de scan, on ignore
-
-        html5QrCode.start(cameraId, config, (text) => handleValidation(text))
-            .catch(err => console.error("Erreur lors du démarrage de la caméra :", err));
     }
 
-    // Changement dynamique de caméra
-    cameraSelect.addEventListener('change', async (e) => {
-        if (html5QrCode.getState() === 2) { // 2 = SCANNING
+    function startScanner(cameraId) {
+        if (!html5QrCode || html5QrCode.getState() === 2) return;
+        html5QrCode
+            .start(cameraId, config, (text) => handleValidation(text))
+            .catch((err) => console.error('Erreur démarrage caméra :', err));
+    }
+
+    cameraSelect?.addEventListener('change', async (e) => {
+        if (!html5QrCode || !e.target.value) return;
+        if (html5QrCode.getState() === 2) {
             await html5QrCode.stop();
         }
         startScanner(e.target.value);
     });
 
-    // --- LOGIQUE DE VALIDATION CENTRALISÉE ET SÉCURISÉE ---
-    async function handleValidation(ref) {
-        if (!ref || ref.trim() === "") return;
+    // --- VALIDATION RÉELLE EN BASE VIA POST ---
+    async function handleValidation(rawRef) {
+        const ref = (rawRef || '').trim();
+        if (!ref || isProcessing) return;
+        isProcessing = true;
 
-        // ÉVITE LE CRASH : On vérifie si le scanner est bien en train de tourner avant de faire pause
-        if (html5QrCode.getState() === 2) { 
-            try { 
-                await html5QrCode.pause(); 
-            } catch (e) { 
-                console.warn("Impossible de mettre en pause, l'état de la caméra est transitoire :", e); 
+        if (html5QrCode && html5QrCode.getState() === 2) {
+            try {
+                await html5QrCode.pause();
+            } catch (e) {
+                console.warn('Pause caméra ignorée :', e);
             }
         }
 
-        console.log("Validation en cours pour la référence :", ref);
+        try {
+            const response = await fetch(verifyUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ code: ref }),
+            });
 
-        // Simulation d'un traitement serveur (Remplacer par votre appel API plus tard)
-        const isSuccess = !ref.includes('000') && ref.length > 4; 
+            const data = await response.json();
+            const isSuccess = Boolean(data.valid);
 
-        const mockData = {
-            name: isSuccess ? "Daniel Lukonu" : "Billet Inconnu / Invalide", 
-            seat: isSuccess ? "12" : "--",
-            dest: isSuccess ? "Matadi" : "N/A",
-            tripCode: "KIN-MAT-260824",
-            msg: isSuccess ? "EMBARQUEMENT AUTORISÉ" : "TICKET NON VALIDE OU DÉJÀ SCANNE"
-        };
+            const normalized = {
+                ticketNumber: data.ticketNumber || ref.toUpperCase(),
+                name: data.passengerName || 'Billet Inconnu / Invalide',
+                seat: data.seatNumber || '--',
+                dest: data.destination || 'N/A',
+                tripCode: data.tripCode || '--',
+                msg: data.message || (isSuccess ? 'EMBARQUEMENT AUTORISÉ' : 'BILLET REFUSÉ'),
+            };
 
-        showResult(isSuccess, mockData);
+            showResult(isSuccess, normalized);
+            prependHistory(isSuccess, normalized);
+        } catch (error) {
+            console.error('Erreur réseau lors du scan :', error);
+            showResult(false, {
+                ticketNumber: ref.toUpperCase(),
+                name: 'Erreur de communication',
+                seat: '--',
+                dest: 'N/A',
+                tripCode: '--',
+                msg: 'Impossible de joindre le serveur de contrôle.',
+            });
+        } finally {
+            isProcessing = false;
+        }
     }
 
     function showResult(success, data) {
-        // Rendre la modale visible immédiatement
         resultModal.classList.remove('hidden', 'success', 'error');
         resultModal.classList.add(success ? 'success' : 'error');
-        
-        // Mettre à jour les éléments de la modale raffinée
-        document.getElementById('js-res-icon').innerHTML = success 
-            ? '<i class="fa-solid fa-circle-check"></i>' 
+
+        document.getElementById('js-res-icon').innerHTML = success
+            ? '<i class="fa-solid fa-circle-check"></i>'
             : '<i class="fa-solid fa-circle-xmark"></i>';
-            
+
         document.getElementById('js-res-name').innerText = data.name;
         document.getElementById('js-res-seat').innerText = data.seat;
         document.getElementById('js-res-dest').innerText = data.dest;
@@ -98,33 +129,68 @@ document.addEventListener('DOMContentLoaded', () => {
         playBeep(success);
     }
 
-    // Gestion du formulaire de saisie manuelle de secours
+    function prependHistory(success, data) {
+        if (!historyList) return;
+
+        const emptyState = historyList.querySelector('.empty-state');
+        if (emptyState) emptyState.remove();
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        const item = document.createElement('div');
+        item.className = `history-item ${success ? 'valid' : 'invalid'}`;
+        item.innerHTML = `
+            <div class="history-item-meta">
+                <strong>#${escapeHtml(data.ticketNumber)}</strong>
+                <small class="text-gray">Contrôleur : ${escapeHtml(data.scannedBy || 'Agent')}</small>
+            </div>
+            <div class="history-item-status text-right">
+                <span class="font-bold ${success ? 'text-success' : 'text-danger'}">
+                    ${success ? 'VALIDÉ' : 'REFUSÉ'}
+                </span>
+                <small class="text-gray">${timeStr}</small>
+            </div>
+        `;
+
+        historyList.prepend(item);
+    }
+
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
     if (manualForm) {
         manualForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Bloque le rechargement de la page qui casse le JS
+            e.preventDefault();
             handleValidation(manualInput.value);
         });
     }
 
-    // Bouton "Passager suivant" de la modale
     if (btnClose) {
         btnClose.addEventListener('click', async () => {
             resultModal.classList.add('hidden');
-            manualInput.value = "";
-            
-            // Relancer le scanner uniquement s'il a été mis en pause (État 3 = PAUSED)
-            if (html5QrCode.getState() === 3) {
+            if (manualInput) {
+                manualInput.value = '';
+                manualInput.focus();
+            }
+
+            if (html5QrCode && html5QrCode.getState() === 3) {
                 try {
                     await html5QrCode.resume();
-                } catch(e) {
-                    console.error("Erreur lors de la reprise du scanner :", e);
+                } catch (e) {
+                    console.error('Erreur reprise scanner :', e);
                 }
             }
         });
     }
 });
 
-// Générateur de bip sonore HTML5 natif pour le terrain
 function playBeep(success) {
     try {
         const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -137,7 +203,7 @@ function playBeep(success) {
         osc.start();
         gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.4);
         osc.stop(context.currentTime + 0.4);
-    } catch(e) {
-        console.warn("Audio non supporté par le navigateur");
+    } catch (e) {
+        console.warn('Audio non supporté par le navigateur');
     }
 }

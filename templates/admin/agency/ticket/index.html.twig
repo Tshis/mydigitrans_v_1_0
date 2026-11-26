@@ -1,121 +1,143 @@
-{# templates/admin/agency/ticketing/index.html.twig #}
+{# templates/admin/agency/ticket/index.html.twig #}
 {% extends "admin/base.html.twig" %}
 
 {% block javascripts %}
-{{ parent() }}
-<script src="/js/datatable.js" defer></script>
+    {{ parent() }}
+    <script src="/js/datatable.js" defer></script>
 {% endblock %}
 
 {% block body %}
-<div class="admin-agency-ticketing-index-scope container">
-    {# --- HEADER ÉPURÉ --- #}
-    <header class="header-refined mb-30">
-        <div class="header-left">
-            <div class="breadcrumb-mini">
-                <span>Opérations</span>
-                <i class="fa-solid fa-chevron-right"></i>
-                <strong>Billetterie</strong>
+    <div class="admin-agency-ticketing-index-scope container">
+
+        {% for message in app.flashes('success') %}
+            <div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+        {% endfor %}
+
+        {# --- HEADER ÉPURÉ --- #}
+        <header class="header-refined mb-30">
+            <div class="header-left">
+                <div class="breadcrumb-mini">
+                    <span>Opérations</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <strong>Billetterie</strong>
+                </div>
+                <h1>Registre des Billets</h1>
+                <p class="subtitle">Billets des départs du jour et à venir (utilisez les filtres pour l'historique complet).</p>
             </div>
-            <h1>Registre des Billets</h1>
-            <p class="subtitle">Gestion et traçabilité des titres de transport émis.</p>
-        </div>
-        <div class="header-right">
-            <a href="{{ path('admin_agency_ticket_scan') }}" class="btn-refined btn-primary-gradient">
-                <i class="fa-solid fa-qrcode"></i>
-                <span>Scanner un ticket</span>
-            </a>
-        </div>
-    </header>
-
-    <div class="ticketing-main-content">
-
-        {# FILTRES #}
-        <div class="card-refined ">
-            <h3 class="side-title">
-                <i class="fa-solid fa-sliders"></i>
-                Filtrage
-            </h3>
-            <div class="p-20">
-                <form action="">
-                    <div class="field-group">
-                        <div class="field">
-                            <label>Statut du billet</label>
-                            <select class="input-refined">
-                                <option value="valid">Valide</option>
-                                <option value="used">Utilisé</option>
-                                <option value="cancelled">Annulé</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Période</label>
-                            <input type="date" class="input-refined">
-                        </div>
-                        <div class="field mb-20">
-                            <label>#Ticket</label>
-                            <input type="text" class="input-refined" placeholder="#TK-0826-0001">
-                        </div>
-                    </div>
-                    <div class="field-button-right">
-                        <button class="btn-refined btn-success-gradient">Mettre à jour la vue</button>
-                    </div>
-                </form>
+            <div class="header-right">
+                <a href="{{ path('admin_agency_ticket_scan') }}" class="btn-refined btn-primary-gradient">
+                    <i class="fa-solid fa-qrcode"></i>
+                    <span>Scanner un ticket</span>
+                </a>
             </div>
-        </div>
+        </header>
 
+        <div class="ticketing-main-content">
 
-        {# LISTE #}
-        <div class="main-content-panel">
-            <div class="table-responsive-wrapper">
-                <table class="table table-scrollable table-striped js-datatable">
-                    <thead>
-                        <tr>
-                            <th>Référence & Date</th>
-                            <th>Passager</th>
-                            <th>Voyage / Siège</th>
-                            <th class="text-center">Statut Billet</th>
-                            <th class="text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ticket in tickets %}
-                        <tr class="matrix-row">
-                            <td>
-                                <div class="ticket-ref">#{{ ticket.reference }}</div>
-                                <small class="text-muted">Émis le
-                                    {{ ticket.createdAt|date('d/m/y') }}</small>
-                            </td>
-                            <td>
-                                <strong>{{ ticket.passengerName }}</strong><br>
-                                <small>{{ ticket.passengerPhone }}</small>
-                            </td>
-                            <td>
-                                <span class="route-badge">{{ ticket.tripCode }}</span><br>
-                                <strong>Siège n°{{ ticket.seatNumber }}</strong>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge-status {{ ticket.status }}">
-                                    {{ ticket.status|upper }}
-                                </span>
-                            </td>
-                            <td class="text-right action-cell">
-                                <div class="action-buttons-group">
-                                    <a href="#" class="action-link" title="Imprimer / Télécharger">
-                                        <i class="fa-solid fa-print"></i>
-                                    </a>
-                                    <a href="#" class="action-link refund" title="Annuler / Rembourser">
-                                        <i class="fa-solid fa-rotate-left"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            {# FILTRES #}
+            <div class="card-refined">
+                <h3 class="side-title">
+                    <i class="fa-solid fa-sliders"></i>
+                    Filtrage
+                </h3>
+                <div class="p-20">
+                    <form action="{{ path('admin_agency_ticket_index') }}" method="GET">
+                        <div class="field-group">
+                            <div class="field">
+                                <label>Statut du billet</label>
+                                <select name="status" class="input-refined">
+                                    <option value="">-- Tous les statuts --</option>
+                                    <option value="paid" {{ filters.status == 'paid' ? 'selected' : '' }}>Valide (Payé)</option>
+                                    <option value="used" {{ filters.status == 'used' ? 'selected' : '' }}>Utilisé (Embarqué)</option>
+                                    <option value="cancelled" {{ filters.status == 'cancelled' ? 'selected' : '' }}>Annulé</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Date de départ</label>
+                                <input type="date" name="date" class="input-refined" value="{{ filters.date }}">
+                            </div>
+                            <div class="field mb-20">
+                                <label>#Ticket / Réservation / Passager</label>
+                                <input type="text" name="query" class="input-refined" placeholder="TK-2611-..., RSV-..." value="{{ filters.query }}">
+                            </div>
+                        </div>
+                        <div class="field-button-right">
+                            <button type="submit" class="btn-refined btn-success-gradient">Mettre à jour la vue</button>
+                        </div>
+                    </form>
+                </div>
             </div>
+
+            {# LISTE #}
+            <div class="main-content-panel">
+                <div class="table-responsive-wrapper">
+                    <table class="table table-scrollable table-striped js-datatable">
+                        <thead>
+                            <tr>
+                                <th>Référence & Date</th>
+                                <th>Passager</th>
+                                <th>Voyage / Siège</th>
+                                <th class="text-center">Statut Billet</th>
+                                <th>Contrôle / Embarquement</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets %}
+                                <tr class="matrix-row">
+                                    <td>
+                                        <div class="ticket-ref">#{{ ticket.reference }}</div>
+                                        <small class="text-muted">Réf : {{ ticket.reservationRef }} • {{ ticket.createdAt|date('d/m/y H:i') }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ ticket.passengerName }}</strong><br>
+                                        <small>{{ ticket.passengerPhone }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="route-badge">{{ ticket.tripCode }}</span>
+                                        <small class="text-muted">({{ ticket.segment }})</small><br>
+                                        <strong>Siège n°{{ ticket.seatNumber }}</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge-status {{ ticket.status == 'paid' ? 'valid' : ticket.status }}">
+                                            {{ ticket.status == 'paid' ? 'VALIDE' : (ticket.status == 'used' ? 'UTILISÉ' : ticket.status|upper) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if ticket.scannedBy %}
+                                            <strong class="text-success">{{ ticket.scannedBy }}</strong><br>
+                                            <small class="text-muted">Le {{ ticket.scannedAt|date('d/m/Y à H\\hi') }}</small>
+                                        {% else %}
+                                            <span class="text-muted">Non scanné</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-right action-cell">
+                                        <div class="action-buttons-group">
+                                            <a href="{{ path('admin_agency_ticket_print', {'ticketNumber': ticket.reference}) }}" target="_blank" class="action-link" title="Imprimer / Télécharger le Billet PDF">
+                                                <i class="fa-solid fa-print"></i>
+                                            </a>
+                                            {% if ticket.status == 'paid' and is_granted('ticket.write') %}
+                                                <a href="{{ path('admin_agency_ticket_cancel', {'ticketNumber': ticket.reference}) }}" class="action-link refund" title="Annuler le billet" onclick="return confirm('Annuler ce billet et libérer le siège ?');">
+                                                    <i class="fa-solid fa-rotate-left"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-20">Aucun billet émis trouvé pour cette période.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
-
-
-
     </div>
-</div>
 {% endblock %}
