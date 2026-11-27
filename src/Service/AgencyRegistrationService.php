@@ -59,7 +59,6 @@ final class AgencyRegistrationService
             $city = trim((string) $data->mainCity);
             $country = trim((string) $data->country);
 
-            // Toutes les erreurs sont rassemblées pour être montrées d'un coup, chacune sous son champ.
             $errors = [];
 
             $sponsor = null;
@@ -84,7 +83,6 @@ final class AgencyRegistrationService
             }
 
             $role = $this->em->getRepository(Role::class)->findOneBy(['code' => self::OWNER_ROLE_CODE]);
-            // Le rôle doit exister, être actif et être un rôle d'agence (jamais un rôle de la plateforme).
             if (!$role instanceof Role || !$role->isActive() || Scope::Agency !== $role->getScope()) {
                 $errors[AgencyRegistrationException::GLOBAL] = 'La création d\'agences est momentanément indisponible. Merci de réessayer plus tard.';
             }
@@ -117,12 +115,12 @@ final class AgencyRegistrationService
                 ->setCity($city)
                 ->setCountry($country)
                 ->setStatus(BranchStatus::Opened)
-                ->setCode(uniqid())
+                ->setCode(self::HEADQUARTERS_CODE)
                 ->setSlug($this->slug(mb_strtolower(self::HEADQUARTERS_CODE) . '-' . $agency->getSlug(), 'siege'));
 
             $this->em->persist($headquarters);
 
-            // 3. Le responsable général, rattaché au siège
+            // 3. Le responsable général (portée réseau global : branch = null)
             $owner = (new User())
                 ->setFirstname(trim((string) $data->ownerFirstname))
                 ->setLastname(trim((string) $data->ownerLastname))
@@ -130,7 +128,7 @@ final class AgencyRegistrationService
                 ->setEmail($ownerEmail)
                 ->setUserType(UserType::Agency)
                 ->setAgency($agency)
-                ->setBranch($headquarters)
+                ->setBranch(null)
                 ->setCode($this->uniqueUserCode())
                 ->setIsActive(true)
                 ->setIsLegalAccepted(true)
@@ -138,12 +136,13 @@ final class AgencyRegistrationService
             $owner->setPassword($this->passwordHasher->hashPassword($owner, (string) $data->password));
             $this->em->persist($owner);
 
-            // 4. Son rôle d'administrateur de l'agence (auto-attribution à l'inscription)
+            // 4. Son rôle d'administrateur de l'agence
             $this->em->persist((new UserRole())->setUser($owner)->setRole($role)->setAgency($agency)->setAssignedBy($owner));
 
             return new AgencyRegistrationResult($agency, $headquarters, $owner);
         });
     }
+
 
     /**
      * @param class-string $class

@@ -6,11 +6,14 @@ namespace App\Controller\web\admin\agency;
 
 use App\Controller\web\admin\AbstractAdminController;
 use App\Dto\admin\agency\ExpenseCreateData;
+use App\Entity\FundTransfer;
 use App\Enum\Scope;
 use App\Form\agency\ExpenseCreateType;
 use App\Service\AgencyFinanceService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class FinanceController extends AbstractAdminController
@@ -38,8 +41,9 @@ final class FinanceController extends AbstractAdminController
         ];
 
         return $this->render('admin/agency/finance/index.html.twig', [
-            'page'    => 'finances',
-            'filters' => $filters,
+            'page'     => 'finances',
+            'filters'  => $filters,
+            'treasury' => $this->financeService->getTreasurySummary($agency, $filters['branchId']),
         ] + $this->financeService->getFinanceOverview($agency, $filters));
     }
 
@@ -113,5 +117,89 @@ final class FinanceController extends AbstractAdminController
         return $this->render('admin/agency/finance/journal_caissier.html.twig', [
             'page' => 'finances',
         ] + $journal);
+    }
+
+    #[Route('/admin/agency/finance/transfers', name: 'admin_agency_finance_transfers', methods: ['GET', 'POST'])]
+    public function transfers(Request $request, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('finance.view');
+        $actor            = $this->actor();
+        $agency           = $actor->getAgency();
+        $restrictedBranch = $actor->getBranch();
+        $branchId         = $restrictedBranch?->getId();
+
+        $headquarters = $em->getRepository(\App\Entity\Branch::class)->findOneBy([
+            'agency' => $agency,
+            'code'   => \App\Service\AgencyRegistrationService::HEADQUARTERS_CODE,
+        ]);
+
+        $initialData = [
+            'destinationType'   => \App\Enum\FundTransferDestinationType::Bank,
+            'branchDestination' => (null !== $headquarters && $headquarters->getId() !== $restrictedBranch?->getId()) ? $headquarters : null,
+        ];
+        if (null === $restrictedBranch && null !== $headquarters) {
+            $initialData['branchSource'] = $headquarters;
+        }
+
+        $form = $this->createForm(\App\Form\agency\FundTransferCreateType::class, $initialData, [
+            'agency'            => $agency,
+            'restricted_branch' => $restrictedBranch,
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessGranted('expense.write');
+            $data = $form->getData();
+
+            try {
+                $transfer = $this->financeService->createFundTransfer([
+                    'branchSourceId'      => $restrictedBranch?->getId() ?? $data['branchSource']?->getId(),
+                    'destinationType'     => $data['destinationType']->value,
+                    'branchDestinationId' => $data['branchDestination']?->getId(),
+                    'bankName'            => $data['bankName'] ?? '',
+                    'bankReference'       => $data['bankReference'] ?? '',
+                    'amount'              => (float) ($data['amount'] ?? 0),
+                    'currencyId'          => (int) $data['currency']?->getId(),
+                ], $actor);
+
+                $this->addFlash('success', sprintf('Transfert de fonds [%s] enregistré (en attente de réception).', $transfer->getReference()));
+
+                return $this->redirectToRoute('admin_agency_finance_transfers');
+            } catch (\DomainException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
+        }
+
+        return $this->render('admin/agency/finance/transfers.html.twig', [
+            'page'      => 'finances',
+            'treasury'  => $this->financeService->getTreasurySummary($agency, $branchId),
+            'transfers' => $this->financeService->listFundTransfers($agency, $branchId),
+            'form'      => $form->createView(),
+        ]);
+    }
+
+
+    #[Route('/admin/agency/finance/transfers/{id}/receive', name: 'admin_agency_finance_transfer_receive', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function receiveTransfer(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('finance.view');
+        if (!$this->isCsrfTokenValid('receive_transfer_' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Jeton CSRF invalide.');
+        }
+
+        $actor    = $this->actor();
+        $transfer = $em->getRepository(FundTransfer::class)->find($id);
+        if (!$transfer instanceof FundTransfer || $transfer->getAgency()?->getId() !== $actor->getAgency()?->getId()) {
+            throw $this->createNotFoundException('Transfert introuvable.');
+        }
+
+        try {
+            $this->financeService->confirmFundTransferReceipt($transfer, $actor);
+            $this->addFlash('success', sprintf('Réception des fonds [%s] confirmée.', $transfer->getReference()));
+        } catch (\DomainException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('admin_agency_finance_transfers');
     }
 }

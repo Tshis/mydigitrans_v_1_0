@@ -177,7 +177,10 @@ final class UserManagementService
             }
 
             $role = $this->resolveRole($actor, $scope, $data->roleCode, null, $errors);
-            $branch = Scope::Agency === $scope ? $this->resolveBranch($actor, $data->branchCode, $errors) : null;
+            $isNetworkRole = null !== $role && \in_array($role->getCode(), ['ROLE_AGENCY_ADMIN', 'ROLE_GENERAL_MANAGER'], true);
+            $branch = (Scope::Agency === $scope && !$isNetworkRole)
+                ? $this->resolveBranch($actor, $data->branchCode, $errors)
+                : null;
 
             if ([] !== $errors) {
                 throw new AgentManagementException($errors);
@@ -224,7 +227,10 @@ final class UserManagementService
 
             if (!$isSelf) {
                 $role = $this->resolveRole($actor, $scope, $data->roleCode, $current?->getRole()?->getCode(), $errors);
-                $branch = Scope::Agency === $scope ? $this->resolveBranch($actor, $data->branchCode, $errors) : null;
+                $isNetworkRole = null !== $role && \in_array($role->getCode(), ['ROLE_AGENCY_ADMIN', 'ROLE_GENERAL_MANAGER'], true);
+                $branch = (Scope::Agency === $scope && !$isNetworkRole)
+                    ? $this->resolveBranch($actor, $data->branchCode, $errors)
+                    : null;
             }
 
             if ([] !== $errors) {
@@ -247,7 +253,7 @@ final class UserManagementService
             $agent->setIsActive('1' === $data->isActive);
 
             $roleChanged = null === $current || $current->getRole()?->getId() !== $role?->getId();
-            $branchChanged = Scope::Agency === $scope && $current?->getBranch()?->getId() !== $branch?->getId();
+            $branchChanged = Scope::Agency === $scope && ($current?->getBranch()?->getId() !== $branch?->getId() || $agent->getBranch()?->getId() !== $branch?->getId());
 
             if ($roleChanged || $branchChanged) {
                 $current?->setRevokedAt(new \DateTimeImmutable())->setRevokedBy($actor);
@@ -256,6 +262,7 @@ final class UserManagementService
             }
         });
     }
+
 
 
     // ------------------------------------------------------------------ BLOC 4 : UTILITAIRES INTERNES

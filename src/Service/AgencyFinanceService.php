@@ -19,6 +19,14 @@ use App\Enum\PaymentMethod;
 use App\Enum\PaymentStatus;
 use Doctrine\ORM\EntityManagerInterface;
 
+use App\Entity\Currency;
+use App\Entity\CurrencyAgency;
+use App\Entity\ExchangeRate;
+use App\Entity\FundTransfer;
+use App\Enum\FundTransferDestinationType;
+use App\Enum\FundTransferStatus;
+
+
 final class AgencyFinanceService
 {
     public function __construct(
@@ -500,6 +508,7 @@ final class AgencyFinanceService
             'active_sessions_count'     => $activeCount,
             'pending_arbitration_count' => $pendingArbitrationCount,
             'totals_by_currency'        => $totalsByCurrency,
+            'treasury'                  => $this->getTreasurySummary($agency, $filters['branchId'] ?? null),
             'sessions'                  => $rows,
             'registers'                 => $registersView,
         ];
@@ -545,6 +554,433 @@ final class AgencyFinanceService
         ];
     }
 
+
+    private function getRateToBase(Agency $agency, Currency $from, Currency $base, \DateTimeImmutable $now): float
+    {
+        if ($from->getId() === $base->getId()) {
+            return 1.0;
+        }
+
+        $row = $this->em->createQueryBuilder()
+            ->select('er.rate')
+            ->from(ExchangeRate::class, 'er')
+            ->andWhere('er.agency = :agency')
+            ->andWhere('er.baseCurrency = :base')
+            ->andWhere('er.targetCurrency = :target')
+            ->andWhere('er.effectiveFrom <= :now')
+            ->setParameter('agency', $agency)
+            ->setParameter('base', $base)
+            ->setParameter('target', $from)
+            ->setParameter('now', $now)
+            ->orderBy('er.effectiveFrom', 'DESC')
+            ->addOrderBy('er.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return (null !== $row && (float) $row['rate'] > 0.0) ? (float) $row['rate'] : 1.0;
+    }
+
+
+
+    /**
+     * Calcule les indicateurs de trésorerie consolidés en devise de base (6.A & 6.B) :
+     * 1. openSessionsTotal        : Fonds actuellement dans les tiroirs ouverts (Opened)
+     * 2. closedVaultGross         : Cumul des sessions clôturées (ClosingPending + Closed) - dépenses hors tiroir payées
+     * 3. outgoingTransfersTotal   : Cumul historique des transferts sortants (utilisé pour le solde réel disponible)
+     *    monthOutgoingTotal       : Transferts sortants du mois en cours (affiché sur la carte)
+     *    pendingOutgoingTotal     : Transferts sortants encore en transit (Pending)
+     * 4. realAvailableBalance     : Solde réel disponible en succursale (Coffre clôturé + transferts reçus - transferts sortants)
+     *
+     * @return array{
+     *   baseCode: string,
+     *   openSessionsTotal: float,
+     *   openSessionsFormatted: string,
+     *   closedVaultGross: float,
+     *   closedVaultFormatted: string,
+     *   outgoingTransfersTotal: float,
+     *   outgoingTransfersFormatted: string,
+     *   monthOutgoingTotal: float,
+     *   monthOutgoingFormatted: string,
+     *   pendingOutgoingTotal: float,
+     *   pendingOutgoingFormatted: string,
+     *   incomingTransfersTotal: float,
+     *   realAvailableBalance: float,
+     *   realAvailableFormatted: string
+     * }
+     */
+    public function getTreasurySummary(Agency $agency, ?int $branchId = null): array
+    {
+        $now = new \DateTimeImmutable();
+        $baseRel = $this->em->getRepository(CurrencyAgency::class)->findOneBy([
+            'agency'   => $agency,
+            'isBase'   => true,
+            'isActive' => true,
+        ]);
+        $baseCurrency = $baseRel?->getCurrency() ?? $agency->getDefaultCurrency();
+        $baseCode = (string) ($baseCurrency?->getCode() ?? 'CDF');
+
+        // 1. Sessions en cours (Opened)
+        $openQb = $this->em->createQueryBuilder()
+            ->select('cs', 'cr', 'br')
+            ->from(CashSession::class, 'cs')
+            ->join('cs.cashRegister', 'cr')
+            ->join('cr.branch', 'br')
+            ->andWhere('cr.agency = :agency')
+            ->andWhere('cs.status = :opened')
+            ->setParameter('agency', $agency)
+            ->setParameter('opened', CashSessionStatus::Opened);
+
+        if (null !== $branchId) {
+            $openQb->andWhere('br.id = :branchId')->setParameter('branchId', $branchId);
+        }
+
+        $openSessionsTotal = 0.0;
+        foreach ($openQb->getQuery()->getResult() as $openSession) {
+            if ($openSession instanceof CashSession) {
+                $summary = $this->cashierService->computeSessionTheoreticalBalances($openSession);
+                $openSessionsTotal += (float) $summary['consolidatedExpected'];
+            }
+        }
+
+        // 2. Coffre des sessions clôturées (ClosingPending + Closed)
+        $closedQb = $this->em->createQueryBuilder()
+            ->select('bal', 'cur', 'cs', 'cr', 'br')
+            ->from(\App\Entity\CashSessionBalance::class, 'bal')
+            ->join('bal.currency', 'cur')
+            ->join('bal.cashSession', 'cs')
+            ->join('cs.cashRegister', 'cr')
+            ->join('cr.branch', 'br')
+            ->andWhere('cr.agency = :agency')
+            ->andWhere('cs.status IN (:ended)')
+            ->setParameter('agency', $agency)
+            ->setParameter('ended', [CashSessionStatus::ClosingPending->value, CashSessionStatus::Closed->value]);
+
+        if (null !== $branchId) {
+            $closedQb->andWhere('br.id = :branchId')->setParameter('branchId', $branchId);
+        }
+
+        $closedSessionsGross = 0.0;
+        foreach ($closedQb->getQuery()->getResult() as $bal) {
+            if (!$bal instanceof \App\Entity\CashSessionBalance) {
+                continue;
+            }
+            $amt = (float) ($bal->getClosingBalanceDeclared() ?? $bal->getClosingBalanceExpected() ?? 0.0);
+            if ($amt <= 0.0) {
+                continue;
+            }
+            $cur = $bal->getCurrency();
+            $rate = (null !== $cur && null !== $baseCurrency) ? $this->getRateToBase($agency, $cur, $baseCurrency, $now) : 1.0;
+            $closedSessionsGross += $amt * $rate;
+        }
+
+        // Soustraire les dépenses payées directement depuis le coffre (hors guichet)
+        $expQb = $this->em->createQueryBuilder()
+            ->select('e', 'cur')
+            ->from(Expense::class, 'e')
+            ->join('e.currency', 'cur')
+            ->andWhere('e.agency = :agency')
+            ->andWhere('e.status = :paid')
+            ->andWhere('e.cashRegister IS NULL')
+            ->setParameter('agency', $agency)
+            ->setParameter('paid', ExpenseStatus::Paid);
+
+        if (null !== $branchId) {
+            $expQb->andWhere('IDENTITY(e.branch) = :branchId')->setParameter('branchId', $branchId);
+        }
+
+        $vaultExpenses = 0.0;
+        foreach ($expQb->getQuery()->getResult() as $exp) {
+            if ($exp instanceof Expense && null !== $exp->getCurrency() && null !== $baseCurrency) {
+                $rate = $this->getRateToBase($agency, $exp->getCurrency(), $baseCurrency, $now);
+                $vaultExpenses += (float) $exp->getAmount() * $rate;
+            }
+        }
+
+        $closedVaultGross = round(max(0.0, $closedSessionsGross - $vaultExpenses), 2);
+
+        // 3. Transferts sortants (cumul intégral pour le solde réel + vue mensuelle & en transit)
+        $outQb = $this->em->createQueryBuilder()
+            ->select('ft', 'cur')
+            ->from(FundTransfer::class, 'ft')
+            ->join('ft.currency', 'cur')
+            ->andWhere('ft.agency = :agency')
+            ->andWhere('ft.status IN (:activeStatuses)')
+            ->setParameter('agency', $agency)
+            ->setParameter('activeStatuses', [FundTransferStatus::Pending->value, FundTransferStatus::Recieved->value]);
+
+        if (null !== $branchId) {
+            $outQb->andWhere('IDENTITY(ft.branch_source) = :branchId')->setParameter('branchId', $branchId);
+        }
+
+        $monthStart = $now->modify('first day of this month')->setTime(0, 0);
+        $outgoingTransfersTotal = 0.0;
+        $monthOutgoingTotal = 0.0;
+        $pendingOutgoingTotal = 0.0;
+
+        foreach ($outQb->getQuery()->getResult() as $ft) {
+            if ($ft instanceof FundTransfer && null !== $ft->getCurrency() && null !== $baseCurrency) {
+                $rate = $this->getRateToBase($agency, $ft->getCurrency(), $baseCurrency, $now);
+                $inBase = (float) $ft->getAmount() * $rate;
+                $outgoingTransfersTotal += $inBase;
+
+                if (null !== $ft->getCreatedAt() && $ft->getCreatedAt() >= $monthStart) {
+                    $monthOutgoingTotal += $inBase;
+                }
+                if (FundTransferStatus::Pending === $ft->getStatus()) {
+                    $pendingOutgoingTotal += $inBase;
+                }
+            }
+        }
+
+        // 4. Transferts entrants reçus (si filtré sur une succursale ou le Siège)
+        $incomingTransfersTotal = 0.0;
+        if (null !== $branchId) {
+            $inQb = $this->em->createQueryBuilder()
+                ->select('ft', 'cur')
+                ->from(FundTransfer::class, 'ft')
+                ->join('ft.currency', 'cur')
+                ->andWhere('ft.agency = :agency')
+                ->andWhere('ft.destinationType = :branchType')
+                ->andWhere('IDENTITY(ft.branch_destination) = :branchId')
+                ->andWhere('ft.status = :recieved')
+                ->setParameter('agency', $agency)
+                ->setParameter('branchType', FundTransferDestinationType::Branch->value)
+                ->setParameter('branchId', $branchId)
+                ->setParameter('recieved', FundTransferStatus::Recieved->value);
+
+            foreach ($inQb->getQuery()->getResult() as $ft) {
+                if ($ft instanceof FundTransfer && null !== $ft->getCurrency() && null !== $baseCurrency) {
+                    $rate = $this->getRateToBase($agency, $ft->getCurrency(), $baseCurrency, $now);
+                    $incomingTransfersTotal += (float) $ft->getAmount() * $rate;
+                }
+            }
+        }
+
+        $openSessionsTotal = round($openSessionsTotal, 2);
+        $outgoingTransfersTotal = round($outgoingTransfersTotal, 2);
+        $monthOutgoingTotal = round($monthOutgoingTotal, 2);
+        $pendingOutgoingTotal = round($pendingOutgoingTotal, 2);
+        $incomingTransfersTotal = round($incomingTransfersTotal, 2);
+        $realAvailableBalance = round($closedVaultGross + $incomingTransfersTotal - $outgoingTransfersTotal, 2);
+
+        return [
+            'baseCode'                   => $baseCode,
+            'openSessionsTotal'          => $openSessionsTotal,
+            'openSessionsFormatted'      => number_format($openSessionsTotal, 2, ',', ' '),
+            'closedVaultGross'           => $closedVaultGross,
+            'closedVaultFormatted'       => number_format($closedVaultGross, 2, ',', ' '),
+            'outgoingTransfersTotal'     => $outgoingTransfersTotal,
+            'outgoingTransfersFormatted' => number_format($outgoingTransfersTotal, 2, ',', ' '),
+            'monthOutgoingTotal'         => $monthOutgoingTotal,
+            'monthOutgoingFormatted'     => number_format($monthOutgoingTotal, 2, ',', ' '),
+            'pendingOutgoingTotal'       => $pendingOutgoingTotal,
+            'pendingOutgoingFormatted'   => number_format($pendingOutgoingTotal, 2, ',', ' '),
+            'incomingTransfersTotal'     => $incomingTransfersTotal,
+            'realAvailableBalance'       => $realAvailableBalance,
+            'realAvailableFormatted'     => number_format($realAvailableBalance, 2, ',', ' '),
+        ];
+    }
+
+
+    /**
+     * Liste les transferts de fonds de l'agence (filtrés par succursale source ou destination).
+     *
+     * @return list<FundTransfer>
+     */
+    public function listFundTransfers(Agency $agency, ?int $branchId = null): array
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('ft', 'bs', 'bd', 'cur', 'cb', 'rb')
+            ->from(FundTransfer::class, 'ft')
+            ->leftJoin('ft.branch_source', 'bs')
+            ->leftJoin('ft.branch_destination', 'bd')
+            ->join('ft.currency', 'cur')
+            ->leftJoin('ft.createdBy', 'cb')
+            ->leftJoin('ft.recievedBy', 'rb')
+            ->andWhere('ft.agency = :agency')
+            ->setParameter('agency', $agency)
+            ->orderBy('ft.createdAt', 'DESC')
+            ->setMaxResults(150);
+
+        if (null !== $branchId) {
+            $qb->andWhere('(bs.id = :branchId OR bd.id = :branchId)')
+                ->setParameter('branchId', $branchId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Crée un transfert / versement de fonds depuis le coffre de la succursale vers la Banque ou une autre Succursale (Siège).
+     *
+     * @param array{
+     *   branchSourceId: ?int,
+     *   destinationType: string,
+     *   branchDestinationId: ?int,
+     *   bankName: ?string,
+     *   bankReference: ?string,
+     *   amount: float,
+     *   currencyId: int
+     * } $payload
+     *
+     * @throws \DomainException
+     */
+    public function createFundTransfer(array $payload, User $actor): FundTransfer
+    {
+        $agency = $actor->getAgency() ?? throw new \DomainException('Agence introuvable.');
+        $sourceId = $actor->getBranch()?->getId() ?? ($payload['branchSourceId'] ?? null);
+        $sourceBranch = null !== $sourceId ? $this->em->getRepository(Branch::class)->find((int) $sourceId) : null;
+
+        if (!$sourceBranch instanceof Branch || $sourceBranch->getAgency()?->getId() !== $agency->getId()) {
+            throw new \DomainException('Succursale émettrice invalide.');
+        }
+
+        $currency = $this->em->getRepository(Currency::class)->find((int) ($payload['currencyId'] ?? 0));
+        if (!$currency instanceof Currency) {
+            throw new \DomainException('Devise de transfert invalide.');
+        }
+
+        $amount = round((float) ($payload['amount'] ?? 0), 2);
+        if ($amount <= 0) {
+            throw new \DomainException('Le montant du transfert doit être supérieur à 0.');
+        }
+
+        $destType = FundTransferDestinationType::tryFrom((string) ($payload['destinationType'] ?? ''));
+        if (null === $destType) {
+            throw new \DomainException('Type de destination invalide.');
+        }
+
+        // Vérification que le solde réel disponible en succursale couvre ce transfert
+        $treasury = $this->getTreasurySummary($agency, (int) $sourceBranch->getId());
+        $baseRel = $this->em->getRepository(CurrencyAgency::class)->findOneBy([
+            'agency'   => $agency,
+            'isBase'   => true,
+            'isActive' => true,
+        ]);
+        $baseCurrency = $baseRel?->getCurrency() ?? $currency;
+        $rate = $this->getRateToBase($agency, $currency, $baseCurrency, new \DateTimeImmutable());
+        $amountInBase = round($amount * $rate, 2);
+
+        if ($amountInBase > ($treasury['realAvailableBalance'] + 0.01)) {
+            throw new \DomainException(sprintf(
+                'Solde réel insuffisant en coffre succursale (%s %s disponibles, transfert demandé : %s %s).',
+                $treasury['realAvailableFormatted'],
+                $treasury['baseCode'],
+                number_format($amountInBase, 2, ',', ' '),
+                $treasury['baseCode']
+            ));
+        }
+
+        $destBranch = null;
+        $bankName = null;
+        $bankRef = null;
+
+        if (FundTransferDestinationType::Branch === $destType) {
+            $destId = (int) ($payload['branchDestinationId'] ?? 0);
+            $destBranch = $this->em->getRepository(Branch::class)->find($destId);
+            if (!$destBranch instanceof Branch || $destBranch->getAgency()?->getId() !== $agency->getId()) {
+                throw new \DomainException('Veuillez sélectionner la succursale ou le Siège destinataire.');
+            }
+            if ($destBranch->getId() === $sourceBranch->getId()) {
+                throw new \DomainException('La succursale destinataire doit être différente de la succursale émettrice.');
+            }
+        } else {
+            $bankName = trim((string) ($payload['bankName'] ?? ''));
+            $bankRef = trim((string) ($payload['bankReference'] ?? ''));
+            if ('' === $bankName || '' === $bankRef) {
+                throw new \DomainException('Le nom de la banque et la référence du bordereau de versement sont obligatoires.');
+            }
+        }
+
+        $ref = sprintf('TRF-%s-%04d', date('ym'), random_int(1000, 9999));
+
+        $transfer = (new FundTransfer())
+            ->setAgency($agency)
+            ->setReference($ref)
+            ->setBranchSource($sourceBranch)
+            ->setDestinationType($destType)
+            ->setBranchDestination($destBranch)
+            ->setBankName($bankName)
+            ->setBankReference($bankRef)
+            ->setAmount(number_format($amount, 2, '.', ''))
+            ->setCurrency($currency)
+            ->setCreatedBy($actor)
+            ->setStatus(FundTransferStatus::Pending);
+
+        $this->em->persist($transfer);
+
+        $this->auditLogger->log(
+            action: AuditAction::Create,
+            entityName: 'FundTransfer',
+            entityId: $transfer->getId(),
+            oldValues: null,
+            newValues: [
+                'reference' => $ref,
+                'source'    => $sourceBranch->getName(),
+                'type'      => $destType->value,
+                'amount'    => $transfer->getAmount(),
+                'currency'  => $currency->getCode(),
+            ],
+            actor: $actor,
+            flush: false
+        );
+
+        $this->em->flush();
+
+        return $transfer;
+    }
+
+
+    /**
+     * Confirme la réception physique des fonds ou la validation du bordereau bancaire.
+     * Autorisé uniquement pour :
+     * - ROLE_AGENCY_ADMIN ou ROLE_GENERAL_MANAGER (Siège / réseau)
+     * - ROLE_MANAGER de la succursale destinataire (pour un transfert inter-succursales)
+     *
+     * @throws \DomainException
+     */
+    public function confirmFundTransferReceipt(FundTransfer $transfer, User $receiver): void
+    {
+        if (FundTransferStatus::Pending !== $transfer->getStatus()) {
+            throw new \DomainException('Ce transfert n\'est plus en attente de réception.');
+        }
+
+        if ($transfer->getCreatedBy()?->getId() === $receiver->getId()) {
+            throw new \DomainException('Vous ne pouvez pas valider la réception d\'un transfert que vous avez vous-même émis.');
+        }
+
+        $roles = $receiver->getRoles();
+        $isTopAdmin = \in_array('ROLE_AGENCY_ADMIN', $roles, true) || \in_array('ROLE_GENERAL_MANAGER', $roles, true);
+        $isDestinationBranchManager = \in_array('ROLE_MANAGER', $roles, true)
+            && FundTransferDestinationType::Branch === $transfer->getDestinationType()
+            && null !== $receiver->getBranch()
+            && null !== $transfer->getBranchDestination()
+            && $receiver->getBranch()->getId() === $transfer->getBranchDestination()->getId();
+
+        if (!$isTopAdmin && !$isDestinationBranchManager) {
+            throw new \DomainException('Accès refusé : seul un administrateur, un directeur général ou le manager de la succursale destinataire peut confirmer ce transfert.');
+        }
+
+        $transfer->setStatus(FundTransferStatus::Recieved)
+            ->setRecievedBy($receiver)
+            ->setRecievedAt(new \DateTimeImmutable());
+
+        $this->auditLogger->log(
+            action: AuditAction::Update,
+            entityName: 'FundTransfer',
+            entityId: $transfer->getId(),
+            oldValues: ['status' => FundTransferStatus::Pending->value],
+            newValues: ['status' => FundTransferStatus::Recieved->value, 'receivedBy' => $receiver->getFullName()],
+            actor: $receiver,
+            flush: false
+        );
+
+        $this->em->flush();
+    }
+
+
+
     private function formatPaymentMethod(PaymentMethod $method): string
     {
         return match ($method) {
@@ -554,5 +990,5 @@ final class AgencyFinanceService
             PaymentMethod::Card         => 'Carte Bancaire',
             PaymentMethod::BankTransfer => 'Virement Bancaire',
         };
-    }
+    } //formatPaymentMethod
 }

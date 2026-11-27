@@ -29,13 +29,17 @@
 						<i class="fa-solid fa-shield-halved"></i>
 						Console d'Audit Globale des Caisses
 					</h1>
-					<p class="subtitle">Supervisez les succursales, consolidez les flux et pilotez les écarts du réseau.</p>
+					<p class="subtitle">Supervisez les succursales, consolidez les flux en {{ treasury.baseCode }} et pilotez les écarts du réseau.</p>
 				</div>
 			</div>
-			<div class="right" style="display: flex; gap: 10px;">
+			<div class="right">
 				<a href="{{ path('admin_agency_cashier_session_init') }}" class="btn-refined btn-primary-gradient text-size-12">
 					<i class="fa-solid fa-key"></i>
 					Allouer une dotation
+				</a>
+				<a href="{{ path('admin_agency_finance_transfers') }}" class="btn-refined btn-primary-gradient text-size-12">
+					<i class="fa-solid fa-money-bill-transfer"></i>
+					Transferts & Trésorerie
 				</a>
 				<a href="{{ path('admin_agency_cashier_add') }}" class="btn-refined btn-success-gradient text-size-12">
 					<i class="fa-solid fa-plus"></i>
@@ -44,15 +48,15 @@
 			</div>
 		</header>
 
-		{# --- CARTES STATISTIQUES CONSOLIDÉES --- #}
+		{# --- CARTES STATISTIQUES CONSOLIDÉES EN DEVISE DE BASE --- #}
 		<div class="stats-overview-grid mb-25">
 			<div class="stat-card">
 				<div class="stat-icon stat-icon--primary">
-					<i class="fa-solid fa-network-wired"></i>
+					<i class="fa-solid fa-cash-register"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">Succursales Réseau</span>
-					<strong class="stat-value">{{ branches|length }} Gare(s)</strong>
+					<span class="stat-label">Sessions en cours ({{ active_sessions_count }} guichet(s))</span>
+					<strong class="stat-value text-primary">{{ treasury.openSessionsFormatted }} <small>{{ treasury.baseCode }}</small></strong>
 				</div>
 			</div>
 
@@ -61,14 +65,28 @@
 					<i class="fa-solid fa-vault"></i>
 				</div>
 				<div class="stat-details">
-					<span class="stat-label">Solde Consolidé des Caisses</span>
-					<div class="stats-currency-stack">
-						{% for code, total in totals_by_currency %}
-							<strong class="stat-value text-success">{{ total|number_format(2, ',', ' ') }} <small>{{ code }}</small></strong>
-						{% else %}
-							<strong class="stat-value text-muted">0,00</strong>
-						{% endfor %}
-					</div>
+					<span class="stat-label">Coffre Clôturé Réseau</span>
+					<strong class="stat-value text-success">{{ treasury.closedVaultFormatted }} <small>{{ treasury.baseCode }}</small></strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--danger">
+					<i class="fa-solid fa-paper-plane"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Transferts Sortants</span>
+					<strong class="stat-value text-danger">{{ treasury.outgoingTransfersFormatted }} <small>{{ treasury.baseCode }}</small></strong>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-icon stat-icon--success">
+					<i class="fa-solid fa-scale-balanced"></i>
+				</div>
+				<div class="stat-details">
+					<span class="stat-label">Solde Réel Disponible</span>
+					<strong class="stat-value text-success">{{ treasury.realAvailableFormatted }} <small>{{ treasury.baseCode }}</small></strong>
 				</div>
 			</div>
 

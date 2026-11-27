@@ -1,0 +1,252 @@
+{# templates/admin/agency/finance/transfers.html.twig #}
+{% extends "admin/base.html.twig" %}
+
+{% block ux_assets %}{{ importmap('app') }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/js/datatable.js" defer></script>
+    <script src="/js/admin/fund-transfer.js" defer></script>
+{% endblock %}
+
+{% block body %}
+    <div class="admin-index-finance-scope container">
+
+        {% for message in app.flashes('success') %}
+            <div class="notice-box-info mt-20"><p><i class="fa-solid fa-circle-check"></i> {{ message }}</p></div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="notice-box-danger-dashboard mt-20"><p><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</p></div>
+        {% endfor %}
+
+        {# --- EN-TÊTE --- #}
+        <header class="header-refined my-30">
+            <div class="header-main-info">
+                <a href="{{ path('admin_agency_finance_index') }}" class="agency-back-action" title="Retour aux finances">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div class="info">
+                    <h1>
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        Trésorerie de Succursale & Transferts de Fonds
+                    </h1>
+                    <p class="subtitle">Suivi du coffre réel disponible et versements vers la Banque ou le Siège Central.</p>
+                </div>
+            </div>
+        </header>
+
+        {# --- 4 CARTES DE TRÉSORERIE CONSOLIDÉES EN DEVISE DE BASE --- #}
+        <div class="stats-overview-grid mb-25">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon--primary">
+                    <i class="fa-solid fa-cash-register"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Sessions en cours (Tiroirs)</span>
+                    <strong class="stat-value text-primary">{{ treasury.openSessionsFormatted }} <small>{{ treasury.baseCode }}</small></strong>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon--success">
+                    <i class="fa-solid fa-vault"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Coffre Clôturé (Brut)</span>
+                    <strong class="stat-value text-success">{{ treasury.closedVaultFormatted }} <small>{{ treasury.baseCode }}</small></strong>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon--danger">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Transferts Sortants (Banque / Siège)</span>
+                    <strong class="stat-value text-danger">{{ treasury.outgoingTransfersFormatted }} <small>{{ treasury.baseCode }}</small></strong>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon--success">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-label">Solde Réel Disponible</span>
+                    <strong class="stat-value text-success">{{ treasury.realAvailableFormatted }} <small>{{ treasury.baseCode }}</small></strong>
+                </div>
+            </div>
+        </div>
+
+        {# --- FORMULAIRE SYMFONY UX DE VERSEMENT / TRANSFERT DE FONDS --- #}
+        {% if is_granted('expense.write') %}
+            <div class="card trip-filters-card mb-25">
+                <h2 class="mb-15 text-primary text-size-18">
+                    <i class="fa-solid fa-building-columns"></i>
+                    Enregistrer un versement / transfert de fonds
+                </h2>
+
+                {{ form_start(form) }}
+                    <div class="field-group">
+                        {% if form.branchSource is defined %}
+                            <div class="field">
+                                {{ form_label(form.branchSource, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                                {{ form_widget(form.branchSource) }}
+                                {{ form_errors(form.branchSource) }}
+                            </div>
+                        {% endif %}
+
+                        <div class="field">
+                            {{ form_label(form.destinationType, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                            {{ form_widget(form.destinationType, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+                            {{ form_errors(form.destinationType) }}
+                        </div>
+
+                        <div class="field is-hidden" id="js-branch-field">
+                            {{ form_label(form.branchDestination, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                            {{ form_widget(form.branchDestination) }}
+                            {{ form_errors(form.branchDestination) }}
+                        </div>
+
+                        <div class="field">
+                            {{ form_label(form.currency, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                            {{ form_widget(form.currency, {'attr': {'class': 'admin-bus-layout-add-select'}}) }}
+                            {{ form_errors(form.currency) }}
+                        </div>
+
+                        <div class="field">
+                            {{ form_label(form.amount, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                            {{ form_widget(form.amount, {'attr': {'class': 'admin-bus-layout-add-input'}}) }}
+                            {{ form_errors(form.amount) }}
+                        </div>
+                    </div>
+
+                    <div class="field-group mt-15" id="js-bank-fields">
+                        <div class="field">
+                            {{ form_label(form.bankName, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                            {{ form_widget(form.bankName, {'attr': {'class': 'admin-bus-layout-add-input'}}) }}
+                            {{ form_errors(form.bankName) }}
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.bankReference, null, {'label_attr': {'class': 'admin-bus-layout-add-label'}}) }}
+                            {{ form_widget(form.bankReference, {'attr': {'class': 'admin-bus-layout-add-input'}}) }}
+                            {{ form_errors(form.bankReference) }}
+                        </div>
+                    </div>
+
+                    <div class="field-button-right mt-15">
+                        <button type="submit" class="btn-refined btn-success-gradient">
+                            <i class="fa-solid fa-check"></i>
+                            Valider le transfert de fonds
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        {% endif %}
+
+        {# --- HISTORIQUE DES TRANSFERTS & RÉCEPTIONS --- #}
+        <div class="card monitoring-table-card mb-25">
+            <div class="table-responsive-wrapper">
+                <h2 class="mb-15 text-primary text-size-18">
+                    <i class="fa-solid fa-list-check"></i>
+                    Historique des Transferts & Versements
+                </h2>
+                <table class="table table-scrollable table-striped js-datatable">
+                    <thead>
+                        <tr>
+                            <th>Référence & Date</th>
+                            <th>Origine</th>
+                            <th>Destination</th>
+                            <th class="text-right">Montant</th>
+                            <th>Statut & Réception</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for trf in transfers %}
+                            <tr>
+                                <td>
+                                    <strong>{{ trf.reference }}</strong>
+                                    <span class="sub-meta-text">{{ trf.createdAt|date('d/m/Y H\\hi') }} • Par {{ trf.createdBy ? trf.createdBy.fullName : '-' }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ trf.branchSource ? trf.branchSource.name : '-' }}</strong>
+                                </td>
+                                <td>
+                                    {% if trf.destinationType.value == 'bank' %}
+                                        <strong>Banque : {{ trf.bankName }}</strong>
+                                        <span class="sub-meta-text">Bordereau : {{ trf.bankReference }}</span>
+                                    {% else %}
+                                        <strong>{{ trf.branchDestination ? trf.branchDestination.name : '-' }}</strong>
+                                        <span class="sub-meta-text">Transfert interne</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right font-bold text-primary">
+                                    {{ trf.amount|number_format(2, ',', ' ') }} {{ trf.currency.code }}
+                                </td>
+                                <td>
+                                    {% if trf.status.value == 'recieved' %}
+                                        <span class="cash-badge badge-confirmed">REÇU / VALIDÉ</span>
+                                        {% if trf.recievedBy %}
+                                            <span class="sub-meta-text">Par {{ trf.recievedBy.fullName }} le {{ trf.recievedAt|date('d/m H\\hi') }}</span>
+                                        {% endif %}
+                                    {% elseif trf.status.value == 'pending' %}
+                                        <span class="cash-badge badge-impacted">EN TRANSIT (ATTENTE RÉCEPTION)</span>
+                                    {% else %}
+                                        <span class="cash-badge badge-exit">ANNULÉ</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right table-action-buttons">
+                                    {% set isTopAdmin = is_granted('ROLE_AGENCY_ADMIN') or is_granted('ROLE_GENERAL_MANAGER') %}
+                                    {% set isDestBranchManager = is_granted('ROLE_MANAGER') and trf.destinationType.value == 'branch' and app.user.branch and trf.branchDestination and app.user.branch.id == trf.branchDestination.id %}
+                                    {% if trf.status.value == 'pending' and (isTopAdmin or isDestBranchManager) and (not trf.createdBy or trf.createdBy.id != app.user.id) %}
+                                        <form action="{{ path('admin_agency_finance_transfer_receive', {'id': trf.id}) }}" method="POST">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('receive_transfer_' ~ trf.id) }}">
+                                            <button
+                                                type="button"
+                                                class="btn-refined btn-success-gradient text-size-10 js-open-receive-modal"
+                                                data-ref="{{ trf.reference }}"
+                                                data-amount="{{ trf.amount|number_format(2, ',', ' ') }} {{ trf.currency.code }}"
+                                                title="Confirmer la réception physique des fonds"
+                                            >
+                                                <i class="fa-solid fa-check-double"></i>
+                                                Confirmer
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-15">Aucun transfert de fonds enregistré.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    {# --- MODALE DE CONFIRMATION DE RÉCEPTION DE TRANSFERT --- #}
+    <div class="confirm-modal-backdrop is-hidden" id="js-receive-transfer-modal">
+        <div class="confirm-modal-card">
+            <div class="confirm-modal-icon">
+                <i class="fa-solid fa-check-double"></i>
+            </div>
+            <h3>Confirmer la réception des fonds ?</h3>
+            <p>
+                Vous confirmez avoir physiquement réceptionné ou vérifié le transfert <strong id="js-modal-transfer-ref"></strong> d'un montant de <strong id="js-modal-transfer-amount"></strong>. Cette validation est définitive.
+            </p>
+            <div class="confirm-modal-actions">
+                <button type="button" id="js-btn-cancel-receive" class="btn-refined btn-danger-gradient">Annuler</button>
+                <button type="button" id="js-btn-confirm-receive" class="btn-refined btn-success-gradient">Confirmer la réception</button>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
