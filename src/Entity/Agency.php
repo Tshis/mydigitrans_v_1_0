@@ -86,10 +86,17 @@ class Agency
     #[ORM\OneToMany(targetEntity: Role::class, mappedBy: 'agency')]
     private Collection $roles;
 
+    /**
+     * @var Collection<int, FundTransfer>
+     */
+    #[ORM\OneToMany(targetEntity: FundTransfer::class, mappedBy: 'agency')]
+    private Collection $fundTransfers;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->roles = new ArrayCollection();
+        $this->fundTransfers = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -334,6 +341,36 @@ class Agency
             // set the owning side to null (unless already changed)
             if ($role->getAgency() === $this) {
                 $role->setAgency(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FundTransfer>
+     */
+    public function getFundTransfers(): Collection
+    {
+        return $this->fundTransfers;
+    }
+
+    public function addFundTransfer(FundTransfer $fundTransfer): static
+    {
+        if (!$this->fundTransfers->contains($fundTransfer)) {
+            $this->fundTransfers->add($fundTransfer);
+            $fundTransfer->setAgency($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFundTransfer(FundTransfer $fundTransfer): static
+    {
+        if ($this->fundTransfers->removeElement($fundTransfer)) {
+            // set the owning side to null (unless already changed)
+            if ($fundTransfer->getAgency() === $this) {
+                $fundTransfer->setAgency(null);
             }
         }
 

@@ -6,6 +6,8 @@ namespace App\Entity;
 
 use App\Enum\BranchStatus;
 use App\Repository\BranchRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BranchRepository::class)]
@@ -48,9 +50,23 @@ class Branch
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * @var Collection<int, FundTransfer>
+     */
+    #[ORM\OneToMany(targetEntity: FundTransfer::class, mappedBy: 'branch_source')]
+    private Collection $outgoingTransfers;
+
+    /**
+     * @var Collection<int, FundTransfer>
+     */
+    #[ORM\OneToMany(targetEntity: FundTransfer::class, mappedBy: 'branch_destination')]
+    private Collection $incomingTransfers;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->outgoingTransfers = new ArrayCollection();
+        $this->incomingTransfers = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -161,5 +177,65 @@ class Branch
     public function __toString(): string
     {
         return (string) $this->name;
+    }
+
+    /**
+     * @return Collection<int, FundTransfer>
+     */
+    public function getOutgoingTransfers(): Collection
+    {
+        return $this->outgoingTransfers;
+    }
+
+    public function addFundTransfer(FundTransfer $fundTransfer): static
+    {
+        if (!$this->outgoingTransfers->contains($fundTransfer)) {
+            $this->outgoingTransfers->add($fundTransfer);
+            $fundTransfer->setBranchSource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFundTransfer(FundTransfer $fundTransfer): static
+    {
+        if ($this->outgoingTransfers->removeElement($fundTransfer)) {
+            // set the owning side to null (unless already changed)
+            if ($fundTransfer->getBranchSource() === $this) {
+                $fundTransfer->setBranchSource(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FundTransfer>
+     */
+    public function getIncomingTransfers(): Collection
+    {
+        return $this->incomingTransfers;
+    }
+
+    public function addIncomingTransfer(FundTransfer $incomingTransfer): static
+    {
+        if (!$this->incomingTransfers->contains($incomingTransfer)) {
+            $this->incomingTransfers->add($incomingTransfer);
+            $incomingTransfer->setBranchDestination($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIncomingTransfer(FundTransfer $incomingTransfer): static
+    {
+        if ($this->incomingTransfers->removeElement($incomingTransfer)) {
+            // set the owning side to null (unless already changed)
+            if ($incomingTransfer->getBranchDestination() === $this) {
+                $incomingTransfer->setBranchDestination(null);
+            }
+        }
+
+        return $this;
     }
 }

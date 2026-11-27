@@ -84,10 +84,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: UserRole::class, mappedBy: 'user')]
     private Collection $userRoles;
 
+    /**
+     * @var Collection<int, FundTransfer>
+     */
+    #[ORM\OneToMany(targetEntity: FundTransfer::class, mappedBy: 'createdBy')]
+    private Collection $outgoingTransfers;
+
+    /**
+     * @var Collection<int, FundTransfer>
+     */
+    #[ORM\OneToMany(targetEntity: FundTransfer::class, mappedBy: 'recievedBy')]
+    private Collection $incomingTransfers;
+
     public function __construct()
     {
         $this->userRoles = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->outgoingTransfers = new ArrayCollection();
+        $this->incomingTransfers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -342,5 +356,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString(): string
     {
         return $this->getFullName();
+    }
+
+    /**
+     * @return Collection<int, FundTransfer>
+     */
+    public function getOutgoingTransfers(): Collection
+    {
+        return $this->outgoingTransfers;
+    }
+
+    public function addOutgoingTransfer(FundTransfer $outgoingTransfer): static
+    {
+        if (!$this->outgoingTransfers->contains($outgoingTransfer)) {
+            $this->outgoingTransfers->add($outgoingTransfer);
+            $outgoingTransfer->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOutgoingTransfer(FundTransfer $outgoingTransfer): static
+    {
+        if ($this->outgoingTransfers->removeElement($outgoingTransfer)) {
+            // set the owning side to null (unless already changed)
+            if ($outgoingTransfer->getCreatedBy() === $this) {
+                $outgoingTransfer->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FundTransfer>
+     */
+    public function getIncomingTransfers(): Collection
+    {
+        return $this->incomingTransfers;
+    }
+
+    public function addIncomingTransfer(FundTransfer $incomingTransfer): static
+    {
+        if (!$this->incomingTransfers->contains($incomingTransfer)) {
+            $this->incomingTransfers->add($incomingTransfer);
+            $incomingTransfer->setRecievedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIncomingTransfer(FundTransfer $incomingTransfer): static
+    {
+        if ($this->incomingTransfers->removeElement($incomingTransfer)) {
+            // set the owning side to null (unless already changed)
+            if ($incomingTransfer->getRecievedBy() === $this) {
+                $incomingTransfer->setRecievedBy(null);
+            }
+        }
+
+        return $this;
     }
 }

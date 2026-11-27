@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\CurrencyRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CurrencyRepository::class)]
@@ -29,9 +31,16 @@ class Currency
     #[ORM\JoinColumn(nullable: false)]
     private ?User $createdBy = null;
 
+    /**
+     * @var Collection<int, FundTransfer>
+     */
+    #[ORM\OneToMany(targetEntity: FundTransfer::class, mappedBy: 'currency')]
+    private Collection $fundTransfers;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->fundTransfers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -76,6 +85,36 @@ class Currency
     public function setCreatedBy(User $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FundTransfer>
+     */
+    public function getFundTransfers(): Collection
+    {
+        return $this->fundTransfers;
+    }
+
+    public function addFundTransfer(FundTransfer $fundTransfer): static
+    {
+        if (!$this->fundTransfers->contains($fundTransfer)) {
+            $this->fundTransfers->add($fundTransfer);
+            $fundTransfer->setCurrency($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFundTransfer(FundTransfer $fundTransfer): static
+    {
+        if ($this->fundTransfers->removeElement($fundTransfer)) {
+            // set the owning side to null (unless already changed)
+            if ($fundTransfer->getCurrency() === $this) {
+                $fundTransfer->setCurrency(null);
+            }
+        }
 
         return $this;
     }
